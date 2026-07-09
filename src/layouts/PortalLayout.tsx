@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { portalNav, portalRoutes } from "@/routes/portal";
 import ThemeToggle from "@/components/ThemeToggle";
+import MobileBottomNav from "@/components/portal/MobileBottomNav";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -21,6 +22,9 @@ export default function PortalLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const canReview = profile?.role === "lead_researcher" || profile?.role === "admin";
+  const isAdmin = profile?.role === "admin";
+
+  const navItems = portalNav.filter((item) => !item.adminOnly || isAdmin);
 
   return (
     <div className="min-h-screen bg-[#060a12] text-white">
@@ -87,7 +91,7 @@ export default function PortalLayout() {
           } fixed inset-x-0 top-[57px] z-30 max-h-[calc(100vh-57px)] overflow-y-auto border-b border-white/[0.08] bg-[#060a12]/95 p-4 backdrop-blur-2xl lg:static lg:block lg:w-60 lg:shrink-0 lg:overflow-visible lg:border-0 lg:bg-transparent lg:p-0 xl:w-64`}
         >
           <nav className="sticky top-24 flex flex-col gap-1">
-            {portalNav.map((item) => {
+            {navItems.map((item) => {
               const Icon = item.icon;
               const children = item.children?.filter(
                 (child) => child.path !== portalRoutes.labsReview || canReview,
@@ -164,10 +168,11 @@ export default function PortalLayout() {
           </nav>
         </aside>
 
-        <main className="min-w-0 flex-1 pb-16">
+        <main className="min-w-0 flex-1 pb-20 lg:pb-8">
           <Outlet />
         </main>
       </div>
+      <MobileBottomNav />
     </div>
   );
 }

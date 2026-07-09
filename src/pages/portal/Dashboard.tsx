@@ -23,6 +23,12 @@ export default function Dashboard() {
   const { data: events } = useEvents();
   const { data: myApps } = useMyLabApplications();
 
+  const isAdmin = profile?.role === "admin";
+
+  const exploreNav = portalNav.filter(
+    (item) => item.label !== "Dashboard" && (!item.adminOnly || isAdmin),
+  );
+
   const upcomingEvents = events?.filter((e) => e.status === "upcoming").length ?? 0;
 
   return (
@@ -66,9 +72,7 @@ export default function Dashboard() {
 
       <PortalSection title="Explore modules">
         <div className="grid gap-3 md:grid-cols-2">
-          {portalNav
-            .filter((item) => item.label !== "Dashboard")
-            .map((item) => {
+          {exploreNav.map((item) => {
               const Icon = item.icon;
               return (
                 <Link key={item.path} to={item.path}>

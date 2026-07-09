@@ -57,3 +57,10 @@ npx vercel --prod
 2. No `placeholder.supabase.co` errors in console
 3. Google sign-in works
 4. Portal loads with news/events data
+5. Promote your account to admin (Supabase SQL Editor):
+
+```sql
+UPDATE profiles SET role = 'admin' WHERE email = 'your@email.com';
+```
+
+Then open `/portal/admin` to publish news, events, opportunities, and explainers.

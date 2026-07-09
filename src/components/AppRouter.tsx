@@ -23,6 +23,8 @@ const PathwaysStudios = lazy(() => import("@/pages/portal/pathways/PathwaysStudi
 const PathwaysEssays = lazy(() => import("@/pages/portal/pathways/PathwaysEssays"));
 const EventsChapters = lazy(() => import("@/pages/portal/events/EventsChapters"));
 const Networking = lazy(() => import("@/pages/portal/network/Networking"));
+const MemberProfile = lazy(() => import("@/pages/portal/network/MemberProfile"));
+const Admin = lazy(() => import("@/pages/portal/Admin"));
 const Settings = lazy(() => import("@/pages/portal/Settings"));
 
 function PortalFallback() {
@@ -83,7 +85,15 @@ function AppRoutes() {
             <Route path="pathways/essays" element={<PathwaysEssays />} />
             <Route path="events" element={<EventsChapters />} />
             <Route path="network" element={<Networking />} />
-            <Route path="network/profile/:id" element={<Networking />} />
+            <Route path="network/profile/:id" element={<MemberProfile />} />
+            <Route
+              path="admin"
+              element={
+                <RoleGuard allowed={["admin"]}>
+                  <Admin />
+                </RoleGuard>
+              }
+            />
             <Route path="settings" element={<Settings />} />
           </Route>
 

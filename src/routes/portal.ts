@@ -6,6 +6,7 @@ import {
   Newspaper,
   Route,
   Settings,
+  Shield,
   Users,
 } from "lucide-react";
 
@@ -22,7 +23,9 @@ export const portalRoutes = {
   pathwaysEssays: `${PORTAL_BASE}/pathways/essays`,
   events: `${PORTAL_BASE}/events`,
   network: `${PORTAL_BASE}/network`,
+  networkProfile: `${PORTAL_BASE}/network/profile`,
   settings: `${PORTAL_BASE}/settings`,
+  admin: `${PORTAL_BASE}/admin`,
 } as const;
 
 export type PortalRouteKey = keyof typeof portalRoutes;
@@ -32,6 +35,7 @@ export interface PortalNavItem {
   path: string;
   icon: LucideIcon;
   description: string;
+  adminOnly?: boolean;
   children?: { label: string; path: string }[];
 }
 
@@ -90,5 +94,12 @@ export const portalNav: PortalNavItem[] = [
     path: portalRoutes.settings,
     icon: Settings,
     description: "Profile and account preferences",
+  },
+  {
+    label: "Admin",
+    path: portalRoutes.admin,
+    icon: Shield,
+    description: "Content management (admin only)",
+    adminOnly: true,
   },
 ];

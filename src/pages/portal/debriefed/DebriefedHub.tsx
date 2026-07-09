@@ -8,7 +8,13 @@ import {
 } from "@/hooks/portal/useDebriefed";
 import { portalRoutes } from "@/routes/portal";
 import type { NewsCategory } from "@/types/domain";
-import { CategoryBadge, EmptyState, LoadingState, PortalCard, PortalPageHeader, portalButtonOutline } from "@/components/portal/PortalUI";
+import {
+  CategoryBadge,
+  PortalCard,
+  PortalPageHeader,
+  QueryStatus,
+  portalButtonOutline,
+} from "@/components/portal/PortalUI";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -24,11 +30,14 @@ const CATEGORIES: { value: NewsCategory | "all"; label: string }[] = [
 
 export default function DebriefedHub() {
   const [category, setCategory] = useState<NewsCategory | "all">("all");
-  const { data: articles, isLoading, error } = useNewsArticles(category);
+  const { data: articles, isLoading, error, refetch } = useNewsArticles(category);
   const { data: prefs } = useDigestPreferences();
   const updatePrefs = useUpdateDigestPreferences();
 
-  const handleDigestToggle = async (key: "weeklyDigestEnabled" | "substackSubscribed", value: boolean) => {
+  const handleDigestToggle = async (
+    key: "weeklyDigestEnabled" | "substackSubscribed",
+    value: boolean,
+  ) => {
     try {
       await updatePrefs.mutateAsync({ [key]: value });
       toast.success("Preferences saved");
@@ -85,7 +94,11 @@ export default function DebriefedHub() {
         </PortalCard>
       </div>
 
-      <Tabs value={category} onValueChange={(v) => setCategory(v as NewsCategory | "all")} className="mb-6">
+      <Tabs
+        value={category}
+        onValueChange={(v) => setCategory(v as NewsCategory | "all")}
+        className="mb-6"
+      >
         <TabsList className="h-auto flex-wrap gap-1 bg-white/[0.04] p-1">
           {CATEGORIES.map((c) => (
             <TabsTrigger
@@ -99,38 +112,46 @@ export default function DebriefedHub() {
         </TabsList>
       </Tabs>
 
-      {isLoading && <LoadingState />}
-      {error && <EmptyState message="Could not load articles. Run the Supabase migration and seed." />}
-      {articles && articles.length === 0 && <EmptyState message="No articles in this category yet." />}
-
-      <div className="space-y-4">
-        {articles?.map((article) => (
-          <PortalCard key={article.id} hover className="p-5">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <CategoryBadge>{article.category}</CategoryBadge>
-                  {article.tags.map((tag) => (
-                    <span key={tag} className="text-xs text-white/35">#{tag}</span>
-                  ))}
+      <QueryStatus
+        isLoading={isLoading}
+        error={error}
+        isEmpty={!articles?.length}
+        emptyMessage="No articles in this category yet."
+        onRetry={() => refetch()}
+      >
+        <div className="space-y-4">
+          {articles?.map((article) => (
+            <PortalCard key={article.id} hover className="p-5">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <CategoryBadge>{article.category}</CategoryBadge>
+                    {article.tags.map((tag) => (
+                      <span key={tag} className="text-xs text-white/35">
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+                  <h3 className="mt-2.5 text-lg font-semibold leading-snug text-white">
+                    {article.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-white/55">{article.summary}</p>
+                  <p className="mt-2 text-xs text-white/35">
+                    {new Date(article.publishedAt).toLocaleDateString()}
+                  </p>
                 </div>
-                <h3 className="mt-2.5 text-lg font-semibold leading-snug text-white">{article.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-white/55">{article.summary}</p>
-                <p className="mt-2 text-xs text-white/35">
-                  {new Date(article.publishedAt).toLocaleDateString()}
-                </p>
+                {article.sourceUrl && (
+                  <a href={article.sourceUrl} target="_blank" rel="noopener noreferrer">
+                    <Button size="sm" variant="outline" className={portalButtonOutline}>
+                      Source <ExternalLink className="h-3.5 w-3.5" />
+                    </Button>
+                  </a>
+                )}
               </div>
-              {article.sourceUrl && (
-                <a href={article.sourceUrl} target="_blank" rel="noopener noreferrer">
-                  <Button size="sm" variant="outline" className={portalButtonOutline}>
-                    Source <ExternalLink className="h-3.5 w-3.5" />
-                  </Button>
-                </a>
-              )}
-            </div>
-          </PortalCard>
-        ))}
-      </div>
+            </PortalCard>
+          ))}
+        </div>
+      </QueryStatus>
     </div>
   );
 }

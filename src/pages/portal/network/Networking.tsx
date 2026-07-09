@@ -1,18 +1,23 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, Plus, UserPlus } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Plus } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   useConnectionRequests,
   useCreateIntroduction,
   useMemberProfiles,
-  useProfileById,
   useRespondToConnection,
-  useSendConnectionRequest,
   useIntroductionPosts,
+  useUpdateMyProfile,
 } from "@/hooks/portal/useNetwork";
 import { portalRoutes } from "@/routes/portal";
-import { EmptyState, LoadingState, PortalCard, PortalPageHeader } from "@/components/portal/PortalUI";
+import {
+  EmptyState,
+  PortalCard,
+  PortalPageHeader,
+  QueryStatus,
+  portalInputClass,
+} from "@/components/portal/PortalUI";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,76 +31,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { useUpdateMyProfile } from "@/hooks/portal/useNetwork";
 import { toast } from "sonner";
 
-function MemberProfile({ id }: { id: string }) {
-  const { user } = useAuth();
-  const { data: profile, isLoading } = useProfileById(id);
-  const { data: connections } = useConnectionRequests();
-  const sendRequest = useSendConnectionRequest();
-
-  const existing = connections?.find(
-    (c) =>
-      (c.fromUserId === user?.id && c.toUserId === id) ||
-      (c.fromUserId === id && c.toUserId === user?.id),
-  );
-
-  const handleConnect = async () => {
-    try {
-      await sendRequest.mutateAsync({ toUserId: id });
-      toast.success("Connection request sent");
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Failed to send request");
-    }
-  };
-
-  if (isLoading) return <LoadingState />;
-  if (!profile) return <EmptyState message="Profile not found." />;
-
-  return (
-    <div>
-      <Link to={portalRoutes.network} className="mb-6 inline-flex items-center gap-2 text-sm text-emerald-300 hover:underline">
-        <ArrowLeft className="h-4 w-4" /> Back to network
-      </Link>
-      <PortalCard className="p-6">
-        <h1 className="text-2xl font-bold text-white">{profile.displayName}</h1>
-        <Badge variant="outline" className="mt-2 border-white/20 capitalize text-white/60">
-          {profile.role.replace("_", " ")}
-        </Badge>
-        {profile.openToCollaborate && (
-          <Badge className="ml-2 bg-emerald-400/15 text-emerald-300">Open to collaborate</Badge>
-        )}
-        {profile.bio && <p className="mt-4 text-white/70">{profile.bio}</p>}
-        {profile.interests.length > 0 && (
-          <div className="mt-4 flex flex-wrap gap-2">
-            {profile.interests.map((i) => (
-              <span key={i} className="rounded-full bg-white/5 px-3 py-1 text-xs text-white/50">{i}</span>
-            ))}
-          </div>
-        )}
-        {user?.id !== id && (
-          <div className="mt-6">
-            {existing ? (
-              <Badge variant="outline" className="border-white/20 capitalize text-white/60">
-                {existing.status}
-              </Badge>
-            ) : (
-              <Button onClick={handleConnect} disabled={sendRequest.isPending}>
-                <UserPlus className="h-4 w-4" /> Connect
-              </Button>
-            )}
-          </div>
-        )}
-      </PortalCard>
-    </div>
-  );
-}
-
 export default function Networking() {
-  const { id } = useParams();
   const { profile } = useAuth();
-  const { data: members, isLoading } = useMemberProfiles();
+  const { data: members, isLoading, error, refetch } = useMemberProfiles();
   const { data: connections } = useConnectionRequests();
   const { data: introductions } = useIntroductionPosts();
   const respond = useRespondToConnection();
@@ -141,13 +81,12 @@ export default function Networking() {
     }
   };
 
-  if (id) return <MemberProfile id={id} />;
-
   const pendingIncoming = connections?.filter(
     (c) => c.toUserId === profile?.id && c.status === "pending",
   );
 
   const memberNameMap = Object.fromEntries(members?.map((m) => [m.id, m.displayName]) ?? []);
+  const otherMembers = members?.filter((m) => m.id !== profile?.id) ?? [];
 
   return (
     <div>
@@ -157,20 +96,35 @@ export default function Networking() {
         action={
           <Dialog open={introOpen} onOpenChange={setIntroOpen}>
             <DialogTrigger asChild>
-              <Button><Plus className="h-4 w-4" /> Post introduction</Button>
+              <Button className="bg-emerald-500 hover:bg-emerald-400">
+                <Plus className="h-4 w-4" /> Post introduction
+              </Button>
             </DialogTrigger>
             <DialogContent className="border-white/15 bg-[#0c1220] text-white">
-              <DialogHeader><DialogTitle>Introduction</DialogTitle></DialogHeader>
+              <DialogHeader>
+                <DialogTitle>Introduction</DialogTitle>
+              </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <Label>Headline</Label>
-                  <Input value={headline} onChange={(e) => setHeadline(e.target.value)} className="mt-1 border-white/20 bg-white/5" />
+                  <Label className="text-white/70">Headline</Label>
+                  <Input
+                    value={headline}
+                    onChange={(e) => setHeadline(e.target.value)}
+                    className={portalInputClass}
+                  />
                 </div>
                 <div>
-                  <Label>What are you looking for?</Label>
-                  <Textarea value={lookingFor} onChange={(e) => setLookingFor(e.target.value)} rows={3} className="mt-1 border-white/20 bg-white/5" />
+                  <Label className="text-white/70">What are you looking for?</Label>
+                  <Textarea
+                    value={lookingFor}
+                    onChange={(e) => setLookingFor(e.target.value)}
+                    rows={3}
+                    className={portalInputClass}
+                  />
                 </div>
-                <Button onClick={handleCreateIntro}>Post</Button>
+                <Button onClick={handleCreateIntro} className="bg-emerald-500 hover:bg-emerald-400">
+                  Post
+                </Button>
               </div>
             </DialogContent>
           </Dialog>
@@ -195,12 +149,23 @@ export default function Networking() {
             {pendingIncoming.map((req) => (
               <PortalCard key={req.id} className="flex items-center justify-between p-4">
                 <div>
-                  <p className="font-medium text-white">{memberNameMap[req.fromUserId] ?? "Member"}</p>
+                  <p className="font-medium text-white">
+                    {memberNameMap[req.fromUserId] ?? "Member"}
+                  </p>
                   {req.message && <p className="text-sm text-white/50">{req.message}</p>}
                 </div>
                 <div className="flex gap-2">
-                  <Button size="sm" onClick={() => handleRespond(req.id, "accepted")}>Accept</Button>
-                  <Button size="sm" variant="outline" className="border-white/20 text-white" onClick={() => handleRespond(req.id, "declined")}>Decline</Button>
+                  <Button size="sm" onClick={() => handleRespond(req.id, "accepted")}>
+                    Accept
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-white/20 text-white"
+                    onClick={() => handleRespond(req.id, "declined")}
+                  >
+                    Decline
+                  </Button>
                 </div>
               </PortalCard>
             ))}
@@ -217,7 +182,9 @@ export default function Networking() {
           {introductions?.map((post) => (
             <PortalCard key={post.id} className="p-4">
               <p className="font-medium text-white">{post.headline}</p>
-              <p className="mt-1 text-sm text-white/50">by {memberNameMap[post.authorId] ?? "Member"}</p>
+              <p className="mt-1 text-sm text-white/50">
+                by {memberNameMap[post.authorId] ?? "Member"}
+              </p>
               <p className="mt-2 text-sm text-white/70">{post.lookingFor}</p>
             </PortalCard>
           ))}
@@ -226,16 +193,22 @@ export default function Networking() {
 
       <section>
         <h2 className="mb-3 text-lg font-semibold text-white">Members</h2>
-        {isLoading && <LoadingState />}
-        <div className="grid gap-3 sm:grid-cols-2">
-          {members
-            ?.filter((m) => m.id !== profile?.id)
-            .map((member) => (
-              <Link key={member.id} to={`${portalRoutes.network}/profile/${member.id}`}>
+        <QueryStatus
+          isLoading={isLoading}
+          error={error}
+          isEmpty={otherMembers.length === 0}
+          emptyMessage="No other members yet. Invite your chapter!"
+          onRetry={() => refetch()}
+        >
+          <div className="grid gap-3 sm:grid-cols-2">
+            {otherMembers.map((member) => (
+              <Link key={member.id} to={`${portalRoutes.networkProfile}/${member.id}`}>
                 <PortalCard className="p-4 transition hover:border-white/30 hover:bg-white/[0.07]">
                   <p className="font-medium text-white">{member.displayName}</p>
                   {member.openToCollaborate && (
-                    <Badge className="mt-2 bg-emerald-400/15 text-xs text-emerald-300">Open to collaborate</Badge>
+                    <Badge className="mt-2 bg-emerald-400/15 text-xs text-emerald-300">
+                      Open to collaborate
+                    </Badge>
                   )}
                   {member.interests.length > 0 && (
                     <p className="mt-2 text-xs text-white/40">{member.interests.join(" · ")}</p>
@@ -243,7 +216,8 @@ export default function Networking() {
                 </PortalCard>
               </Link>
             ))}
-        </div>
+          </div>
+        </QueryStatus>
       </section>
     </div>
   );

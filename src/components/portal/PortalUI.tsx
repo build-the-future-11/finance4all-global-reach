@@ -1,5 +1,7 @@
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
+import { AlertCircle, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export const portalInputClass =
   "mt-1.5 border-white/15 bg-white/[0.06] text-white placeholder:text-white/30 focus-visible:border-emerald-400/40 focus-visible:ring-emerald-400/20";
@@ -18,7 +20,8 @@ export function PortalCard({
       className={cn(
         "rounded-2xl border border-white/[0.12] bg-white/[0.04] backdrop-blur-xl",
         "shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]",
-        hover && "transition duration-300 hover:border-white/25 hover:bg-white/[0.07] hover:shadow-[0_8px_32px_rgba(0,0,0,0.2)]",
+        hover &&
+          "transition duration-300 hover:border-white/25 hover:bg-white/[0.07] hover:shadow-[0_8px_32px_rgba(0,0,0,0.2)]",
         className,
       )}
       {...props}
@@ -137,11 +140,33 @@ export function CategoryBadge({
   );
 }
 
-export function LoadingState() {
+export function LoadingState({ label = "Loading…" }: { label?: string }) {
   return (
     <div className="flex flex-col items-center justify-center gap-3 py-20">
       <div className="h-9 w-9 animate-spin rounded-full border-2 border-white/15 border-t-emerald-400" />
-      <p className="text-sm text-white/40">Loading…</p>
+      <p className="text-sm text-white/40">{label}</p>
+    </div>
+  );
+}
+
+export function SkeletonCard({ lines = 3 }: { lines?: number }) {
+  return (
+    <PortalCard className="animate-pulse p-5">
+      <div className="mb-3 h-4 w-20 rounded bg-white/10" />
+      <div className="mb-2 h-6 w-3/4 rounded bg-white/10" />
+      {Array.from({ length: lines }).map((_, i) => (
+        <div key={i} className="mb-2 h-3 rounded bg-white/[0.06]" style={{ width: `${90 - i * 15}%` }} />
+      ))}
+    </PortalCard>
+  );
+}
+
+export function SkeletonList({ count = 3 }: { count?: number }) {
+  return (
+    <div className="space-y-4">
+      {Array.from({ length: count }).map((_, i) => (
+        <SkeletonCard key={i} />
+      ))}
     </div>
   );
 }
@@ -149,16 +174,80 @@ export function LoadingState() {
 export function EmptyState({
   message,
   icon: Icon,
+  action,
 }: {
   message: string;
   icon?: LucideIcon;
+  action?: React.ReactNode;
 }) {
   return (
     <PortalCard className="flex flex-col items-center justify-center gap-3 p-12 text-center">
       {Icon && <Icon className="h-10 w-10 text-white/20" />}
       <p className="max-w-sm text-sm text-white/45">{message}</p>
+      {action}
     </PortalCard>
   );
+}
+
+export function ErrorState({
+  message,
+  onRetry,
+}: {
+  message: string;
+  onRetry?: () => void;
+}) {
+  return (
+    <PortalCard className="flex flex-col items-center gap-4 p-10 text-center">
+      <AlertCircle className="h-10 w-10 text-red-400/60" />
+      <p className="max-w-md text-sm text-white/55">{message}</p>
+      {onRetry && (
+        <Button
+          variant="outline"
+          size="sm"
+          className={portalButtonOutline}
+          onClick={onRetry}
+        >
+          <RefreshCw className="mr-2 h-3.5 w-3.5" />
+          Try again
+        </Button>
+      )}
+    </PortalCard>
+  );
+}
+
+export function QueryStatus({
+  isLoading,
+  error,
+  isEmpty,
+  emptyMessage,
+  onRetry,
+  children,
+  skeletonCount = 3,
+}: {
+  isLoading: boolean;
+  error: unknown;
+  isEmpty?: boolean;
+  emptyMessage?: string;
+  onRetry?: () => void;
+  children: React.ReactNode;
+  skeletonCount?: number;
+}) {
+  if (isLoading) return <SkeletonList count={skeletonCount} />;
+  if (error)
+    return (
+      <ErrorState
+        message={
+          error instanceof Error
+            ? error.message
+            : typeof error === "object" && error && "message" in error
+              ? String((error as { message: unknown }).message)
+              : "Something went wrong loading data."
+        }
+        onRetry={onRetry}
+      />
+    );
+  if (isEmpty) return <EmptyState message={emptyMessage ?? "Nothing here yet."} />;
+  return <>{children}</>;
 }
 
 export function PortalHero({

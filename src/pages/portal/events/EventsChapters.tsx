@@ -1,7 +1,17 @@
 import { useState } from "react";
 import { Calendar, ExternalLink, MapPin, Users } from "lucide-react";
-import { useChapters, useEvents, useEventRegistrations, useToggleEventRegistration } from "@/hooks/portal/useEvents";
-import { EmptyState, LoadingState, PortalCard, PortalPageHeader } from "@/components/portal/PortalUI";
+import {
+  useChapters,
+  useEvents,
+  useEventRegistrations,
+  useToggleEventRegistration,
+} from "@/hooks/portal/useEvents";
+import ChapterMap from "@/components/portal/ChapterMap";
+import {
+  PortalCard,
+  PortalPageHeader,
+  QueryStatus,
+} from "@/components/portal/PortalUI";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -9,10 +19,18 @@ import { toast } from "sonner";
 
 export default function EventsChapters() {
   const [selectedChapter, setSelectedChapter] = useState<string>("all");
-  const { data: chapters, isLoading: chaptersLoading } = useChapters();
-  const { data: events, isLoading: eventsLoading } = useEvents(
-    selectedChapter === "all" ? undefined : selectedChapter,
-  );
+  const {
+    data: chapters,
+    isLoading: chaptersLoading,
+    error: chaptersError,
+    refetch: refetchChapters,
+  } = useChapters();
+  const {
+    data: events,
+    isLoading: eventsLoading,
+    error: eventsError,
+    refetch: refetchEvents,
+  } = useEvents(selectedChapter === "all" ? undefined : selectedChapter);
   const { data: registrations } = useEventRegistrations();
   const toggleReg = useToggleEventRegistration();
 
@@ -27,48 +45,89 @@ export default function EventsChapters() {
     }
   };
 
-  const isLoading = chaptersLoading || eventsLoading;
+  const handleChapterSelect = (id: string) => {
+    setSelectedChapter(id);
+  };
 
   return (
     <div>
       <PortalPageHeader
+        eyebrow="Global reach"
         title="Events + Chapters"
-        description="Global chapters, local events, and registration."
+        description="Explore chapters worldwide, discover local events, and register your interest."
       />
 
-      {chapters && chapters.length > 0 && (
-        <section className="mb-8">
-          <h2 className="mb-4 text-lg font-semibold text-white">Chapters</h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {chapters.map((chapter) => (
-              <PortalCard key={chapter.id} className="p-5">
-                <div className="flex items-start gap-3">
-                  <div className="rounded-lg bg-emerald-400/10 p-2 text-emerald-300">
-                    <MapPin className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-white">{chapter.name}</h3>
-                    <p className="text-sm text-white/50">{chapter.city}, {chapter.country}</p>
-                    <p className="mt-2 flex items-center gap-1 text-xs text-white/40">
-                      <Users className="h-3 w-3" /> {chapter.memberCount} members
-                    </p>
-                  </div>
-                </div>
-              </PortalCard>
-            ))}
-          </div>
-        </section>
-      )}
+      <QueryStatus
+        isLoading={chaptersLoading}
+        error={chaptersError}
+        isEmpty={!chapters?.length}
+        emptyMessage="No chapters yet. Admins can add chapters in Supabase."
+        onRetry={() => refetchChapters()}
+        skeletonCount={2}
+      >
+        {chapters && chapters.length > 0 && (
+          <section className="mb-8 space-y-6">
+            <ChapterMap
+              chapters={chapters}
+              selectedId={selectedChapter === "all" ? undefined : selectedChapter}
+              onSelect={handleChapterSelect}
+            />
+
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {chapters.map((chapter) => (
+                <button
+                  key={chapter.id}
+                  type="button"
+                  onClick={() => handleChapterSelect(chapter.id)}
+                  className="text-left"
+                >
+                  <PortalCard
+                    className={`p-5 transition ${
+                      selectedChapter === chapter.id
+                        ? "border-emerald-400/40 bg-emerald-500/10"
+                        : "hover:border-white/25"
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="rounded-lg bg-emerald-400/10 p-2 text-emerald-300">
+                        <MapPin className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-white">{chapter.name}</h3>
+                        <p className="text-sm text-white/50">
+                          {chapter.city}, {chapter.country}
+                        </p>
+                        <p className="mt-2 flex items-center gap-1 text-xs text-white/40">
+                          <Users className="h-3 w-3" /> {chapter.memberCount} members
+                        </p>
+                      </div>
+                    </div>
+                  </PortalCard>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
+      </QueryStatus>
 
       <section>
         <h2 className="mb-4 text-lg font-semibold text-white">Events</h2>
 
         {chapters && chapters.length > 0 && (
           <Tabs value={selectedChapter} onValueChange={setSelectedChapter} className="mb-6">
-            <TabsList className="bg-white/5">
-              <TabsTrigger value="all" className="data-[state=active]:bg-white/15">All</TabsTrigger>
+            <TabsList className="h-auto flex-wrap gap-1 bg-white/[0.04] p-1">
+              <TabsTrigger
+                value="all"
+                className="data-[state=active]:bg-emerald-500/20 data-[state=active]:text-emerald-300"
+              >
+                All
+              </TabsTrigger>
               {chapters.map((c) => (
-                <TabsTrigger key={c.id} value={c.id} className="data-[state=active]:bg-white/15">
+                <TabsTrigger
+                  key={c.id}
+                  value={c.id}
+                  className="data-[state=active]:bg-emerald-500/20 data-[state=active]:text-emerald-300"
+                >
                   {c.name}
                 </TabsTrigger>
               ))}
@@ -76,69 +135,72 @@ export default function EventsChapters() {
           </Tabs>
         )}
 
-        {isLoading && <LoadingState />}
-        {events && events.length === 0 && <EmptyState message="No events for this chapter." />}
-
-        <div className="space-y-4">
-          {events?.map((event) => {
-            const chapter = chapterMap[event.chapterId];
-            const registered = registrations?.has(event.id) ?? false;
-            return (
-              <PortalCard key={event.id} className="p-5">
-                <div className="flex flex-wrap items-start justify-between gap-4">
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap gap-2">
-                      <Badge variant="outline" className="border-white/20 capitalize text-white/60">
-                        {event.status}
-                      </Badge>
-                      {chapter && (
-                        <span className="text-xs text-white/40">{chapter.name}</span>
+        <QueryStatus
+          isLoading={eventsLoading}
+          error={eventsError}
+          isEmpty={!events?.length}
+          emptyMessage="No events for this chapter yet."
+          onRetry={() => refetchEvents()}
+        >
+          <div className="space-y-4">
+            {events?.map((event) => {
+              const chapter = chapterMap[event.chapterId];
+              const registered = registrations?.has(event.id) ?? false;
+              return (
+                <PortalCard key={event.id} className="p-5">
+                  <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap gap-2">
+                        <Badge variant="outline" className="border-white/20 capitalize text-white/60">
+                          {event.status}
+                        </Badge>
+                        {chapter && <span className="text-xs text-white/40">{chapter.name}</span>}
+                      </div>
+                      <h3 className="mt-2 text-lg font-semibold text-white">{event.title}</h3>
+                      <p className="mt-2 text-sm text-white/60">{event.description}</p>
+                      <p className="mt-2 flex items-center gap-1 text-xs text-white/40">
+                        <Calendar className="h-3 w-3" />
+                        {new Date(event.startsAt).toLocaleString()}
+                      </p>
+                      {event.programLinks.length > 0 && (
+                        <div className="mt-3 flex flex-wrap gap-3">
+                          {event.programLinks.map((link) => (
+                            <a
+                              key={link.url}
+                              href={link.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-sm text-emerald-300 hover:underline"
+                            >
+                              {link.label} <ExternalLink className="h-3 w-3" />
+                            </a>
+                          ))}
+                        </div>
                       )}
                     </div>
-                    <h3 className="mt-2 text-lg font-semibold text-white">{event.title}</h3>
-                    <p className="mt-2 text-sm text-white/60">{event.description}</p>
-                    <p className="mt-2 flex items-center gap-1 text-xs text-white/40">
-                      <Calendar className="h-3 w-3" />
-                      {new Date(event.startsAt).toLocaleString()}
-                    </p>
-                    {event.programLinks.length > 0 && (
-                      <div className="mt-3 flex flex-wrap gap-3">
-                        {event.programLinks.map((link) => (
-                          <a
-                            key={link.url}
-                            href={link.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-sm text-emerald-300 hover:underline"
-                          >
-                            {link.label} <ExternalLink className="h-3 w-3" />
-                          </a>
-                        ))}
-                      </div>
-                    )}
+                    <div className="flex flex-col gap-2">
+                      <Button
+                        size="sm"
+                        variant={registered ? "default" : "outline"}
+                        className={registered ? "bg-emerald-500 hover:bg-emerald-400" : "border-white/20 text-white"}
+                        onClick={() => handleRegister(event.id, registered)}
+                      >
+                        {registered ? "Registered" : "Register interest"}
+                      </Button>
+                      {event.registrationUrl && (
+                        <a href={event.registrationUrl} target="_blank" rel="noopener noreferrer">
+                          <Button size="sm" variant="outline" className="w-full border-white/20 text-white">
+                            External signup <ExternalLink className="h-3.5 w-3.5" />
+                          </Button>
+                        </a>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex flex-col gap-2">
-                    <Button
-                      size="sm"
-                      variant={registered ? "default" : "outline"}
-                      className={registered ? "" : "border-white/20 text-white"}
-                      onClick={() => handleRegister(event.id, registered)}
-                    >
-                      {registered ? "Registered" : "Register interest"}
-                    </Button>
-                    {event.registrationUrl && (
-                      <a href={event.registrationUrl} target="_blank" rel="noopener noreferrer">
-                        <Button size="sm" variant="outline" className="w-full border-white/20 text-white">
-                          External signup <ExternalLink className="h-3.5 w-3.5" />
-                        </Button>
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </PortalCard>
-            );
-          })}
-        </div>
+                </PortalCard>
+              );
+            })}
+          </div>
+        </QueryStatus>
       </section>
     </div>
   );
