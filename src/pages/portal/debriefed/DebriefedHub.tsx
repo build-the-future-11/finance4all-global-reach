@@ -8,8 +8,7 @@ import {
 } from "@/hooks/portal/useDebriefed";
 import { portalRoutes } from "@/routes/portal";
 import type { NewsCategory } from "@/types/domain";
-import { EmptyState, LoadingState, PortalCard, PortalPageHeader } from "@/components/portal/PortalUI";
-import { Badge } from "@/components/ui/badge";
+import { CategoryBadge, EmptyState, LoadingState, PortalCard, PortalPageHeader, portalButtonOutline } from "@/components/portal/PortalUI";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -41,11 +40,12 @@ export default function DebriefedHub() {
   return (
     <div>
       <PortalPageHeader
-        title="Finance Debriefed"
+        eyebrow="Finance Debriefed"
+        title="News & market pulse"
         description="Global macro updates, market movers, and IPO watchlists."
         action={
           <Link to={portalRoutes.debriefedExplainers}>
-            <Button variant="outline" className="border-white/20 bg-white/5 text-white hover:bg-white/10">
+            <Button variant="outline" className={portalButtonOutline}>
               Explainers
             </Button>
           </Link>
@@ -55,7 +55,7 @@ export default function DebriefedHub() {
       <div className="mb-8 grid gap-4 lg:grid-cols-2">
         <PortalCard className="p-5">
           <h3 className="font-semibold text-white">Weekly digest</h3>
-          <p className="mt-1 text-sm text-white/55">Get a curated roundup of top stories.</p>
+          <p className="mt-1 text-sm text-white/50">Curated roundup of top stories.</p>
           <div className="mt-4 flex items-center justify-between">
             <span className="text-sm text-white/70">Enable weekly email digest</span>
             <Switch
@@ -86,9 +86,13 @@ export default function DebriefedHub() {
       </div>
 
       <Tabs value={category} onValueChange={(v) => setCategory(v as NewsCategory | "all")} className="mb-6">
-        <TabsList className="bg-white/5">
+        <TabsList className="h-auto flex-wrap gap-1 bg-white/[0.04] p-1">
           {CATEGORIES.map((c) => (
-            <TabsTrigger key={c.value} value={c.value} className="data-[state=active]:bg-white/15">
+            <TabsTrigger
+              key={c.value}
+              value={c.value}
+              className="rounded-lg data-[state=active]:bg-emerald-500/20 data-[state=active]:text-emerald-300"
+            >
               {c.label}
             </TabsTrigger>
           ))}
@@ -101,26 +105,24 @@ export default function DebriefedHub() {
 
       <div className="space-y-4">
         {articles?.map((article) => (
-          <PortalCard key={article.id} className="p-5">
+          <PortalCard key={article.id} hover className="p-5">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant="outline" className="border-white/20 capitalize text-white/60">
-                    {article.category}
-                  </Badge>
+                  <CategoryBadge>{article.category}</CategoryBadge>
                   {article.tags.map((tag) => (
-                    <span key={tag} className="text-xs text-white/40">#{tag}</span>
+                    <span key={tag} className="text-xs text-white/35">#{tag}</span>
                   ))}
                 </div>
-                <h3 className="mt-2 text-lg font-semibold text-white">{article.title}</h3>
-                <p className="mt-2 text-sm text-white/60">{article.summary}</p>
-                <p className="mt-2 text-xs text-white/40">
+                <h3 className="mt-2.5 text-lg font-semibold leading-snug text-white">{article.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-white/55">{article.summary}</p>
+                <p className="mt-2 text-xs text-white/35">
                   {new Date(article.publishedAt).toLocaleDateString()}
                 </p>
               </div>
               {article.sourceUrl && (
                 <a href={article.sourceUrl} target="_blank" rel="noopener noreferrer">
-                  <Button size="sm" variant="outline" className="border-white/20 text-white">
+                  <Button size="sm" variant="outline" className={portalButtonOutline}>
                     Source <ExternalLink className="h-3.5 w-3.5" />
                   </Button>
                 </a>

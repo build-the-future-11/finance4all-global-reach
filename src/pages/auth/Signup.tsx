@@ -1,12 +1,16 @@
 import { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
+import { CheckCircle2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import AuthLayout from "@/components/portal/AuthLayout";
+import GoogleSignInButton, { AuthDivider } from "@/components/portal/GoogleSignInButton";
+import { portalInputClass } from "@/components/portal/PortalUI";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export default function Signup() {
-  const { signUp, user, loading } = useAuth();
+  const { signUp, signInWithGoogle, user, loading } = useAuth();
   const navigate = useNavigate();
 
   const [displayName, setDisplayName] = useState("");
@@ -15,6 +19,7 @@ export default function Signup() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   if (!loading && user) return <Navigate to="/portal" replace />;
 
@@ -31,40 +36,69 @@ export default function Signup() {
     }
   };
 
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-[#060a12] px-4">
-      <div className="w-full max-w-md rounded-2xl border border-white/15 bg-white/[0.04] p-8 backdrop-blur-xl">
-        <Link to="/" className="text-sm text-white/50 hover:text-white/80">← Back to site</Link>
-        <h1 className="mt-4 text-2xl font-bold text-white">Join Finance4All</h1>
-        <p className="mt-2 text-sm text-white/60">Create your member account to access the portal.</p>
+  const handleGoogle = async () => {
+    setError("");
+    setGoogleLoading(true);
+    const { error: err } = await signInWithGoogle();
+    if (err) {
+      setError(err);
+      setGoogleLoading(false);
+    }
+  };
 
-        {success ? (
-          <p className="mt-6 text-sm text-emerald-300">Account created! Redirecting…</p>
-        ) : (
-          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+  return (
+    <AuthLayout
+      title="Join Finance4All"
+      subtitle="Create your member account to unlock the full portal."
+      footer={
+        <>
+          Already have an account?{" "}
+          <Link to="/login" className="font-medium text-emerald-400 hover:underline">
+            Sign in
+          </Link>
+        </>
+      }
+    >
+      {success ? (
+        <div className="flex flex-col items-center gap-3 py-4 text-center">
+          <CheckCircle2 className="h-10 w-10 text-emerald-400" />
+          <p className="text-sm text-emerald-300">Account created! Redirecting…</p>
+        </div>
+      ) : (
+        <>
+          <GoogleSignInButton onClick={handleGoogle} loading={googleLoading} label="Sign up with Google" />
+          <AuthDivider />
+
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="name" className="text-white/80">Display name</Label>
+              <Label htmlFor="name" className="text-white/70">
+                Display name
+              </Label>
               <Input
                 id="name"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 required
-                className="mt-1 border-white/20 bg-white/5 text-white"
+                className={portalInputClass}
               />
             </div>
             <div>
-              <Label htmlFor="email" className="text-white/80">Email</Label>
+              <Label htmlFor="email" className="text-white/70">
+                Email
+              </Label>
               <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="mt-1 border-white/20 bg-white/5 text-white"
+                className={portalInputClass}
               />
             </div>
             <div>
-              <Label htmlFor="password" className="text-white/80">Password</Label>
+              <Label htmlFor="password" className="text-white/70">
+                Password
+              </Label>
               <Input
                 id="password"
                 type="password"
@@ -72,21 +106,20 @@ export default function Signup() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
-                className="mt-1 border-white/20 bg-white/5 text-white"
+                className={portalInputClass}
               />
             </div>
-            {error && <p className="text-sm text-red-400">{error}</p>}
-            <Button type="submit" className="w-full" disabled={submitting}>
-              {submitting ? "Creating account…" : "Create account"}
+            {error && (
+              <p className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+                {error}
+              </p>
+            )}
+            <Button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-400" disabled={submitting}>
+              {submitting ? "Creating account…" : "Create account with email"}
             </Button>
           </form>
-        )}
-
-        <p className="mt-6 text-center text-sm text-white/50">
-          Already have an account?{" "}
-          <Link to="/login" className="text-emerald-300 hover:underline">Sign in</Link>
-        </p>
-      </div>
-    </div>
+        </>
+      )}
+    </AuthLayout>
   );
 }

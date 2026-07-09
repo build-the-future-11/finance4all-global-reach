@@ -13,6 +13,7 @@ import NotFound from "./pages/NotFound.tsx";
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
 import Onboarding from "./pages/auth/Onboarding";
+import AuthCallback from "./pages/auth/AuthCallback";
 import Dashboard from "./pages/portal/Dashboard";
 import DebriefedHub from "./pages/portal/debriefed/DebriefedHub";
 import DebriefedExplainers from "./pages/portal/debriefed/DebriefedExplainers";
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
 
             <Route
               path="/onboarding"
