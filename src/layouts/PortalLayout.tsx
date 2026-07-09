@@ -67,12 +67,14 @@ export default function PortalLayout() {
               <LogOut className="h-4 w-4" />
             </Button>
             {profile && (
-              <Avatar className="h-8 w-8 border border-white/15">
-                <AvatarImage src={profile.avatarUrl} />
-                <AvatarFallback className="bg-emerald-500/20 text-xs text-emerald-300">
-                  {initials(profile.displayName)}
-                </AvatarFallback>
-              </Avatar>
+              <Link to={portalRoutes.settings}>
+                <Avatar className="h-8 w-8 border border-white/15 transition hover:ring-2 hover:ring-emerald-400/30">
+                  <AvatarImage src={profile.avatarUrl} />
+                  <AvatarFallback className="bg-emerald-500/20 text-xs text-emerald-300">
+                    {initials(profile.displayName)}
+                  </AvatarFallback>
+                </Avatar>
+              </Link>
             )}
           </div>
         </div>

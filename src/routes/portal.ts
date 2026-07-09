@@ -5,6 +5,7 @@ import {
   LayoutDashboard,
   Newspaper,
   Route,
+  Settings,
   Users,
 } from "lucide-react";
 
@@ -21,6 +22,7 @@ export const portalRoutes = {
   pathwaysEssays: `${PORTAL_BASE}/pathways/essays`,
   events: `${PORTAL_BASE}/events`,
   network: `${PORTAL_BASE}/network`,
+  settings: `${PORTAL_BASE}/settings`,
 } as const;
 
 export type PortalRouteKey = keyof typeof portalRoutes;
@@ -82,5 +84,11 @@ export const portalNav: PortalNavItem[] = [
     path: portalRoutes.network,
     icon: Users,
     description: "Profiles, connections, and introductions",
+  },
+  {
+    label: "Settings",
+    path: portalRoutes.settings,
+    icon: Settings,
+    description: "Profile and account preferences",
   },
 ];

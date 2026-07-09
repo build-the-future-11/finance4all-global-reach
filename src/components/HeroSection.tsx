@@ -1,4 +1,5 @@
-import { Github, ExternalLink } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Github, ExternalLink, ArrowRight } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 export default function HeroSection() {
@@ -165,20 +166,28 @@ export default function HeroSection() {
 
           <div className="flex flex-wrap justify-center gap-4">
 
+            <Link
+              to="/login"
+              className="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-8 py-3 text-white font-medium shadow-[0_12px_60px_rgba(0,255,180,0.45)] transition-all duration-300 hover:scale-105 hover:shadow-[0_20px_90px_rgba(0,255,180,0.7)]"
+            >
+              Enter Member Portal
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+
             <a
               href="#programs"
-              className="inline-flex items-center gap-2 rounded-full bg-emerald-500 px-8 py-3 text-white font-medium shadow-[0_12px_60px_rgba(0,255,180,0.45)] transition-all duration-300 hover:scale-105 hover:shadow-[0_20px_90px_rgba(0,255,180,0.7)]"
+              className="inline-flex items-center gap-2 rounded-full border border-white/30 px-8 py-3 text-white backdrop-blur-lg transition-all duration-300 hover:bg-white/10 hover:scale-105"
             >
               Explore Programs
               <ExternalLink className="h-4 w-4" />
             </a>
 
-            <a
-              href="#contact"
-              className="inline-flex items-center gap-2 rounded-full border border-white/30 px-8 py-3 text-white backdrop-blur-lg transition-all duration-300 hover:bg-white/10 hover:scale-105"
+            <Link
+              to="/signup"
+              className="inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-400/10 px-8 py-3 text-emerald-200 backdrop-blur-lg transition-all duration-300 hover:bg-emerald-400/20 hover:scale-105"
             >
-              Join the Initiative
-            </a>
+              Create Account
+            </Link>
 
           </div>
 

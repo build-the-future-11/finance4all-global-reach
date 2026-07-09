@@ -1,55 +1,40 @@
 # Finance4All Global Reach
 
-Global nonprofit landing site and member portal for finance education, research, and community.
+Global nonprofit landing site and **Supabase-powered member portal**.
 
-## Quick start
-
-```bash
-npm install
-cp .env.example .env   # add your Supabase credentials
-npm run dev
-```
-
-- **Landing page:** http://localhost:8080
-- **Member portal:** http://localhost:8080/login
-
-## Supabase setup
-
-1. Create a project at [supabase.com](https://supabase.com)
-2. Run `supabase/migrations/001_initial_schema.sql` in the SQL Editor
-3. Run `supabase/seed.sql` for sample content
-4. Copy your URL and anon key into `.env`
-
-See [supabase/README.md](supabase/README.md) for full details.
+**Live on Vercel:** set env vars (see [DEPLOYMENT.md](DEPLOYMENT.md)) then deploy.
 
 ## Portal modules
 
-| Route | Module |
-|-------|--------|
+| Route | Feature |
+|-------|---------|
 | `/portal` | Dashboard |
-| `/portal/debriefed` | News feed + digest preferences |
-| `/portal/debriefed/explainers` | Beginner finance explainers |
-| `/portal/labs` | Research projects + applications |
-| `/portal/labs/review` | Application review (lead/admin) |
-| `/portal/pathways` | Opportunity board |
-| `/portal/pathways/studios` | Project submissions |
-| `/portal/pathways/essays` | Essay challenge + upvotes |
+| `/portal/debriefed` | News + digest prefs |
+| `/portal/labs` | Research projects + apply |
+| `/portal/pathways` | Opportunities, studios, essays |
 | `/portal/events` | Chapters + events |
-| `/portal/network` | Member profiles + connections |
+| `/portal/network` | Profiles + connections |
+| `/portal/settings` | Profile settings |
+
+## Vercel deploy (required env vars)
+
+```
+VITE_SUPABASE_URL=https://pnemeegkwyaicsbnbnmg.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
+```
+
+Add redirect URL in Supabase: `https://YOUR-APP.vercel.app/auth/callback`
+
+Full guide: **[DEPLOYMENT.md](DEPLOYMENT.md)**
+
+## Local dev
+
+```bash
+npm install
+cp .env.example .env   # add Supabase keys
+npm run dev
+```
 
 ## Stack
 
-- React 18 + TypeScript + Vite
-- Tailwind CSS + shadcn/ui
-- Supabase (auth, Postgres, RLS)
-- TanStack React Query
-
-## Scripts
-
-```bash
-npm run dev      # development server
-npm run build    # production build
-npm run preview  # preview production build
-npm run lint     # eslint
-npm test         # vitest
-```
+React · Vite · Tailwind · shadcn/ui · Supabase · TanStack Query
