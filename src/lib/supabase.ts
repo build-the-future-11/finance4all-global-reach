@@ -6,15 +6,17 @@ const supabaseKey =
   import.meta.env.VITE_SUPABASE_ANON_KEY ??
   import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
-if (!supabaseUrl || !supabaseKey) {
-  console.warn(
-    "Missing Supabase env vars. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY (or VITE_SUPABASE_PUBLISHABLE_KEY) to .env",
+export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseKey);
+
+if (!isSupabaseConfigured) {
+  console.error(
+    "[Finance4All] Missing Supabase env vars. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env, then restart the dev server.",
   );
 }
 
 export const supabase = createClient<Database>(
-  supabaseUrl ?? "https://placeholder.supabase.co",
-  supabaseKey ?? "placeholder-key",
+  supabaseUrl || "http://localhost:0",
+  supabaseKey || "missing-key",
   {
     auth: {
       autoRefreshToken: true,
@@ -23,8 +25,6 @@ export const supabase = createClient<Database>(
     },
   },
 );
-
-export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseKey);
 
 export function getAuthRedirectUrl() {
   return `${window.location.origin}/auth/callback`;
