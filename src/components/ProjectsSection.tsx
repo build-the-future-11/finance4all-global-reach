@@ -1,28 +1,34 @@
+import { Link } from "react-router-dom";
 import { ArrowRight, BookOpenText, BriefcaseBusiness, FlaskConical, Newspaper } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { portalRoutes } from "@/routes/portal";
 
 const phaseOneModules = [
   {
     icon: Newspaper,
     title: "Finance Debriefed",
+    href: portalRoutes.debriefed,
     summary: "Global macro updates, market movers, and IPO watchlists in one place.",
     bullets: ["Daily global economic pulse", "Gainers/losers tracker", "IPO + company spotlight"],
   },
   {
     icon: BookOpenText,
     title: "Intro to Finance",
+    href: portalRoutes.debriefedExplainers,
     summary: "Beginner-friendly explainers for core buzzwords and current finance narratives.",
     bullets: ["What is an IPO?", "Why sectors move", "Build your finance vocabulary"],
   },
   {
     icon: FlaskConical,
     title: "Finance Meta Labs",
+    href: portalRoutes.labs,
     summary: "Research project directory with verified lead researchers and open applications.",
     bullets: ["Lead researcher verification", "Student application flow", "Professor + student collaboration"],
   },
   {
     icon: BriefcaseBusiness,
     title: "Axiom Pathways",
+    href: portalRoutes.pathways,
     summary: "Opportunity board for internships, programs, and project-based roles.",
     bullets: ["Internship opportunities", "Curated pathways", "Apply and track interest"],
   },
@@ -54,9 +60,10 @@ export default function ProjectsSection() {
           {phaseOneModules.map((module) => {
             const Icon = module.icon;
             return (
-              <article
+              <Link
                 key={module.title}
-                className="rounded-3xl border border-white/20 bg-white/[0.05] p-6 backdrop-blur-xl transition hover:-translate-y-1 hover:border-white/35"
+                to={module.href}
+                className="block rounded-3xl border border-white/20 bg-white/[0.05] p-6 backdrop-blur-xl transition hover:-translate-y-1 hover:border-white/35"
               >
                 <div className="mb-5 flex items-center gap-3">
                   <div className="rounded-xl border border-white/20 bg-white/10 p-3 text-emerald-300">
@@ -75,7 +82,7 @@ export default function ProjectsSection() {
                     </li>
                   ))}
                 </ul>
-              </article>
+              </Link>
             );
           })}
         </div>
@@ -93,13 +100,21 @@ export default function ProjectsSection() {
               current UI blocks are ready to connect to APIs and auth.
             </p>
           </div>
-          <a
-            href="#contact"
-            className="inline-flex items-center gap-2 rounded-full bg-white/90 px-5 py-2 text-sm font-semibold text-black transition hover:bg-white"
-          >
-            Request Early Access
-            <ArrowRight className="h-4 w-4" />
-          </a>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              to="/login"
+              className="inline-flex items-center gap-2 rounded-full bg-white/90 px-5 py-2 text-sm font-semibold text-black transition hover:bg-white"
+            >
+              Sign in to Portal
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link
+              to="/signup"
+              className="inline-flex items-center gap-2 rounded-full border border-white/30 px-5 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+            >
+              Create account
+            </Link>
+          </div>
         </div>
       </div>
     </section>

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 
@@ -122,6 +123,12 @@ export default function Navbar() {
                     {l.label}
                   </a>
                 ))}
+                <Link
+                  to="/login"
+                  className="rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-black transition hover:bg-white"
+                >
+                  Portal
+                </Link>
                 <ThemeToggle />
               </div>
 
@@ -163,6 +170,13 @@ export default function Navbar() {
                   {l.label}
                 </a>
               ))}
+              <Link
+                to="/login"
+                onClick={() => setOpen(false)}
+                className="block rounded-xl px-4 py-3 font-semibold text-emerald-300 transition hover:bg-white/15"
+              >
+                Portal
+              </Link>
             </div>
           </div>
 
