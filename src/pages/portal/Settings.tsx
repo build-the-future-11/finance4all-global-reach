@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { Lock, Shield } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChapters } from "@/hooks/portal/useEvents";
 import { useUpdateMyProfile } from "@/hooks/portal/useNetwork";
+import { computeProfileCompleteness } from "@/hooks/portal/useMemberStats";
 import { portalRoutes } from "@/routes/portal";
+import MembershipCard from "@/components/portal/MembershipCard";
 import {
   PortalCard,
   PortalPageHeader,
@@ -24,10 +27,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { sanitizeBio, sanitizeDisplayName } from "@/lib/security";
 
 const SUGGESTED_INTERESTS = ["macro", "equities", "fintech", "credit", "startups", "research"];
 
 export default function Settings() {
+  useDocumentTitle("Settings");
   const { profile, signOut } = useAuth();
   const { data: chapters } = useChapters();
   const updateProfile = useUpdateMyProfile();
@@ -38,6 +44,16 @@ export default function Settings() {
   const [openToCollaborate, setOpenToCollaborate] = useState(profile?.openToCollaborate ?? false);
   const [chapterId, setChapterId] = useState(profile?.chapterId ?? "");
 
+  const { percent, missing } = computeProfileCompleteness({
+    displayName,
+    bio,
+    interests,
+    chapterId: chapterId || undefined,
+    openToCollaborate,
+  });
+
+  const chapterName = chapters?.find((c) => c.id === chapterId)?.name;
+
   const toggleInterest = (tag: string) => {
     setInterests((prev) =>
       prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag],
@@ -47,8 +63,8 @@ export default function Settings() {
   const handleSave = async () => {
     try {
       const { error } = await updateProfile.mutateAsync({
-        displayName: displayName.trim(),
-        bio: bio.trim() || undefined,
+        displayName: sanitizeDisplayName(displayName),
+        bio: sanitizeBio(bio) || undefined,
         interests,
         openToCollaborate,
         chapterId: chapterId || undefined,
@@ -72,8 +88,33 @@ export default function Settings() {
       <PortalPageHeader
         eyebrow="Account"
         title="Settings"
-        description="Manage your profile and portal preferences."
+        description="Manage your profile, membership, and security preferences."
       />
+
+      <div className="mb-8 grid gap-6 lg:grid-cols-2">
+        {profile && <MembershipCard profile={profile} chapterName={chapterName} />}
+        <PortalCard className="p-6">
+          <div className="flex items-center gap-2 text-emerald-300">
+            <Shield className="h-4 w-4" />
+            <h3 className="font-semibold text-white">Profile strength</h3>
+          </div>
+          <p className="mt-2 text-3xl font-bold text-white">{percent}%</p>
+          <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500 transition-all"
+              style={{ width: `${percent}%` }}
+            />
+          </div>
+          {missing.length > 0 && (
+            <p className="mt-3 text-sm text-white/50">
+              Add: {missing.join(", ").toLowerCase()}
+            </p>
+          )}
+          <Link to={portalRoutes.network} className="mt-4 inline-block text-sm text-emerald-400 hover:underline">
+            View public profile →
+          </Link>
+        </PortalCard>
+      </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
         <PortalCard className="p-6 lg:col-span-1">
@@ -89,9 +130,6 @@ export default function Settings() {
             <p className="mt-1 text-xs capitalize text-white/40">
               {profile?.role?.replace("_", " ")}
             </p>
-            <Link to={portalRoutes.network} className="mt-4 text-sm text-emerald-400 hover:underline">
-              View network →
-            </Link>
           </div>
         </PortalCard>
 
@@ -102,6 +140,7 @@ export default function Settings() {
               <Input
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
+                maxLength={80}
                 className={portalInputClass}
               />
             </div>
@@ -111,8 +150,10 @@ export default function Settings() {
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 rows={3}
+                maxLength={500}
                 className={portalInputClass}
               />
+              <p className="mt-1 text-xs text-white/35">{bio.length}/500</p>
             </div>
             <div>
               <Label className="text-white/70">Interests</Label>
@@ -172,6 +213,22 @@ export default function Settings() {
           </div>
         </PortalCard>
       </div>
+
+      <PortalCard className="mt-6 p-6">
+        <div className="flex items-start gap-3">
+          <Lock className="mt-0.5 h-5 w-5 text-white/40" />
+          <div>
+            <h3 className="font-semibold text-white">Security</h3>
+            <p className="mt-1 text-sm text-white/50">
+              Password changes and two-factor authentication are managed through Supabase Auth.
+              Use a strong unique password and enable Google sign-in for faster secure access.
+            </p>
+            <p className="mt-2 text-xs text-white/35">
+              Never share your password or service-role keys. Report suspicious activity to your chapter lead.
+            </p>
+          </div>
+        </div>
+      </PortalCard>
     </div>
   );
 }

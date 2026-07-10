@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Plus } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useChapters } from "@/hooks/portal/useEvents";
 import {
   useConnectionRequests,
   useCreateIntroduction,
@@ -31,6 +32,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
@@ -38,6 +46,7 @@ export default function Networking() {
   useDocumentTitle("Network");
   const { profile } = useAuth();
   const { data: members, isLoading, error, refetch } = useMemberProfiles();
+  const { data: chapters } = useChapters();
   const { data: connections } = useConnectionRequests();
   const { data: introductions } = useIntroductionPosts();
   const respond = useRespondToConnection();
@@ -49,6 +58,7 @@ export default function Networking() {
   const [lookingFor, setLookingFor] = useState("");
   const [search, setSearch] = useState("");
   const [collaboratorsOnly, setCollaboratorsOnly] = useState(false);
+  const [chapterFilter, setChapterFilter] = useState<string>("all");
 
   const handleRespond = async (connectionId: string, status: "accepted" | "declined") => {
     try {
@@ -97,6 +107,7 @@ export default function Networking() {
       members?.filter((m) => {
         if (m.id === profile?.id) return false;
         if (collaboratorsOnly && !m.openToCollaborate) return false;
+        if (chapterFilter !== "all" && m.chapterId !== chapterFilter) return false;
         if (!q) return true;
         return (
           m.displayName.toLowerCase().includes(q) ||
@@ -104,7 +115,7 @@ export default function Networking() {
         );
       }) ?? []
     );
-  }, [members, profile?.id, search, collaboratorsOnly]);
+  }, [members, profile?.id, search, collaboratorsOnly, chapterFilter]);
 
   return (
     <div>
@@ -223,6 +234,21 @@ export default function Networking() {
               <Switch checked={collaboratorsOnly} onCheckedChange={setCollaboratorsOnly} />
               Open to collaborate
             </label>
+            {chapters && chapters.length > 0 && (
+              <Select value={chapterFilter} onValueChange={setChapterFilter}>
+                <SelectTrigger className={`w-40 ${portalInputClass}`}>
+                  <SelectValue placeholder="Chapter" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All chapters</SelectItem>
+                  {chapters.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
         </div>
         <QueryStatus

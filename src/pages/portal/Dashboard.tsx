@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import {
   ArrowRight,
   Bookmark,
-  Briefcase,
   Calendar,
   FlaskConical,
   Newspaper,
@@ -11,9 +10,10 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useActivityFeed } from "@/hooks/portal/useActivityFeed";
+import { useMyMemberStats } from "@/hooks/portal/useMemberStats";
+import { useChapters } from "@/hooks/portal/useEvents";
 import { useNewsArticles } from "@/hooks/portal/useDebriefed";
 import { useResearchProjects, useMyLabApplications } from "@/hooks/portal/useLabs";
-import { useOpportunities } from "@/hooks/portal/usePathways";
 import { useEvents } from "@/hooks/portal/useEvents";
 import { portalNav, portalRoutes } from "@/routes/portal";
 import {
@@ -27,6 +27,8 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import MembershipCard from "@/components/portal/MembershipCard";
+import PortalOnboardingChecklist from "@/components/portal/PortalOnboardingChecklist";
 
 const ACTIVITY_ICONS = {
   news: Newspaper,
@@ -41,11 +43,14 @@ export default function Dashboard() {
   const { profile } = useAuth();
   const { data: news } = useNewsArticles();
   const { data: projects } = useResearchProjects("open");
-  const { data: opportunities } = useOpportunities();
   const { data: events } = useEvents();
   const { data: myApps } = useMyLabApplications();
   const { data: activity, isLoading: activityLoading, error: activityError, refetch } =
     useActivityFeed(6);
+  const { data: stats } = useMyMemberStats();
+  const { data: chapters } = useChapters();
+
+  const chapterName = chapters?.find((c) => c.id === profile?.chapterId)?.name;
 
   const isAdmin = profile?.role === "admin";
 
@@ -77,6 +82,17 @@ export default function Dashboard() {
         }
       />
 
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-1">
+          {profile && (
+            <MembershipCard profile={profile} chapterName={chapterName} />
+          )}
+        </div>
+        <div className="lg:col-span-2">
+          <PortalOnboardingChecklist />
+        </div>
+      </div>
+
       <div className="flex flex-wrap gap-2">
         <Link to={portalRoutes.saved}>
           <Button variant="outline" size="sm" className="border-white/20 bg-white/5 text-white">
@@ -98,7 +114,7 @@ export default function Dashboard() {
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="News articles" value={news?.length ?? "—"} icon={Newspaper} accent="emerald" />
         <StatCard label="Open lab projects" value={projects?.length ?? "—"} icon={FlaskConical} accent="blue" />
-        <StatCard label="Opportunities" value={opportunities?.length ?? "—"} icon={Briefcase} accent="amber" />
+        <StatCard label="Your connections" value={stats?.connections ?? "—"} icon={Users} accent="amber" />
         <StatCard label="Upcoming events" value={upcomingEvents} icon={Calendar} accent="purple" />
       </div>
 

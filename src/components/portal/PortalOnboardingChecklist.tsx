@@ -1,0 +1,92 @@
+import { Link } from "react-router-dom";
+import { CheckCircle2, Circle, X } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { computeProfileCompleteness } from "@/hooks/portal/useMemberStats";
+import { portalRoutes } from "@/routes/portal";
+import { PortalCard } from "@/components/portal/PortalUI";
+import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
+
+const STORAGE_KEY = "f4a-onboarding-dismissed";
+
+const STEPS = [
+  { id: "profile", label: "Complete your profile", path: portalRoutes.settings },
+  { id: "debriefed", label: "Read the latest news", path: portalRoutes.debriefed },
+  { id: "network", label: "Connect with a member", path: portalRoutes.network },
+  { id: "saved", label: "Save an article or project", path: portalRoutes.saved },
+] as const;
+
+export default function PortalOnboardingChecklist() {
+  const { profile } = useAuth();
+  const [dismissed, setDismissed] = useState(true);
+
+  const { percent, missing } = computeProfileCompleteness(profile);
+
+  useEffect(() => {
+    setDismissed(localStorage.getItem(STORAGE_KEY) === "1");
+  }, []);
+
+  if (dismissed || percent >= 100) return null;
+
+  const handleDismiss = () => {
+    localStorage.setItem(STORAGE_KEY, "1");
+    setDismissed(true);
+  };
+
+  return (
+    <PortalCard className="relative overflow-hidden border-emerald-400/20 bg-gradient-to-br from-emerald-500/10 to-transparent p-6">
+      <button
+        type="button"
+        onClick={handleDismiss}
+        className="absolute right-3 top-3 rounded-lg p-1.5 text-white/40 transition hover:bg-white/10 hover:text-white/70"
+        aria-label="Dismiss checklist"
+      >
+        <X className="h-4 w-4" />
+      </button>
+
+      <p className="text-xs font-medium uppercase tracking-[0.2em] text-emerald-400/90">
+        Welcome to the portal
+      </p>
+      <h3 className="mt-1 text-lg font-semibold text-white">Get the most from your membership</h3>
+      <p className="mt-1 text-sm text-white/50">
+        Profile {percent}% complete
+        {missing.length > 0 && ` — add ${missing[0].toLowerCase()}`}
+      </p>
+
+      <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-white/10">
+        <div
+          className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500 transition-all"
+          style={{ width: `${percent}%` }}
+        />
+      </div>
+
+      <ul className="mt-5 space-y-2">
+        {STEPS.map((step, i) => {
+          const done = i === 0 ? percent >= 60 : false;
+          const Icon = done ? CheckCircle2 : Circle;
+          return (
+            <li key={step.id}>
+              <Link
+                to={step.path}
+                className="flex items-center gap-3 rounded-lg px-2 py-2 text-sm transition hover:bg-white/[0.06]"
+              >
+                <Icon
+                  className={`h-4 w-4 shrink-0 ${done ? "text-emerald-400" : "text-white/25"}`}
+                />
+                <span className={done ? "text-white/45 line-through" : "text-white/75"}>
+                  {step.label}
+                </span>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+
+      <Link to={portalRoutes.settings} className="mt-4 inline-block">
+        <Button size="sm" className="bg-emerald-500 hover:bg-emerald-400">
+          Complete profile
+        </Button>
+      </Link>
+    </PortalCard>
+  );
+}

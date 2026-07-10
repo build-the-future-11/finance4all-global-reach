@@ -9,6 +9,7 @@ import {
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { getAuthRedirectUrl, supabase } from "@/lib/supabase";
+import { isPasswordAcceptable, isValidEmail, sanitizeDisplayName } from "@/lib/security";
 import { mapProfile } from "@/lib/mappers";
 import type { UserProfile } from "@/types/domain";
 
@@ -141,15 +142,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [fetchProfile]);
 
   const signIn = useCallback(async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (!isValidEmail(email)) return { error: "Enter a valid email address." };
+    const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
     return { error: error?.message ?? null };
   }, []);
 
   const signUp = useCallback(async (email: string, password: string, displayName: string) => {
+    const name = sanitizeDisplayName(displayName);
+    if (!name) return { error: "Display name is required." };
+    if (!isValidEmail(email)) return { error: "Enter a valid email address." };
+    if (!isPasswordAcceptable(password)) {
+      return { error: "Password must be at least 8 characters with letters and numbers." };
+    }
     const { error } = await supabase.auth.signUp({
-      email,
+      email: email.trim(),
       password,
-      options: { data: { display_name: displayName } },
+      options: { data: { display_name: name } },
     });
     return { error: error?.message ?? null };
   }, []);

@@ -174,7 +174,7 @@ export default function PortalLayout() {
           </nav>
         </aside>
 
-        <main className="min-w-0 flex-1 pb-20 lg:pb-8">
+        <main className="min-w-0 flex-1 pb-20 lg:pb-8 animate-in fade-in duration-500">
           <Outlet />
         </main>
       </div>

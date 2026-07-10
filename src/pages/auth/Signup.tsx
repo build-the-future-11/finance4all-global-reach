@@ -1,15 +1,19 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { CheckCircle2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import AuthLayout from "@/components/portal/AuthLayout";
 import GoogleSignInButton, { AuthDivider } from "@/components/portal/GoogleSignInButton";
+import PasswordStrengthMeter from "@/components/portal/PasswordStrengthMeter";
+import { assessPassword } from "@/lib/security";
 import { portalInputClass } from "@/components/portal/PortalUI";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export default function Signup() {
+  useDocumentTitle("Sign up");
   const { signUp, signInWithGoogle, user, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -22,6 +26,8 @@ export default function Signup() {
   const [googleLoading, setGoogleLoading] = useState(false);
 
   if (!loading && user) return <Navigate to="/portal" replace />;
+
+  const passwordCheck = useMemo(() => assessPassword(password), [password]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,9 +111,13 @@ export default function Signup() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                minLength={6}
+                minLength={8}
+                autoComplete="new-password"
                 className={portalInputClass}
               />
+              {password.length > 0 && (
+                <PasswordStrengthMeter strength={passwordCheck.strength} hints={passwordCheck.hints} />
+              )}
             </div>
             {error && (
               <p className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300">
