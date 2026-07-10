@@ -25,6 +25,7 @@ const EventsChapters = lazy(() => import("@/pages/portal/events/EventsChapters")
 const Networking = lazy(() => import("@/pages/portal/network/Networking"));
 const MemberProfile = lazy(() => import("@/pages/portal/network/MemberProfile"));
 const Admin = lazy(() => import("@/pages/portal/Admin"));
+const Saved = lazy(() => import("@/pages/portal/Saved"));
 const Settings = lazy(() => import("@/pages/portal/Settings"));
 
 function PortalFallback() {
@@ -95,6 +96,7 @@ function AppRoutes() {
               }
             />
             <Route path="settings" element={<Settings />} />
+            <Route path="saved" element={<Saved />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />

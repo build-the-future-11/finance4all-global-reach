@@ -6,8 +6,10 @@ import ProjectsSection from "@/components/ProjectsSection";
 import FounderSection from "@/components/FounderSection";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 const Index = () => {
+  useDocumentTitle();
   return (
     <div className="min-h-screen">
       <Navbar />

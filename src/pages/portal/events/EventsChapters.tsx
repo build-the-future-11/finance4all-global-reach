@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Calendar, ExternalLink, MapPin, Users } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Calendar, ExternalLink, LayoutGrid, List, MapPin, Users } from "lucide-react";
 import {
   useChapters,
   useEvents,
@@ -16,9 +16,24 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+
+function groupEventsByMonth(events: { id: string; title: string; startsAt: string }[]) {
+  const groups = new Map<string, typeof events>();
+  for (const e of events) {
+    const key = new Date(e.startsAt).toLocaleDateString(undefined, {
+      month: "long",
+      year: "numeric",
+    });
+    (groups.get(key) ?? groups.set(key, []).get(key)!).push(e);
+  }
+  return [...groups.entries()];
+}
 
 export default function EventsChapters() {
+  useDocumentTitle("Events");
   const [selectedChapter, setSelectedChapter] = useState<string>("all");
+  const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
   const {
     data: chapters,
     isLoading: chaptersLoading,
@@ -48,6 +63,11 @@ export default function EventsChapters() {
   const handleChapterSelect = (id: string) => {
     setSelectedChapter(id);
   };
+
+  const eventsByMonth = useMemo(
+    () => groupEventsByMonth(events ?? []),
+    [events],
+  );
 
   return (
     <div>
@@ -111,7 +131,27 @@ export default function EventsChapters() {
       </QueryStatus>
 
       <section>
-        <h2 className="mb-4 text-lg font-semibold text-white">Events</h2>
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-lg font-semibold text-white">Events</h2>
+          <div className="flex gap-1 rounded-lg bg-white/[0.04] p-1">
+            <Button
+              size="sm"
+              variant={viewMode === "list" ? "default" : "ghost"}
+              className={viewMode === "list" ? "bg-emerald-500/20 text-emerald-300" : "text-white/50"}
+              onClick={() => setViewMode("list")}
+            >
+              <List className="mr-1.5 h-3.5 w-3.5" /> List
+            </Button>
+            <Button
+              size="sm"
+              variant={viewMode === "calendar" ? "default" : "ghost"}
+              className={viewMode === "calendar" ? "bg-emerald-500/20 text-emerald-300" : "text-white/50"}
+              onClick={() => setViewMode("calendar")}
+            >
+              <LayoutGrid className="mr-1.5 h-3.5 w-3.5" /> Calendar
+            </Button>
+          </div>
+        </div>
 
         {chapters && chapters.length > 0 && (
           <Tabs value={selectedChapter} onValueChange={setSelectedChapter} className="mb-6">
@@ -142,6 +182,33 @@ export default function EventsChapters() {
           emptyMessage="No events for this chapter yet."
           onRetry={() => refetchEvents()}
         >
+          {viewMode === "calendar" ? (
+            <div className="space-y-8">
+              {eventsByMonth.map(([month, monthEvents]) => (
+                <div key={month}>
+                  <h3 className="mb-3 text-sm font-medium uppercase tracking-wider text-emerald-400/80">
+                    {month}
+                  </h3>
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    {monthEvents.map((event) => {
+                      const d = new Date(event.startsAt);
+                      const chapter = chapterMap[(events ?? []).find((e) => e.id === event.id)?.chapterId ?? ""];
+                      return (
+                        <PortalCard key={event.id} className="p-4">
+                          <p className="text-2xl font-bold text-emerald-300">{d.getDate()}</p>
+                          <p className="text-xs text-white/40">
+                            {d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}
+                          </p>
+                          <p className="mt-2 font-medium text-white">{event.title}</p>
+                          {chapter && <p className="mt-1 text-xs text-white/45">{chapter.name}</p>}
+                        </PortalCard>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
           <div className="space-y-4">
             {events?.map((event) => {
               const chapter = chapterMap[event.chapterId];
@@ -200,6 +267,7 @@ export default function EventsChapters() {
               );
             })}
           </div>
+          )}
         </QueryStatus>
       </section>
     </div>

@@ -104,7 +104,10 @@ export function useToggleProjectBookmark() {
         if (error) throw error;
       }
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["project-bookmarks"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["project-bookmarks"] });
+      qc.invalidateQueries({ queryKey: ["saved-projects"] });
+    },
   });
 }
 

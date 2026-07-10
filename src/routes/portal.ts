@@ -1,5 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 import {
+  Bookmark,
   CalendarDays,
   FlaskConical,
   LayoutDashboard,
@@ -25,6 +26,7 @@ export const portalRoutes = {
   network: `${PORTAL_BASE}/network`,
   networkProfile: `${PORTAL_BASE}/network/profile`,
   settings: `${PORTAL_BASE}/settings`,
+  saved: `${PORTAL_BASE}/saved`,
   admin: `${PORTAL_BASE}/admin`,
 } as const;
 
@@ -88,6 +90,12 @@ export const portalNav: PortalNavItem[] = [
     path: portalRoutes.network,
     icon: Users,
     description: "Profiles, connections, and introductions",
+  },
+  {
+    label: "Saved",
+    path: portalRoutes.saved,
+    icon: Bookmark,
+    description: "Bookmarked articles and lab projects",
   },
   {
     label: "Settings",

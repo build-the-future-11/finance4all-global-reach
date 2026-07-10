@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Plus } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -32,8 +32,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 export default function Networking() {
+  useDocumentTitle("Network");
   const { profile } = useAuth();
   const { data: members, isLoading, error, refetch } = useMemberProfiles();
   const { data: connections } = useConnectionRequests();
@@ -45,6 +47,8 @@ export default function Networking() {
   const [introOpen, setIntroOpen] = useState(false);
   const [headline, setHeadline] = useState("");
   const [lookingFor, setLookingFor] = useState("");
+  const [search, setSearch] = useState("");
+  const [collaboratorsOnly, setCollaboratorsOnly] = useState(false);
 
   const handleRespond = async (connectionId: string, status: "accepted" | "declined") => {
     try {
@@ -86,7 +90,21 @@ export default function Networking() {
   );
 
   const memberNameMap = Object.fromEntries(members?.map((m) => [m.id, m.displayName]) ?? []);
-  const otherMembers = members?.filter((m) => m.id !== profile?.id) ?? [];
+
+  const filteredMembers = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return (
+      members?.filter((m) => {
+        if (m.id === profile?.id) return false;
+        if (collaboratorsOnly && !m.openToCollaborate) return false;
+        if (!q) return true;
+        return (
+          m.displayName.toLowerCase().includes(q) ||
+          m.interests.some((i) => i.toLowerCase().includes(q))
+        );
+      }) ?? []
+    );
+  }, [members, profile?.id, search, collaboratorsOnly]);
 
   return (
     <div>
@@ -192,16 +210,30 @@ export default function Networking() {
       </section>
 
       <section>
-        <h2 className="mb-3 text-lg font-semibold text-white">Members</h2>
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <h2 className="text-lg font-semibold text-white">Members</h2>
+          <div className="flex flex-wrap items-center gap-3">
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search by name or interest…"
+              className={`max-w-xs ${portalInputClass}`}
+            />
+            <label className="flex items-center gap-2 text-sm text-white/55">
+              <Switch checked={collaboratorsOnly} onCheckedChange={setCollaboratorsOnly} />
+              Open to collaborate
+            </label>
+          </div>
+        </div>
         <QueryStatus
           isLoading={isLoading}
           error={error}
-          isEmpty={otherMembers.length === 0}
-          emptyMessage="No other members yet. Invite your chapter!"
+          isEmpty={filteredMembers.length === 0}
+          emptyMessage="No members match your filters."
           onRetry={() => refetch()}
         >
           <div className="grid gap-3 sm:grid-cols-2">
-            {otherMembers.map((member) => (
+            {filteredMembers.map((member) => (
               <Link key={member.id} to={`${portalRoutes.networkProfile}/${member.id}`}>
                 <PortalCard className="p-4 transition hover:border-white/30 hover:bg-white/[0.07]">
                   <p className="font-medium text-white">{member.displayName}</p>

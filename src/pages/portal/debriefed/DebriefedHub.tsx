@@ -6,8 +6,10 @@ import {
   useNewsArticles,
   useUpdateDigestPreferences,
 } from "@/hooks/portal/useDebriefed";
+import { useNewsBookmarks, useToggleNewsBookmark } from "@/hooks/portal/useBookmarks";
 import { portalRoutes } from "@/routes/portal";
 import type { NewsCategory } from "@/types/domain";
+import BookmarkButton from "@/components/portal/BookmarkButton";
 import {
   CategoryBadge,
   PortalCard,
@@ -19,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 const CATEGORIES: { value: NewsCategory | "all"; label: string }[] = [
   { value: "all", label: "All" },
@@ -29,10 +32,13 @@ const CATEGORIES: { value: NewsCategory | "all"; label: string }[] = [
 ];
 
 export default function DebriefedHub() {
+  useDocumentTitle("Debriefed");
   const [category, setCategory] = useState<NewsCategory | "all">("all");
   const { data: articles, isLoading, error, refetch } = useNewsArticles(category);
   const { data: prefs } = useDigestPreferences();
   const updatePrefs = useUpdateDigestPreferences();
+  const { data: bookmarks } = useNewsBookmarks();
+  const toggleBookmark = useToggleNewsBookmark();
 
   const handleDigestToggle = async (
     key: "weeklyDigestEnabled" | "substackSubscribed",
@@ -140,13 +146,26 @@ export default function DebriefedHub() {
                     {new Date(article.publishedAt).toLocaleDateString()}
                   </p>
                 </div>
-                {article.sourceUrl && (
-                  <a href={article.sourceUrl} target="_blank" rel="noopener noreferrer">
-                    <Button size="sm" variant="outline" className={portalButtonOutline}>
-                      Source <ExternalLink className="h-3.5 w-3.5" />
-                    </Button>
-                  </a>
-                )}
+                <div className="flex shrink-0 flex-col gap-2">
+                  <BookmarkButton
+                    saved={bookmarks?.has(article.id) ?? false}
+                    loading={toggleBookmark.isPending}
+                    label="Save"
+                    onToggle={() =>
+                      toggleBookmark.mutateAsync({
+                        articleId: article.id,
+                        saved: bookmarks?.has(article.id) ?? false,
+                      })
+                    }
+                  />
+                  {article.sourceUrl && (
+                    <a href={article.sourceUrl} target="_blank" rel="noopener noreferrer">
+                      <Button size="sm" variant="outline" className={portalButtonOutline}>
+                        Source <ExternalLink className="h-3.5 w-3.5" />
+                      </Button>
+                    </a>
+                  )}
+                </div>
               </div>
             </PortalCard>
           ))}
