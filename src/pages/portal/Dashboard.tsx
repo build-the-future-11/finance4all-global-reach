@@ -17,7 +17,6 @@ import { useMyMemberStats } from "@/hooks/portal/useMemberStats";
 import { useChapters } from "@/hooks/portal/useEvents";
 import { useNewsArticles } from "@/hooks/portal/useDebriefed";
 import { useResearchProjects, useMyLabApplications } from "@/hooks/portal/useLabs";
-import { useEvents } from "@/hooks/portal/useEvents";
 import { portalNav, portalRoutes } from "@/routes/portal";
 import {
   CategoryBadge,
@@ -50,9 +49,7 @@ export default function Dashboard() {
   useDocumentTitle("Dashboard");
   const { profile } = useAuth();
   const { data: news } = useNewsArticles();
-  const { data: projects } = useResearchProjects("open");
   const { data: allProjects } = useResearchProjects("all");
-  const { data: events } = useEvents();
   const { data: myApps } = useMyLabApplications();
   const { data: activity, isLoading: activityLoading, error: activityError, refetch } =
     useActivityFeed(6);
@@ -71,7 +68,6 @@ export default function Dashboard() {
       (!item.adminOnly || isAdmin),
   );
 
-  const upcomingEvents = events?.filter((e) => e.status === "upcoming").length ?? 0;
   const projectTitleMap = Object.fromEntries(allProjects?.map((p) => [p.id, p.title]) ?? []);
 
   return (
@@ -157,10 +153,10 @@ export default function Dashboard() {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="News articles" value={news?.length ?? "—"} icon={Newspaper} accent="emerald" />
-        <StatCard label="Open lab projects" value={projects?.length ?? "—"} icon={FlaskConical} accent="blue" />
-        <StatCard label="Your connections" value={stats?.connections ?? "—"} icon={Users} accent="amber" />
-        <StatCard label="Upcoming events" value={upcomingEvents} icon={Calendar} accent="purple" />
+        <StatCard label="Saved articles" value={stats?.savedArticles ?? "—"} icon={Bookmark} accent="emerald" />
+        <StatCard label="Your lab apps" value={myApps?.length ?? "—"} icon={FlaskConical} accent="blue" />
+        <StatCard label="Connections" value={stats?.connections ?? "—"} icon={Users} accent="amber" />
+        <StatCard label="Events registered" value={stats?.eventsRegistered ?? "—"} icon={Calendar} accent="purple" />
       </div>
 
       <PortalSection title="Recent activity">

@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Mail } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabase";
 import AuthLayout from "@/components/portal/AuthLayout";
 import GoogleSignInButton, { AuthDivider } from "@/components/portal/GoogleSignInButton";
 import PasswordStrengthMeter from "@/components/portal/PasswordStrengthMeter";
@@ -22,6 +23,7 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [needsEmailConfirm, setNeedsEmailConfirm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
@@ -37,8 +39,13 @@ export default function Signup() {
     setSubmitting(false);
     if (err) setError(err);
     else {
-      setSuccess(true);
-      setTimeout(() => navigate("/onboarding"), 1500);
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        setSuccess(true);
+        setTimeout(() => navigate("/onboarding"), 1500);
+      } else {
+        setNeedsEmailConfirm(true);
+      }
     }
   };
 
@@ -65,7 +72,19 @@ export default function Signup() {
         </>
       }
     >
-      {success ? (
+      {needsEmailConfirm ? (
+        <div className="flex flex-col items-center gap-3 py-4 text-center">
+          <Mail className="h-10 w-10 text-emerald-400" />
+          <p className="text-sm font-medium text-white">Check your email</p>
+          <p className="text-sm text-white/55">
+            We sent a confirmation link to <span className="text-white/80">{email}</span>. Click it
+            to activate your account, then sign in.
+          </p>
+          <Link to="/login" className="mt-2 text-sm font-medium text-emerald-400 hover:underline">
+            Go to sign in
+          </Link>
+        </div>
+      ) : success ? (
         <div className="flex flex-col items-center gap-3 py-4 text-center">
           <CheckCircle2 className="h-10 w-10 text-emerald-400" />
           <p className="text-sm text-emerald-300">Account created! Redirecting…</p>

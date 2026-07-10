@@ -88,7 +88,7 @@ export default function ResetPassword() {
             autoComplete="new-password"
             className={portalInputClass}
           />
-          <PasswordStrengthMeter check={passwordCheck} />
+          <PasswordStrengthMeter strength={passwordCheck.strength} hints={passwordCheck.hints} />
         </div>
         <div>
           <Label htmlFor="confirm" className="text-white/70">

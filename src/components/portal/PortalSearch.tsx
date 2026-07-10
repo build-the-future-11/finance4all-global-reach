@@ -5,6 +5,8 @@ import {
   Briefcase,
   Calendar,
   FlaskConical,
+  GraduationCap,
+  Library,
   Newspaper,
   Search,
   Users,
@@ -19,23 +21,27 @@ import {
   CommandList,
 } from "@/components/ui/command";
 
-const TYPE_ICONS = {
+const TYPE_ICONS: Record<SearchResult["type"], typeof Newspaper> = {
   news: Newspaper,
   lab: FlaskConical,
   opportunity: Briefcase,
   event: Calendar,
   member: Users,
   explainer: BookOpen,
-} as const;
+  education: GraduationCap,
+  resource: Library,
+};
 
-const TYPE_LABELS = {
+const TYPE_LABELS: Record<SearchResult["type"], string> = {
   news: "News",
   lab: "Labs",
   opportunity: "Pathways",
   event: "Events",
   member: "Members",
   explainer: "Explainers",
-} as const;
+  education: "Education",
+  resource: "Resources",
+};
 
 function groupResults(results: SearchResult[]) {
   const groups: Partial<Record<SearchResult["type"], SearchResult[]>> = {};
@@ -114,7 +120,7 @@ export default function PortalSearch() {
             <CommandEmpty className="text-white/40">No results found.</CommandEmpty>
           ) : (
             Object.entries(grouped).map(([type, items]) => {
-              const Icon = TYPE_ICONS[type as SearchResult["type"]];
+              const Icon = TYPE_ICONS[type as SearchResult["type"]] ?? Search;
               return (
                 <CommandGroup
                   key={type}

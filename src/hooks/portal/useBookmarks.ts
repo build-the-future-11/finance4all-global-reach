@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { mapNewsArticle, mapResearchProject } from "@/lib/mappers";
+import { mapNewsArticle, mapOpportunity, mapResearchProject } from "@/lib/mappers";
 import { useAuth } from "@/contexts/AuthContext";
 
 export function useNewsBookmarks() {
@@ -129,6 +129,30 @@ export function useSavedProjects() {
           savedAt: row.created_at,
           project: mapResearchProject(
             row.research_projects as Parameters<typeof mapResearchProject>[0],
+          ),
+        }));
+    },
+  });
+}
+
+export function useSavedOpportunities() {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ["saved-opportunities", user?.id],
+    enabled: Boolean(user),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("opportunity_interests")
+        .select("opportunity_id, created_at, opportunities(*)")
+        .eq("user_id", user!.id)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data
+        .filter((row) => row.opportunities)
+        .map((row) => ({
+          savedAt: row.created_at,
+          opportunity: mapOpportunity(
+            row.opportunities as Parameters<typeof mapOpportunity>[0],
           ),
         }));
     },

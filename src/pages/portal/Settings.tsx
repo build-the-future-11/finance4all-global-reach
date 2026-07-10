@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Camera, Lock, Shield } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -50,6 +50,15 @@ export default function Settings() {
   const [interests, setInterests] = useState<string[]>(profile?.interests ?? []);
   const [openToCollaborate, setOpenToCollaborate] = useState(profile?.openToCollaborate ?? false);
   const [chapterId, setChapterId] = useState(profile?.chapterId ?? "");
+
+  useEffect(() => {
+    if (!profile) return;
+    setDisplayName(profile.displayName ?? "");
+    setBio(profile.bio ?? "");
+    setInterests(profile.interests ?? []);
+    setOpenToCollaborate(profile.openToCollaborate ?? false);
+    setChapterId(profile.chapterId ?? "");
+  }, [profile]);
 
   const { percent, missing } = computeProfileCompleteness({
     displayName,
@@ -131,7 +140,10 @@ export default function Settings() {
               Add: {missing.join(", ").toLowerCase()}
             </p>
           )}
-          <Link to={portalRoutes.network} className="mt-4 inline-block text-sm text-emerald-400 hover:underline">
+          <Link
+            to={profile ? `${portalRoutes.networkProfile}/${profile.id}` : portalRoutes.network}
+            className="mt-4 inline-block text-sm text-emerald-400 hover:underline"
+          >
             View public profile →
           </Link>
         </PortalCard>

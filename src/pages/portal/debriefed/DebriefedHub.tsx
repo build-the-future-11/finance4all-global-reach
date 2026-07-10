@@ -83,10 +83,12 @@ export default function DebriefedHub() {
 
       <div className="mb-8 grid gap-4 lg:grid-cols-2">
         <PortalCard className="p-5">
-          <h3 className="font-semibold text-white">Weekly digest</h3>
-          <p className="mt-1 text-sm text-white/50">Curated roundup of top stories.</p>
+          <h3 className="font-semibold text-white">Digest preferences</h3>
+          <p className="mt-1 text-sm text-white/50">
+            Save your preferences here — weekly email delivery is rolling out soon.
+          </p>
           <div className="mt-4 flex items-center justify-between">
-            <span className="text-sm text-white/70">Enable weekly email digest</span>
+            <span className="text-sm text-white/70">Interested in weekly digest</span>
             <Switch
               checked={prefs?.weeklyDigestEnabled ?? false}
               onCheckedChange={(v) => handleDigestToggle("weeklyDigestEnabled", v)}

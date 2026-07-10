@@ -120,7 +120,7 @@ function ProjectDetail({ id }: { id: string }) {
         )}
       </PortalCard>
 
-      {project.status === "open" && profile?.role === "member" && (
+      {project.status === "open" && profile && project.leadResearcherId !== profile.id && (
         <div className="mt-6">
           {alreadyApplied ? (
             <Badge className="bg-emerald-400/15 text-emerald-300">Application submitted</Badge>

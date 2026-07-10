@@ -137,7 +137,7 @@ export default function Admin() {
             </div>
             <Button
               className="mt-4 bg-emerald-500 hover:bg-emerald-400"
-              disabled={createNews.isPending}
+              disabled={createNews.isPending || !newsForm.title.trim() || !newsForm.summary.trim()}
               onClick={async () => {
                 try {
                   await createNews.mutateAsync({
@@ -208,8 +208,12 @@ export default function Admin() {
                 <Label className="text-white/70">Description</Label>
                 <Textarea value={oppForm.description} onChange={(e) => setOppForm({ ...oppForm, description: e.target.value })} rows={3} className={portalInputClass} />
               </div>
+              <div className="sm:col-span-2">
+                <Label className="text-white/70">Tags (comma-separated)</Label>
+                <Input value={oppForm.tags} onChange={(e) => setOppForm({ ...oppForm, tags: e.target.value })} className={portalInputClass} />
+              </div>
             </div>
-            <Button className="mt-4 bg-emerald-500 hover:bg-emerald-400" onClick={async () => {
+            <Button className="mt-4 bg-emerald-500 hover:bg-emerald-400" disabled={createOpp.isPending || !oppForm.title.trim()} onClick={async () => {
               try {
                 await createOpp.mutateAsync({ ...oppForm, tags: parseTags(oppForm.tags), applicationUrl: oppForm.applicationUrl || undefined });
                 toast.success("Opportunity added");
@@ -250,8 +254,12 @@ export default function Admin() {
                 <Label className="text-white/70">Description</Label>
                 <Textarea value={eventForm.description} onChange={(e) => setEventForm({ ...eventForm, description: e.target.value })} rows={3} className={portalInputClass} />
               </div>
+              <div className="sm:col-span-2">
+                <Label className="text-white/70">Registration URL (optional)</Label>
+                <Input value={eventForm.registrationUrl} onChange={(e) => setEventForm({ ...eventForm, registrationUrl: e.target.value })} className={portalInputClass} />
+              </div>
             </div>
-            <Button className="mt-4 bg-emerald-500 hover:bg-emerald-400" onClick={async () => {
+            <Button className="mt-4 bg-emerald-500 hover:bg-emerald-400" disabled={createEvent.isPending || !eventForm.title.trim() || !eventForm.chapterId || !eventForm.startsAt} onClick={async () => {
               try {
                 await createEvent.mutateAsync({
                   ...eventForm,
@@ -293,7 +301,7 @@ export default function Admin() {
                 <Textarea value={explainerForm.body} onChange={(e) => setExplainerForm({ ...explainerForm, body: e.target.value })} rows={8} className={portalInputClass} />
               </div>
             </div>
-            <Button className="mt-4 bg-emerald-500 hover:bg-emerald-400" onClick={async () => {
+            <Button className="mt-4 bg-emerald-500 hover:bg-emerald-400" disabled={createExplainer.isPending || !explainerForm.slug.trim() || !explainerForm.title.trim()} onClick={async () => {
               try {
                 await createExplainer.mutateAsync(explainerForm);
                 toast.success("Explainer published");

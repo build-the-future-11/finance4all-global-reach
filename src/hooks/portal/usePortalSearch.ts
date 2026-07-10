@@ -110,16 +110,25 @@ export function usePortalSearch(query: string) {
         (m) =>
           m.title.toLowerCase().includes(q) ||
           m.description.toLowerCase().includes(q) ||
-          m.lessons.some((l) => l.title.toLowerCase().includes(q)),
-      ).forEach((m) =>
+          m.lessons.some(
+            (l) =>
+              l.title.toLowerCase().includes(q) || l.summary.toLowerCase().includes(q),
+          ),
+      ).forEach((m) => {
+        const matchingLesson = m.lessons.find(
+          (l) =>
+            l.title.toLowerCase().includes(q) || l.summary.toLowerCase().includes(q),
+        );
         results.push({
-          id: m.id,
+          id: matchingLesson?.id ?? m.id,
           type: "education",
-          title: m.title,
-          subtitle: "Education module",
-          href: portalRoutes.education,
-        }),
-      );
+          title: matchingLesson ? matchingLesson.title : m.title,
+          subtitle: m.title,
+          href: matchingLesson
+            ? `${portalRoutes.education}/${matchingLesson.id}`
+            : portalRoutes.education,
+        });
+      });
 
       RESOURCE_LIBRARY.filter(
         (r) =>
@@ -132,7 +141,7 @@ export function usePortalSearch(query: string) {
           type: "resource",
           title: r.title,
           subtitle: "Resource",
-          href: portalRoutes.resources,
+          href: r.href.startsWith("/") ? r.href : portalRoutes.resources,
         }),
       );
 

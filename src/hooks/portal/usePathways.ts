@@ -58,7 +58,10 @@ export function useToggleOpportunityInterest() {
         if (error) throw error;
       }
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["opportunity-interests"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["opportunity-interests"] });
+      qc.invalidateQueries({ queryKey: ["saved-opportunities"] });
+    },
   });
 }
 
