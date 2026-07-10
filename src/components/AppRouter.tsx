@@ -8,6 +8,7 @@ import { LoadingState } from "@/components/portal/PortalUI";
 import Index from "@/pages/Index";
 import NotFound from "@/pages/NotFound";
 import Login from "@/pages/auth/Login";
+import ForgotPassword from "@/pages/auth/ForgotPassword";
 import Signup from "@/pages/auth/Signup";
 import Onboarding from "@/pages/auth/Onboarding";
 import AuthCallback from "@/pages/auth/AuthCallback";
@@ -47,6 +48,7 @@ function AppRoutes() {
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
 

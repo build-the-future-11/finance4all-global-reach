@@ -29,6 +29,9 @@ import { Button } from "@/components/ui/button";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import MembershipCard from "@/components/portal/MembershipCard";
 import PortalOnboardingChecklist from "@/components/portal/PortalOnboardingChecklist";
+import PortalTour from "@/components/portal/PortalTour";
+import MemberBadges from "@/components/portal/MemberBadges";
+import { computeMemberBadges } from "@/lib/badges";
 
 const ACTIVITY_ICONS = {
   news: Newspaper,
@@ -51,6 +54,7 @@ export default function Dashboard() {
   const { data: chapters } = useChapters();
 
   const chapterName = chapters?.find((c) => c.id === profile?.chapterId)?.name;
+  const memberBadges = computeMemberBadges(profile, stats);
 
   const isAdmin = profile?.role === "admin";
 
@@ -65,6 +69,7 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8">
+      <PortalTour />
       <PortalHero
         greeting="Welcome back"
         name={profile?.displayName ?? "Member"}
@@ -83,10 +88,11 @@ export default function Dashboard() {
       />
 
       <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 space-y-4">
           {profile && (
             <MembershipCard profile={profile} chapterName={chapterName} />
           )}
+          {profile && <MemberBadges badges={memberBadges} compact />}
         </div>
         <div className="lg:col-span-2">
           <PortalOnboardingChecklist />

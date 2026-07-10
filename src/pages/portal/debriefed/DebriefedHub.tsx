@@ -20,8 +20,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { toast } from "sonner";
-import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { useLiveHeadlines } from "@/hooks/portal/useLiveHeadlines";
+import SubstackEmbed from "@/components/portal/SubstackEmbed";
+import { Badge } from "@/components/ui/badge";
 
 const CATEGORIES: { value: NewsCategory | "all"; label: string }[] = [
   { value: "all", label: "All" },
@@ -39,6 +40,12 @@ export default function DebriefedHub() {
   const updatePrefs = useUpdateDigestPreferences();
   const { data: bookmarks } = useNewsBookmarks();
   const toggleBookmark = useToggleNewsBookmark();
+  const { data: liveHeadlines } = useLiveHeadlines();
+
+  const filteredLive =
+    category === "all"
+      ? liveHeadlines
+      : liveHeadlines?.filter((h) => h.category === category);
 
   const handleDigestToggle = async (
     key: "weeklyDigestEnabled" | "substackSubscribed",
@@ -99,6 +106,39 @@ export default function DebriefedHub() {
           </a>
         </PortalCard>
       </div>
+
+      <div className="mb-8">
+        <SubstackEmbed />
+      </div>
+
+      {filteredLive && filteredLive.length > 0 && (
+        <section className="mb-8">
+          <div className="mb-4 flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-white">Live market headlines</h2>
+            <Badge className="border-0 bg-red-500/20 text-red-300">Live</Badge>
+          </div>
+          <div className="space-y-3">
+            {filteredLive.map((headline) => (
+              <PortalCard key={headline.id} hover className="p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <CategoryBadge>{headline.category}</CategoryBadge>
+                    <h3 className="mt-2 font-medium text-white">{headline.title}</h3>
+                    {headline.summary && (
+                      <p className="mt-1 line-clamp-2 text-sm text-white/55">{headline.summary}</p>
+                    )}
+                  </div>
+                  <a href={headline.sourceUrl} target="_blank" rel="noopener noreferrer">
+                    <Button size="sm" variant="outline" className={portalButtonOutline}>
+                      Read <ExternalLink className="h-3.5 w-3.5" />
+                    </Button>
+                  </a>
+                </div>
+              </PortalCard>
+            ))}
+          </div>
+        </section>
+      )}
 
       <Tabs
         value={category}

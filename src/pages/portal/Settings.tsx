@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import { Lock, Shield } from "lucide-react";
+import { Camera, Lock, Shield } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChapters } from "@/hooks/portal/useEvents";
 import { useUpdateMyProfile } from "@/hooks/portal/useNetwork";
-import { computeProfileCompleteness } from "@/hooks/portal/useMemberStats";
+import { computeProfileCompleteness, useMyMemberStats } from "@/hooks/portal/useMemberStats";
+import { useAvatarUpload } from "@/hooks/portal/useAvatarUpload";
+import { computeMemberBadges } from "@/lib/badges";
 import { portalRoutes } from "@/routes/portal";
 import MembershipCard from "@/components/portal/MembershipCard";
+import MemberBadges from "@/components/portal/MemberBadges";
 import {
   PortalCard,
   PortalPageHeader,
@@ -34,9 +37,12 @@ const SUGGESTED_INTERESTS = ["macro", "equities", "fintech", "credit", "startups
 
 export default function Settings() {
   useDocumentTitle("Settings");
-  const { profile, signOut } = useAuth();
+  const { profile, signOut, refreshProfile } = useAuth();
   const { data: chapters } = useChapters();
+  const { data: stats } = useMyMemberStats();
   const updateProfile = useUpdateMyProfile();
+  const uploadAvatar = useAvatarUpload();
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const [displayName, setDisplayName] = useState(profile?.displayName ?? "");
   const [bio, setBio] = useState(profile?.bio ?? "");
@@ -53,6 +59,20 @@ export default function Settings() {
   });
 
   const chapterName = chapters?.find((c) => c.id === chapterId)?.name;
+  const memberBadges = computeMemberBadges(profile, stats);
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      await uploadAvatar.mutateAsync(file);
+      await refreshProfile();
+      toast.success("Avatar updated");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Upload failed");
+    }
+    e.target.value = "";
+  };
 
   const toggleInterest = (tag: string) => {
     setInterests((prev) =>
@@ -119,12 +139,30 @@ export default function Settings() {
       <div className="grid gap-6 lg:grid-cols-3">
         <PortalCard className="p-6 lg:col-span-1">
           <div className="flex flex-col items-center text-center">
-            <Avatar className="h-20 w-20 border border-white/15">
-              <AvatarImage src={profile?.avatarUrl} />
-              <AvatarFallback className="bg-emerald-500/20 text-lg text-emerald-300">
-                {initials || "?"}
-              </AvatarFallback>
-            </Avatar>
+            <div className="relative">
+              <Avatar className="h-20 w-20 border border-white/15">
+                <AvatarImage src={profile?.avatarUrl} />
+                <AvatarFallback className="bg-emerald-500/20 text-lg text-emerald-300">
+                  {initials || "?"}
+                </AvatarFallback>
+              </Avatar>
+              <button
+                type="button"
+                onClick={() => fileRef.current?.click()}
+                disabled={uploadAvatar.isPending}
+                className="absolute -bottom-1 -right-1 rounded-full border border-white/20 bg-emerald-500 p-1.5 text-white shadow-lg transition hover:bg-emerald-400"
+                aria-label="Upload avatar"
+              >
+                <Camera className="h-3.5 w-3.5" />
+              </button>
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                className="hidden"
+                onChange={handleAvatarChange}
+              />
+            </div>
             <h2 className="mt-4 text-lg font-semibold text-white">{profile?.displayName}</h2>
             <p className="text-sm text-white/50">{profile?.email}</p>
             <p className="mt-1 text-xs capitalize text-white/40">
@@ -213,6 +251,11 @@ export default function Settings() {
           </div>
         </PortalCard>
       </div>
+
+      <PortalCard className="mt-6 p-6">
+        <h3 className="mb-4 font-semibold text-white">Membership badges</h3>
+        <MemberBadges badges={memberBadges} />
+      </PortalCard>
 
       <PortalCard className="mt-6 p-6">
         <div className="flex items-start gap-3">
