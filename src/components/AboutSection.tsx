@@ -1,6 +1,7 @@
 import { BookOpen, FlaskConical, Globe } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import SectionHeader from "@/components/landing/SectionHeader";
+import GlassSurface from "@/components/landing/GlassSurface";
 
 const pillars = [
   {
@@ -48,25 +49,23 @@ export default function AboutSection() {
         />
 
         <div className="mt-16 grid gap-5 lg:grid-cols-3">
-          {pillars.map((pillar, i) => {
+          {pillars.map((pillar) => {
             const Icon = pillar.icon;
             return (
-              <article
-                key={pillar.title}
-                className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03] p-7 transition duration-500 hover:border-white/20 hover:bg-white/[0.05]"
-                style={{ transitionDelay: `${i * 50}ms` }}
-              >
-                <div className="absolute -right-4 -top-4 font-mono text-7xl font-bold text-white/[0.03] transition group-hover:text-white/[0.05]">
-                  {pillar.number}
-                </div>
-                <div className="relative">
-                  <div className="mb-5 inline-flex rounded-2xl border border-white/10 bg-white/[0.06] p-3 text-emerald-300">
-                    <Icon className="h-5 w-5" />
+              <GlassSurface key={pillar.title} className="p-7" strong>
+                <div className="landing-glass-inner relative">
+                  <div className="absolute -right-2 -top-2 font-mono text-7xl font-bold text-white/[0.04]">
+                    {pillar.number}
                   </div>
-                  <h3 className="text-lg font-semibold text-white">{pillar.title}</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-white/55">{pillar.description}</p>
+                  <div className="relative">
+                    <div className="mb-5 inline-flex rounded-2xl border border-white/10 bg-white/[0.08] p-3 text-emerald-300">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-white">{pillar.title}</h3>
+                    <p className="mt-3 text-sm leading-relaxed text-white/58">{pillar.description}</p>
+                  </div>
                 </div>
-              </article>
+              </GlassSurface>
             );
           })}
         </div>

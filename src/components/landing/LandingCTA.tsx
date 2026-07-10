@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, Check } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import GlassSurface from "@/components/landing/GlassSurface";
 
 const INCLUDES = [
   "Full Catalyst lesson library with exercises",
@@ -14,14 +15,9 @@ export default function LandingCTA() {
 
   return (
     <section className="px-4 pb-28 pt-8 sm:pb-36">
-      <div
-        ref={ref}
-        className="relative mx-auto max-w-6xl overflow-hidden rounded-[32px] border border-white/10 bg-[#060c14]"
-      >
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_100%_0%,rgba(52,211,153,0.15),transparent_50%)]" />
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_0%_100%,rgba(99,102,241,0.1),transparent_45%)]" />
-
-        <div className="relative grid gap-10 p-10 sm:p-14 lg:grid-cols-2 lg:items-center lg:gap-16">
+      <div ref={ref} className="mx-auto max-w-6xl">
+        <GlassSurface strong>
+          <div className="landing-glass-inner grid gap-10 p-10 sm:p-14 lg:grid-cols-2 lg:items-center lg:gap-16">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-emerald-400/90">
               Get started
@@ -35,7 +31,8 @@ export default function LandingCTA() {
             </p>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+          <div className="landing-glass rounded-2xl p-6 sm:p-8">
+            <div className="landing-glass-inner">
             <p className="text-xs font-semibold uppercase tracking-wider text-white/40">
               Included with every account
             </p>
@@ -62,8 +59,10 @@ export default function LandingCTA() {
                 Sign in
               </Link>
             </div>
+            </div>
           </div>
-        </div>
+          </div>
+        </GlassSurface>
       </div>
     </section>
   );

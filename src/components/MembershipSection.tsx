@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, BookOpen, Globe, Newspaper, Users } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import SectionHeader from "@/components/landing/SectionHeader";
+import GlassSurface from "@/components/landing/GlassSurface";
 
 const PERKS = [
   {
@@ -48,18 +49,17 @@ export default function MembershipSection() {
 
         <div className="mt-14 grid gap-4 sm:grid-cols-2">
           {PERKS.map(({ icon: Icon, title, desc }) => (
-            <div
-              key={title}
-              className="flex gap-5 rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition hover:border-emerald-400/25 hover:bg-white/[0.05]"
-            >
-              <div className="shrink-0 rounded-xl border border-white/10 bg-emerald-500/10 p-3 text-emerald-300">
-                <Icon className="h-5 w-5" />
+            <GlassSurface key={title} className="p-6" strong>
+              <div className="landing-glass-inner flex gap-5">
+                <div className="shrink-0 rounded-xl border border-white/10 bg-emerald-500/10 p-3 text-emerald-300">
+                  <Icon className="h-5 w-5" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-white">{title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-white/52">{desc}</p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-semibold text-white">{title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-white/50">{desc}</p>
-              </div>
-            </div>
+            </GlassSurface>
           ))}
         </div>
 

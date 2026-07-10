@@ -1,20 +1,52 @@
 -- Finance4All Portal — initial schema
 -- Run in Supabase SQL Editor or via supabase db push
+-- Safe to re-run: enums/tables use IF NOT EXISTS / duplicate_object guards
 
 -- ─── Enums ───────────────────────────────────────────────────────────────────
 
-CREATE TYPE user_role AS ENUM ('member', 'lead_researcher', 'admin');
-CREATE TYPE news_category AS ENUM ('macro', 'markets', 'ipo', 'company');
-CREATE TYPE research_project_status AS ENUM ('draft', 'open', 'reviewing', 'closed');
-CREATE TYPE lab_application_status AS ENUM ('pending', 'under_review', 'accepted', 'rejected');
-CREATE TYPE opportunity_type AS ENUM ('internship', 'program', 'challenge', 'project_role');
-CREATE TYPE event_status AS ENUM ('upcoming', 'live', 'completed');
-CREATE TYPE connection_status AS ENUM ('pending', 'accepted', 'declined');
-CREATE TYPE explainer_difficulty AS ENUM ('beginner', 'intermediate');
+DO $$ BEGIN
+  CREATE TYPE user_role AS ENUM ('member', 'lead_researcher', 'admin');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  CREATE TYPE news_category AS ENUM ('macro', 'markets', 'ipo', 'company');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  CREATE TYPE research_project_status AS ENUM ('draft', 'open', 'reviewing', 'closed');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  CREATE TYPE lab_application_status AS ENUM ('pending', 'under_review', 'accepted', 'rejected');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  CREATE TYPE opportunity_type AS ENUM ('internship', 'program', 'challenge', 'project_role');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  CREATE TYPE event_status AS ENUM ('upcoming', 'live', 'completed');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  CREATE TYPE connection_status AS ENUM ('pending', 'accepted', 'declined');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  CREATE TYPE explainer_difficulty AS ENUM ('beginner', 'intermediate');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 -- ─── Chapters (before profiles FK) ───────────────────────────────────────────
 
-CREATE TABLE chapters (
+CREATE TABLE IF NOT EXISTS chapters (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   city TEXT NOT NULL,
@@ -27,7 +59,7 @@ CREATE TABLE chapters (
 
 -- ─── Profiles ────────────────────────────────────────────────────────────────
 
-CREATE TABLE profiles (
+CREATE TABLE IF NOT EXISTS profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   display_name TEXT NOT NULL DEFAULT '',
   email TEXT NOT NULL,

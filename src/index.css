@@ -279,4 +279,83 @@
     transform: translateY(-2px);
     box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
   }
+
+  /* ─── Landing liquid glass surfaces ─── */
+  .landing-glass {
+    @apply relative overflow-hidden rounded-3xl border backdrop-blur-2xl;
+    border-color: rgba(255, 255, 255, 0.12);
+    background: linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.09) 0%,
+      rgba(255, 255, 255, 0.03) 45%,
+      rgba(52, 211, 153, 0.04) 100%
+    );
+    box-shadow:
+      0 8px 40px rgba(0, 0, 0, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  .landing-glass-strong {
+    @apply relative overflow-hidden rounded-3xl border backdrop-blur-3xl;
+    border-color: rgba(255, 255, 255, 0.16);
+    background: linear-gradient(
+      155deg,
+      rgba(255, 255, 255, 0.11) 0%,
+      rgba(255, 255, 255, 0.04) 40%,
+      rgba(99, 102, 241, 0.05) 100%
+    );
+    box-shadow:
+      0 20px 60px rgba(0, 0, 0, 0.45),
+      0 0 0 1px rgba(255, 255, 255, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  .landing-glass::before,
+  .landing-glass-strong::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(
+      circle at var(--mx, 50%) var(--my, 50%),
+      rgba(255, 255, 255, 0.14) 0%,
+      transparent 55%
+    );
+    opacity: 0;
+    transition: opacity 0.45s ease;
+    pointer-events: none;
+  }
+
+  .landing-glass:hover::before,
+  .landing-glass-strong:hover::before {
+    opacity: 1;
+  }
+
+  .landing-glass::after,
+  .landing-glass-strong::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 8%;
+    right: 8%;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.35),
+      transparent
+    );
+    pointer-events: none;
+  }
+
+  .landing-glass-inner {
+    @apply relative z-10;
+  }
+
+  .landing-orb {
+    @apply absolute rounded-full blur-[120px];
+    animation: landing-float 10s ease-in-out infinite;
+  }
 }

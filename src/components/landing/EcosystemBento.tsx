@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import SectionHeader from "@/components/landing/SectionHeader";
+import GlassSurface from "@/components/landing/GlassSurface";
 import { portalRoutes } from "@/routes/portal";
 
 const MODULES = [
@@ -88,12 +89,12 @@ export default function EcosystemBento() {
               <Link
                 key={mod.title}
                 to={mod.href}
-                className={`landing-bento-card group relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.025] p-6 backdrop-blur-xl transition duration-500 hover:border-white/22 hover:bg-white/[0.05] ${mod.className}`}
+                className={`landing-bento-card landing-glass group relative overflow-hidden p-6 transition duration-500 hover:border-white/22 ${mod.className}`}
               >
                 <div
                   className={`pointer-events-none absolute inset-0 bg-gradient-to-br opacity-90 ${mod.gradient}`}
                 />
-                <div className="relative z-10 flex h-full flex-col">
+                <div className="relative z-10 flex h-full flex-col landing-glass-inner">
                   <div className="flex items-start justify-between gap-3">
                     <span className="rounded-full border border-white/10 bg-black/20 px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white/45">
                       {mod.tag}

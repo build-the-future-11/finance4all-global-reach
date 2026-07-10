@@ -1,22 +1,25 @@
 -- Bookmarks, notifications, and activity triggers
 
-CREATE TYPE notification_type AS ENUM (
-  'connection_request',
-  'connection_accepted',
-  'lab_application_status',
-  'lab_application_received'
-);
+DO $$ BEGIN
+  CREATE TYPE notification_type AS ENUM (
+    'connection_request',
+    'connection_accepted',
+    'lab_application_status',
+    'lab_application_received'
+  );
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 -- ─── Bookmarks ───────────────────────────────────────────────────────────────
 
-CREATE TABLE news_bookmarks (
+CREATE TABLE IF NOT EXISTS news_bookmarks (
   user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   article_id UUID NOT NULL REFERENCES news_articles(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   PRIMARY KEY (user_id, article_id)
 );
 
-CREATE TABLE project_bookmarks (
+CREATE TABLE IF NOT EXISTS project_bookmarks (
   user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   project_id UUID NOT NULL REFERENCES research_projects(id) ON DELETE CASCADE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -25,7 +28,7 @@ CREATE TABLE project_bookmarks (
 
 -- ─── Notifications ───────────────────────────────────────────────────────────
 
-CREATE TABLE notifications (
+CREATE TABLE IF NOT EXISTS notifications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   type notification_type NOT NULL,

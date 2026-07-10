@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { FileText, GraduationCap, Microscope } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { portalRoutes } from "@/routes/portal";
+import GlassSurface from "@/components/landing/GlassSurface";
 
 const OUTCOMES = [
   {
@@ -57,10 +58,8 @@ export default function ImpactOutcomesSection() {
           {OUTCOMES.map((o) => {
             const Icon = o.icon;
             return (
-              <article
-                key={o.label}
-                className="flex flex-col rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.05] to-transparent p-7 transition hover:border-white/18"
-              >
+              <GlassSurface key={o.label} className="flex flex-col p-7" strong>
+                <div className="landing-glass-inner flex flex-1 flex-col">
                 <div className="flex items-start justify-between">
                   <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-3 text-emerald-300">
                     <Icon className="h-5 w-5" />
@@ -75,7 +74,8 @@ export default function ImpactOutcomesSection() {
                 >
                   {o.cta} →
                 </Link>
-              </article>
+                </div>
+              </GlassSurface>
             );
           })}
         </div>

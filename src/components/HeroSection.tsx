@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, ChevronDown, FlaskConical, Newspaper, Users } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import GlassSurface from "@/components/landing/GlassSurface";
 
 const STATS = [
   { value: 25000, suffix: "+", label: "Students in outreach", context: "since 2023" },
@@ -105,12 +106,12 @@ export default function HeroSection() {
 
       <div className="relative z-10 mx-auto grid w-full max-w-6xl items-center gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
         <div>
-          <div className="mb-8 inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.04] py-1.5 pl-1.5 pr-4 backdrop-blur-md">
-            <span className="rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-emerald-300">
-              Free membership
-            </span>
-            <span className="text-xs text-white/50">Portal · Labs · Chapters · Journal</span>
-          </div>
+          <GlassSurface className="mb-8 inline-flex w-fit rounded-full p-1.5 pr-4" interactive={false}>
+            <div className="landing-glass-inner flex items-center gap-3">
+              <span className="glass-pill !text-emerald-200">Free membership</span>
+              <span className="text-xs text-white/55">Portal · Labs · Chapters · Journal</span>
+            </div>
+          </GlassSurface>
 
           <h1 className="text-balance text-4xl font-bold leading-[1.06] tracking-tight text-white sm:text-5xl lg:text-[3.35rem]">
             Finance education that{" "}
@@ -135,27 +136,29 @@ export default function HeroSection() {
             </Link>
             <Link
               to="/login"
-              className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-7 py-3.5 text-sm font-semibold text-white transition hover:border-white/25 hover:bg-white/[0.07]"
+              className="landing-glass inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold text-white transition hover:border-white/25"
             >
-              Sign in to portal
+              <span className="landing-glass-inner">Sign in to portal</span>
             </Link>
           </div>
 
-          <div className="mt-12 grid gap-8 sm:grid-cols-3">
-            {STATS.map((s) => (
-              <AnimatedStat key={s.label} {...s} />
-            ))}
-          </div>
+          <GlassSurface className="mt-12 p-6 sm:p-8" strong>
+            <div className="landing-glass-inner grid gap-8 sm:grid-cols-3">
+              {STATS.map((s) => (
+                <AnimatedStat key={s.label} {...s} />
+              ))}
+            </div>
+          </GlassSurface>
         </div>
 
         <div className="relative">
           <div
             ref={glareRef}
-            className="pointer-events-none absolute -inset-6 rounded-[40px] bg-[radial-gradient(circle,rgba(52,211,153,0.14),transparent_68%)] transition-transform duration-500"
+            className="pointer-events-none absolute -inset-6 rounded-[40px] bg-[radial-gradient(circle,rgba(52,211,153,0.16),transparent_68%)] transition-transform duration-500"
           />
-          <div className="relative overflow-hidden rounded-[28px] border border-white/12 bg-gradient-to-b from-white/[0.07] to-white/[0.02] p-[1px] shadow-[0_32px_100px_rgba(0,0,0,0.55)]">
-            <div className="rounded-[27px] border border-white/8 bg-[#050810]/95 backdrop-blur-2xl">
-              <div className="flex items-center justify-between border-b border-white/8 px-5 py-3.5">
+          <GlassSurface strong className="rounded-[28px]">
+            <div className="landing-glass-inner">
+              <div className="flex items-center justify-between border-b border-white/10 px-5 py-3.5">
                 <div className="flex gap-1.5">
                   <div className="h-2.5 w-2.5 rounded-full bg-red-400/60" />
                   <div className="h-2.5 w-2.5 rounded-full bg-amber-400/60" />
@@ -170,9 +173,9 @@ export default function HeroSection() {
                   return (
                     <div
                       key={item.label}
-                      className="group rounded-2xl border border-white/8 bg-white/[0.03] p-4 transition hover:border-white/15 hover:bg-white/[0.05]"
+                      className="landing-glass rounded-2xl p-4 transition"
                     >
-                      <div className="flex items-start gap-3">
+                      <div className="landing-glass-inner flex items-start gap-3">
                         <div
                           className={`rounded-xl border p-2.5 ${accentMap[item.accent as keyof typeof accentMap]}`}
                         >
@@ -195,13 +198,13 @@ export default function HeroSection() {
                 })}
               </div>
 
-              <div className="border-t border-white/8 px-5 py-3">
-                <p className="text-center text-[11px] text-white/35">
+              <div className="border-t border-white/10 px-5 py-3">
+                <p className="text-center text-[11px] text-white/40">
                   Live modules — news, research, pathways, chapters
                 </p>
               </div>
             </div>
-          </div>
+          </GlassSurface>
         </div>
       </div>
 

@@ -125,12 +125,8 @@ function ProgramCard({ program }: { program: typeof programs[0] }) {
       onClick={() => setExpanded(!expanded)}
       className="
         group relative cursor-pointer overflow-hidden rounded-2xl
-        border border-white/10
-        bg-white/[0.03]
-        p-6
+        landing-glass p-6
         transition-all duration-300
-        hover:border-white/20
-        hover:bg-white/[0.05]
       "
     >
       {/* cursor glow */}
@@ -145,7 +141,7 @@ function ProgramCard({ program }: { program: typeof programs[0] }) {
       {/* gradient edge glow */}
       <div className="absolute inset-0 rounded-3xl pointer-events-none bg-[linear-gradient(120deg,transparent,rgba(255,255,255,0.2),transparent)] opacity-20" />
 
-      <div className="relative flex flex-col gap-3">
+      <div className="relative flex flex-col gap-3 landing-glass-inner">
         <div className="flex items-start justify-between">
           <div className="flex gap-3">
             <div className="p-3 rounded-xl bg-white/10 border border-white/20 backdrop-blur-md text-emerald-300">

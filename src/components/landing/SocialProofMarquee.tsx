@@ -17,7 +17,7 @@ export default function SocialProofMarquee() {
   const items = [...INSTITUTIONS, ...INSTITUTIONS];
 
   return (
-    <div className="relative overflow-hidden border-y border-white/[0.07] bg-black/20 py-4 backdrop-blur-sm">
+    <div className="relative overflow-hidden border-y border-white/[0.08] py-4 landing-glass !rounded-none backdrop-blur-xl">
       <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-32 bg-gradient-to-r from-[#030508] to-transparent" />
       <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-32 bg-gradient-to-l from-[#030508] to-transparent" />
 

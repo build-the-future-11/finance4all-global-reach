@@ -17,7 +17,20 @@ The app includes safe project defaults if Vercel env vars are missing, but you s
 
 ## 2. Run SQL migrations (in order)
 
-Open **SQL Editor** and run each file:
+**If you see `type "user_role" already exists`** — you already ran `001`. Do **not** re-run it from scratch. Instead:
+
+1. Run `supabase/verify_migration_status.sql` to see what's installed
+2. Skip files you've already run; continue with the next number
+
+| Step | File | Skip if… |
+|------|------|----------|
+| 1 | `001_initial_schema.sql` | `user_role` enum already exists |
+| 2 | `seed.sql` | you already have chapters/news data |
+| 3 | `002_google_oauth.sql` | always safe to re-run |
+| 4 | `003_bookmarks_notifications.sql` | `news_bookmarks` table exists |
+| 5 | `004_avatar_storage.sql` | avatars bucket exists |
+
+Open **SQL Editor** and run each file you still need:
 
 1. `supabase/migrations/001_initial_schema.sql`
 2. `supabase/seed.sql`
@@ -88,7 +101,7 @@ Expect `200`.
 | Error | Fix |
 |-------|-----|
 | `Missing Supabase env vars` | Set `VITE_*` in `.env` locally or Vercel; restart dev server |
-| `localhost:0` / `ERR_UNSAFE_PORT` | Pull latest code — fixed with project URL defaults |
+| `type "user_role" already exists` | Migration 001 already ran — skip to 002–004 + seed |
 | `Failed to fetch` on signup | Check redirect URLs; confirm anon key is JWT not publishable key |
 | Bookmarks/notifications fail | Run migration `003` |
 | Avatar upload fails | Run migration `004`; check Storage → avatars bucket exists |
