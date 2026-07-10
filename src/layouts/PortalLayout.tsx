@@ -5,6 +5,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { portalNav, portalRoutes } from "@/routes/portal";
 import ThemeToggle from "@/components/ThemeToggle";
 import MobileBottomNav from "@/components/portal/MobileBottomNav";
+import NotificationsCenter from "@/components/portal/NotificationsCenter";
+import PortalSearch from "@/components/portal/PortalSearch";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -20,6 +23,7 @@ function initials(name: string) {
 export default function PortalLayout() {
   const { profile, signOut } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  useDocumentTitle("Portal");
 
   const canReview = profile?.role === "lead_researcher" || profile?.role === "admin";
   const isAdmin = profile?.role === "admin";
@@ -55,12 +59,14 @@ export default function PortalLayout() {
           </div>
 
           <div className="flex items-center gap-2">
+            <PortalSearch />
             <Link
               to="/"
               className="hidden text-xs text-white/40 transition hover:text-white/70 sm:inline"
             >
               ← Site
             </Link>
+            <NotificationsCenter />
             <ThemeToggle />
             <Button
               variant="ghost"

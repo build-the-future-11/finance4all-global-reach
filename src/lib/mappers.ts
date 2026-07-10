@@ -9,6 +9,7 @@ import type {
   IntroductionPost,
   LabApplication,
   NewsArticle,
+  Notification,
   Opportunity,
   ResearchProject,
   StudioSubmission,
@@ -178,6 +179,19 @@ export function mapIntroductionPost(row: Tables<"introduction_posts">): Introduc
     headline: row.headline,
     lookingFor: row.looking_for,
     interests: row.interests,
+    createdAt: row.created_at,
+  };
+}
+
+export function mapNotification(row: Tables<"notifications">): Notification {
+  return {
+    id: row.id,
+    userId: row.user_id,
+    type: row.type,
+    title: row.title,
+    body: row.body,
+    link: row.link ?? undefined,
+    read: row.read,
     createdAt: row.created_at,
   };
 }

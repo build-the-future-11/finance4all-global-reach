@@ -198,3 +198,25 @@ export const IntroductionPostSchema = z.object({
   createdAt: z.string().datetime(),
 });
 export type IntroductionPost = z.infer<typeof IntroductionPostSchema>;
+
+// ─── Bookmarks & Notifications ──────────────────────────────────────────────
+
+export const NotificationTypeSchema = z.enum([
+  "connection_request",
+  "connection_accepted",
+  "lab_application_status",
+  "lab_application_received",
+]);
+export type NotificationType = z.infer<typeof NotificationTypeSchema>;
+
+export const NotificationSchema = z.object({
+  id: z.string().uuid(),
+  userId: z.string().uuid(),
+  type: NotificationTypeSchema,
+  title: z.string(),
+  body: z.string(),
+  link: z.string().optional(),
+  read: z.boolean().default(false),
+  createdAt: z.string().datetime(),
+});
+export type Notification = z.infer<typeof NotificationSchema>;

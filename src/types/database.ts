@@ -8,6 +8,11 @@ export type OpportunityType = "internship" | "program" | "challenge" | "project_
 export type EventStatus = "upcoming" | "live" | "completed";
 export type ConnectionStatus = "pending" | "accepted" | "declined";
 export type ExplainerDifficulty = "beginner" | "intermediate";
+export type NotificationType =
+  | "connection_request"
+  | "connection_accepted"
+  | "lab_application_status"
+  | "lab_application_received";
 
 export interface Database {
   public: {
@@ -246,6 +251,34 @@ export interface Database {
           id?: string;
         };
         Update: Partial<Database["public"]["Tables"]["introduction_posts"]["Insert"]>;
+      };
+      news_bookmarks: {
+        Row: { user_id: string; article_id: string; created_at: string };
+        Insert: { user_id: string; article_id: string; created_at?: string };
+        Update: Partial<Database["public"]["Tables"]["news_bookmarks"]["Insert"]>;
+      };
+      project_bookmarks: {
+        Row: { user_id: string; project_id: string; created_at: string };
+        Insert: { user_id: string; project_id: string; created_at?: string };
+        Update: Partial<Database["public"]["Tables"]["project_bookmarks"]["Insert"]>;
+      };
+      notifications: {
+        Row: {
+          id: string;
+          user_id: string;
+          type: NotificationType;
+          title: string;
+          body: string;
+          link: string | null;
+          read: boolean;
+          created_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["notifications"]["Row"], "id" | "created_at" | "read"> & {
+          id?: string;
+          read?: boolean;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["notifications"]["Insert"]>;
       };
     };
     Views: {
