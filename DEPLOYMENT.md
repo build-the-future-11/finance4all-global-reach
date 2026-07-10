@@ -17,6 +17,7 @@ In Vercel → Project → **Settings** → **Environment Variables**, add:
 |------|-------|--------------|
 | `VITE_SUPABASE_URL` | `https://pnemeegkwyaicsbnbnmg.supabase.co` | Production, Preview, Development |
 | `VITE_SUPABASE_ANON_KEY` | Your Supabase **anon** JWT (`eyJ...`) | Production, Preview, Development |
+| `VITE_APP_URL` | `https://YOUR-PROJECT.vercel.app` (recommended) | Production |
 
 Optional (only if you omit `VITE_SUPABASE_ANON_KEY`):
 
@@ -42,11 +43,13 @@ Dev server runs at **http://localhost:8080** (see `vite.config.ts`).
 
 In [Supabase Dashboard](https://supabase.com/dashboard/project/pnemeegkwyaicsbnbnmg) → **Authentication** → **URL Configuration**:
 
-**Site URL** (production):
+**Site URL** (production) — must be your **live Vercel URL**, NOT localhost:
 
 ```
 https://YOUR-PROJECT.vercel.app
 ```
+
+If Site URL is `http://localhost:8080`, Google sign-in on production will redirect to localhost and fail with `ERR_CONNECTION_REFUSED`.
 
 **Redirect URLs** — add ALL of these:
 

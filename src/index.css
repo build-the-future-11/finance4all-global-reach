@@ -226,4 +226,57 @@
   .text-balance {
     text-wrap: balance;
   }
+
+  @keyframes landing-aurora {
+    0%, 100% { transform: translateX(-5%) rotate(-2deg); opacity: 0.35; }
+    50% { transform: translateX(5%) rotate(2deg); opacity: 0.55; }
+  }
+
+  @keyframes landing-float {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-24px) scale(1.05); }
+  }
+
+  @keyframes landing-marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  @keyframes shine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  .landing-aurora {
+    background: linear-gradient(
+      105deg,
+      transparent 0%,
+      rgba(52, 211, 153, 0.12) 25%,
+      rgba(99, 102, 241, 0.1) 50%,
+      rgba(236, 72, 153, 0.08) 75%,
+      transparent 100%
+    );
+    animation: landing-aurora 14s ease-in-out infinite;
+  }
+
+  .landing-aurora-delay {
+    animation-delay: -7s;
+  }
+
+  .landing-float {
+    animation: landing-float 8s ease-in-out infinite;
+  }
+
+  .landing-float-delay {
+    animation-delay: -4s;
+  }
+
+  .landing-marquee {
+    animation: landing-marquee 40s linear infinite;
+  }
+
+  .landing-bento-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+  }
 }

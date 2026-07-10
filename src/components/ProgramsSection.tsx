@@ -178,7 +178,7 @@ function ImpactNumbers() {
   const stats = [
     { value: "25,000+", label: "Students Impacted" },
     { value: "15+", label: "Countries Reached" },
-    { value: "50+", label: "Global Members" },
+    { value: "500+", label: "Global Members" },
   ];
 
   return (

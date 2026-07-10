@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
+import { getAuthCallbackUrl } from "@/lib/appOrigin";
 
 /**
  * Public Supabase project defaults (anon key is safe in client code; RLS enforces access).
@@ -59,5 +60,5 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
 });
 
 export function getAuthRedirectUrl() {
-  return `${window.location.origin}/auth/callback`;
+  return getAuthCallbackUrl();
 }

@@ -56,42 +56,27 @@ export default function FounderSection() {
   const ref = useScrollReveal();
 
   return (
-    <section id="founder" className="px-4 py-28 sm:py-36 relative">
-
+    <section id="founder" className="relative px-4 py-28 sm:py-36">
       <div ref={ref} className="section-fade mx-auto max-w-6xl">
-
-        {/* HEADER */}
         <div className="mb-20 text-center">
-          <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-primary">
+          <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-emerald-400">
             Leadership
           </p>
-
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
-            Built by <span className="gradient-text">Operators</span>
+          <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
+            Built by <span className="bg-gradient-to-r from-emerald-300 to-cyan-300 bg-clip-text text-transparent">operators</span>
           </h2>
-
-          <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
-            A small, high leverage team working across finance, research, and execution.
+          <p className="mx-auto mt-4 max-w-2xl text-white/55">
+            A small, high-leverage team working across finance, research, and execution.
           </p>
         </div>
 
-        {/* FOUNDER */}
         <div className="mb-16">
-          <div className="relative overflow-hidden rounded-3xl border border-white/20 bg-white/10 p-8 sm:p-10 backdrop-blur-3xl shadow-[0_25px_80px_rgba(0,0,0,0.25)]">
-
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(120,255,220,0.12),transparent_40%)]" />
-            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.08),transparent)] opacity-60" />
-
+          <div className="relative overflow-hidden rounded-3xl border border-white/15 bg-white/[0.05] p-8 backdrop-blur-3xl sm:p-10">
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(52,211,153,0.12),transparent_40%)]" />
             <div className="relative z-10">
-              <h3 className="text-2xl font-semibold">
-                Ryan Gomez
-              </h3>
-
-              <p className="mt-1 text-primary/90 font-medium">
-                Founder and ML Researcher
-              </p>
-
-              <div className="mt-6 grid gap-3 sm:grid-cols-2 text-sm text-muted-foreground">
+              <h3 className="text-2xl font-semibold text-white">Ryan Gomez</h3>
+              <p className="mt-1 font-medium text-emerald-300">Founder and ML Researcher</p>
+              <div className="mt-6 grid gap-3 text-sm text-white/60 sm:grid-cols-2">
                 <p>• 16 year old ML researcher and entrepreneur</p>
                 <p>• Top 200 at World Scholars Cup Yale</p>
                 <p>• 1M+ cumulative global reads</p>
@@ -114,15 +99,9 @@ export default function FounderSection() {
 
               <div className="relative z-10">
 
-                <h4 className="text-lg font-semibold">
-                  {member.name}
-                </h4>
-
-                <p className="mb-3 text-sm text-primary/80">
-                  {member.role}
-                </p>
-
-                <ul className="space-y-1 text-sm text-muted-foreground">
+              <h4 className="text-lg font-semibold text-white">{member.name}</h4>
+                <p className="mb-3 text-sm text-emerald-300/90">{member.role}</p>
+                <ul className="space-y-1 text-sm text-white/55">
                   {member.highlights.map((h) => (
                     <li key={h}>• {h}</li>
                   ))}

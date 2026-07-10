@@ -9,6 +9,7 @@ import {
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { getAuthRedirectUrl, supabase } from "@/lib/supabase";
+import { getResetPasswordUrl } from "@/lib/appOrigin";
 import { formatAuthError } from "@/lib/authErrors";
 import { isPasswordAcceptable, isValidEmail, sanitizeDisplayName } from "@/lib/security";
 import { mapProfile } from "@/lib/mappers";
@@ -179,7 +180,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const resetPassword = useCallback(async (email: string) => {
     if (!isValidEmail(email)) return { error: "Enter a valid email address." };
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: getResetPasswordUrl(),
     });
     return { error: error ? formatAuthError(error.message) : null };
   }, []);
