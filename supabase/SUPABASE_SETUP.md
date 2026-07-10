@@ -37,8 +37,11 @@ https://YOUR-APP.vercel.app
 **Redirect URLs:**
 ```
 http://localhost:8080/auth/callback
+http://localhost:8080/reset-password
 https://YOUR-APP.vercel.app/auth/callback
+https://YOUR-APP.vercel.app/reset-password
 https://YOUR-APP-*.vercel.app/auth/callback
+https://YOUR-APP-*.vercel.app/reset-password
 ```
 
 **Google OAuth** (if enabled): add in Google Cloud Console:
