@@ -3,9 +3,8 @@ import HeroSection from "@/components/HeroSection";
 import LandingBackground from "@/components/landing/LandingBackground";
 import SocialProofMarquee from "@/components/landing/SocialProofMarquee";
 import EcosystemBento from "@/components/landing/EcosystemBento";
-import InclusiveImpactSection from "@/components/landing/InclusiveImpactSection";
-import ResourcesPreviewSection from "@/components/landing/ResourcesPreviewSection";
-import TestimonialsSection from "@/components/landing/TestimonialsSection";
+import OriginStorySection from "@/components/landing/OriginStorySection";
+import ImpactOutcomesSection from "@/components/landing/ImpactOutcomesSection";
 import LandingCTA from "@/components/landing/LandingCTA";
 import AboutSection from "@/components/AboutSection";
 import ProgramsSection from "@/components/ProgramsSection";
@@ -41,11 +40,10 @@ const Index = () => {
         <HeroSection />
         <SocialProofMarquee />
         <AboutSection />
-        <InclusiveImpactSection />
+        <OriginStorySection />
         <EcosystemBento />
-        <ResourcesPreviewSection />
+        <ImpactOutcomesSection />
         <ProgramsSection />
-        <TestimonialsSection />
         <ProjectsSection />
         <MembershipSection />
         <LandingCTA />

@@ -100,7 +100,7 @@ export const portalNav: PortalNavItem[] = [
     label: "Education",
     path: portalRoutes.education,
     icon: GraduationCap,
-    description: "Catalyst curriculum, lessons, and finance assistant",
+    description: "Catalyst curriculum, lessons, and glossary search",
   },
   {
     label: "Resources",

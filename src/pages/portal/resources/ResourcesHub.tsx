@@ -1,136 +1,93 @@
 import { Link } from "react-router-dom";
-import {
-  BookOpen,
-  ExternalLink,
-  FileText,
-  Headphones,
-  Mic,
-  Sparkles,
-  Video,
-  Wrench,
-} from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { RESOURCE_LIBRARY, UPCOMING_WEBINARS } from "@/data/resources";
-import type { ResourceType } from "@/data/resources";
-import FinanceAssistant from "@/components/portal/FinanceAssistant";
-import {
-  PortalCard,
-  PortalPageHeader,
-  PortalSection,
-} from "@/components/portal/PortalUI";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { RESOURCE_GUIDES } from "@/data/resourceGuides";
+import GlossarySearch from "@/components/portal/GlossarySearch";
+import { PortalCard, PortalPageHeader, PortalSection } from "@/components/portal/PortalUI";
 import { portalRoutes } from "@/routes/portal";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
-const TYPE_META: Record<ResourceType, { icon: typeof BookOpen; label: string }> = {
-  curriculum: { icon: BookOpen, label: "Curriculum" },
-  journal: { icon: FileText, label: "Journal" },
-  podcast: { icon: Headphones, label: "Podcast" },
-  toolkit: { icon: Wrench, label: "Toolkit" },
-  partner: { icon: Sparkles, label: "Partner" },
-  webinar: { icon: Video, label: "Webinar" },
-};
-
 export default function ResourcesHub() {
   useDocumentTitle("Resources");
-  const freeCount = RESOURCE_LIBRARY.filter((r) => r.free).length;
+
+  const guides = RESOURCE_LIBRARY.filter((r) => RESOURCE_GUIDES[r.id]);
+  const external = RESOURCE_LIBRARY.filter((r) => r.external);
+  const portalLinks = RESOURCE_LIBRARY.filter((r) => !r.external && !RESOURCE_GUIDES[r.id]);
 
   return (
     <div>
       <PortalPageHeader
-        eyebrow="FinanceMeta library"
+        eyebrow="Member library"
         title="Resources"
-        description="Curriculum packs, journal submissions, podcasts, partner programs, and tools — everything FinanceMeta offers members, in one place."
-        action={
-          <Link to={portalRoutes.education}>
-            <Button className="bg-emerald-500 hover:bg-emerald-400">Education hub</Button>
-          </Link>
-        }
+        description="Facilitator guides, journal standards, and partner programs. Guides with full text are written for Finance4All chapters — not generic downloads."
       />
 
-      <PortalCard className="mb-8 grid gap-4 p-6 sm:grid-cols-3">
-        <div>
-          <p className="text-3xl font-bold text-white">{RESOURCE_LIBRARY.length}</p>
-          <p className="text-xs text-white/45">Resource collections</p>
-        </div>
-        <div>
-          <p className="text-3xl font-bold text-emerald-300">{freeCount}</p>
-          <p className="text-xs text-white/45">Free for all members</p>
-        </div>
-        <div>
-          <p className="text-3xl font-bold text-white">{UPCOMING_WEBINARS.length}</p>
-          <p className="text-xs text-white/45">Live session series</p>
-        </div>
-      </PortalCard>
-
-      <PortalSection title="Live & recurring sessions">
-        <div className="grid gap-4 md:grid-cols-3">
-          {UPCOMING_WEBINARS.map((w) => (
-            <Link key={w.id} to={w.href}>
+      <PortalSection title="Written guides">
+        <div className="grid gap-4 sm:grid-cols-2">
+          {guides.map((item) => (
+            <Link key={item.id} to={`${portalRoutes.resources}/${item.id}`}>
               <PortalCard hover className="h-full p-5">
-                <Mic className="h-5 w-5 text-emerald-400" />
-                <h3 className="mt-3 font-semibold text-white">{w.title}</h3>
-                <p className="mt-1 text-xs text-emerald-300/80">{w.host} · {w.date}</p>
-                <p className="mt-2 text-sm text-white/55">{w.description}</p>
+                <p className="text-xs uppercase tracking-wider text-white/40">Guide</p>
+                <h3 className="mt-2 font-semibold text-white">{item.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-white/55">{item.description}</p>
+                <span className="mt-4 inline-block text-sm text-emerald-300">Read guide →</span>
               </PortalCard>
             </Link>
           ))}
         </div>
       </PortalSection>
 
-      <PortalSection title="Resource library">
-        <div className="grid gap-4 sm:grid-cols-2">
-          {RESOURCE_LIBRARY.map((item) => {
-            const meta = TYPE_META[item.type];
-            const Icon = meta.icon;
-            const inner = (
+      <PortalSection title="Recurring sessions">
+        <div className="grid gap-3 md:grid-cols-3">
+          {UPCOMING_WEBINARS.map((w) => (
+            <Link key={w.id} to={w.href}>
               <PortalCard hover className="h-full p-5">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="rounded-xl border border-white/10 bg-white/[0.06] p-2.5 text-emerald-300">
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  {item.free && (
-                    <Badge className="border-0 bg-emerald-500/15 text-[10px] text-emerald-300">
-                      Free
-                    </Badge>
-                  )}
-                </div>
-                <p className="mt-3 text-[10px] uppercase tracking-wider text-white/35">{meta.label}</p>
-                <h3 className="mt-1 font-semibold text-white">{item.title}</h3>
-                <p className="mt-2 text-sm text-white/55">{item.description}</p>
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {item.tags.map((tag) => (
-                    <span key={tag} className="text-[10px] text-white/35">
-                      #{tag}
-                    </span>
-                  ))}
-                </div>
-                {item.external && (
-                  <span className="mt-3 inline-flex items-center gap-1 text-xs text-emerald-300">
-                    External <ExternalLink className="h-3 w-3" />
-                  </span>
-                )}
+                <p className="text-xs text-emerald-300/80">{w.host}</p>
+                <h3 className="mt-1 font-medium text-white">{w.title}</h3>
+                <p className="mt-2 text-sm text-white/50">{w.description}</p>
+                <p className="mt-3 text-xs text-white/35">{w.date}</p>
               </PortalCard>
-            );
-
-            if (item.external) {
-              return (
-                <a key={item.id} href={item.href} target="_blank" rel="noopener noreferrer">
-                  {inner}
-                </a>
-              );
-            }
-            return (
-              <Link key={item.id} to={item.href}>
-                {inner}
-              </Link>
-            );
-          })}
+            </Link>
+          ))}
         </div>
       </PortalSection>
 
+      {portalLinks.length > 0 && (
+        <PortalSection title="In the portal">
+          <div className="grid gap-3 sm:grid-cols-2">
+            {portalLinks.map((item) => (
+              <Link key={item.id} to={item.href}>
+                <PortalCard hover className="p-4">
+                  <h3 className="font-medium text-white">{item.title}</h3>
+                  <p className="mt-1 text-sm text-white/50">{item.description}</p>
+                </PortalCard>
+              </Link>
+            ))}
+          </div>
+        </PortalSection>
+      )}
+
+      {external.length > 0 && (
+        <PortalSection title="External">
+          <div className="space-y-2">
+            {external.map((item) => (
+              <a
+                key={item.id}
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between rounded-xl border border-white/10 px-4 py-3 text-sm transition hover:bg-white/[0.04]"
+              >
+                <span className="text-white/80">{item.title}</span>
+                <ExternalLink className="h-4 w-4 text-white/35" />
+              </a>
+            ))}
+          </div>
+        </PortalSection>
+      )}
+
       <div className="mt-10">
-        <FinanceAssistant compact />
+        <GlossarySearch compact />
       </div>
     </div>
   );

@@ -3,7 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { useExplainerBySlug, useExplainers } from "@/hooks/portal/useDebriefed";
 import { portalRoutes } from "@/routes/portal";
 import MarkdownContent from "@/components/portal/MarkdownContent";
-import FinanceAssistant from "@/components/portal/FinanceAssistant";
+import GlossarySearch from "@/components/portal/GlossarySearch";
 import {
   EmptyState,
   PortalCard,
@@ -52,7 +52,7 @@ function ExplainerDetail({ slug }: { slug: string }) {
             )}
           </PortalCard>
           <div className="mt-6">
-            <FinanceAssistant compact />
+            <GlossarySearch compact />
           </div>
         </div>
       )}
@@ -76,7 +76,7 @@ export default function DebriefedExplainers() {
       />
 
       <div className="mb-8">
-        <FinanceAssistant />
+        <GlossarySearch />
       </div>
 
       <QueryStatus

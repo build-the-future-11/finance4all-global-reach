@@ -13,79 +13,80 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import SectionHeader from "@/components/landing/SectionHeader";
 
 const programs = [
   {
     icon: School,
     title: "Global Literacy Outreach",
-    short: "Teaching financial fundamentals in underserved schools worldwide.",
+    short: "Catalyst workshops in underserved schools — budgeting, banking, investing.",
     detail:
-      "Our volunteers visit underprivileged schools across multiple countries to teach essential concepts like budgeting, saving, investing, and entrepreneurship—giving students tools rarely covered in traditional curricula.",
+      "Volunteers deliver the same 90-minute Catalyst modules found in the Education hub. Chapters report attendance; curriculum updates sync to the portal so Mumbai and London teach from one source.",
     href: "/portal/education",
   },
   {
     icon: Newspaper,
     title: "Economics Journal",
-    short: "Student-run publication with global reach.",
+    short: "Student opinion and market analysis with editorial review.",
     detail:
-      "Students from around the world submit opinion columns and market analysis. The strongest pieces are promoted to outlets connected to major financial and economic publications.",
+      "Submissions flow through Pathways. Editors push back on unsupported claims and unclear structure before pieces are promoted externally. Standards live in the Resources library.",
     href: "/portal/pathways/essays",
   },
   {
     icon: FlaskConical,
-    title: "Research Lab",
-    short: "Mentored research with leading universities.",
+    title: "Meta Labs",
+    short: "Mentor-led research with defined deliverables.",
     detail:
-      "Students collaborate on research projects guided by mentors affiliated with institutions including Stanford University, MIT, the University of Chicago, and others.",
+      "Atlas Economics Lab, IYERN, and fintech tracks each list open projects with lead researchers. Applications include motivation statements — reviewed by humans, not auto-scored.",
     href: "/portal/labs",
   },
   {
     icon: BookOpen,
     title: "Global School Clubs",
-    short: "Structured curriculum backed by industry pros.",
+    short: "Faculty-backed chapters with a month-by-month playbook.",
     detail:
-      "Clubs run educational programs using a curriculum supported by professionals connected to quantitative trading firms such as Jane Street.",
-    href: "/portal/resources",
+      "The club toolkit covers officer roles, first events, and sponsor outreach. Quant firms often support puzzle nights when chapters document learning outcomes.",
+    href: "/portal/resources/club-toolkit",
   },
   {
     icon: GraduationCap,
-    title: "School Visits",
-    short: "Hands-on financial workshops in communities.",
+    title: "Catalyst Education",
+    short: "Full lesson library — the outreach curriculum, online.",
     detail:
-      "Interactive workshops in underprivileged communities teaching budgeting, investing basics, and entrepreneurship fundamentals.",
+      "Seven modules from financial foundations through research writing. Each lesson includes key terms, markdown body, and an exercise members can complete at their own pace.",
     href: "/portal/education",
   },
   {
     icon: Mic,
     title: "Student Podcasts",
-    short: "Conversations with young entrepreneurs.",
+    short: "Founder interviews curated for members.",
     detail:
-      "A podcast series featuring successful student founders sharing their journeys and insights for the next generation.",
+      "External playlist linked from Resources — conversations with young entrepreneurs on building companies while still in school.",
     href: "/portal/resources",
   },
   {
     icon: Briefcase,
     title: "Industry Projects",
-    short: "Real problems judged by professionals.",
+    short: "Case-style challenges via Pathways.",
     detail:
-      "Students tackle real finance challenges evaluated by industry professionals and university professors.",
+      "Members tackle structured finance problems with rubrics aligned to how practitioners evaluate work — not open-ended \"build a startup\" prompts.",
     href: "/portal/pathways",
   },
   {
     icon: Trophy,
     title: "Economics Olympiad",
-    short: "Global competition in economic reasoning.",
+    short: "Competition prep and partner links.",
     detail:
-      "A worldwide olympiad where students apply economic thinking to real-world market problems.",
+      "Practice cases and olympiad resources aggregated in Pathways for members preparing for national and international rounds.",
     href: "/portal/pathways",
   },
   {
     icon: Monitor,
-    title: "Digital Education",
-    short: "Scaling financial literacy online.",
+    title: "Finance Debriefed",
+    short: "Weekly macro digest and live headlines.",
     detail:
-      "Educational content delivered through digital platforms reaching thousands of students globally.",
-    href: "/portal/education",
+      "Member news hub with optional live headline feed, Substack integration, and explainers that decode the week's narratives for beginners.",
+    href: "/portal/debriefed",
   },
 ];
 
@@ -123,14 +124,13 @@ function ProgramCard({ program }: { program: typeof programs[0] }) {
       onMouseMove={handleMove}
       onClick={() => setExpanded(!expanded)}
       className="
-        group relative cursor-pointer p-6 rounded-3xl
-        border border-white/20
-        backdrop-blur-xl
-        bg-white/[0.04]
-        transition-all duration-500
-        hover:border-white/40
-        hover:-translate-y-1
-        overflow-hidden
+        group relative cursor-pointer overflow-hidden rounded-2xl
+        border border-white/10
+        bg-white/[0.03]
+        p-6
+        transition-all duration-300
+        hover:border-white/20
+        hover:bg-white/[0.05]
       "
     >
       {/* cursor glow */}
@@ -193,66 +193,22 @@ function ProgramCard({ program }: { program: typeof programs[0] }) {
   );
 }
 
-function ImpactNumbers() {
-  const stats = [
-    { value: "25,000+", label: "Students Impacted" },
-    { value: "15+", label: "Countries Reached" },
-    { value: "500+", label: "Global Members" },
-  ];
-
-  return (
-    <div className="mt-28 grid sm:grid-cols-3 gap-6">
-      {stats.map((s) => (
-        <div
-          key={s.label}
-          className="
-            p-10 text-center rounded-3xl
-            border border-white/20
-            backdrop-blur-xl
-            bg-white/[0.05]
-            hover:bg-white/[0.08]
-            transition
-          "
-        >
-          <p className="text-4xl font-bold text-white">{s.value}</p>
-
-          <p className="text-xs uppercase tracking-widest text-white/60 mt-2">
-            {s.label}
-          </p>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 function PartnersSection() {
   return (
-    <div className="mt-32">
-      <div className="text-center mb-12">
-        <h3 className="text-3xl font-bold text-white">
-          Partners & Collaborators
-        </h3>
-
-        <p className="text-white/70 text-sm mt-3 max-w-xl mx-auto">
-          Finance4All Meta collaborates with researchers, institutions,
-          and organizations advancing financial education worldwide.
+    <div className="mt-24 rounded-3xl border border-white/10 bg-white/[0.02] p-10 sm:p-12">
+      <div className="text-center">
+        <h3 className="text-2xl font-bold text-white sm:text-3xl">Partners & collaborators</h3>
+        <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-white/50">
+          Researchers, chapter sponsors, and programs that connect members to real mentorship —
+          not logo walls without substance.
         </p>
       </div>
 
-      <div className="flex flex-wrap justify-center gap-4">
+      <div className="mt-10 flex flex-wrap justify-center gap-3">
         {partners.map((p) => (
           <div
             key={p}
-            className="
-              px-6 py-2 rounded-full
-              border border-white/20
-              bg-white/[0.05]
-              text-white/80
-              hover:text-white
-              hover:border-white/40
-              hover:bg-white/[0.08]
-              transition
-            "
+            className="rounded-full border border-white/12 bg-white/[0.04] px-5 py-2 text-sm text-white/65 transition hover:border-white/25 hover:text-white/90"
           >
             {p}
           </div>
@@ -276,31 +232,18 @@ export default function ProgramsSection() {
       </div>
 
       <div ref={ref} className="mx-auto max-w-6xl">
-        <div className="text-center mb-20">
-          <p className="text-sm uppercase tracking-widest text-emerald-300 mb-3">
-            Initiatives
-          </p>
+        <SectionHeader
+          eyebrow="Initiatives"
+          title="Nine programs. Each links to the portal."
+          description="Expand a card to read how it works — then open the module where members actually participate."
+          className="mb-16"
+        />
 
-          <h2 className="text-4xl sm:text-5xl font-bold text-white">
-            Programs Driving Global
-            <span className="bg-gradient-to-r from-emerald-300 to-purple-300 bg-clip-text text-transparent">
-              {" "}Financial Education
-            </span>
-          </h2>
-
-          <p className="text-white/70 mt-4 text-sm">
-            Click any program to explore how students are building the future
-            of financial literacy.
-          </p>
-        </div>
-
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {programs.map((p) => (
             <ProgramCard key={p.title} program={p} />
           ))}
         </div>
-
-        <ImpactNumbers />
 
         <PartnersSection />
       </div>

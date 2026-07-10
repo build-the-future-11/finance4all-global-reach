@@ -131,8 +131,8 @@ export default function Dashboard() {
           <PortalCard hover className="flex items-center gap-3 p-4">
             <BookOpen className="h-5 w-5 text-purple-400" />
             <div>
-              <p className="text-sm font-medium text-white">AI assistant</p>
-              <p className="text-xs text-white/45">Ask finance questions</p>
+              <p className="text-sm font-medium text-white">Glossary search</p>
+              <p className="text-xs text-white/45">Find terms in explainers & lessons</p>
             </div>
           </PortalCard>
         </Link>

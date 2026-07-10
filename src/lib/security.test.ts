@@ -7,7 +7,7 @@ import {
 } from "@/lib/security";
 import { computeMemberBadges } from "@/lib/badges";
 import { formatAuthError } from "@/lib/authErrors";
-import { askFinanceAssistant } from "@/lib/financeAssistant";
+import { searchGlossary } from "@/lib/glossarySearch";
 
 describe("security", () => {
   it("validates email", () => {
@@ -38,11 +38,23 @@ describe("authErrors", () => {
   });
 });
 
-describe("financeAssistant", () => {
-  it("answers IPO questions", () => {
-    const reply = askFinanceAssistant("What is an IPO?");
-    expect(reply.answer.toLowerCase()).toContain("public");
-    expect(reply.confidence).not.toBe("low");
+describe("glossarySearch", () => {
+  it("finds explainer matches for IPO queries", () => {
+    const results = searchGlossary("IPO", [
+      {
+        title: "What is an IPO?",
+        summary: "How companies go public and sell shares.",
+        body: "An initial public offering lets a private company list on a stock exchange.",
+        slug: "what-is-an-ipo",
+      },
+    ]);
+    expect(results.length).toBeGreaterThan(0);
+    expect(results[0].title.toLowerCase()).toContain("ipo");
+    expect(results[0].href).toContain("what-is-an-ipo");
+  });
+
+  it("returns empty results for short queries", () => {
+    expect(searchGlossary("a", [])).toEqual([]);
   });
 });
 
