@@ -31,6 +31,8 @@ import MembershipCard from "@/components/portal/MembershipCard";
 import PortalOnboardingChecklist from "@/components/portal/PortalOnboardingChecklist";
 import PortalTour from "@/components/portal/PortalTour";
 import MemberBadges from "@/components/portal/MemberBadges";
+import CommunityPulse from "@/components/portal/CommunityPulse";
+import FlagshipInitiatives from "@/components/portal/FlagshipInitiatives";
 import { computeMemberBadges } from "@/lib/badges";
 
 const ACTIVITY_ICONS = {
@@ -46,6 +48,7 @@ export default function Dashboard() {
   const { profile } = useAuth();
   const { data: news } = useNewsArticles();
   const { data: projects } = useResearchProjects("open");
+  const { data: allProjects } = useResearchProjects("all");
   const { data: events } = useEvents();
   const { data: myApps } = useMyLabApplications();
   const { data: activity, isLoading: activityLoading, error: activityError, refetch } =
@@ -66,6 +69,7 @@ export default function Dashboard() {
   );
 
   const upcomingEvents = events?.filter((e) => e.status === "upcoming").length ?? 0;
+  const projectTitleMap = Object.fromEntries(allProjects?.map((p) => [p.id, p.title]) ?? []);
 
   return (
     <div className="space-y-8">
@@ -98,6 +102,8 @@ export default function Dashboard() {
           <PortalOnboardingChecklist />
         </div>
       </div>
+
+      <CommunityPulse />
 
       <div className="flex flex-wrap gap-2">
         <Link to={portalRoutes.saved}>
@@ -161,14 +167,27 @@ export default function Dashboard() {
         <PortalSection title="Your lab applications">
           <div className="space-y-2">
             {myApps.slice(0, 3).map((app) => (
-              <PortalCard key={app.id} className="flex items-center justify-between p-4">
-                <span className="text-sm text-white/75">Application submitted</span>
-                <CategoryBadge>{app.status.replace("_", " ")}</CategoryBadge>
-              </PortalCard>
+              <Link key={app.id} to={`${portalRoutes.labs}/${app.projectId}`}>
+                <PortalCard hover className="flex items-center justify-between p-4">
+                  <div className="min-w-0">
+                    <p className="truncate font-medium text-white">
+                      {projectTitleMap[app.projectId] ?? "Research project"}
+                    </p>
+                    <p className="text-xs text-white/45">
+                      Submitted {new Date(app.submittedAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <CategoryBadge>{app.status.replace("_", " ")}</CategoryBadge>
+                </PortalCard>
+              </Link>
             ))}
           </div>
         </PortalSection>
       )}
+
+      <PortalSection title="Flagship initiatives">
+        <FlagshipInitiatives />
+      </PortalSection>
 
       <PortalSection title="Explore modules">
         <div className="grid gap-3 md:grid-cols-2">
@@ -208,15 +227,17 @@ export default function Dashboard() {
         >
           <div className="space-y-3">
             {news.slice(0, 3).map((article) => (
-              <PortalCard key={article.id} hover className="p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="font-medium leading-snug text-white">{article.title}</p>
-                    <p className="mt-1.5 line-clamp-2 text-sm text-white/50">{article.summary}</p>
+              <Link key={article.id} to={portalRoutes.debriefed}>
+                <PortalCard hover className="p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="font-medium leading-snug text-white">{article.title}</p>
+                      <p className="mt-1.5 line-clamp-2 text-sm text-white/50">{article.summary}</p>
+                    </div>
+                    <CategoryBadge>{article.category}</CategoryBadge>
                   </div>
-                  <CategoryBadge>{article.category}</CategoryBadge>
-                </div>
-              </PortalCard>
+                </PortalCard>
+              </Link>
             ))}
           </div>
         </PortalSection>

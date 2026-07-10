@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 import { Plus } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChapters } from "@/hooks/portal/useEvents";
@@ -39,6 +38,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import MemberDirectoryCard from "@/components/portal/MemberDirectoryCard";
+import CommunityPulse from "@/components/portal/CommunityPulse";
 import { toast } from "sonner";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
@@ -100,6 +101,7 @@ export default function Networking() {
   );
 
   const memberNameMap = Object.fromEntries(members?.map((m) => [m.id, m.displayName]) ?? []);
+  const chapterNameMap = Object.fromEntries(chapters?.map((c) => [c.id, c.name]) ?? []);
 
   const filteredMembers = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -120,8 +122,9 @@ export default function Networking() {
   return (
     <div>
       <PortalPageHeader
+        eyebrow="FinanceMeta Network"
         title="Network"
-        description="Discover members, send connect requests, and post introductions. No DMs in v1."
+        description="Discover members across global chapters, send connect requests, and post introductions."
         action={
           <Dialog open={introOpen} onOpenChange={setIntroOpen}>
             <DialogTrigger asChild>
@@ -159,6 +162,10 @@ export default function Networking() {
           </Dialog>
         }
       />
+
+      <div className="mb-8">
+        <CommunityPulse />
+      </div>
 
       <PortalCard className="mb-8 flex items-center justify-between p-5">
         <div>
@@ -209,12 +216,25 @@ export default function Networking() {
         )}
         <div className="space-y-3">
           {introductions?.map((post) => (
-            <PortalCard key={post.id} className="p-4">
+            <PortalCard key={post.id} hover className="p-4">
               <p className="font-medium text-white">{post.headline}</p>
               <p className="mt-1 text-sm text-white/50">
                 by {memberNameMap[post.authorId] ?? "Member"}
               </p>
               <p className="mt-2 text-sm text-white/70">{post.lookingFor}</p>
+              {post.interests.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {post.interests.map((tag) => (
+                    <Badge
+                      key={tag}
+                      variant="outline"
+                      className="border-white/15 text-[10px] text-white/50"
+                    >
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              )}
             </PortalCard>
           ))}
         </div>
@@ -258,21 +278,13 @@ export default function Networking() {
           emptyMessage="No members match your filters."
           onRetry={() => refetch()}
         >
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {filteredMembers.map((member) => (
-              <Link key={member.id} to={`${portalRoutes.networkProfile}/${member.id}`}>
-                <PortalCard className="p-4 transition hover:border-white/30 hover:bg-white/[0.07]">
-                  <p className="font-medium text-white">{member.displayName}</p>
-                  {member.openToCollaborate && (
-                    <Badge className="mt-2 bg-emerald-400/15 text-xs text-emerald-300">
-                      Open to collaborate
-                    </Badge>
-                  )}
-                  {member.interests.length > 0 && (
-                    <p className="mt-2 text-xs text-white/40">{member.interests.join(" · ")}</p>
-                  )}
-                </PortalCard>
-              </Link>
+              <MemberDirectoryCard
+                key={member.id}
+                member={member}
+                chapterName={member.chapterId ? chapterNameMap[member.chapterId] : undefined}
+              />
             ))}
           </div>
         </QueryStatus>

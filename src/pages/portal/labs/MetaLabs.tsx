@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Plus } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -162,9 +162,11 @@ function ProjectDetail({ id }: { id: string }) {
 
 export default function MetaLabs() {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const tagFromUrl = searchParams.get("tag") ?? "";
   const { profile } = useAuth();
   const [statusFilter, setStatusFilter] = useState<ResearchProjectStatus | "all">("all");
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(tagFromUrl);
   const { data: projects, isLoading, error, refetch } = useResearchProjects();
   const { data: bookmarks } = useProjectBookmarks();
   const toggleBookmark = useToggleProjectBookmark();
@@ -306,7 +308,7 @@ export default function MetaLabs() {
           {filtered?.map((project) => {
             const saved = bookmarks?.has(project.id) ?? false;
             return (
-              <PortalCard key={project.id} className="p-5">
+              <PortalCard key={project.id} hover className="p-5">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <Link to={`${portalRoutes.labs}/${project.id}`} className="min-w-0 flex-1">
                     <div className="flex flex-wrap gap-2">

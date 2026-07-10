@@ -1,13 +1,14 @@
 import { Link } from "react-router-dom";
 import { CheckCircle2, Circle, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { computeProfileCompleteness } from "@/hooks/portal/useMemberStats";
+import { computeProfileCompleteness, useMyMemberStats } from "@/hooks/portal/useMemberStats";
 import { portalRoutes } from "@/routes/portal";
 import { PortalCard } from "@/components/portal/PortalUI";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 
 const STORAGE_KEY = "f4a-onboarding-dismissed";
+export const DEBRIEFED_VISITED_KEY = "f4a-visited-debriefed";
 
 const STEPS = [
   { id: "profile", label: "Complete your profile", path: portalRoutes.settings },
@@ -16,17 +17,39 @@ const STEPS = [
   { id: "saved", label: "Save an article or project", path: portalRoutes.saved },
 ] as const;
 
+function isStepDone(
+  stepId: (typeof STEPS)[number]["id"],
+  percent: number,
+  stats: { connections: number; savedArticles: number; savedProjects: number } | undefined,
+): boolean {
+  switch (stepId) {
+    case "profile":
+      return percent >= 80;
+    case "debriefed":
+      return localStorage.getItem(DEBRIEFED_VISITED_KEY) === "1" || (stats?.savedArticles ?? 0) > 0;
+    case "network":
+      return (stats?.connections ?? 0) > 0;
+    case "saved":
+      return (stats?.savedArticles ?? 0) + (stats?.savedProjects ?? 0) > 0;
+    default:
+      return false;
+  }
+}
+
 export default function PortalOnboardingChecklist() {
   const { profile } = useAuth();
+  const { data: stats } = useMyMemberStats();
   const [dismissed, setDismissed] = useState(true);
 
   const { percent, missing } = computeProfileCompleteness(profile);
+  const completedCount = STEPS.filter((s) => isStepDone(s.id, percent, stats)).length;
+  const allDone = completedCount === STEPS.length;
 
   useEffect(() => {
     setDismissed(localStorage.getItem(STORAGE_KEY) === "1");
   }, []);
 
-  if (dismissed || percent >= 100) return null;
+  if (dismissed || allDone) return null;
 
   const handleDismiss = () => {
     localStorage.setItem(STORAGE_KEY, "1");
@@ -49,20 +72,20 @@ export default function PortalOnboardingChecklist() {
       </p>
       <h3 className="mt-1 text-lg font-semibold text-white">Get the most from your membership</h3>
       <p className="mt-1 text-sm text-white/50">
-        Profile {percent}% complete
-        {missing.length > 0 && ` — add ${missing[0].toLowerCase()}`}
+        {completedCount}/{STEPS.length} steps complete
+        {missing.length > 0 && percent < 80 && ` — add ${missing[0].toLowerCase()}`}
       </p>
 
       <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-white/10">
         <div
           className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500 transition-all"
-          style={{ width: `${percent}%` }}
+          style={{ width: `${(completedCount / STEPS.length) * 100}%` }}
         />
       </div>
 
       <ul className="mt-5 space-y-2">
-        {STEPS.map((step, i) => {
-          const done = i === 0 ? percent >= 60 : false;
+        {STEPS.map((step) => {
+          const done = isStepDone(step.id, percent, stats);
           const Icon = done ? CheckCircle2 : Circle;
           return (
             <li key={step.id}>
@@ -84,7 +107,7 @@ export default function PortalOnboardingChecklist() {
 
       <Link to={portalRoutes.settings} className="mt-4 inline-block">
         <Button size="sm" className="bg-emerald-500 hover:bg-emerald-400">
-          Complete profile
+          {percent < 80 ? "Complete profile" : "Explore the network"}
         </Button>
       </Link>
     </PortalCard>

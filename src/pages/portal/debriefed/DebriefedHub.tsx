@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ExternalLink } from "lucide-react";
+import { toast } from "sonner";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import {
   useDigestPreferences,
   useNewsArticles,
@@ -22,6 +24,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLiveHeadlines } from "@/hooks/portal/useLiveHeadlines";
 import SubstackEmbed from "@/components/portal/SubstackEmbed";
+import { DEBRIEFED_VISITED_KEY } from "@/components/portal/PortalOnboardingChecklist";
 import { Badge } from "@/components/ui/badge";
 
 const CATEGORIES: { value: NewsCategory | "all"; label: string }[] = [
@@ -41,6 +44,10 @@ export default function DebriefedHub() {
   const { data: bookmarks } = useNewsBookmarks();
   const toggleBookmark = useToggleNewsBookmark();
   const { data: liveHeadlines } = useLiveHeadlines();
+
+  useEffect(() => {
+    localStorage.setItem(DEBRIEFED_VISITED_KEY, "1");
+  }, []);
 
   const filteredLive =
     category === "all"

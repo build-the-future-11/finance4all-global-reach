@@ -46,13 +46,13 @@ export default function ProjectsSection() {
 
       <div ref={ref} className="mx-auto max-w-6xl">
         <div className="mx-auto max-w-3xl text-center">
-          <p className="mb-3 text-sm uppercase tracking-widest text-emerald-300">Phase 1 Build</p>
+          <p className="mb-3 text-sm uppercase tracking-widest text-emerald-300">Member Portal</p>
           <h2 className="text-4xl font-bold text-white sm:text-5xl">
-            Membership Portal Foundations
+            FinanceMeta Ecosystem
           </h2>
           <p className="mt-4 text-sm text-white/70 sm:text-base">
-            A clean first release focused on content, opportunities, and research workflows.
-            This keeps launch simple while setting up the architecture for Phase 2 expansion.
+            Live modules for news, research labs, career pathways, and a global member network —
+            the same pillars that power Finance4All Meta worldwide.
           </p>
         </div>
 
@@ -93,11 +93,11 @@ export default function ProjectsSection() {
         >
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-emerald-200/90">
-              Launch Readiness
+              Join the network
             </p>
             <p className="mt-2 max-w-2xl text-sm text-white/80">
-              Next immediate step: hook these modules to live datasets and user accounts. The
-              current UI blocks are ready to connect to APIs and auth.
+              Sign in to access Debriefed news, Meta Labs research, chapter events, and connect
+              with members across Stanford, MIT, IIT, Princeton, and beyond.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
