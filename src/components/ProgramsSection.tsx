@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { Link } from "react-router-dom";
 import {
   Mic,
   Briefcase,
@@ -20,6 +21,7 @@ const programs = [
     short: "Teaching financial fundamentals in underserved schools worldwide.",
     detail:
       "Our volunteers visit underprivileged schools across multiple countries to teach essential concepts like budgeting, saving, investing, and entrepreneurship—giving students tools rarely covered in traditional curricula.",
+    href: "/portal/education",
   },
   {
     icon: Newspaper,
@@ -27,6 +29,7 @@ const programs = [
     short: "Student-run publication with global reach.",
     detail:
       "Students from around the world submit opinion columns and market analysis. The strongest pieces are promoted to outlets connected to major financial and economic publications.",
+    href: "/portal/pathways/essays",
   },
   {
     icon: FlaskConical,
@@ -34,6 +37,7 @@ const programs = [
     short: "Mentored research with leading universities.",
     detail:
       "Students collaborate on research projects guided by mentors affiliated with institutions including Stanford University, MIT, the University of Chicago, and others.",
+    href: "/portal/labs",
   },
   {
     icon: BookOpen,
@@ -41,6 +45,7 @@ const programs = [
     short: "Structured curriculum backed by industry pros.",
     detail:
       "Clubs run educational programs using a curriculum supported by professionals connected to quantitative trading firms such as Jane Street.",
+    href: "/portal/resources",
   },
   {
     icon: GraduationCap,
@@ -48,6 +53,7 @@ const programs = [
     short: "Hands-on financial workshops in communities.",
     detail:
       "Interactive workshops in underprivileged communities teaching budgeting, investing basics, and entrepreneurship fundamentals.",
+    href: "/portal/education",
   },
   {
     icon: Mic,
@@ -55,6 +61,7 @@ const programs = [
     short: "Conversations with young entrepreneurs.",
     detail:
       "A podcast series featuring successful student founders sharing their journeys and insights for the next generation.",
+    href: "/portal/resources",
   },
   {
     icon: Briefcase,
@@ -62,6 +69,7 @@ const programs = [
     short: "Real problems judged by professionals.",
     detail:
       "Students tackle real finance challenges evaluated by industry professionals and university professors.",
+    href: "/portal/pathways",
   },
   {
     icon: Trophy,
@@ -69,6 +77,7 @@ const programs = [
     short: "Global competition in economic reasoning.",
     detail:
       "A worldwide olympiad where students apply economic thinking to real-world market problems.",
+    href: "/portal/pathways",
   },
   {
     icon: Monitor,
@@ -76,6 +85,7 @@ const programs = [
     short: "Scaling financial literacy online.",
     detail:
       "Educational content delivered through digital platforms reaching thousands of students globally.",
+    href: "/portal/education",
   },
 ];
 
@@ -162,12 +172,21 @@ function ProgramCard({ program }: { program: typeof programs[0] }) {
 
         <div
           className={`transition-all duration-500 overflow-hidden ${
-            expanded ? "max-h-40 opacity-100 mt-3" : "max-h-0 opacity-0"
+            expanded ? "max-h-48 opacity-100 mt-3" : "max-h-0 opacity-0"
           }`}
         >
           <p className="text-xs text-white/60 border-t border-white/10 pt-3">
             {program.detail}
           </p>
+          {program.href && (
+            <Link
+              to={program.href}
+              onClick={(e) => e.stopPropagation()}
+              className="mt-3 inline-block text-xs font-medium text-emerald-300 hover:underline"
+            >
+              Open in portal →
+            </Link>
+          )}
         </div>
       </div>
     </div>

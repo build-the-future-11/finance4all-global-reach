@@ -1,10 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
+import { EDUCATION_MODULES } from "@/data/educationModules";
+import { RESOURCE_LIBRARY } from "@/data/resources";
 import { portalRoutes } from "@/routes/portal";
 
 export interface SearchResult {
   id: string;
-  type: "news" | "lab" | "opportunity" | "event" | "member" | "explainer";
+  type: "news" | "lab" | "opportunity" | "event" | "member" | "explainer" | "education" | "resource";
   title: string;
   subtitle?: string;
   href: string;
@@ -103,6 +105,36 @@ export function usePortalSearch(query: string) {
             href: `${portalRoutes.debriefedExplainers}/${r.slug}`,
           }),
         );
+
+      EDUCATION_MODULES.filter(
+        (m) =>
+          m.title.toLowerCase().includes(q) ||
+          m.description.toLowerCase().includes(q) ||
+          m.lessons.some((l) => l.title.toLowerCase().includes(q)),
+      ).forEach((m) =>
+        results.push({
+          id: m.id,
+          type: "education",
+          title: m.title,
+          subtitle: "Education module",
+          href: portalRoutes.education,
+        }),
+      );
+
+      RESOURCE_LIBRARY.filter(
+        (r) =>
+          r.title.toLowerCase().includes(q) ||
+          r.description.toLowerCase().includes(q) ||
+          r.tags.some((t) => t.includes(q)),
+      ).forEach((r) =>
+        results.push({
+          id: r.id,
+          type: "resource",
+          title: r.title,
+          subtitle: "Resource",
+          href: portalRoutes.resources,
+        }),
+      );
 
       return results.slice(0, 12);
     },

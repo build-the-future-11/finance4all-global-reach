@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, BookOpen, FlaskConical, GraduationCap, Newspaper } from "lucide-react";
+import { ArrowRight, BookOpen, FlaskConical, GraduationCap, Newspaper, Route } from "lucide-react";
 import { portalRoutes } from "@/routes/portal";
 import { PortalCard } from "@/components/portal/PortalUI";
 
@@ -21,8 +21,18 @@ const INITIATIVES = [
     title: "Catalyst Financial Education",
     description:
       "Expand access to finance literacy, mentorship, and career development for the next generation.",
-    href: portalRoutes.debriefedExplainers,
+    href: portalRoutes.education,
     accent: "from-amber-500/20 to-orange-500/10",
+  },
+  {
+    id: "resources",
+    icon: BookOpen,
+    eyebrow: "Library",
+    title: "Resources & media",
+    description:
+      "Curriculum packs, Economics Journal, podcasts, webinars, and partner programs.",
+    href: portalRoutes.resources,
+    accent: "from-violet-500/20 to-blue-500/10",
   },
   {
     id: "debriefed",
@@ -36,7 +46,7 @@ const INITIATIVES = [
   },
   {
     id: "pathways",
-    icon: BookOpen,
+    icon: Route,
     eyebrow: "Opportunities",
     title: "Axiom Pathways",
     description:

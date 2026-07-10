@@ -1,9 +1,12 @@
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
+  BookOpen,
   Bookmark,
   Calendar,
   FlaskConical,
+  GraduationCap,
+  Library,
   Newspaper,
   Search,
   Users,
@@ -104,6 +107,36 @@ export default function Dashboard() {
       </div>
 
       <CommunityPulse />
+
+      <div className="grid gap-3 sm:grid-cols-3">
+        <Link to={portalRoutes.education}>
+          <PortalCard hover className="flex items-center gap-3 p-4">
+            <GraduationCap className="h-5 w-5 text-emerald-400" />
+            <div>
+              <p className="text-sm font-medium text-white">Education hub</p>
+              <p className="text-xs text-white/45">Free Catalyst curriculum</p>
+            </div>
+          </PortalCard>
+        </Link>
+        <Link to={portalRoutes.resources}>
+          <PortalCard hover className="flex items-center gap-3 p-4">
+            <Library className="h-5 w-5 text-blue-400" />
+            <div>
+              <p className="text-sm font-medium text-white">Resources</p>
+              <p className="text-xs text-white/45">Journal, podcasts, toolkits</p>
+            </div>
+          </PortalCard>
+        </Link>
+        <Link to={portalRoutes.debriefedExplainers}>
+          <PortalCard hover className="flex items-center gap-3 p-4">
+            <BookOpen className="h-5 w-5 text-purple-400" />
+            <div>
+              <p className="text-sm font-medium text-white">AI assistant</p>
+              <p className="text-xs text-white/45">Ask finance questions</p>
+            </div>
+          </PortalCard>
+        </Link>
+      </div>
 
       <div className="flex flex-wrap gap-2">
         <Link to={portalRoutes.saved}>

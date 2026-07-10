@@ -1,9 +1,12 @@
 import type { LucideIcon } from "lucide-react";
 import {
   Bookmark,
+  BookOpen,
   CalendarDays,
   FlaskConical,
+  GraduationCap,
   LayoutDashboard,
+  Library,
   Newspaper,
   Route,
   Settings,
@@ -27,6 +30,8 @@ export const portalRoutes = {
   networkProfile: `${PORTAL_BASE}/network/profile`,
   settings: `${PORTAL_BASE}/settings`,
   saved: `${PORTAL_BASE}/saved`,
+  education: `${PORTAL_BASE}/education`,
+  resources: `${PORTAL_BASE}/resources`,
   admin: `${PORTAL_BASE}/admin`,
 } as const;
 
@@ -90,6 +95,18 @@ export const portalNav: PortalNavItem[] = [
     path: portalRoutes.network,
     icon: Users,
     description: "Profiles, connections, and introductions",
+  },
+  {
+    label: "Education",
+    path: portalRoutes.education,
+    icon: GraduationCap,
+    description: "Catalyst curriculum, lessons, and finance assistant",
+  },
+  {
+    label: "Resources",
+    path: portalRoutes.resources,
+    icon: Library,
+    description: "Curriculum packs, journal, podcasts, and partner programs",
   },
   {
     label: "Saved",

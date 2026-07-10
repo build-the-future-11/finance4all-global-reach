@@ -13,6 +13,7 @@ export const DEBRIEFED_VISITED_KEY = "f4a-visited-debriefed";
 const STEPS = [
   { id: "profile", label: "Complete your profile", path: portalRoutes.settings },
   { id: "debriefed", label: "Read the latest news", path: portalRoutes.debriefed },
+  { id: "education", label: "Complete a Catalyst lesson", path: portalRoutes.education },
   { id: "network", label: "Connect with a member", path: portalRoutes.network },
   { id: "saved", label: "Save an article or project", path: portalRoutes.saved },
 ] as const;
@@ -27,6 +28,9 @@ function isStepDone(
       return percent >= 80;
     case "debriefed":
       return localStorage.getItem(DEBRIEFED_VISITED_KEY) === "1" || (stats?.savedArticles ?? 0) > 0;
+    case "education":
+      return localStorage.getItem("f4a-education-progress") !== null &&
+        localStorage.getItem("f4a-education-progress") !== "[]";
     case "network":
       return (stats?.connections ?? 0) > 0;
     case "saved":

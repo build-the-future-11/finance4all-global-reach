@@ -27,6 +27,8 @@ const EventsChapters = lazy(() => import("@/pages/portal/events/EventsChapters")
 const Networking = lazy(() => import("@/pages/portal/network/Networking"));
 const MemberProfile = lazy(() => import("@/pages/portal/network/MemberProfile"));
 const Admin = lazy(() => import("@/pages/portal/Admin"));
+const EducationHub = lazy(() => import("@/pages/portal/education/EducationHub"));
+const ResourcesHub = lazy(() => import("@/pages/portal/resources/ResourcesHub"));
 const Saved = lazy(() => import("@/pages/portal/Saved"));
 const Settings = lazy(() => import("@/pages/portal/Settings"));
 
@@ -101,6 +103,8 @@ function AppRoutes() {
             />
             <Route path="settings" element={<Settings />} />
             <Route path="saved" element={<Saved />} />
+            <Route path="education" element={<EducationHub />} />
+            <Route path="resources" element={<ResourcesHub />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />

@@ -7,6 +7,7 @@ import {
 } from "@/lib/security";
 import { computeMemberBadges } from "@/lib/badges";
 import { formatAuthError } from "@/lib/authErrors";
+import { askFinanceAssistant } from "@/lib/financeAssistant";
 
 describe("security", () => {
   it("validates email", () => {
@@ -34,6 +35,14 @@ describe("security", () => {
 describe("authErrors", () => {
   it("maps invalid credentials", () => {
     expect(formatAuthError("Invalid login credentials")).toContain("Incorrect email or password");
+  });
+});
+
+describe("financeAssistant", () => {
+  it("answers IPO questions", () => {
+    const reply = askFinanceAssistant("What is an IPO?");
+    expect(reply.answer.toLowerCase()).toContain("public");
+    expect(reply.confidence).not.toBe("low");
   });
 });
 

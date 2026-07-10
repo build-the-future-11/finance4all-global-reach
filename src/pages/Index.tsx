@@ -3,6 +3,10 @@ import HeroSection from "@/components/HeroSection";
 import LandingBackground from "@/components/landing/LandingBackground";
 import SocialProofMarquee from "@/components/landing/SocialProofMarquee";
 import EcosystemBento from "@/components/landing/EcosystemBento";
+import InclusiveImpactSection from "@/components/landing/InclusiveImpactSection";
+import ResourcesPreviewSection from "@/components/landing/ResourcesPreviewSection";
+import TestimonialsSection from "@/components/landing/TestimonialsSection";
+import LandingCTA from "@/components/landing/LandingCTA";
 import AboutSection from "@/components/AboutSection";
 import ProgramsSection from "@/components/ProgramsSection";
 import ProjectsSection from "@/components/ProjectsSection";
@@ -25,17 +29,29 @@ const Index = () => {
 
   return (
     <div className="dark relative min-h-screen overflow-x-hidden text-white">
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-emerald-500 focus:px-4 focus:py-2 focus:text-black"
+      >
+        Skip to content
+      </a>
       <LandingBackground />
       <Navbar />
-      <HeroSection />
-      <SocialProofMarquee />
-      <AboutSection />
-      <EcosystemBento />
-      <ProgramsSection />
-      <ProjectsSection />
-      <MembershipSection />
-      <FounderSection />
-      <ContactSection />
+      <main id="main">
+        <HeroSection />
+        <SocialProofMarquee />
+        <AboutSection />
+        <InclusiveImpactSection />
+        <EcosystemBento />
+        <ResourcesPreviewSection />
+        <ProgramsSection />
+        <TestimonialsSection />
+        <ProjectsSection />
+        <MembershipSection />
+        <LandingCTA />
+        <FounderSection />
+        <ContactSection />
+      </main>
       <Footer />
     </div>
   );

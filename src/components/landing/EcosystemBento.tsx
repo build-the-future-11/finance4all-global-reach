@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowUpRight, BookOpen, FlaskConical, Newspaper, Route, Users } from "lucide-react";
+import { ArrowUpRight, BookOpen, FlaskConical, GraduationCap, Newspaper, Route, Users } from "lucide-react";
 import { portalRoutes } from "@/routes/portal";
 
 const MODULES = [
@@ -36,12 +36,20 @@ const MODULES = [
     gradient: "from-amber-500/15 to-transparent",
   },
   {
-    title: "Explainers",
-    desc: "Finance vocabulary for everyone.",
-    icon: BookOpen,
-    href: portalRoutes.debriefedExplainers,
+    title: "Catalyst Education",
+    desc: "Free curriculum · progress tracking · finance assistant.",
+    icon: GraduationCap,
+    href: portalRoutes.education,
     className: "",
-    gradient: "from-teal-500/20 to-transparent",
+    gradient: "from-amber-500/20 to-transparent",
+  },
+  {
+    title: "Resources library",
+    desc: "Journal, podcasts, toolkits & webinars.",
+    icon: BookOpen,
+    href: portalRoutes.resources,
+    className: "",
+    gradient: "from-violet-500/20 to-transparent",
   },
 ];
 

@@ -68,3 +68,83 @@ INSERT INTO events (chapter_id, title, description, status, starts_at, registrat
     '[]'::jsonb
   )
 ON CONFLICT DO NOTHING;
+
+-- Meta Labs (requires at least one admin or lead_researcher profile)
+INSERT INTO research_projects (title, description, status, lead_researcher_id, tags)
+SELECT
+  'Atlas Economics Lab: EM Growth & Inflation',
+  'Student-led quantitative macro research on emerging-market growth and inflation dynamics.',
+  'open',
+  p.id,
+  ARRAY['macro', 'economics', 'atlas']
+FROM profiles p
+WHERE p.role IN ('admin', 'lead_researcher')
+  AND NOT EXISTS (SELECT 1 FROM research_projects WHERE title LIKE 'Atlas Economics%')
+ORDER BY p.created_at
+LIMIT 1;
+
+INSERT INTO research_projects (title, description, status, lead_researcher_id, tags)
+SELECT
+  'IYERN: Cross-border capital flows',
+  'Analyze capital flow patterns and policy responses across G20 economies.',
+  'open',
+  p.id,
+  ARRAY['macro', 'flows', 'research']
+FROM profiles p
+WHERE p.role IN ('admin', 'lead_researcher')
+  AND NOT EXISTS (SELECT 1 FROM research_projects WHERE title LIKE 'IYERN%')
+ORDER BY p.created_at
+LIMIT 1;
+
+INSERT INTO research_projects (title, description, status, lead_researcher_id, tags)
+SELECT
+  'Fintech credit underwriting study',
+  'Meta Labs project on alternative credit signals in consumer fintech.',
+  'open',
+  p.id,
+  ARRAY['fintech', 'credit']
+FROM profiles p
+WHERE p.role IN ('admin', 'lead_researcher')
+  AND NOT EXISTS (SELECT 1 FROM research_projects WHERE title LIKE 'Fintech credit%')
+ORDER BY p.created_at
+LIMIT 1;
+
+-- Meta Labs (requires at least one admin or lead_researcher profile)
+INSERT INTO research_projects (title, description, status, lead_researcher_id, tags)
+SELECT
+  'Atlas Economics Lab: EM Growth & Inflation',
+  'Student-led quantitative macro research on emerging-market growth and inflation dynamics.',
+  'open',
+  p.id,
+  ARRAY['macro', 'economics', 'atlas']
+FROM profiles p
+WHERE p.role IN ('admin', 'lead_researcher')
+  AND NOT EXISTS (SELECT 1 FROM research_projects WHERE title LIKE 'Atlas Economics%')
+ORDER BY p.created_at
+LIMIT 1;
+
+INSERT INTO research_projects (title, description, status, lead_researcher_id, tags)
+SELECT
+  'IYERN: Cross-border capital flows',
+  'Analyze capital flow patterns and policy responses across G20 economies.',
+  'open',
+  p.id,
+  ARRAY['macro', 'flows', 'research']
+FROM profiles p
+WHERE p.role IN ('admin', 'lead_researcher')
+  AND NOT EXISTS (SELECT 1 FROM research_projects WHERE title LIKE 'IYERN%')
+ORDER BY p.created_at
+LIMIT 1;
+
+INSERT INTO research_projects (title, description, status, lead_researcher_id, tags)
+SELECT
+  'Fintech credit underwriting study',
+  'Meta Labs project on alternative credit signals in consumer fintech.',
+  'open',
+  p.id,
+  ARRAY['fintech', 'credit']
+FROM profiles p
+WHERE p.role IN ('admin', 'lead_researcher')
+  AND NOT EXISTS (SELECT 1 FROM research_projects WHERE title LIKE 'Fintech credit%')
+ORDER BY p.created_at
+LIMIT 1;
