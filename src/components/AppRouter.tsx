@@ -9,6 +9,7 @@ import Index from "@/pages/Index";
 import NotFound from "@/pages/NotFound";
 import Login from "@/pages/auth/Login";
 import ForgotPassword from "@/pages/auth/ForgotPassword";
+import ResetPassword from "@/pages/auth/ResetPassword";
 import Signup from "@/pages/auth/Signup";
 import Onboarding from "@/pages/auth/Onboarding";
 import AuthCallback from "@/pages/auth/AuthCallback";
@@ -49,6 +50,7 @@ function AppRoutes() {
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
 

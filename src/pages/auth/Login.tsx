@@ -12,7 +12,8 @@ export default function Login() {
   const { signIn, signInWithGoogle, user, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const from = (location.state as { from?: string })?.from ?? "/portal";
+  const from = (location.state as { from?: string; message?: string })?.from ?? "/portal";
+  const flashMessage = (location.state as { message?: string })?.message;
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -57,6 +58,12 @@ export default function Login() {
     >
       <GoogleSignInButton onClick={handleGoogle} loading={googleLoading} />
       <AuthDivider />
+
+      {flashMessage && (
+        <p className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">
+          {flashMessage}
+        </p>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>

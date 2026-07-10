@@ -9,6 +9,7 @@ import {
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { getAuthRedirectUrl, supabase } from "@/lib/supabase";
+import { formatAuthError } from "@/lib/authErrors";
 import { isPasswordAcceptable, isValidEmail, sanitizeDisplayName } from "@/lib/security";
 import { mapProfile } from "@/lib/mappers";
 import type { UserProfile } from "@/types/domain";
@@ -23,6 +24,7 @@ interface AuthContextValue {
   signUp: (email: string, password: string, displayName: string) => Promise<{ error: string | null }>;
   signInWithGoogle: () => Promise<{ error: string | null }>;
   resetPassword: (email: string) => Promise<{ error: string | null }>;
+  updatePassword: (password: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
   updateProfile: (updates: Partial<Pick<UserProfile, "displayName" | "bio" | "interests" | "openToCollaborate" | "chapterId">>) => Promise<{ error: string | null }>;
@@ -145,7 +147,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signIn = useCallback(async (email: string, password: string) => {
     if (!isValidEmail(email)) return { error: "Enter a valid email address." };
     const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
-    return { error: error?.message ?? null };
+    return { error: error ? formatAuthError(error.message) : null };
   }, []);
 
   const signUp = useCallback(async (email: string, password: string, displayName: string) => {
@@ -160,7 +162,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       password,
       options: { data: { display_name: name } },
     });
-    return { error: error?.message ?? null };
+    return { error: error ? formatAuthError(error.message) : null };
   }, []);
 
   const signInWithGoogle = useCallback(async () => {
@@ -171,15 +173,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         queryParams: { prompt: "select_account" },
       },
     });
-    return { error: error?.message ?? null };
+    return { error: error ? formatAuthError(error.message) : null };
   }, []);
 
   const resetPassword = useCallback(async (email: string) => {
     if (!isValidEmail(email)) return { error: "Enter a valid email address." };
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-      redirectTo: `${window.location.origin}/login`,
+      redirectTo: `${window.location.origin}/reset-password`,
     });
-    return { error: error?.message ?? null };
+    return { error: error ? formatAuthError(error.message) : null };
+  }, []);
+
+  const updatePassword = useCallback(async (password: string) => {
+    if (!isPasswordAcceptable(password)) {
+      return { error: "Password must be at least 8 characters with letters and numbers." };
+    }
+    const { error } = await supabase.auth.updateUser({ password });
+    return { error: error ? formatAuthError(error.message) : null };
   }, []);
 
   const signOut = useCallback(async () => {
@@ -220,11 +230,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signUp,
       signInWithGoogle,
       resetPassword,
+      updatePassword,
       signOut,
       refreshProfile,
       updateProfile,
     }),
-    [session, profile, loading, needsOnboarding, signIn, signUp, signInWithGoogle, resetPassword, signOut, refreshProfile, updateProfile],
+    [session, profile, loading, needsOnboarding, signIn, signUp, signInWithGoogle, resetPassword, updatePassword, signOut, refreshProfile, updateProfile],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -9,7 +9,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-const STORAGE_KEY = "f4a-portal-tour-v1";
+export const PORTAL_TOUR_STORAGE_KEY = "f4a-portal-tour-v1";
+
+export function replayPortalTour() {
+  localStorage.removeItem(PORTAL_TOUR_STORAGE_KEY);
+  window.location.reload();
+}
 
 const STEPS = [
   {
@@ -37,13 +42,13 @@ export default function PortalTour() {
   const [step, setStep] = useState(0);
 
   useEffect(() => {
-    if (localStorage.getItem(STORAGE_KEY) !== "1") {
+    if (localStorage.getItem(PORTAL_TOUR_STORAGE_KEY) !== "1") {
       setOpen(true);
     }
   }, []);
 
   const finish = () => {
-    localStorage.setItem(STORAGE_KEY, "1");
+    localStorage.setItem(PORTAL_TOUR_STORAGE_KEY, "1");
     setOpen(false);
   };
 

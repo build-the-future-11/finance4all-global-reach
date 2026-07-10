@@ -52,8 +52,11 @@ https://YOUR-PROJECT.vercel.app
 
 ```
 http://localhost:8080/auth/callback
+http://localhost:8080/reset-password
 https://YOUR-PROJECT.vercel.app/auth/callback
+https://YOUR-PROJECT.vercel.app/reset-password
 https://YOUR-PROJECT-*.vercel.app/auth/callback
+https://YOUR-PROJECT-*.vercel.app/reset-password
 ```
 
 Replace `YOUR-PROJECT` with your Vercel subdomain (e.g. `finance4all-global-reach`).
@@ -74,10 +77,21 @@ If not done yet, run in Supabase SQL Editor (in order):
 2. `supabase/seed.sql`
 3. `supabase/migrations/002_google_oauth.sql` (Google login)
 4. `supabase/migrations/003_bookmarks_notifications.sql` (bookmarks + notifications)
+5. `supabase/migrations/004_avatar_storage.sql` (profile avatars)
 
 ## 5. Deploy
 
-Push to `main` — Vercel auto-deploys. Or:
+Push to `main` from **your** GitHub account — Vercel Hobby only deploys commits authored by the repo owner on private repos.
+
+```bash
+# Use your GitHub noreply email (Settings → Emails on github.com)
+git config user.email "271452460+build-the-future-11@users.noreply.github.com"
+git push origin main
+```
+
+If a deploy is blocked for “commit author did not have contributing access”, the push was made with the wrong email (e.g. `youremail@example.com`). Amend or recommit with your GitHub-linked email, then push again.
+
+Or deploy manually:
 
 ```bash
 npx vercel --prod

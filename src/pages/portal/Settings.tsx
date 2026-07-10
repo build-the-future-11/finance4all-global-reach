@@ -10,6 +10,7 @@ import { computeMemberBadges } from "@/lib/badges";
 import { portalRoutes } from "@/routes/portal";
 import MembershipCard from "@/components/portal/MembershipCard";
 import MemberBadges from "@/components/portal/MemberBadges";
+import { replayPortalTour } from "@/components/portal/PortalTour";
 import {
   PortalCard,
   PortalPageHeader,
@@ -269,6 +270,14 @@ export default function Settings() {
             <p className="mt-2 text-xs text-white/35">
               Never share your password or service-role keys. Report suspicious activity to your chapter lead.
             </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Button variant="outline" className={portalButtonOutline} asChild>
+                <Link to="/forgot-password">Reset password</Link>
+              </Button>
+              <Button variant="outline" className={portalButtonOutline} onClick={replayPortalTour}>
+                Replay portal tour
+              </Button>
+            </div>
           </div>
         </div>
       </PortalCard>

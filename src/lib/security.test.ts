@@ -6,6 +6,7 @@ import {
   sanitizeDisplayName,
 } from "@/lib/security";
 import { computeMemberBadges } from "@/lib/badges";
+import { formatAuthError } from "@/lib/authErrors";
 
 describe("security", () => {
   it("validates email", () => {
@@ -27,6 +28,12 @@ describe("security", () => {
 
   it("sanitizes display names", () => {
     expect(sanitizeDisplayName("  Ryan   Doe  ")).toBe("Ryan Doe");
+  });
+});
+
+describe("authErrors", () => {
+  it("maps invalid credentials", () => {
+    expect(formatAuthError("Invalid login credentials")).toContain("Incorrect email or password");
   });
 });
 
