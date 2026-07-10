@@ -45,3 +45,43 @@ export function sanitizeDisplayName(name: string): string {
 export function sanitizeBio(bio: string): string {
   return bio.trim().slice(0, 500);
 }
+
+const BLOCKED_URL_SCHEMES = /^(javascript|data|vbscript|file):/i;
+
+/** Only allow http(s) and relative in-app paths for user-authored markdown links. */
+export function sanitizeUrl(url: string): string | null {
+  const trimmed = url.trim();
+  if (!trimmed || trimmed.length > 2048) return null;
+
+  if (trimmed.startsWith("/") && !trimmed.startsWith("//")) {
+    return trimmed;
+  }
+
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return null;
+    if (BLOCKED_URL_SCHEMES.test(trimmed)) return null;
+    return parsed.href;
+  } catch {
+    return null;
+  }
+}
+
+export function sanitizeSearchQuery(query: string, maxLength = 80): string {
+  return query.replace(/[\x00-\x1f\x7f]/g, "").trim().slice(0, maxLength);
+}
+
+/** Reject service-role or secret keys accidentally set as client env vars. */
+export function isClientSafeSupabaseKey(key: string): boolean {
+  const k = key.trim();
+  if (!k) return false;
+  if (k.includes("service_role") || k.startsWith("sb_secret_")) return false;
+  return k.startsWith("eyJ") || k.startsWith("sb_publishable_");
+}
+
+/** Prevent open redirects after login — only same-origin relative paths. */
+export function safeInternalPath(path: string | undefined, fallback = "/portal"): string {
+  if (!path || typeof path !== "string") return fallback;
+  if (!path.startsWith("/") || path.startsWith("//") || path.includes("://")) return fallback;
+  return path;
+}

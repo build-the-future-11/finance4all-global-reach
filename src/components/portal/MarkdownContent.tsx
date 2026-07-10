@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { sanitizeUrl } from "@/lib/security";
 
 interface MarkdownContentProps {
   content: string;
@@ -30,17 +31,22 @@ function inlineFormat(text: string): React.ReactNode[] {
     } else {
       const linkMatch = /\[([^\]]+)\]\(([^)]+)\)/.exec(token);
       if (linkMatch) {
-        parts.push(
-          <a
-            key={key++}
-            href={linkMatch[2]}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-emerald-300 underline underline-offset-2 hover:text-emerald-200"
-          >
-            {linkMatch[1]}
-          </a>,
-        );
+        const safeHref = sanitizeUrl(linkMatch[2]);
+        if (safeHref) {
+          parts.push(
+            <a
+              key={key++}
+              href={safeHref}
+              target={safeHref.startsWith("/") ? undefined : "_blank"}
+              rel={safeHref.startsWith("/") ? undefined : "noopener noreferrer"}
+              className="text-emerald-300 underline underline-offset-2 hover:text-emerald-200"
+            >
+              {linkMatch[1]}
+            </a>,
+          );
+        } else {
+          parts.push(linkMatch[1]);
+        }
       }
     }
     last = match.index + token.length;

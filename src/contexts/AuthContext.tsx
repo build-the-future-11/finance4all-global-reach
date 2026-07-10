@@ -11,7 +11,7 @@ import type { Session, User } from "@supabase/supabase-js";
 import { getAuthRedirectUrl, supabase } from "@/lib/supabase";
 import { getResetPasswordUrl } from "@/lib/appOrigin";
 import { formatAuthError } from "@/lib/authErrors";
-import { isPasswordAcceptable, isValidEmail, sanitizeDisplayName } from "@/lib/security";
+import { isPasswordAcceptable, isValidEmail, sanitizeBio, sanitizeDisplayName } from "@/lib/security";
 import { mapProfile } from "@/lib/mappers";
 import type { UserProfile } from "@/types/domain";
 
@@ -205,8 +205,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!session?.user) return { error: "Not authenticated" };
 
       const payload: Record<string, unknown> = {};
-      if (updates.displayName !== undefined) payload.display_name = updates.displayName;
-      if (updates.bio !== undefined) payload.bio = updates.bio;
+      if (updates.displayName !== undefined) {
+        const name = sanitizeDisplayName(updates.displayName);
+        if (!name) return { error: "Display name is required." };
+        payload.display_name = name;
+      }
+      if (updates.bio !== undefined) payload.bio = sanitizeBio(updates.bio);
       if (updates.interests !== undefined) payload.interests = updates.interests;
       if (updates.openToCollaborate !== undefined) payload.open_to_collaborate = updates.openToCollaborate;
       if (updates.chapterId !== undefined) payload.chapter_id = updates.chapterId ?? null;

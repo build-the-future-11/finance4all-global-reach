@@ -1,5 +1,6 @@
 import { LESSON_CONTENT } from "@/data/lessonContent";
 import { portalRoutes } from "@/routes/portal";
+import { sanitizeSearchQuery } from "@/lib/security";
 
 export interface GlossaryResult {
   title: string;
@@ -20,7 +21,8 @@ export function searchGlossary(
   query: string,
   explainers: { title: string; summary: string; body: string; slug: string }[],
 ): GlossaryResult[] {
-  const queryTokens = tokenize(query);
+  const cleaned = sanitizeSearchQuery(query);
+  const queryTokens = tokenize(cleaned);
   if (queryTokens.length === 0) return [];
 
   const results: { score: number; result: GlossaryResult }[] = [];

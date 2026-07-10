@@ -129,7 +129,7 @@ export default function HeroSection() {
           <div className="mt-10 flex flex-wrap gap-3">
             <Link
               to="/signup"
-              className="group inline-flex items-center gap-2 rounded-full bg-emerald-500 px-7 py-3.5 text-sm font-semibold text-black shadow-[0_8px_32px_rgba(52,211,153,0.35)] transition hover:bg-emerald-400"
+              className="landing-shimmer group inline-flex items-center gap-2 rounded-full bg-emerald-500 px-7 py-3.5 text-sm font-semibold text-black shadow-[0_8px_32px_rgba(52,211,153,0.35)] transition hover:bg-emerald-400"
             >
               Create free account
               <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Search } from "lucide-react";
 import { useExplainers } from "@/hooks/portal/useDebriefed";
 import { searchGlossary } from "@/lib/glossarySearch";
+import { sanitizeSearchQuery } from "@/lib/security";
 import { PortalCard } from "@/components/portal/PortalUI";
 import { Input } from "@/components/ui/input";
 
@@ -31,15 +32,17 @@ export default function GlossarySearch({ compact }: GlossarySearchProps) {
     <PortalCard className={compact ? "p-4" : "p-6"}>
       <h3 className="font-semibold text-white">Glossary search</h3>
       <p className="mt-1 text-sm text-white/50">
-        Search member explainers and education guides — sourced from Finance4All content, not generated guesses.
+        Search explainers and Catalyst lessons written for members — results link to source pages.
       </p>
 
       <div className="relative mt-4">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/35" />
         <Input
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => setQuery(sanitizeSearchQuery(e.target.value))}
+          maxLength={80}
           placeholder="e.g. IPO, inflation, diversification…"
+          aria-label="Search glossary"
           className="border-white/15 bg-white/[0.06] pl-9 text-white placeholder:text-white/30"
         />
       </div>

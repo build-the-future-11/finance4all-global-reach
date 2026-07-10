@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import GlassSurface from "@/components/landing/GlassSurface";
 
 const TIMELINE = [
   {
@@ -47,7 +48,8 @@ export default function OriginStorySection() {
             </Link>
           </div>
 
-          <ol className="relative space-y-0">
+          <GlassSurface strong className="p-8 lg:p-10">
+            <ol className="landing-glass-inner relative space-y-0">
             <div className="absolute bottom-4 left-[15px] top-4 w-px bg-gradient-to-b from-emerald-400/50 via-white/10 to-transparent" />
             {TIMELINE.map((item, i) => (
               <li key={item.year} className="relative flex gap-8 pb-12 last:pb-0">
@@ -61,7 +63,8 @@ export default function OriginStorySection() {
                 </div>
               </li>
             ))}
-          </ol>
+            </ol>
+          </GlassSurface>
         </div>
       </div>
     </section>

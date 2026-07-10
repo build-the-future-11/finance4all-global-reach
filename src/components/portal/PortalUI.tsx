@@ -18,10 +18,9 @@ export function PortalCard({
   return (
     <div
       className={cn(
-        "rounded-2xl border border-white/[0.12] bg-white/[0.04] backdrop-blur-xl",
-        "shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]",
+        "portal-glass",
         hover &&
-          "transition duration-300 hover:border-white/25 hover:bg-white/[0.07] hover:shadow-[0_8px_32px_rgba(0,0,0,0.2)]",
+          "transition duration-300 hover:border-white/20 hover:bg-white/[0.06] hover:shadow-[0_12px_40px_rgba(0,0,0,0.28)]",
         className,
       )}
       {...props}

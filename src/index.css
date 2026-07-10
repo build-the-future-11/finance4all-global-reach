@@ -328,8 +328,8 @@
     pointer-events: none;
   }
 
-  .landing-glass:hover::before,
-  .landing-glass-strong:hover::before {
+  .landing-glass-interactive:hover::before,
+  .landing-glass-strong.landing-glass-interactive:hover::before {
     opacity: 1;
   }
 
@@ -357,5 +357,54 @@
   .landing-orb {
     @apply absolute rounded-full blur-[120px];
     animation: landing-float 10s ease-in-out infinite;
+  }
+
+  .landing-glass-interactive:hover::before {
+    opacity: 1;
+  }
+
+  @keyframes landing-shimmer {
+    0% { transform: translateX(-100%) skewX(-12deg); }
+    100% { transform: translateX(200%) skewX(-12deg); }
+  }
+
+  .landing-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .landing-shimmer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.08),
+      transparent
+    );
+    animation: landing-shimmer 4s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  /* ─── Portal liquid glass ─── */
+  .portal-glass {
+    @apply rounded-2xl border backdrop-blur-2xl;
+    border-color: rgba(255, 255, 255, 0.1);
+    background: linear-gradient(
+      160deg,
+      rgba(255, 255, 255, 0.06) 0%,
+      rgba(255, 255, 255, 0.02) 100%
+    );
+    box-shadow:
+      0 4px 24px rgba(0, 0, 0, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
+  .portal-glass-header {
+    @apply border-b backdrop-blur-2xl;
+    border-color: rgba(255, 255, 255, 0.08);
+    background: rgba(6, 10, 18, 0.75);
+    box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.04);
   }
 }

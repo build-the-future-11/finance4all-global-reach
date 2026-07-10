@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 import { getAuthCallbackUrl } from "@/lib/appOrigin";
+import { isClientSafeSupabaseKey } from "@/lib/security";
 
 /**
  * Public Supabase project defaults (anon key is safe in client code; RLS enforces access).
@@ -23,7 +24,17 @@ function resolveSupabaseUrl(): string {
 
 function resolveSupabaseKey(): string {
   const anon = import.meta.env.VITE_SUPABASE_ANON_KEY?.trim();
-  if (anon?.startsWith("eyJ")) return anon;
+  if (anon) {
+    if (!isClientSafeSupabaseKey(anon)) {
+      if (import.meta.env.DEV) {
+        console.error(
+          "[Finance4All] VITE_SUPABASE_ANON_KEY looks like a secret key. Use the anon JWT only.",
+        );
+      }
+      return PROJECT_ANON_KEY;
+    }
+    if (anon.startsWith("eyJ")) return anon;
+  }
 
   const publishable = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY?.trim();
   if (publishable?.startsWith("sb_publishable_")) {
@@ -35,7 +46,7 @@ function resolveSupabaseKey(): string {
     return PROJECT_ANON_KEY;
   }
 
-  if (anon) return anon;
+  if (anon && isClientSafeSupabaseKey(anon)) return anon;
 
   if (import.meta.env.DEV && !import.meta.env.VITE_SUPABASE_URL) {
     console.warn("[Finance4All] Using built-in Supabase project defaults. Copy .env.example to .env to override.");

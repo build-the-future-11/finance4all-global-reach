@@ -31,13 +31,22 @@ export default function PortalLayout() {
   const navItems = portalNav.filter((item) => !item.adminOnly || isAdmin);
 
   return (
-    <div className="min-h-screen bg-[#060a12] text-white">
+    <div className="min-h-screen bg-[#040810] text-white">
       <div className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute top-0 left-1/4 h-[500px] w-[500px] rounded-full bg-emerald-500/[0.07] blur-[160px]" />
-        <div className="absolute right-0 bottom-0 h-[400px] w-[400px] rounded-full bg-blue-500/[0.06] blur-[140px]" />
+        <div className="landing-orb left-1/4 top-0 h-[32rem] w-[32rem] bg-emerald-500/[0.08]" />
+        <div className="landing-orb landing-float-delay right-0 bottom-0 h-96 w-96 bg-blue-500/[0.06]" />
+        <div
+          className="absolute inset-0 opacity-[0.25]"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)",
+            backgroundSize: "64px 64px",
+            maskImage: "radial-gradient(ellipse 80% 70% at 50% 20%, black, transparent)",
+          }}
+        />
       </div>
 
-      <header className="sticky top-0 z-40 border-b border-white/[0.08] bg-[#060a12]/85 backdrop-blur-2xl">
+      <header className="portal-glass-header sticky top-0 z-40">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5">
           <div className="flex items-center gap-3">
             <button
@@ -145,7 +154,7 @@ export default function PortalLayout() {
             })}
 
             {profile && (
-              <div className="mt-4 hidden rounded-xl border border-white/[0.08] bg-white/[0.03] p-3 lg:block">
+              <div className="mt-4 hidden portal-glass p-3 lg:block">
                 <div className="flex items-center gap-2.5">
                   <Avatar className="h-9 w-9 border border-white/10">
                     <AvatarImage src={profile.avatarUrl} />

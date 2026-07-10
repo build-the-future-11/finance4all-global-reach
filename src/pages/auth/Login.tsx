@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { safeInternalPath } from "@/lib/security";
 import AuthLayout from "@/components/portal/AuthLayout";
 import GoogleSignInButton, { AuthDivider } from "@/components/portal/GoogleSignInButton";
 import { portalInputClass } from "@/components/portal/PortalUI";
@@ -12,7 +13,7 @@ export default function Login() {
   const { signIn, signInWithGoogle, user, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const from = (location.state as { from?: string; message?: string })?.from ?? "/portal";
+  const from = safeInternalPath((location.state as { from?: string })?.from);
   const flashMessage = (location.state as { message?: string })?.message;
 
   const [email, setEmail] = useState("");
@@ -76,6 +77,7 @@ export default function Login() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            autoComplete="email"
             className={portalInputClass}
           />
         </div>
@@ -94,6 +96,7 @@ export default function Login() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            autoComplete="current-password"
             className={portalInputClass}
           />
         </div>

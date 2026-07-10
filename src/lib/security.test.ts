@@ -1,9 +1,13 @@
 import { describe, it, expect } from "vitest";
 import {
   assessPassword,
+  isClientSafeSupabaseKey,
   isPasswordAcceptable,
   isValidEmail,
   sanitizeDisplayName,
+  sanitizeSearchQuery,
+  sanitizeUrl,
+  safeInternalPath,
 } from "@/lib/security";
 import { computeMemberBadges } from "@/lib/badges";
 import { formatAuthError } from "@/lib/authErrors";
@@ -29,6 +33,28 @@ describe("security", () => {
 
   it("sanitizes display names", () => {
     expect(sanitizeDisplayName("  Ryan   Doe  ")).toBe("Ryan Doe");
+  });
+
+  it("blocks unsafe markdown URLs", () => {
+    expect(sanitizeUrl("javascript:alert(1)")).toBeNull();
+    expect(sanitizeUrl("https://example.com/path")).toBe("https://example.com/path");
+    expect(sanitizeUrl("/portal/education")).toBe("/portal/education");
+  });
+
+  it("sanitizes search queries", () => {
+    expect(sanitizeSearchQuery("  IPO  ")).toBe("IPO");
+    expect(sanitizeSearchQuery("a".repeat(100)).length).toBe(80);
+  });
+
+  it("rejects secret supabase keys in client", () => {
+    expect(isClientSafeSupabaseKey("eyJhbGciOiJIUzI1NiJ9.test")).toBe(true);
+    expect(isClientSafeSupabaseKey("sb_secret_abc")).toBe(false);
+  });
+
+  it("blocks open redirect paths", () => {
+    expect(safeInternalPath("/portal/debriefed")).toBe("/portal/debriefed");
+    expect(safeInternalPath("https://evil.com")).toBe("/portal");
+    expect(safeInternalPath("//evil.com")).toBe("/portal");
   });
 });
 
