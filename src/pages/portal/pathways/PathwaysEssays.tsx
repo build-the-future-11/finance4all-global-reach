@@ -7,12 +7,20 @@ import {
   useToggleEssayUpvote,
 } from "@/hooks/portal/usePathways";
 import { useProfilesByIds } from "@/hooks/portal/useLabs";
-import { PortalCard, PortalPageHeader, QueryStatus, portalInputClass } from "@/components/portal/PortalUI";
+import {
+  PortalCard,
+  PortalDialogContent,
+  PortalPageHeader,
+  QueryStatus,
+  portalButtonOutline,
+  portalButtonPrimary,
+  portalInputClass,
+} from "@/components/portal/PortalUI";
+import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -21,6 +29,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { portalCopy } from "@/lib/portalCopy";
+import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
 
 export default function PathwaysEssays() {
   const { data: essays, isLoading, error, refetch } = useEssays();
@@ -57,17 +67,19 @@ export default function PathwaysEssays() {
 
   return (
     <div>
-      <PortalPageHeader
-        title="Financial Takes Challenge"
-        description="Submit opinion and market analysis. Community upvotes surface strong writing for editorial review."
+      <PortalAnimatedSection>
+        <PortalPageHeader
+          eyebrow={portalCopy.pathways.essays.eyebrow}
+          title={portalCopy.pathways.essays.title}
+          description={portalCopy.pathways.essays.description}
         action={
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-emerald-500 hover:bg-emerald-400">
+              <Button className={portalButtonPrimary}>
                 <Plus className="h-4 w-4" /> Submit essay
               </Button>
             </DialogTrigger>
-            <DialogContent className="border-white/15 bg-[#0c1220] text-white">
+            <PortalDialogContent>
               <DialogHeader><DialogTitle>Submit your take</DialogTitle></DialogHeader>
               <div className="space-y-4">
                 <div>
@@ -78,20 +90,21 @@ export default function PathwaysEssays() {
                   <Label>Essay</Label>
                   <Textarea value={body} onChange={(e) => setBody(e.target.value)} rows={8} className={portalInputClass} />
                 </div>
-                <Button onClick={handleSubmit} disabled={submitEssay.isPending} className="bg-emerald-500 hover:bg-emerald-400">
+                <Button onClick={handleSubmit} disabled={submitEssay.isPending} className={portalButtonPrimary}>
                   Publish
                 </Button>
               </div>
-            </DialogContent>
+            </PortalDialogContent>
           </Dialog>
         }
       />
+      </PortalAnimatedSection>
 
       <QueryStatus
         isLoading={isLoading}
         error={error}
         isEmpty={!essays?.length}
-        emptyMessage="No essays yet — submit the first take on markets, policy, or investing."
+        emptyMessage={portalCopy.pathways.essays.empty}
         onRetry={() => refetch()}
         skeletonCount={2}
       >
@@ -115,7 +128,7 @@ export default function PathwaysEssays() {
                   <Button
                     size="sm"
                     variant={upvoted ? "default" : "outline"}
-                    className={upvoted ? "bg-emerald-500 hover:bg-emerald-400" : "shrink-0 border-white/20 text-white"}
+                    className={upvoted ? cn("shrink-0", portalButtonPrimary) : cn("shrink-0", portalButtonOutline)}
                     onClick={() => handleUpvote(essay.id, upvoted)}
                   >
                     <ThumbsUp className={`h-3.5 w-3.5 ${upvoted ? "fill-current" : ""}`} />

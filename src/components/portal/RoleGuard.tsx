@@ -1,7 +1,6 @@
-import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import type { UserRole } from "@/types/domain";
-import { portalRoutes } from "@/routes/portal";
+import AccessDenied from "@/components/portal/AccessDenied";
 
 interface RoleGuardProps {
   allowed: UserRole[];
@@ -12,7 +11,12 @@ export default function RoleGuard({ allowed, children }: RoleGuardProps) {
   const { profile } = useAuth();
 
   if (!profile || !allowed.includes(profile.role)) {
-    return <Navigate to={portalRoutes.labs} replace />;
+    return (
+      <AccessDenied
+        title="This page requires elevated access"
+        description={`Only ${allowed.map((r) => r.replace("_", " ")).join(" or ")} roles can view this area. Your current role is ${profile?.role?.replace("_", " ") ?? "unknown"}.`}
+      />
+    );
   }
 
   return <>{children}</>;

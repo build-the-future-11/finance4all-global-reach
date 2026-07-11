@@ -1,47 +1,43 @@
 import { Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
 
 export default function ThemeToggle() {
-  const [dark, setDark] = useState(false);
+  const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
-  // Initialize theme based on localStorage or system preference
-  useEffect(() => {
-    const stored = localStorage.getItem("theme");
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    if (stored === "dark" || (!stored && prefersDark)) {
-      setDark(true);
-      document.documentElement.classList.add("dark");
-    }
-  }, []);
+  useEffect(() => setMounted(true), []);
 
-  const toggle = () => {
-    setDark((prev) => {
-      const next = !prev;
-      document.documentElement.classList.toggle("dark", next);
-      localStorage.setItem("theme", next ? "dark" : "light");
-      return next;
-    });
-  };
+  const dark = mounted && resolvedTheme === "dark";
+
+  const toggle = () => setTheme(dark ? "light" : "dark");
 
   return (
     <button
+      type="button"
       onClick={toggle}
-      aria-label="Toggle theme"
-      className="relative flex items-center justify-center rounded-full p-3 transition-all duration-300 hover:scale-110 active:scale-95 glass-card-liquid shadow-lg"
+      aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
+      className={cn(
+        "portal-focus-ring relative flex items-center justify-center rounded-full p-3",
+        "glass-card-liquid shadow-lg transition-transform duration-300 hover:scale-110 active:scale-95",
+      )}
     >
-      {/* Animated background blur */}
-      <span className="absolute inset-0 rounded-full bg-white/10 backdrop-blur-md transition-opacity duration-500 pointer-events-none" />
+      <span className="pointer-events-none absolute inset-0 rounded-full bg-white/10 opacity-100 backdrop-blur-md transition-opacity duration-500" />
 
-      {/* Icons with fade/rotate transition */}
       <Sun
-        className={`absolute h-5 w-5 text-yellow-400 transition-all duration-500 ${
-          dark ? "opacity-0 rotate-90 scale-75" : "opacity-100 rotate-0 scale-100"
-        }`}
+        className={cn(
+          "absolute h-5 w-5 text-yellow-400 transition-all duration-500",
+          dark ? "scale-75 rotate-90 opacity-0" : "scale-100 rotate-0 opacity-100",
+        )}
+        aria-hidden
       />
       <Moon
-        className={`absolute h-5 w-5 text-indigo-400 transition-all duration-500 ${
-          dark ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-75"
-        }`}
+        className={cn(
+          "absolute h-5 w-5 text-indigo-400 transition-all duration-500",
+          dark ? "scale-100 rotate-0 opacity-100" : "scale-75 -rotate-90 opacity-0",
+        )}
+        aria-hidden
       />
     </button>
   );

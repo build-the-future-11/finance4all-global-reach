@@ -1,20 +1,23 @@
-const INSTITUTIONS = [
-  "Stanford University",
-  "MIT",
-  "Princeton University",
-  "IIT Madras",
-  "University of Chicago",
-  "UC Berkeley",
-  "Harvard University",
-  "Jane Street",
-  "Youth Economy Lab",
-  "Atlas Economics Lab",
+import { portalCopy } from "@/lib/portalCopy";
+
+/** Programs and initiatives inside Finance4All — not unaffiliated institution logos. */
+const PROGRAMS = [
+  "Catalyst Education",
+  "Meta Labs",
   "Finance Debriefed",
+  "Axiom Pathways",
+  "Economics Journal",
+  "Atlas Economics Lab",
+  "Global School Clubs",
   "EconScholars",
+  "S.I.S.T.E.R Research",
+  "Student Outreach",
+  "Pathways Studios",
+  "Chapter Events",
 ];
 
 export default function SocialProofMarquee() {
-  const items = [...INSTITUTIONS, ...INSTITUTIONS];
+  const items = [...PROGRAMS, ...PROGRAMS];
 
   return (
     <div className="relative overflow-hidden border-y border-white/[0.08] py-4 landing-glass !rounded-none backdrop-blur-xl">
@@ -22,7 +25,7 @@ export default function SocialProofMarquee() {
       <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-32 bg-gradient-to-l from-[#030508] to-transparent" />
 
       <p className="mb-3 text-center text-[10px] font-medium uppercase tracking-[0.25em] text-white/25">
-        Researchers & partners across the network
+        {portalCopy.landing.socialProofLabel}
       </p>
 
       <div className="landing-marquee flex w-max items-center gap-12">

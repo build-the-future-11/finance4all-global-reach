@@ -1,17 +1,20 @@
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Clock } from "lucide-react";
 import { EDUCATION_MODULES } from "@/data/educationModules";
 import { LESSON_CONTENT } from "@/data/lessonContent";
 import { useEducationProgress } from "@/hooks/portal/useEducationProgress";
 import MarkdownContent from "@/components/portal/MarkdownContent";
-import { PortalCard, PortalPageHeader } from "@/components/portal/PortalUI";
+import { PortalCard, PortalPageHeader, portalButtonOutline, portalButtonPrimary } from "@/components/portal/PortalUI";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { portalRoutes } from "@/routes/portal";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { portalCopy } from "@/lib/portalCopy";
+import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
 
 export default function EducationLesson() {
   const { lessonId } = useParams();
-  const { toggleLesson, isLessonComplete } = useEducationProgress();
+  const { toggleLesson, isLessonComplete, isSyncing } = useEducationProgress();
 
   const lesson = EDUCATION_MODULES.flatMap((m) =>
     m.lessons.map((l) => ({ ...l, module: m })),
@@ -28,25 +31,33 @@ export default function EducationLesson() {
         <Link to={portalRoutes.education} className="text-sm text-emerald-300 hover:underline">
           ← Education hub
         </Link>
-        <p className="mt-6 text-white/60">Lesson not found.</p>
+        <p className="mt-6 text-white/60">{portalCopy.education.lessonNotFound}</p>
       </div>
     );
   }
 
   return (
     <div>
-      <Link
-        to={portalRoutes.education}
-        className="mb-6 inline-flex items-center gap-2 text-sm text-emerald-300 hover:underline"
-      >
-        <ArrowLeft className="h-4 w-4" /> {lesson.module.title}
-      </Link>
+      <PortalAnimatedSection>
+        <Link
+          to={portalRoutes.education}
+          className="mb-6 inline-flex items-center gap-2 text-sm text-emerald-300 hover:underline"
+        >
+          <ArrowLeft className="h-4 w-4" /> {lesson.module.title}
+        </Link>
 
-      <PortalPageHeader
-        eyebrow={lesson.module.eyebrow}
-        title={lesson.title}
-        description={lesson.summary}
-      />
+        <PortalPageHeader
+          eyebrow={lesson.module.eyebrow}
+          title={lesson.title}
+          description={lesson.summary}
+          action={
+            <Badge variant="outline" className="border-white/20 text-white/60">
+              <Clock className="mr-1 h-3 w-3" />
+              {lesson.durationMin} min read
+            </Badge>
+          }
+        />
+      </PortalAnimatedSection>
 
       <div className="mb-6 flex flex-wrap gap-2">
         {content.keyTerms.map((term) => (
@@ -65,7 +76,7 @@ export default function EducationLesson() {
       </PortalCard>
 
       <PortalCard className="mt-6 border-emerald-400/15 p-6">
-        <h2 className="font-semibold text-white">Exercise</h2>
+        <h2 className="font-semibold text-white">{portalCopy.education.exerciseTitle}</h2>
         <div className="mt-3 text-sm leading-relaxed text-white/65">
           <MarkdownContent content={content.exercise} />
         </div>
@@ -74,15 +85,16 @@ export default function EducationLesson() {
       <div className="mt-8 flex flex-wrap gap-3">
         <Button
           onClick={() => toggleLesson(lesson.id)}
-          className={done ? "border-white/20 bg-transparent text-white" : "bg-emerald-500 hover:bg-emerald-400"}
+          disabled={isSyncing}
+          className={done ? portalButtonOutline : portalButtonPrimary}
           variant={done ? "outline" : "default"}
         >
           {done && <CheckCircle2 className="mr-2 h-4 w-4" />}
-          {done ? "Completed — click to undo" : "Mark lesson complete"}
+          {done ? portalCopy.education.markUndo : portalCopy.education.markComplete}
         </Button>
         <Link to={portalRoutes.debriefedExplainers}>
           <Button variant="outline" className="border-white/20 text-white hover:bg-white/10">
-            Related explainers
+            {portalCopy.education.relatedExplainers}
           </Button>
         </Link>
       </div>

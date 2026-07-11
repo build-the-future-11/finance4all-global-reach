@@ -4,17 +4,43 @@ import { mapConnectionRequest, mapIntroductionPost, mapProfile } from "@/lib/map
 import type { ConnectionStatus } from "@/types/domain";
 import { useAuth } from "@/contexts/AuthContext";
 
-export function useMemberProfiles() {
+export const MEMBER_PAGE_SIZE = 24;
+
+export interface MemberProfilesOptions {
+  page?: number;
+  pageSize?: number;
+  search?: string;
+}
+
+export function useMemberProfiles(options?: MemberProfilesOptions) {
+  const page = options?.page ?? 0;
+  const pageSize = options?.pageSize;
+  const search = options?.search?.trim();
+
   return useQuery({
-    queryKey: ["member-profiles"],
+    queryKey: ["member-profiles", page, pageSize, search],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("profiles")
-        .select("*")
+        .select("*", { count: "exact" })
         .neq("display_name", "")
         .order("display_name");
+
+      if (search) {
+        query = query.ilike("display_name", `%${search}%`);
+      }
+
+      if (pageSize != null) {
+        const from = page * pageSize;
+        query = query.range(from, from + pageSize - 1);
+      }
+
+      const { data, error, count } = await query;
       if (error) throw error;
-      return data.map(mapProfile);
+      return {
+        members: data.map(mapProfile),
+        total: count ?? data.length,
+      };
     },
   });
 }
@@ -103,6 +129,17 @@ export function useCreateIntroduction() {
         looking_for: input.lookingFor,
         interests: input.interests,
       });
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["introductions"] }),
+  });
+}
+
+export function useDeleteIntroduction() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("introduction_posts").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["introductions"] }),

@@ -2,11 +2,12 @@ import { Link } from "react-router-dom";
 import { ArrowRight, ChevronDown, FlaskConical, Newspaper, Users } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import GlassSurface from "@/components/landing/GlassSurface";
+import { portalCopy } from "@/lib/portalCopy";
 
 const STATS = [
-  { value: 25000, suffix: "+", label: "Students in outreach", context: "since 2023" },
-  { value: 15, suffix: "+", label: "Countries with chapters", context: "and growing" },
-  { value: 500, suffix: "+", label: "Portal members", context: "research & events" },
+  { value: 25000, suffix: "+", label: "Students reached", context: "outreach since 2023" },
+  { value: 15, suffix: "+", label: "Chapter countries", context: "India, UK, US, and more" },
+  { value: 500, suffix: "+", label: "Portal accounts", context: "research, events, writing" },
 ];
 
 const PORTAL_SNIPPETS = [
@@ -108,22 +109,20 @@ export default function HeroSection() {
         <div>
           <GlassSurface className="mb-8 inline-flex w-fit rounded-full p-1.5 pr-4" interactive={false}>
             <div className="landing-glass-inner flex items-center gap-3">
-              <span className="glass-pill !text-emerald-200">Free membership</span>
-              <span className="text-xs text-white/55">Portal · Labs · Chapters · Journal</span>
+              <span className="glass-pill !text-emerald-200">{portalCopy.landing.heroBadge}</span>
+              <span className="text-xs text-white/55">{portalCopy.landing.heroBadgeModules}</span>
             </div>
           </GlassSurface>
 
           <h1 className="text-balance text-4xl font-bold leading-[1.06] tracking-tight text-white sm:text-5xl lg:text-[3.35rem]">
-            Finance education that{" "}
+            {portalCopy.landing.heroTitle}{" "}
             <span className="bg-gradient-to-r from-emerald-200 via-white to-emerald-100 bg-clip-text text-transparent">
-              scales with ambition.
+              {portalCopy.landing.heroTitleAccent}
             </span>
           </h1>
 
           <p className="mt-6 max-w-xl text-base leading-[1.7] text-white/58 sm:text-lg">
-            Finance4All started in Indian classrooms teaching budgeting to students who had never
-            seen a brokerage account. Today the same Catalyst curriculum, Meta Labs research track,
-            and Economics Journal live in one member portal — run by chapters from Mumbai to New York.
+            {portalCopy.landing.heroSubtext}
           </p>
 
           <div className="mt-10 flex flex-wrap gap-3">
@@ -131,14 +130,14 @@ export default function HeroSection() {
               to="/signup"
               className="landing-shimmer group inline-flex items-center gap-2 rounded-full bg-emerald-500 px-7 py-3.5 text-sm font-semibold text-black shadow-[0_8px_32px_rgba(52,211,153,0.35)] transition hover:bg-emerald-400"
             >
-              Create free account
+              {portalCopy.landing.heroCtaPrimary}
               <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
             </Link>
             <Link
               to="/login"
               className="landing-glass inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold text-white transition hover:border-white/25"
             >
-              <span className="landing-glass-inner">Sign in to portal</span>
+              <span className="landing-glass-inner">{portalCopy.landing.heroCtaSecondary}</span>
             </Link>
           </div>
 
@@ -164,7 +163,9 @@ export default function HeroSection() {
                   <div className="h-2.5 w-2.5 rounded-full bg-amber-400/60" />
                   <div className="h-2.5 w-2.5 rounded-full bg-emerald-400/60" />
                 </div>
-                <p className="font-mono text-[10px] text-white/30">finance4all.app/portal</p>
+                <p className="font-mono text-[10px] text-white/30">
+                  {portalCopy.landing.heroPortalPreview}
+                </p>
               </div>
 
               <div className="space-y-3 p-5">
@@ -200,7 +201,7 @@ export default function HeroSection() {
 
               <div className="border-t border-white/10 px-5 py-3">
                 <p className="text-center text-[11px] text-white/40">
-                  Live modules — news, research, pathways, chapters
+                  {portalCopy.landing.heroPortalFooter}
                 </p>
               </div>
             </div>
@@ -213,7 +214,7 @@ export default function HeroSection() {
         className="absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-1 text-white/25 transition hover:text-white/55"
         aria-label="Scroll to learn more"
       >
-        <span className="text-[10px] uppercase tracking-[0.2em]">The network</span>
+        <span className="text-[10px] uppercase tracking-[0.2em]">{portalCopy.landing.heroScrollHint}</span>
         <ChevronDown className="h-5 w-5 animate-bounce" />
       </a>
     </section>

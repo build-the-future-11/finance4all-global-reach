@@ -1,6 +1,7 @@
 import { Bookmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { portalButtonOutline, portalButtonPrimary } from "@/components/portal/PortalUI";
 import { toast } from "sonner";
 
 interface BookmarkButtonProps {
@@ -35,14 +36,12 @@ export default function BookmarkButton({
       size="sm"
       variant={saved ? "default" : "outline"}
       disabled={loading}
-      className={cn(
-        saved ? "bg-emerald-500 hover:bg-emerald-400" : "border-white/20 text-white hover:bg-white/10",
-        className,
-      )}
+      className={cn(saved ? portalButtonPrimary : portalButtonOutline, className)}
       onClick={handleClick}
       aria-label={saved ? "Remove bookmark" : "Save bookmark"}
+      aria-pressed={saved}
     >
-      <Bookmark className={cn("h-3.5 w-3.5", saved && "fill-current")} />
+      <Bookmark className={cn("h-3.5 w-3.5", saved && "fill-current")} aria-hidden />
       {label && <span className="ml-1.5">{saved ? "Saved" : label}</span>}
     </Button>
   );

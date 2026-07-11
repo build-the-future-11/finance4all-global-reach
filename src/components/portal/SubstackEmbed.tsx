@@ -22,7 +22,7 @@ export default function SubstackEmbed() {
         src="https://financedebriefed.substack.com/embed"
         width="100%"
         height="320"
-        className="border-0 bg-[#0c1220]"
+        className="border-0 bg-portal-surface"
         title="Finance Debriefed Substack"
         loading="lazy"
       />

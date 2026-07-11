@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import tailwindcssAnimate from "tailwindcss-animate";
 
 export default {
   darkMode: ["class"],
@@ -60,6 +61,27 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        portal: {
+          bg: "hsl(var(--portal-bg))",
+          "bg-elevated": "hsl(var(--portal-bg-elevated))",
+          surface: "hsl(var(--portal-surface))",
+          border: "hsl(var(--portal-border))",
+          "border-strong": "hsl(var(--portal-border-strong))",
+          muted: "hsl(var(--portal-text-muted))",
+          subtle: "hsl(var(--portal-text-subtle))",
+          accent: "hsl(var(--portal-accent))",
+          "accent-text": "hsl(var(--portal-accent-text))",
+        },
+        landing: {
+          bg: "hsl(var(--landing-bg))",
+          "map-bg": "hsl(var(--landing-map-bg))",
+        },
+      },
+      transitionTimingFunction: {
+        portal: "cubic-bezier(0.16, 1, 0.3, 1)",
+      },
+      transitionDuration: {
+        portal: "200ms",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -97,5 +119,5 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [tailwindcssAnimate],
 } satisfies Config;

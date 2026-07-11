@@ -4,15 +4,27 @@ import {
   useReviewQueue,
   useUpdateApplicationStatus,
 } from "@/hooks/portal/useLabs";
-import { EmptyState, LoadingState, PortalCard, PortalPageHeader } from "@/components/portal/PortalUI";
+import {
+  EmptyState,
+  ErrorState,
+  LoadingState,
+  PortalCard,
+  PortalPageHeader,
+  portalButtonOutline,
+  portalButtonPrimary,
+} from "@/components/portal/PortalUI";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { LabApplicationStatus } from "@/types/domain";
 import { toast } from "sonner";
+import { portalCopy } from "@/lib/portalCopy";
+import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 export default function LabReview() {
+  useDocumentTitle("Lab review");
   const { profile } = useAuth();
-  const { data: queue, isLoading, error } = useReviewQueue();
+  const { data: queue, isLoading, error, refetch } = useReviewQueue();
   const updateStatus = useUpdateApplicationStatus();
 
   const applicantIds = queue?.map((a) => a.applicantId) ?? [];
@@ -28,19 +40,31 @@ export default function LabReview() {
   };
 
   if (profile?.role === "member") {
-    return <EmptyState message="Reviewer access requires lead_researcher or admin role." />;
+    return (
+      <EmptyState message={portalCopy.labs.reviewAccessDenied ?? "Reviewer access requires lead_researcher or admin role."} />
+    );
   }
 
   return (
     <div>
-      <PortalPageHeader
-        title="Reviewer Dashboard"
-        description="Review pending applications for your research projects."
-      />
+      <PortalAnimatedSection>
+        <PortalPageHeader
+          eyebrow={portalCopy.labs.reviewEyebrow}
+          title={portalCopy.labs.reviewTitle ?? "Reviewer Dashboard"}
+          description={portalCopy.labs.reviewDescription ?? "Review pending applications for your research projects."}
+        />
+      </PortalAnimatedSection>
 
       {isLoading && <LoadingState />}
-      {error && <EmptyState message="Could not load review queue." />}
-      {queue && queue.length === 0 && <EmptyState message="No pending applications." />}
+      {error && (
+        <ErrorState
+          message={error instanceof Error ? error.message : "Could not load review queue."}
+          onRetry={() => refetch()}
+        />
+      )}
+      {!isLoading && !error && queue && queue.length === 0 && (
+        <EmptyState message={portalCopy.labs.reviewEmpty ?? "No pending applications."} />
+      )}
 
       <div className="space-y-4">
         {queue?.map((app) => {
@@ -56,7 +80,7 @@ export default function LabReview() {
                   <Badge variant="outline" className="mt-2 border-white/20 capitalize text-white/60">
                     {app.status.replace("_", " ")}
                   </Badge>
-                  <p className="mt-3 text-sm text-white/70">{app.motivation}</p>
+                  <p className="mt-3 text-sm leading-relaxed text-white/70">{app.motivation}</p>
                   <p className="mt-2 text-xs text-white/40">
                     Submitted {new Date(app.submittedAt).toLocaleDateString()}
                   </p>
@@ -66,12 +90,12 @@ export default function LabReview() {
                     <Button
                       size="sm"
                       variant="outline"
-                      className="border-white/20 text-white"
+                      className={portalButtonOutline}
                       onClick={() => handleReview(app.id, "under_review")}
                     >
                       Mark reviewing
                     </Button>
-                    <Button size="sm" onClick={() => handleReview(app.id, "accepted")}>
+                    <Button size="sm" className={portalButtonPrimary} onClick={() => handleReview(app.id, "accepted")}>
                       Accept
                     </Button>
                     <Button

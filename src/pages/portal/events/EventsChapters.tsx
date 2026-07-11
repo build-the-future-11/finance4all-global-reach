@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { Calendar, ExternalLink, LayoutGrid, List, MapPin, Users } from "lucide-react";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { Calendar, CalendarPlus, ExternalLink, LayoutGrid, List, MapPin, Users } from "lucide-react";
 import {
   useChapters,
   useEvents,
@@ -10,13 +11,20 @@ import ChapterMap from "@/components/portal/ChapterMap";
 import {
   PortalCard,
   PortalPageHeader,
+  PortalTabsList,
+  PortalTabsTrigger,
   QueryStatus,
+  portalButtonOutline,
+  portalButtonPrimary,
 } from "@/components/portal/PortalUI";
+import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { portalCopy } from "@/lib/portalCopy";
+import { downloadIcal } from "@/lib/downloadIcal";
+import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
 
 function groupEventsByMonth(events: { id: string; title: string; startsAt: string }[]) {
   const groups = new Map<string, typeof events>();
@@ -34,6 +42,7 @@ export default function EventsChapters() {
   useDocumentTitle("Events");
   const [selectedChapter, setSelectedChapter] = useState<string>("all");
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
+  const [eventFilter, setEventFilter] = useState<"all" | "mine">("all");
   const {
     data: chapters,
     isLoading: chaptersLoading,
@@ -64,24 +73,34 @@ export default function EventsChapters() {
     setSelectedChapter(id);
   };
 
+  const displayEvents = useMemo(() => {
+    if (!events) return [];
+    if (eventFilter === "mine") {
+      return events.filter((e) => registrations?.has(e.id));
+    }
+    return events;
+  }, [events, eventFilter, registrations]);
+
   const eventsByMonth = useMemo(
-    () => groupEventsByMonth(events ?? []),
-    [events],
+    () => groupEventsByMonth(displayEvents),
+    [displayEvents],
   );
 
   return (
     <div>
-      <PortalPageHeader
-        eyebrow="Global reach"
-        title="Events + Chapters"
-        description="Explore chapters worldwide, discover local events, and register your interest."
-      />
+      <PortalAnimatedSection>
+        <PortalPageHeader
+          eyebrow={portalCopy.events.eyebrow}
+          title={portalCopy.events.title}
+          description={portalCopy.events.description}
+        />
+      </PortalAnimatedSection>
 
       <QueryStatus
         isLoading={chaptersLoading}
         error={chaptersError}
         isEmpty={!chapters?.length}
-        emptyMessage="No chapters yet. Admins can add chapters in Supabase."
+        emptyMessage={portalCopy.events.emptyChapters}
         onRetry={() => refetchChapters()}
         skeletonCount={2}
       >
@@ -133,7 +152,26 @@ export default function EventsChapters() {
       <section>
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-lg font-semibold text-white">Events</h2>
-          <div className="flex gap-1 rounded-lg bg-white/[0.04] p-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="flex gap-1 rounded-lg bg-white/[0.04] p-1">
+              <Button
+                size="sm"
+                variant={eventFilter === "all" ? "default" : "ghost"}
+                className={eventFilter === "all" ? "bg-emerald-500/20 text-emerald-300" : "text-white/50"}
+                onClick={() => setEventFilter("all")}
+              >
+                All events
+              </Button>
+              <Button
+                size="sm"
+                variant={eventFilter === "mine" ? "default" : "ghost"}
+                className={eventFilter === "mine" ? "bg-emerald-500/20 text-emerald-300" : "text-white/50"}
+                onClick={() => setEventFilter("mine")}
+              >
+                My events
+              </Button>
+            </div>
+            <div className="flex gap-1 rounded-lg bg-white/[0.04] p-1">
             <Button
               size="sm"
               variant={viewMode === "list" ? "default" : "ghost"}
@@ -151,35 +189,27 @@ export default function EventsChapters() {
               <LayoutGrid className="mr-1.5 h-3.5 w-3.5" /> Calendar
             </Button>
           </div>
+          </div>
         </div>
 
         {chapters && chapters.length > 0 && (
           <Tabs value={selectedChapter} onValueChange={setSelectedChapter} className="mb-6">
-            <TabsList className="h-auto flex-wrap gap-1 bg-white/[0.04] p-1">
-              <TabsTrigger
-                value="all"
-                className="data-[state=active]:bg-emerald-500/20 data-[state=active]:text-emerald-300"
-              >
-                All
-              </TabsTrigger>
+            <PortalTabsList>
+              <PortalTabsTrigger value="all">All</PortalTabsTrigger>
               {chapters.map((c) => (
-                <TabsTrigger
-                  key={c.id}
-                  value={c.id}
-                  className="data-[state=active]:bg-emerald-500/20 data-[state=active]:text-emerald-300"
-                >
+                <PortalTabsTrigger key={c.id} value={c.id}>
                   {c.name}
-                </TabsTrigger>
+                </PortalTabsTrigger>
               ))}
-            </TabsList>
+            </PortalTabsList>
           </Tabs>
         )}
 
         <QueryStatus
           isLoading={eventsLoading}
           error={eventsError}
-          isEmpty={!events?.length}
-          emptyMessage="No events for this chapter yet."
+          isEmpty={!displayEvents.length}
+          emptyMessage={eventFilter === "mine" ? "You haven't registered for any events yet. Browse chapters and register for upcoming meetups." : portalCopy.events.emptyEvents}
           onRetry={() => refetchEvents()}
         >
           {viewMode === "calendar" ? (
@@ -191,16 +221,46 @@ export default function EventsChapters() {
                   </h3>
                   <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                     {monthEvents.map((event) => {
+                      const full = displayEvents.find((e) => e.id === event.id) ?? events?.find((e) => e.id === event.id);
                       const d = new Date(event.startsAt);
-                      const chapter = chapterMap[(events ?? []).find((e) => e.id === event.id)?.chapterId ?? ""];
+                      const chapter = chapterMap[full?.chapterId ?? ""];
+                      const registered = registrations?.has(event.id) ?? false;
                       return (
-                        <PortalCard key={event.id} className="p-4">
+                        <PortalCard key={event.id} className="flex flex-col p-4">
                           <p className="text-2xl font-bold text-emerald-300">{d.getDate()}</p>
                           <p className="text-xs text-white/40">
                             {d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })}
                           </p>
                           <p className="mt-2 font-medium text-white">{event.title}</p>
                           {chapter && <p className="mt-1 text-xs text-white/45">{chapter.name}</p>}
+                          <Button
+                            size="sm"
+                            variant={registered ? "default" : "outline"}
+                            className={`mt-3 ${registered ? portalButtonPrimary : portalButtonOutline}`}
+                            onClick={() => handleRegister(event.id, registered)}
+                          >
+                            {registered ? "Registered" : "Register"}
+                          </Button>
+                          {full && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="mt-2 border-white/20 text-white"
+                              onClick={() =>
+                                downloadIcal({
+                                  id: full.id,
+                                  title: full.title,
+                                  description: full.description,
+                                  startsAt: full.startsAt,
+                                  endsAt: full.endsAt,
+                                  location: chapter ? `${chapter.name}, ${chapter.city}` : undefined,
+                                })
+                              }
+                            >
+                              <CalendarPlus className="mr-1 h-3 w-3" />
+                              {portalCopy.calendar.addToCalendar}
+                            </Button>
+                          )}
                         </PortalCard>
                       );
                     })}
@@ -210,7 +270,7 @@ export default function EventsChapters() {
             </div>
           ) : (
           <div className="space-y-4">
-            {events?.map((event) => {
+            {displayEvents.map((event) => {
               const chapter = chapterMap[event.chapterId];
               const registered = registrations?.has(event.id) ?? false;
               return (
@@ -249,10 +309,28 @@ export default function EventsChapters() {
                       <Button
                         size="sm"
                         variant={registered ? "default" : "outline"}
-                        className={registered ? "bg-emerald-500 hover:bg-emerald-400" : "border-white/20 text-white"}
+                        className={registered ? portalButtonPrimary : portalButtonOutline}
                         onClick={() => handleRegister(event.id, registered)}
                       >
                         {registered ? "Registered" : "Register interest"}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-white/20 text-white"
+                        onClick={() =>
+                          downloadIcal({
+                            id: event.id,
+                            title: event.title,
+                            description: event.description,
+                            startsAt: event.startsAt,
+                            endsAt: event.endsAt,
+                            location: chapter ? `${chapter.name}, ${chapter.city}` : undefined,
+                          })
+                        }
+                      >
+                        <CalendarPlus className="mr-1.5 h-3.5 w-3.5" />
+                        {portalCopy.calendar.addToCalendar}
                       </Button>
                       {event.registrationUrl && (
                         <a href={event.registrationUrl} target="_blank" rel="noopener noreferrer">

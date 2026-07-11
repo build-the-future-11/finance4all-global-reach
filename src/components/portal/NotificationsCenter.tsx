@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Bell, CheckCheck } from "lucide-react";
+import { Bell, CheckCheck, Inbox, RefreshCw } from "lucide-react";
 import {
   useMarkAllNotificationsRead,
   useMarkNotificationRead,
@@ -8,12 +8,10 @@ import {
   useUnreadNotificationCount,
 } from "@/hooks/portal/useNotifications";
 import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverTrigger } from "@/components/ui/popover";
+import { PortalPopoverContent, portalButtonOutline } from "@/components/portal/PortalUI";
 import { cn } from "@/lib/utils";
+import { portalRoutes } from "@/routes/portal";
 import { toast } from "sonner";
 
 function timeAgo(iso: string) {
@@ -28,7 +26,7 @@ function timeAgo(iso: string) {
 
 export default function NotificationsCenter() {
   const [open, setOpen] = useState(false);
-  const { data: notifications, isLoading } = useNotifications();
+  const { data: notifications, isLoading, error, refetch, isRefetching } = useNotifications();
   const unread = useUnreadNotificationCount();
   const markRead = useMarkNotificationRead();
   const markAllRead = useMarkAllNotificationsRead();
@@ -54,8 +52,8 @@ export default function NotificationsCenter() {
       <PopoverTrigger asChild>
         <button
           type="button"
-          className="relative rounded-lg p-2 text-white/50 transition hover:bg-white/10 hover:text-white"
-          aria-label="Notifications"
+          className="portal-focus-ring portal-interactive relative rounded-lg p-2 text-white/50 hover:bg-white/10 hover:text-white"
+          aria-label={`Notifications${unread > 0 ? `, ${unread} unread` : ""}`}
         >
           <Bell className="h-4 w-4" />
           {unread > 0 && (
@@ -65,10 +63,7 @@ export default function NotificationsCenter() {
           )}
         </button>
       </PopoverTrigger>
-      <PopoverContent
-        align="end"
-        className="w-80 border-white/10 bg-[#0c1220] p-0 text-white sm:w-96"
-      >
+      <PortalPopoverContent align="end" className="w-80 p-0 sm:w-96">
         <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
           <p className="font-semibold">Notifications</p>
           {unread > 0 && (
@@ -89,10 +84,35 @@ export default function NotificationsCenter() {
           {isLoading && (
             <p className="px-4 py-8 text-center text-sm text-white/40">Loading…</p>
           )}
-          {!isLoading && !notifications?.length && (
-            <p className="px-4 py-8 text-center text-sm text-white/40">
-              No notifications yet
-            </p>
+          {error && !isLoading && (
+            <div className="px-4 py-6 text-center">
+              <p className="text-sm text-red-300">Could not load notifications</p>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="mt-2 text-xs text-white/60 hover:text-white"
+                onClick={() => refetch()}
+                disabled={isRefetching}
+              >
+                <RefreshCw className={`mr-1 h-3.5 w-3.5 ${isRefetching ? "animate-spin" : ""}`} />
+                Retry
+              </Button>
+            </div>
+          )}
+          {!isLoading && !error && !notifications?.length && (
+            <div className="px-4 py-8 text-center">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-white/[0.04]">
+                <Inbox className="h-5 w-5 text-white/30" />
+              </div>
+              <p className="text-sm text-white/40">No notifications yet — activity from labs, connections, and events will appear here.</p>
+              <Link
+                to={portalRoutes.debriefed}
+                onClick={() => setOpen(false)}
+                className="mt-2 inline-block text-xs text-emerald-400 hover:underline"
+              >
+                Read Debriefed →
+              </Link>
+            </div>
           )}
           {notifications?.map((n) => (
             <div
@@ -134,7 +154,7 @@ export default function NotificationsCenter() {
             </div>
           ))}
         </div>
-      </PopoverContent>
+      </PortalPopoverContent>
     </Popover>
   );
 }

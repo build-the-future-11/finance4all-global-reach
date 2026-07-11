@@ -29,6 +29,9 @@ The app includes safe project defaults if Vercel env vars are missing, but you s
 | 3 | `002_google_oauth.sql` | always safe to re-run |
 | 4 | `003_bookmarks_notifications.sql` | `news_bookmarks` table exists |
 | 5 | `004_avatar_storage.sql` | avatars bucket exists |
+| 6 | `005_security_hardening.sql` | always safe to re-run (RLS + role triggers) |
+| 7 | `006_education_progress.sql` | `education_lesson_progress` table exists |
+| 8 | `007_contact_submissions.sql` | `contact_submissions` table exists |
 
 Open **SQL Editor** and run each file you still need:
 
@@ -37,6 +40,9 @@ Open **SQL Editor** and run each file you still need:
 3. `supabase/migrations/002_google_oauth.sql`
 4. `supabase/migrations/003_bookmarks_notifications.sql`
 5. `supabase/migrations/004_avatar_storage.sql`
+6. `supabase/migrations/005_security_hardening.sql`
+7. `supabase/migrations/006_education_progress.sql`
+8. `supabase/migrations/007_contact_submissions.sql`
 
 ## 3. Auth redirect URLs
 

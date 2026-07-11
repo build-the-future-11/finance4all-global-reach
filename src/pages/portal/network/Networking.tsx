@@ -1,28 +1,35 @@
 import { useMemo, useState } from "react";
-import { Plus } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Plus, Trash2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChapters } from "@/hooks/portal/useEvents";
 import {
   useConnectionRequests,
   useCreateIntroduction,
+  useDeleteIntroduction,
   useMemberProfiles,
+  MEMBER_PAGE_SIZE,
   useRespondToConnection,
   useIntroductionPosts,
+  useSendConnectionRequest,
   useUpdateMyProfile,
 } from "@/hooks/portal/useNetwork";
 import { portalRoutes } from "@/routes/portal";
 import {
   EmptyState,
   PortalCard,
+  PortalDataRow,
+  PortalDialogContent,
   PortalPageHeader,
   QueryStatus,
+  portalButtonPrimary,
+  portalButtonOutline,
   portalInputClass,
 } from "@/components/portal/PortalUI";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -40,24 +47,42 @@ import {
 } from "@/components/ui/select";
 import MemberDirectoryCard from "@/components/portal/MemberDirectoryCard";
 import CommunityPulse from "@/components/portal/CommunityPulse";
+import SuggestedMembersRail from "@/components/portal/SuggestedMembersRail";
+import InterestPillBar from "@/components/portal/InterestPillBar";
+import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
+import { portalCopy } from "@/lib/portalCopy";
+import { sharedInterests } from "@/lib/personalization";
 import { toast } from "sonner";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 export default function Networking() {
   useDocumentTitle("Network");
   const { profile } = useAuth();
-  const { data: members, isLoading, error, refetch } = useMemberProfiles();
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(0);
+  const { data: memberData, isLoading, error, refetch } = useMemberProfiles({
+    page,
+    pageSize: MEMBER_PAGE_SIZE,
+    search,
+  });
+  const members = memberData?.members;
+  const totalMembers = memberData?.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(totalMembers / MEMBER_PAGE_SIZE));
   const { data: chapters } = useChapters();
   const { data: connections } = useConnectionRequests();
   const { data: introductions } = useIntroductionPosts();
   const respond = useRespondToConnection();
   const createIntro = useCreateIntroduction();
+  const deleteIntro = useDeleteIntroduction();
+  const sendConnect = useSendConnectionRequest();
   const updateMyProfile = useUpdateMyProfile();
+  const [connectingId, setConnectingId] = useState<string | null>(null);
+  const [connectTargetId, setConnectTargetId] = useState<string | null>(null);
+  const [connectMessage, setConnectMessage] = useState("");
 
   const [introOpen, setIntroOpen] = useState(false);
   const [headline, setHeadline] = useState("");
   const [lookingFor, setLookingFor] = useState("");
-  const [search, setSearch] = useState("");
   const [collaboratorsOnly, setCollaboratorsOnly] = useState(false);
   const [chapterFilter, setChapterFilter] = useState<string>("all");
 
@@ -96,6 +121,47 @@ export default function Networking() {
     }
   };
 
+  const connectionStatusFor = (memberId: string): "none" | "pending" | "accepted" | "declined" => {
+    const conn = connections?.find(
+      (c) =>
+        (c.fromUserId === profile?.id && c.toUserId === memberId) ||
+        (c.fromUserId === memberId && c.toUserId === profile?.id),
+    );
+    return conn?.status ?? "none";
+  };
+
+  const handleQuickConnect = (memberId: string) => {
+    setConnectTargetId(memberId);
+    setConnectMessage("");
+  };
+
+  const handleSendConnection = async () => {
+    if (!connectTargetId) return;
+    setConnectingId(connectTargetId);
+    try {
+      await sendConnect.mutateAsync({
+        toUserId: connectTargetId,
+        message: connectMessage.trim() || undefined,
+      });
+      toast.success("Connection request sent");
+      setConnectTargetId(null);
+      setConnectMessage("");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to connect");
+    } finally {
+      setConnectingId(null);
+    }
+  };
+
+  const handleDeleteIntro = async (id: string) => {
+    try {
+      await deleteIntro.mutateAsync(id);
+      toast.success("Introduction removed");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to delete");
+    }
+  };
+
   const pendingIncoming = connections?.filter(
     (c) => c.toUserId === profile?.id && c.status === "pending",
   );
@@ -104,35 +170,33 @@ export default function Networking() {
   const chapterNameMap = Object.fromEntries(chapters?.map((c) => [c.id, c.name]) ?? []);
 
   const filteredMembers = useMemo(() => {
-    const q = search.trim().toLowerCase();
     return (
       members?.filter((m) => {
         if (m.id === profile?.id) return false;
         if (collaboratorsOnly && !m.openToCollaborate) return false;
         if (chapterFilter !== "all" && m.chapterId !== chapterFilter) return false;
+        const q = search.trim().toLowerCase();
         if (!q) return true;
-        return (
-          m.displayName.toLowerCase().includes(q) ||
-          m.interests.some((i) => i.toLowerCase().includes(q))
-        );
+        return m.interests.some((i) => i.toLowerCase().includes(q));
       }) ?? []
     );
   }, [members, profile?.id, search, collaboratorsOnly, chapterFilter]);
 
   return (
-    <div>
-      <PortalPageHeader
-        eyebrow="FinanceMeta Network"
-        title="Network"
-        description="Discover members across global chapters, send connect requests, and post introductions."
-        action={
+    <div className="space-y-8">
+      <PortalAnimatedSection>
+        <PortalPageHeader
+          eyebrow={portalCopy.network.eyebrow}
+          title={portalCopy.network.title}
+          description={portalCopy.network.description}
+          action={
           <Dialog open={introOpen} onOpenChange={setIntroOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-emerald-500 hover:bg-emerald-400">
+              <Button className={portalButtonPrimary}>
                 <Plus className="h-4 w-4" /> Post introduction
               </Button>
             </DialogTrigger>
-            <DialogContent className="border-white/15 bg-[#0c1220] text-white">
+            <PortalDialogContent>
               <DialogHeader>
                 <DialogTitle>Introduction</DialogTitle>
               </DialogHeader>
@@ -154,20 +218,29 @@ export default function Networking() {
                     className={portalInputClass}
                   />
                 </div>
-                <Button onClick={handleCreateIntro} className="bg-emerald-500 hover:bg-emerald-400">
+                <Button onClick={handleCreateIntro} className={portalButtonPrimary}>
                   Post
                 </Button>
               </div>
-            </DialogContent>
+            </PortalDialogContent>
           </Dialog>
         }
       />
+      </PortalAnimatedSection>
+
+      <PortalAnimatedSection delay={40}>
+        <InterestPillBar />
+      </PortalAnimatedSection>
+
+      <PortalAnimatedSection delay={60}>
+        <SuggestedMembersRail />
+      </PortalAnimatedSection>
 
       <div className="mb-8">
         <CommunityPulse />
       </div>
 
-      <PortalCard className="mb-8 flex items-center justify-between p-5">
+      <PortalDataRow className="mb-8 p-5">
         <div>
           <p className="font-medium text-white">Your profile visibility</p>
           <p className="text-sm text-white/50">Let others know you're open to collaborate</p>
@@ -176,14 +249,14 @@ export default function Networking() {
           checked={profile?.openToCollaborate ?? false}
           onCheckedChange={handleCollaborateToggle}
         />
-      </PortalCard>
+      </PortalDataRow>
 
       {pendingIncoming && pendingIncoming.length > 0 && (
         <section className="mb-8">
           <h2 className="mb-3 text-lg font-semibold text-white">Pending requests</h2>
           <div className="space-y-3">
             {pendingIncoming.map((req) => (
-              <PortalCard key={req.id} className="flex items-center justify-between p-4">
+              <PortalDataRow key={req.id}>
                 <div>
                   <p className="font-medium text-white">
                     {memberNameMap[req.fromUserId] ?? "Member"}
@@ -191,19 +264,19 @@ export default function Networking() {
                   {req.message && <p className="text-sm text-white/50">{req.message}</p>}
                 </div>
                 <div className="flex gap-2">
-                  <Button size="sm" onClick={() => handleRespond(req.id, "accepted")}>
+                  <Button size="sm" className={portalButtonPrimary} onClick={() => handleRespond(req.id, "accepted")}>
                     Accept
                   </Button>
                   <Button
                     size="sm"
                     variant="outline"
-                    className="border-white/20 text-white"
+                    className={portalButtonOutline}
                     onClick={() => handleRespond(req.id, "declined")}
                   >
                     Decline
                   </Button>
                 </div>
-              </PortalCard>
+              </PortalDataRow>
             ))}
           </div>
         </section>
@@ -212,29 +285,59 @@ export default function Networking() {
       <section className="mb-8">
         <h2 className="mb-3 text-lg font-semibold text-white">Introductions feed</h2>
         {introductions && introductions.length === 0 && (
-          <EmptyState message="No introductions yet. Be the first to post!" />
+          <PortalCard className="flex flex-wrap items-center justify-between gap-4 p-5">
+            <div>
+              <p className="font-medium text-white">No introductions yet</p>
+              <p className="text-sm text-white/50">Post what you're looking for — collaborators, mentors, or project partners.</p>
+            </div>
+            <Button className={portalButtonPrimary} onClick={() => setIntroOpen(true)}>
+              <Plus className="mr-1 h-4 w-4" /> Post introduction
+            </Button>
+          </PortalCard>
         )}
         <div className="space-y-3">
           {introductions?.map((post) => (
             <PortalCard key={post.id} hover className="p-4">
-              <p className="font-medium text-white">{post.headline}</p>
-              <p className="mt-1 text-sm text-white/50">
-                by {memberNameMap[post.authorId] ?? "Member"}
-              </p>
-              <p className="mt-2 text-sm text-white/70">{post.lookingFor}</p>
-              {post.interests.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {post.interests.map((tag) => (
-                    <Badge
-                      key={tag}
-                      variant="outline"
-                      className="border-white/15 text-[10px] text-white/50"
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-white">{post.headline}</p>
+                  <p className="mt-1 text-sm text-white/50">
+                    by{" "}
+                    <Link
+                      to={`${portalRoutes.networkProfile}/${post.authorId}`}
+                      className="text-emerald-400 hover:underline"
+                      onClick={(e) => e.stopPropagation()}
                     >
-                      {tag}
-                    </Badge>
-                  ))}
+                      {memberNameMap[post.authorId] ?? "Member"}
+                    </Link>
+                  </p>
+                  <p className="mt-2 text-sm text-white/70">{post.lookingFor}</p>
+                  {post.interests.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {post.interests.map((tag) => (
+                        <Badge
+                          key={tag}
+                          variant="outline"
+                          className="border-white/15 text-[10px] text-white/50"
+                        >
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
+                {post.authorId === profile?.id && (
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="shrink-0 text-red-400/60 hover:text-red-400"
+                    onClick={() => handleDeleteIntro(post.id)}
+                    aria-label="Delete introduction"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
             </PortalCard>
           ))}
         </div>
@@ -246,7 +349,10 @@ export default function Networking() {
           <div className="flex flex-wrap items-center gap-3">
             <Input
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(0);
+              }}
               placeholder="Search by name or interest…"
               className={`max-w-xs ${portalInputClass}`}
             />
@@ -275,7 +381,7 @@ export default function Networking() {
           isLoading={isLoading}
           error={error}
           isEmpty={filteredMembers.length === 0}
-          emptyMessage="No members match your filters."
+          emptyMessage={portalCopy.network.emptyMembers}
           onRetry={() => refetch()}
         >
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -284,11 +390,72 @@ export default function Networking() {
                 key={member.id}
                 member={member}
                 chapterName={member.chapterId ? chapterNameMap[member.chapterId] : undefined}
+                connectionStatus={connectionStatusFor(member.id)}
+                sharedInterestCount={sharedInterests(profile?.interests ?? [], member.interests).length}
+                onConnect={() => handleQuickConnect(member.id)}
+                connectLoading={connectingId === member.id}
               />
             ))}
           </div>
         </QueryStatus>
+        {totalPages > 1 && (
+          <div className="mt-4 flex items-center justify-center gap-3">
+            <Button
+              size="sm"
+              variant="outline"
+              className="border-white/20 text-white"
+              disabled={page === 0}
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
+            >
+              Previous
+            </Button>
+            <span className="text-sm text-white/50">
+              Page {page + 1} of {totalPages}
+            </span>
+            <Button
+              size="sm"
+              variant="outline"
+              className="border-white/20 text-white"
+              disabled={page >= totalPages - 1}
+              onClick={() => setPage((p) => p + 1)}
+            >
+              Next
+            </Button>
+          </div>
+        )}
       </section>
+
+      <Dialog open={Boolean(connectTargetId)} onOpenChange={(open) => !open && setConnectTargetId(null)}>
+        <PortalDialogContent>
+          <DialogHeader>
+            <DialogTitle>Send connection request</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label className="text-white/70">Message (optional)</Label>
+              <Textarea
+                value={connectMessage}
+                onChange={(e) => setConnectMessage(e.target.value)}
+                rows={3}
+                placeholder="Introduce yourself or mention shared interests…"
+                className={portalInputClass}
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" className="border-white/20 text-white" onClick={() => setConnectTargetId(null)}>
+                Cancel
+              </Button>
+              <Button
+                className={portalButtonPrimary}
+                disabled={connectingId === connectTargetId}
+                onClick={handleSendConnection}
+              >
+                {connectingId === connectTargetId ? "Sending…" : "Send request"}
+              </Button>
+            </div>
+          </div>
+        </PortalDialogContent>
+      </Dialog>
     </div>
   );
 }

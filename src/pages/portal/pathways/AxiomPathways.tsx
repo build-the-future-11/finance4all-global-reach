@@ -9,16 +9,23 @@ import type { OpportunityType } from "@/types/domain";
 import {
   PortalCard,
   PortalPageHeader,
+  PortalTabsList,
+  PortalTabsTrigger,
   QueryStatus,
   portalButtonOutline,
+  portalButtonPrimary,
   portalInputClass,
 } from "@/components/portal/PortalUI";
+import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { portalCopy } from "@/lib/portalCopy";
+import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
+import InterestPillBar from "@/components/portal/InterestPillBar";
 
 const TYPES: { value: OpportunityType | "all"; label: string }[] = [
   { value: "all", label: "All" },
@@ -60,25 +67,27 @@ export default function AxiomPathways() {
 
   return (
     <div>
-      <PortalPageHeader
-        eyebrow="Careers"
-        title="Axiom Pathways"
-        description="Internships, programs, challenges, and project-based roles."
-      />
+      <PortalAnimatedSection>
+        <PortalPageHeader
+          eyebrow={portalCopy.pathways.opportunities.eyebrow}
+          title={portalCopy.pathways.opportunities.title}
+          description={portalCopy.pathways.opportunities.description}
+        />
+      </PortalAnimatedSection>
+
+      <PortalAnimatedSection delay={40}>
+        <InterestPillBar />
+      </PortalAnimatedSection>
 
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <Tabs value={typeFilter} onValueChange={(v) => setTypeFilter(v as OpportunityType | "all")}>
-          <TabsList className="h-auto flex-wrap gap-1 bg-white/[0.04] p-1">
+          <PortalTabsList>
             {TYPES.map((t) => (
-              <TabsTrigger
-                key={t.value}
-                value={t.value}
-                className="data-[state=active]:bg-emerald-500/20 data-[state=active]:text-emerald-300"
-              >
+              <PortalTabsTrigger key={t.value} value={t.value}>
                 {t.label}
-              </TabsTrigger>
+              </PortalTabsTrigger>
             ))}
-          </TabsList>
+          </PortalTabsList>
         </Tabs>
         <Input
           value={search}
@@ -92,7 +101,7 @@ export default function AxiomPathways() {
         isLoading={isLoading}
         error={error}
         isEmpty={!filtered?.length}
-        emptyMessage="No opportunities match your filters."
+        emptyMessage={portalCopy.pathways.opportunities.empty}
         onRetry={() => refetch()}
       >
         <div className="space-y-4">
@@ -125,7 +134,7 @@ export default function AxiomPathways() {
                     <Button
                       size="sm"
                       variant={saved ? "default" : "outline"}
-                      className={saved ? "bg-emerald-500 hover:bg-emerald-400" : "border-white/20 text-white"}
+                      className={saved ? portalButtonPrimary : portalButtonOutline}
                       onClick={() => handleToggle(opp.id, saved)}
                     >
                       <Star className={`h-3.5 w-3.5 ${saved ? "fill-current" : ""}`} />

@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import { landingEyebrowClass } from "@/components/portal/PortalUI";
+import { cn } from "@/lib/utils";
 
 interface SectionHeaderProps {
   eyebrow: string;
@@ -18,8 +20,8 @@ export default function SectionHeader({
   const alignClass = align === "center" ? "text-center mx-auto" : "text-left";
 
   return (
-    <header className={`max-w-3xl ${alignClass} ${className}`}>
-      <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-emerald-400/90">
+    <header className={cn("max-w-3xl", alignClass, className)}>
+      <p className={landingEyebrowClass}>
         {eyebrow}
       </p>
       <h2 className="mt-4 text-balance text-3xl font-bold leading-[1.12] tracking-tight text-white sm:text-4xl lg:text-[2.75rem]">

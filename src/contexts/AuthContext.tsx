@@ -9,11 +9,22 @@ import {
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { getAuthRedirectUrl, supabase } from "@/lib/supabase";
-import { getResetPasswordUrl } from "@/lib/appOrigin";
-import { formatAuthError } from "@/lib/authErrors";
-import { isPasswordAcceptable, isValidEmail, sanitizeBio, sanitizeDisplayName } from "@/lib/security";
+import { getAuthCallbackUrl, getResetPasswordUrl } from "@/lib/appOrigin";
+import { formatAuthError, sanitizeUserFacingError } from "@/lib/authErrors";
+import {
+  isPasswordAcceptable,
+  isValidEmail,
+  sanitizeBio,
+  sanitizeDisplayName,
+  sanitizeInterests,
+  checkLoginRateLimit,
+  recordLoginAttempt,
+  clearLoginAttempts,
+} from "@/lib/security";
 import { mapProfile } from "@/lib/mappers";
 import type { UserProfile } from "@/types/domain";
+import { trackEvent } from "@/lib/analytics";
+import { checkServerRateLimit, recordServerRateLimit } from "@/lib/rateLimit";
 
 interface AuthContextValue {
   session: Session | null;
@@ -147,8 +158,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = useCallback(async (email: string, password: string) => {
     if (!isValidEmail(email)) return { error: "Enter a valid email address." };
+    const limit = checkLoginRateLimit(email);
+    if (!limit.allowed) {
+      const wait = limit.retryAfterSec ?? 300;
+      const minutes = Math.ceil(wait / 60);
+      return { error: `Too many sign-in attempts. Try again in about ${minutes} minute${minutes === 1 ? "" : "s"}.` };
+    }
+    const serverAllowed = await checkServerRateLimit("login", email, 8, 900);
+    if (!serverAllowed) {
+      return { error: "Too many sign-in attempts. Try again in about 15 minutes." };
+    }
     const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
-    return { error: error ? formatAuthError(error.message) : null };
+    if (error) {
+      recordLoginAttempt(email);
+      await recordServerRateLimit("login", email);
+      return { error: formatAuthError(error.message) };
+    }
+    clearLoginAttempts(email);
+    trackEvent("auth.sign_in", { method: "email" });
+    return { error: null };
   }, []);
 
   const signUp = useCallback(async (email: string, password: string, displayName: string) => {
@@ -161,8 +189,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { error } = await supabase.auth.signUp({
       email: email.trim(),
       password,
-      options: { data: { display_name: name } },
+      options: {
+        data: { display_name: name },
+        emailRedirectTo: getAuthCallbackUrl(),
+      },
     });
+    if (!error) trackEvent("auth.sign_up", { method: "email" });
     return { error: error ? formatAuthError(error.message) : null };
   }, []);
 
@@ -174,6 +206,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         queryParams: { prompt: "select_account" },
       },
     });
+    if (!error) trackEvent("auth.sign_in", { method: "google" });
     return { error: error ? formatAuthError(error.message) : null };
   }, []);
 
@@ -194,6 +227,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = useCallback(async () => {
+    trackEvent("auth.sign_out");
     await supabase.auth.signOut();
     setProfile(null);
   }, []);
@@ -211,13 +245,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         payload.display_name = name;
       }
       if (updates.bio !== undefined) payload.bio = sanitizeBio(updates.bio);
-      if (updates.interests !== undefined) payload.interests = updates.interests;
+      if (updates.interests !== undefined) payload.interests = sanitizeInterests(updates.interests);
       if (updates.openToCollaborate !== undefined) payload.open_to_collaborate = updates.openToCollaborate;
       if (updates.chapterId !== undefined) payload.chapter_id = updates.chapterId ?? null;
 
       const { error } = await supabase.from("profiles").update(payload).eq("id", session.user.id);
       if (!error) await fetchProfile(session.user);
-      return { error: error?.message ?? null };
+      return { error: error ? sanitizeUserFacingError(error.message) : null };
     },
     [session?.user, fetchProfile],
   );

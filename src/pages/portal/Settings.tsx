@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Camera, Lock, Shield } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChapters } from "@/hooks/portal/useEvents";
 import { useUpdateMyProfile } from "@/hooks/portal/useNetwork";
@@ -14,31 +15,45 @@ import { replayPortalTour } from "@/components/portal/PortalTour";
 import {
   PortalCard,
   PortalPageHeader,
-  portalInputClass,
+  PortalInput,
+  PortalLabel,
+  PortalTextarea,
+  PortalToggleRow,
+  PortalInterestPill,
+  PortalProgressBar,
+  PortalSelectContent,
+  PortalSelectItem,
+  PortalSectionHeading,
   portalButtonOutline,
+  portalButtonPrimary,
+  portalInputClass,
+  portalLinkClass,
 } from "@/components/portal/PortalUI";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import {
   Select,
-  SelectContent,
-  SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
-import { sanitizeBio, sanitizeDisplayName } from "@/lib/security";
+import { sanitizeBio, sanitizeDisplayName, isPasswordAcceptable, assessPassword } from "@/lib/security";
+import PasswordStrengthMeter from "@/components/portal/PasswordStrengthMeter";
+import { useDigestPreferences, useUpdateDigestPreferences } from "@/hooks/portal/useDebriefed";
+import { portalCopy } from "@/lib/portalCopy";
+import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
+import InterestPillBar from "@/components/portal/InterestPillBar";
 
 const SUGGESTED_INTERESTS = ["macro", "equities", "fintech", "credit", "startups", "research"];
 
 export default function Settings() {
   useDocumentTitle("Settings");
-  const { profile, signOut, refreshProfile } = useAuth();
+  const { profile, signOut, refreshProfile, updatePassword } = useAuth();
+  const isAdmin = profile?.role === "admin";
+  const { data: digestPrefs } = useDigestPreferences();
+  const updateDigest = useUpdateDigestPreferences();
   const { data: chapters } = useChapters();
   const { data: stats } = useMyMemberStats();
   const updateProfile = useUpdateMyProfile();
@@ -50,6 +65,9 @@ export default function Settings() {
   const [interests, setInterests] = useState<string[]>(profile?.interests ?? []);
   const [openToCollaborate, setOpenToCollaborate] = useState(profile?.openToCollaborate ?? false);
   const [chapterId, setChapterId] = useState(profile?.chapterId ?? "");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordSaving, setPasswordSaving] = useState(false);
 
   useEffect(() => {
     if (!profile) return;
@@ -106,6 +124,38 @@ export default function Settings() {
     }
   };
 
+  const handlePasswordChange = async () => {
+    if (newPassword !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+    if (!isPasswordAcceptable(newPassword)) {
+      toast.error("Password must be at least 8 characters with letters and numbers.");
+      return;
+    }
+    setPasswordSaving(true);
+    const { error } = await updatePassword(newPassword);
+    setPasswordSaving(false);
+    if (error) {
+      toast.error(error);
+      return;
+    }
+    toast.success("Password updated");
+    setNewPassword("");
+    setConfirmPassword("");
+  };
+
+  const passwordAssessment = assessPassword(newPassword);
+
+  const handleDigestToggle = async (key: "weeklyDigestEnabled" | "substackSubscribed", value: boolean) => {
+    try {
+      await updateDigest.mutateAsync({ [key]: value });
+      toast.success("Communication preferences saved");
+    } catch {
+      toast.error("Could not save preferences");
+    }
+  };
+
   const initials = displayName
     .split(" ")
     .map((n) => n[0])
@@ -115,11 +165,17 @@ export default function Settings() {
 
   return (
     <div>
-      <PortalPageHeader
-        eyebrow="Account"
-        title="Settings"
-        description="Manage your profile, membership, and security preferences."
-      />
+      <PortalAnimatedSection>
+        <PortalPageHeader
+          eyebrow={portalCopy.settings.eyebrow}
+          title={portalCopy.settings.title}
+          description={portalCopy.settings.description}
+        />
+      </PortalAnimatedSection>
+
+      <PortalAnimatedSection delay={40}>
+        <InterestPillBar />
+      </PortalAnimatedSection>
 
       <div className="mb-8 grid gap-6 lg:grid-cols-2">
         {profile && <MembershipCard profile={profile} chapterName={chapterName} />}
@@ -129,11 +185,8 @@ export default function Settings() {
             <h3 className="font-semibold text-white">Profile strength</h3>
           </div>
           <p className="mt-2 text-3xl font-bold text-white">{percent}%</p>
-          <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/10">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-emerald-500 transition-all"
-              style={{ width: `${percent}%` }}
-            />
+          <div className="mt-3">
+            <PortalProgressBar value={percent} label="Profile completeness" />
           </div>
           {missing.length > 0 && (
             <p className="mt-3 text-sm text-white/50">
@@ -142,7 +195,7 @@ export default function Settings() {
           )}
           <Link
             to={profile ? `${portalRoutes.networkProfile}/${profile.id}` : portalRoutes.network}
-            className="mt-4 inline-block text-sm text-emerald-400 hover:underline"
+            className={cn(portalLinkClass, "mt-4 inline-block text-sm")}
           >
             View public profile →
           </Link>
@@ -163,7 +216,7 @@ export default function Settings() {
                 type="button"
                 onClick={() => fileRef.current?.click()}
                 disabled={uploadAvatar.isPending}
-                className="absolute -bottom-1 -right-1 rounded-full border border-white/20 bg-emerald-500 p-1.5 text-white shadow-lg transition hover:bg-emerald-400"
+                className="portal-focus-ring absolute -bottom-1 -right-1 rounded-full border border-white/20 bg-emerald-500 p-1.5 text-white shadow-lg transition duration-portal hover:bg-emerald-400 disabled:opacity-50"
                 aria-label="Upload avatar"
               >
                 <Camera className="h-3.5 w-3.5" />
@@ -187,73 +240,65 @@ export default function Settings() {
         <PortalCard className="p-6 lg:col-span-2">
           <div className="space-y-5">
             <div>
-              <Label className="text-white/70">Display name</Label>
-              <Input
+              <PortalLabel>Display name</PortalLabel>
+              <PortalInput
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 maxLength={80}
-                className={portalInputClass}
               />
             </div>
             <div>
-              <Label className="text-white/70">Bio</Label>
-              <Textarea
+              <PortalLabel>Bio</PortalLabel>
+              <PortalTextarea
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 rows={3}
                 maxLength={500}
-                className={portalInputClass}
               />
               <p className="mt-1 text-xs text-white/35">{bio.length}/500</p>
             </div>
             <div>
-              <Label className="text-white/70">Interests</Label>
+              <PortalLabel>Interests</PortalLabel>
               <div className="mt-2 flex flex-wrap gap-2">
                 {SUGGESTED_INTERESTS.map((tag) => (
-                  <button
+                  <PortalInterestPill
                     key={tag}
-                    type="button"
+                    active={interests.includes(tag)}
                     onClick={() => toggleInterest(tag)}
-                    className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
-                      interests.includes(tag)
-                        ? "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-400/30"
-                        : "bg-white/[0.05] text-white/55 ring-1 ring-white/10 hover:bg-white/10"
-                    }`}
                   >
                     {tag}
-                  </button>
+                  </PortalInterestPill>
                 ))}
               </div>
             </div>
             {chapters && chapters.length > 0 && (
               <div>
-                <Label className="text-white/70">Chapter</Label>
+                <PortalLabel>Chapter</PortalLabel>
                 <Select value={chapterId} onValueChange={setChapterId}>
                   <SelectTrigger className={portalInputClass}>
                     <SelectValue placeholder="Select a chapter" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <PortalSelectContent>
                     {chapters.map((c) => (
-                      <SelectItem key={c.id} value={c.id}>
+                      <PortalSelectItem key={c.id} value={c.id}>
                         {c.name}, {c.country}
-                      </SelectItem>
+                      </PortalSelectItem>
                     ))}
-                  </SelectContent>
+                  </PortalSelectContent>
                 </Select>
               </div>
             )}
-            <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] p-4">
-              <div>
-                <p className="text-sm font-medium text-white">Open to collaborate</p>
-                <p className="text-xs text-white/45">Shown on your public profile</p>
-              </div>
+            <PortalToggleRow
+              title="Open to collaborate"
+              description="Shown on your public profile"
+            >
               <Switch checked={openToCollaborate} onCheckedChange={setOpenToCollaborate} />
-            </div>
+            </PortalToggleRow>
             <div className="flex flex-wrap gap-3 pt-2">
               <Button
                 onClick={handleSave}
                 disabled={updateProfile.isPending}
-                className="bg-emerald-500 hover:bg-emerald-400"
+                className={portalButtonPrimary}
               >
                 {updateProfile.isPending ? "Saving…" : "Save changes"}
               </Button>
@@ -271,20 +316,90 @@ export default function Settings() {
       </PortalCard>
 
       <PortalCard className="mt-6 p-6">
+        <PortalSectionHeading title="Communications" description={portalCopy.settings.digestNote} className="mb-4" />
+        <div className="space-y-4">
+          <PortalToggleRow
+            title="Weekly Debriefed digest"
+            description="Email summary of top stories (when enabled for your region)"
+          >
+            <Switch
+              checked={digestPrefs?.weeklyDigestEnabled ?? false}
+              onCheckedChange={(v) => handleDigestToggle("weeklyDigestEnabled", v)}
+            />
+          </PortalToggleRow>
+          <PortalToggleRow
+            title="Substack subscriber"
+            description="Shows on your digest preferences in Debriefed"
+          >
+            <Switch
+              checked={digestPrefs?.substackSubscribed ?? false}
+              onCheckedChange={(v) => handleDigestToggle("substackSubscribed", v)}
+            />
+          </PortalToggleRow>
+        </div>
+      </PortalCard>
+
+      <PortalCard className="mt-6 p-6">
         <div className="flex items-start gap-3">
-          <Lock className="mt-0.5 h-5 w-5 text-white/40" />
+          <Lock className="mt-0.5 h-5 w-5 shrink-0 text-white/40" aria-hidden />
+          <div className="w-full max-w-md">
+            <PortalSectionHeading
+              title="Change password"
+              description={portalCopy.security.passwordHints}
+            />
+            <div className="mt-4 space-y-3">
+              <div>
+                <PortalLabel>New password</PortalLabel>
+                <PortalInput
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  autoComplete="new-password"
+                />
+                {newPassword && (
+                  <PasswordStrengthMeter
+                    strength={passwordAssessment.strength}
+                    hints={passwordAssessment.hints}
+                  />
+                )}
+              </div>
+              <div>
+                <PortalLabel>Confirm password</PortalLabel>
+                <PortalInput
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  autoComplete="new-password"
+                />
+              </div>
+              <Button
+                variant="outline"
+                className={portalButtonOutline}
+                disabled={passwordSaving || !newPassword}
+                onClick={handlePasswordChange}
+              >
+                {passwordSaving ? "Updating…" : "Update password"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </PortalCard>
+
+      <PortalCard className="mt-6 p-6">
+        <div className="flex items-start gap-3">
+          <Lock className="mt-0.5 h-5 w-5 shrink-0 text-white/40" aria-hidden />
           <div>
-            <h3 className="font-semibold text-white">Security</h3>
-            <p className="mt-1 text-sm text-white/50">
-              Password changes and two-factor authentication are managed through Supabase Auth.
-              Use a strong unique password and enable Google sign-in for faster secure access.
-            </p>
-            <p className="mt-2 text-xs text-white/35">
-              Never share your password or service-role keys. Report suspicious activity to your chapter lead.
-            </p>
+            <PortalSectionHeading title="Security" description={portalCopy.security.twoFactorNote} />
+            <p className="mt-2 text-xs text-white/35">{portalCopy.security.neverShare}</p>
+            {isAdmin && (
+              <p className="mt-3 text-xs text-white/40">{portalCopy.settings.securityAdmin}</p>
+            )}
+            {!isAdmin && (
+              <p className="mt-3 text-xs text-white/40">{portalCopy.settings.securityMember}</p>
+            )}
             <div className="mt-4 flex flex-wrap gap-2">
               <Button variant="outline" className={portalButtonOutline} asChild>
-                <Link to="/forgot-password">Reset password</Link>
+                <Link to="/forgot-password">Reset via email</Link>
               </Button>
               <Button variant="outline" className={portalButtonOutline} onClick={replayPortalTour}>
                 Replay portal tour

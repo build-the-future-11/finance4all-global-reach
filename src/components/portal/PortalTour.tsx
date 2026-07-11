@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { portalRoutes } from "@/routes/portal";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+  PortalDialogContent,
+  portalButtonOutline,
+  portalButtonPrimary,
+} from "@/components/portal/PortalUI";
+import { portalCopy } from "@/lib/portalCopy";
 
 export const PORTAL_TOUR_STORAGE_KEY = "f4a-portal-tour-v1";
 
@@ -16,24 +18,26 @@ export function replayPortalTour() {
   window.location.reload();
 }
 
+const { tour } = portalCopy;
+
 const STEPS = [
   {
-    title: "Welcome to your portal",
-    body: "This is your home base — news, labs, pathways, events, and your global network.",
+    title: tour.step1Title,
+    body: tour.step1Body,
   },
   {
-    title: "Search everything",
-    body: "Press ⌘K (or Ctrl+K) to search news, labs, opportunities, events, and members.",
+    title: tour.step2Title,
+    body: tour.step2Body,
   },
   {
-    title: "Build your profile",
-    body: "Complete Settings to unlock badges, chapter visibility, and collaboration matching.",
-    cta: { label: "Go to Settings", path: portalRoutes.settings },
+    title: tour.step3Title,
+    body: tour.step3Body,
+    cta: { label: tour.step3Cta, path: portalRoutes.settings },
   },
   {
-    title: "You're all set",
-    body: "Explore Debriefed for market news, Meta Labs for research, and Network to connect.",
-    cta: { label: "Explore Debriefed", path: portalRoutes.debriefed },
+    title: tour.step4Title,
+    body: tour.step4Body,
+    cta: { label: tour.step4Cta, path: portalRoutes.debriefed },
   },
 ];
 
@@ -57,9 +61,9 @@ export default function PortalTour() {
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && finish()}>
-      <DialogContent className="border-white/15 bg-[#0c1220] text-white sm:max-w-md">
+      <PortalDialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{current.title}</DialogTitle>
+          <DialogTitle className="text-white">{current.title}</DialogTitle>
         </DialogHeader>
         <p className="text-sm leading-relaxed text-white/60">{current.body}</p>
         <div className="flex gap-1 pt-2">
@@ -72,25 +76,25 @@ export default function PortalTour() {
         </div>
         <div className="flex flex-wrap gap-2 pt-2">
           {step > 0 && (
-            <Button variant="outline" className="border-white/20 text-white" onClick={() => setStep(step - 1)}>
-              Back
+            <Button variant="outline" className={portalButtonOutline} onClick={() => setStep(step - 1)}>
+              {tour.back}
             </Button>
           )}
           {current.cta && (
             <Link to={current.cta.path} onClick={finish}>
-              <Button variant="outline" className="border-white/20 text-white">
+              <Button variant="outline" className={portalButtonOutline}>
                 {current.cta.label}
               </Button>
             </Link>
           )}
           <Button
-            className="ml-auto bg-emerald-500 hover:bg-emerald-400"
+            className={cn("ml-auto", portalButtonPrimary)}
             onClick={() => (isLast ? finish() : setStep(step + 1))}
           >
-            {isLast ? "Get started" : "Next"}
+            {isLast ? tour.finish : tour.next}
           </Button>
         </div>
-      </DialogContent>
+      </PortalDialogContent>
     </Dialog>
   );
 }

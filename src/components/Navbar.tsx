@@ -107,9 +107,8 @@ export default function Navbar() {
             <div className="relative z-10 flex items-center justify-between">
 
               {/* Logo */}
-              <a href="/" className="flex items-center gap-2 text-lg tracking-tight">
+              <a href="/" className="portal-focus-ring flex items-center gap-2 rounded-lg text-lg tracking-tight">
                 <span className="font-semibold text-white">Finance4All</span>
-                <span className="text-white/50">Meta</span>
               </a>
 
               {/* Desktop */}
@@ -118,14 +117,14 @@ export default function Navbar() {
                   <a
                     key={l.href}
                     href={l.href}
-                    className="rounded-full px-4 py-2 text-sm font-medium text-white/80 transition-all duration-300 hover:bg-white/15 hover:text-white hover:scale-[1.05]"
+                    className="portal-focus-ring rounded-full px-4 py-2 text-sm font-medium text-white/80 transition-all duration-300 hover:bg-white/15 hover:text-white motion-safe:hover:scale-[1.05]"
                   >
                     {l.label}
                   </a>
                 ))}
                 <Link
                   to="/login"
-                  className="rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-black transition hover:bg-white"
+                  className="portal-focus-ring rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-black transition hover:bg-white"
                 >
                   Portal
                 </Link>
@@ -137,9 +136,11 @@ export default function Navbar() {
                 <ThemeToggle />
 
                 <button
-                  aria-label="Toggle menu"
+                  type="button"
+                  aria-expanded={open}
+                  aria-label={open ? "Close menu" : "Open menu"}
                   onClick={() => setOpen((v) => !v)}
-                  className="rounded-full border border-white/30 bg-white/10 p-2 backdrop-blur-xl transition hover:bg-white/20"
+                  className="portal-focus-ring rounded-full border border-white/30 bg-white/10 p-2 backdrop-blur-xl transition hover:bg-white/20"
                 >
                   {open ? (
                     <X className="h-5 w-5 text-white" />
@@ -165,7 +166,7 @@ export default function Navbar() {
                   key={l.href}
                   href={l.href}
                   onClick={() => setOpen(false)}
-                  className="block rounded-xl px-4 py-3 text-white/80 transition hover:bg-white/15 hover:text-white"
+                  className="portal-focus-ring block rounded-xl px-4 py-3 text-white/80 transition hover:bg-white/15 hover:text-white"
                 >
                   {l.label}
                 </a>
@@ -173,7 +174,7 @@ export default function Navbar() {
               <Link
                 to="/login"
                 onClick={() => setOpen(false)}
-                className="block rounded-xl px-4 py-3 font-semibold text-emerald-300 transition hover:bg-white/15"
+                className="portal-focus-ring block rounded-xl px-4 py-3 font-semibold text-emerald-300 transition hover:bg-white/15"
               >
                 Portal
               </Link>

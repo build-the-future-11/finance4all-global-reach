@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
 import { FileText, GraduationCap, Microscope } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import SectionHeader from "@/components/landing/SectionHeader";
 import { portalRoutes } from "@/routes/portal";
+import { portalCopy } from "@/lib/portalCopy";
 import GlassSurface from "@/components/landing/GlassSurface";
 
 const OUTCOMES = [
@@ -10,7 +12,7 @@ const OUTCOMES = [
     stat: "25,000+",
     label: "Students in outreach",
     detail:
-      "Volunteer-led Catalyst sessions on budgeting, banking, and investing — delivered in schools across India and expanding through chapter-led workshops abroad.",
+      "Volunteer-led Catalyst sessions on budgeting, banking, and investing — logged by chapter officers and tracked in the Education hub.",
     href: portalRoutes.education,
     cta: "Catalyst curriculum",
   },
@@ -19,7 +21,7 @@ const OUTCOMES = [
     stat: "Atlas Lab",
     label: "Macro research track",
     detail:
-      "Students work on FX pass-through, inflation dynamics, and emerging-market policy with mentor review. Outputs aim for publication, not portfolio padding.",
+      "FX pass-through, inflation dynamics, and emerging-market policy projects with mentor review. Deliverables are specified on each listing before you apply.",
     href: portalRoutes.labs,
     cta: "Browse open projects",
   },
@@ -28,7 +30,7 @@ const OUTCOMES = [
     stat: "Economics Journal",
     label: "Student writing pipeline",
     detail:
-      "Opinion and market analysis edited to external standards. Strong pieces are promoted beyond the portal — the bar is clarity and evidence, not word count.",
+      "Opinion and market analysis edited for thesis clarity and cited evidence. Submission standards are in Resources; submit through Pathways → Essays.",
     href: `${portalRoutes.pathways}/essays`,
     cta: "Submission standards",
   },
@@ -41,16 +43,14 @@ export default function ImpactOutcomesSection() {
     <section className="relative px-4 py-28 sm:py-36">
       <div ref={ref} className="mx-auto max-w-6xl">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div className="max-w-2xl">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-emerald-400/90">
-              Outcomes
-            </p>
-            <h2 className="mt-4 text-3xl font-bold text-white sm:text-4xl">
-              Programs members actually use
-            </h2>
-          </div>
+          <SectionHeader
+            align="left"
+            eyebrow={portalCopy.landing.impactEyebrow}
+            title={portalCopy.landing.impactTitle}
+            className="max-w-2xl"
+          />
           <p className="max-w-sm text-sm leading-relaxed text-white/45">
-            Each track below links to a live module in the portal — not a landing-page promise.
+            {portalCopy.landing.impactAside}
           </p>
         </div>
 

@@ -1,22 +1,26 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChapters } from "@/hooks/portal/useEvents";
 import AuthLayout from "@/components/portal/AuthLayout";
-import { portalInputClass } from "@/components/portal/PortalUI";
+import {
+  PortalAlert,
+  PortalInput,
+  PortalLabel,
+  PortalTextarea,
+  PortalToggleRow,
+  PortalInterestPill,
+  PortalSelectContent,
+  PortalSelectItem,
+  portalButtonPrimary,
+  portalInputClass,
+} from "@/components/portal/PortalUI";
+import { portalCopy } from "@/lib/portalCopy";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const SUGGESTED_INTERESTS = ["macro", "equities", "fintech", "credit", "startups", "research"];
 
@@ -65,9 +69,9 @@ export default function Onboarding() {
 
   return (
     <AuthLayout
-      title="Complete your profile"
-      subtitle="A few details so the community can find and connect with you."
-      footer={<span className="text-white/35">You can update this anytime in Network.</span>}
+      title={portalCopy.auth.onboardingTitle}
+      subtitle={portalCopy.auth.onboardingSubtitle}
+      footer={<span className="text-white/35">{portalCopy.auth.onboardingFooter}</span>}
     >
       {avatarUrl && (
         <div className="mb-6 flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-4">
@@ -79,80 +83,61 @@ export default function Onboarding() {
           </Avatar>
           <div>
             <p className="text-sm font-medium text-white">Signed in with Google</p>
-            <p className="text-xs text-white/45">Your photo will appear on your profile</p>
+            <p className="text-xs text-white/45">{portalCopy.auth.onboardingGoogleNote}</p>
           </div>
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <Label className="text-white/70">Display name</Label>
-          <Input
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
-            required
-            className={portalInputClass}
-          />
+          <PortalLabel>Display name</PortalLabel>
+          <PortalInput value={displayName} onChange={(e) => setDisplayName(e.target.value)} required />
         </div>
         <div>
-          <Label className="text-white/70">Bio</Label>
-          <Textarea
+          <PortalLabel>Bio</PortalLabel>
+          <PortalTextarea
             value={bio}
             onChange={(e) => setBio(e.target.value)}
             rows={3}
-            placeholder="What are you working on or interested in?"
-            className={portalInputClass}
+            placeholder="e.g. macro research, chapter outreach, applying to grad school"
           />
         </div>
         <div>
-          <Label className="text-white/70">Interests</Label>
+          <PortalLabel>Interests</PortalLabel>
           <div className="mt-2 flex flex-wrap gap-2">
             {SUGGESTED_INTERESTS.map((tag) => (
-              <button
+              <PortalInterestPill
                 key={tag}
-                type="button"
+                active={interests.includes(tag)}
                 onClick={() => toggleInterest(tag)}
-                className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
-                  interests.includes(tag)
-                    ? "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-400/30"
-                    : "bg-white/[0.05] text-white/55 ring-1 ring-white/10 hover:bg-white/10"
-                }`}
               >
                 {tag}
-              </button>
+              </PortalInterestPill>
             ))}
           </div>
         </div>
         {chapters && chapters.length > 0 && (
           <div>
-            <Label className="text-white/70">Chapter (optional)</Label>
+            <PortalLabel>Chapter (optional)</PortalLabel>
             <Select value={chapterId} onValueChange={setChapterId}>
               <SelectTrigger className={portalInputClass}>
                 <SelectValue placeholder="Select a chapter" />
               </SelectTrigger>
-              <SelectContent>
+              <PortalSelectContent>
                 {chapters.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
+                  <PortalSelectItem key={c.id} value={c.id}>
                     {c.name}, {c.country}
-                  </SelectItem>
+                  </PortalSelectItem>
                 ))}
-              </SelectContent>
+              </PortalSelectContent>
             </Select>
           </div>
         )}
-        <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] p-4">
-          <div>
-            <p className="text-sm font-medium text-white">Open to collaborate</p>
-            <p className="text-xs text-white/45">Visible on your profile</p>
-          </div>
+        <PortalToggleRow title="Open to collaborate" description="Visible on your profile">
           <Switch checked={openToCollaborate} onCheckedChange={setOpenToCollaborate} />
-        </div>
-        {error && (
-          <p className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300">
-            {error}
-          </p>
-        )}
-        <Button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-400" disabled={submitting}>
+        </PortalToggleRow>
+        {error && <PortalAlert variant="error">{error}</PortalAlert>}
+        <Button type="submit" className={cn("w-full", portalButtonPrimary)} disabled={submitting}>
           {submitting ? "Saving…" : "Enter portal"}
         </Button>
       </form>

@@ -10,7 +10,7 @@ const INITIATIVES = [
     eyebrow: "Research lab",
     title: "Atlas Economics Lab",
     description:
-      "Quantitative macro research run by students — publication-quality work on the biggest economic questions.",
+      "Student-led macro research on FX, inflation, and policy. Browse open roles or read past project notes.",
     href: `${portalRoutes.labs}?tag=macro`,
     accent: "from-blue-500/20 to-emerald-500/10",
   },
@@ -18,9 +18,9 @@ const INITIATIVES = [
     id: "cfei",
     icon: GraduationCap,
     eyebrow: "Education",
-    title: "Catalyst Financial Education",
+    title: "Catalyst Education",
     description:
-      "Expand access to finance literacy, mentorship, and career development for the next generation.",
+      "Three modules, seven lessons — budgeting through research writing. Same material used in chapter outreach.",
     href: portalRoutes.education,
     accent: "from-amber-500/20 to-orange-500/10",
   },
@@ -30,7 +30,7 @@ const INITIATIVES = [
     eyebrow: "Library",
     title: "Resources & media",
     description:
-      "Curriculum packs, Economics Journal, podcasts, webinars, and partner programs.",
+      "Facilitator guides, journal standards, club toolkits, podcasts, and partner programs.",
     href: portalRoutes.resources,
     accent: "from-violet-500/20 to-blue-500/10",
   },
@@ -40,7 +40,7 @@ const INITIATIVES = [
     eyebrow: "News",
     title: "Finance Debriefed",
     description:
-      "Daily global economic pulse, market movers, and IPO watchlists — curated for members.",
+      "Macro, markets, and IPO coverage — save articles to your library from the news feed.",
     href: portalRoutes.debriefed,
     accent: "from-emerald-500/20 to-teal-500/10",
   },
@@ -50,7 +50,7 @@ const INITIATIVES = [
     eyebrow: "Opportunities",
     title: "Axiom Pathways",
     description:
-      "Internships, research programs, and project roles from partners across startups and funds.",
+      "Internships, research programs, and project roles from partner organizations worldwide.",
     href: portalRoutes.pathways,
     accent: "from-purple-500/20 to-blue-500/10",
   },

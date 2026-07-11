@@ -280,6 +280,38 @@ export interface Database {
         };
         Update: Partial<Database["public"]["Tables"]["notifications"]["Insert"]>;
       };
+      education_lesson_progress: {
+        Row: {
+          user_id: string;
+          lesson_id: string;
+          completed_at: string;
+        };
+        Insert: {
+          user_id: string;
+          lesson_id: string;
+          completed_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["education_lesson_progress"]["Insert"]>;
+      };
+      contact_submissions: {
+        Row: {
+          id: string;
+          name: string;
+          email: string;
+          subject: string;
+          message: string;
+          status: "new" | "read" | "archived";
+          created_at: string;
+        };
+        Insert: {
+          name: string;
+          email: string;
+          subject: string;
+          message: string;
+          status?: "new" | "read" | "archived";
+        };
+        Update: Partial<Pick<Database["public"]["Tables"]["contact_submissions"]["Row"], "status">>;
+      };
     };
     Views: {
       essay_submissions_with_counts: {

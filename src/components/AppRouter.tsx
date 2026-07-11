@@ -1,6 +1,5 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
-import FluidCursor from "@/components/FluidCursor";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/portal/ProtectedRoute";
 import RoleGuard from "@/components/portal/RoleGuard";
@@ -20,6 +19,7 @@ const DebriefedHub = lazy(() => import("@/pages/portal/debriefed/DebriefedHub"))
 const DebriefedExplainers = lazy(() => import("@/pages/portal/debriefed/DebriefedExplainers"));
 const MetaLabs = lazy(() => import("@/pages/portal/labs/MetaLabs"));
 const LabReview = lazy(() => import("@/pages/portal/labs/LabReview"));
+const PathwaysHub = lazy(() => import("@/pages/portal/pathways/PathwaysHub"));
 const AxiomPathways = lazy(() => import("@/pages/portal/pathways/AxiomPathways"));
 const PathwaysStudios = lazy(() => import("@/pages/portal/pathways/PathwaysStudios"));
 const PathwaysEssays = lazy(() => import("@/pages/portal/pathways/PathwaysEssays"));
@@ -32,7 +32,10 @@ const EducationLesson = lazy(() => import("@/pages/portal/education/EducationLes
 const ResourcesHub = lazy(() => import("@/pages/portal/resources/ResourcesHub"));
 const ResourceGuidePage = lazy(() => import("@/pages/portal/resources/ResourceGuidePage"));
 const Saved = lazy(() => import("@/pages/portal/Saved"));
+const ActivityPage = lazy(() => import("@/pages/portal/ActivityPage"));
 const Settings = lazy(() => import("@/pages/portal/Settings"));
+
+const FluidCursor = lazy(() => import("@/components/FluidCursor"));
 
 function PortalFallback() {
   return (
@@ -48,7 +51,11 @@ function AppRoutes() {
 
   return (
     <>
-      {isLanding && <FluidCursor />}
+      {isLanding && (
+        <Suspense fallback={null}>
+          <FluidCursor />
+        </Suspense>
+      )}
       <Suspense fallback={<PortalFallback />}>
         <Routes>
           <Route path="/" element={<Index />} />
@@ -89,7 +96,8 @@ function AppRoutes() {
               }
             />
             <Route path="labs/:id" element={<MetaLabs />} />
-            <Route path="pathways" element={<AxiomPathways />} />
+            <Route path="pathways" element={<PathwaysHub />} />
+            <Route path="pathways/opportunities" element={<AxiomPathways />} />
             <Route path="pathways/studios" element={<PathwaysStudios />} />
             <Route path="pathways/essays" element={<PathwaysEssays />} />
             <Route path="events" element={<EventsChapters />} />
@@ -105,6 +113,7 @@ function AppRoutes() {
             />
             <Route path="settings" element={<Settings />} />
             <Route path="saved" element={<Saved />} />
+            <Route path="activity" element={<ActivityPage />} />
             <Route path="education" element={<EducationHub />} />
             <Route path="education/:lessonId" element={<EducationLesson />} />
             <Route path="resources" element={<ResourcesHub />} />

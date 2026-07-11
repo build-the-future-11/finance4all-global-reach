@@ -3,22 +3,25 @@ import { useNavigate } from "react-router-dom";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { parseAuthHashError } from "@/lib/appOrigin";
+import { sanitizeUserFacingError } from "@/lib/authErrors";
 import { Button } from "@/components/ui/button";
+import { PortalFullPageShell } from "@/components/portal/PortalUI";
 
 export default function AuthCallback() {
   const { user, loading, needsOnboarding } = useAuth();
   const navigate = useNavigate();
   const hashError = parseAuthHashError();
+  const friendlyHashError = hashError
+    ? hashError.includes("localhost")
+      ? "Auth redirected to localhost. In Supabase → URL Configuration, set Site URL to your Vercel domain and add it to Redirect URLs."
+      : sanitizeUserFacingError(hashError, "Sign-in was cancelled or could not be completed.")
+    : null;
 
   useEffect(() => {
-    if (hashError) {
+    if (friendlyHashError) {
       navigate("/login", {
         replace: true,
-        state: {
-          message: hashError.includes("localhost")
-            ? "Auth redirected to localhost. In Supabase → URL Configuration, set Site URL to your Vercel domain and add it to Redirect URLs (not localhost)."
-            : hashError,
-        },
+        state: { message: friendlyHashError },
       });
       return;
     }
@@ -40,21 +43,25 @@ export default function AuthCallback() {
       );
       return () => clearTimeout(timer);
     }
-  }, [user, loading, needsOnboarding, navigate, hashError]);
+  }, [user, loading, needsOnboarding, navigate, friendlyHashError]);
 
-  if (hashError) {
+  if (friendlyHashError) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#060a12] px-4 text-white">
-        <AlertCircle className="h-10 w-10 text-amber-400" />
-        <p className="max-w-md text-center text-sm text-white/60">Redirecting…</p>
-      </div>
+      <PortalFullPageShell className="gap-4 text-center">
+        <AlertCircle className="h-10 w-10 text-amber-400" aria-hidden />
+        <p className="max-w-md text-sm text-white/60" role="status">
+          Redirecting…
+        </p>
+      </PortalFullPageShell>
     );
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#060a12] px-4 text-white">
-      <Loader2 className="h-8 w-8 animate-spin text-emerald-400" />
-      <p className="text-sm text-white/50">Completing sign in…</p>
+    <PortalFullPageShell className="gap-4 text-center">
+      <Loader2 className="h-8 w-8 animate-spin text-emerald-400" aria-hidden />
+      <p className="text-sm text-white/50" role="status">
+        Completing sign in…
+      </p>
       <Button
         variant="ghost"
         className="mt-4 text-white/40 hover:text-white"
@@ -62,6 +69,6 @@ export default function AuthCallback() {
       >
         Cancel
       </Button>
-    </div>
+    </PortalFullPageShell>
   );
 }

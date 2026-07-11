@@ -16,15 +16,21 @@ Follow these steps to connect your Finance4All portal to Supabase.
 
 ---
 
-## Step 2: Run the database migration
+## Step 2: Run the database migrations
 
 1. In your Supabase dashboard, open **SQL Editor** (left sidebar).
 2. Click **New query**.
-3. Open `supabase/migrations/001_initial_schema.sql` from this repo, copy the entire file, paste into the editor.
-4. Click **Run** (or press Cmd/Ctrl + Enter).
-5. You should see **Success. No rows returned**.
+3. Run each migration file **in order** (copy entire file, paste, **Run**):
+   - `supabase/migrations/001_initial_schema.sql`
+   - `supabase/migrations/002_google_oauth.sql`
+   - `supabase/migrations/003_bookmarks_notifications.sql`
+   - `supabase/migrations/004_avatar_storage.sql`
+   - `supabase/migrations/005_security_hardening.sql`
+   - `supabase/migrations/006_education_progress.sql`
+   - `supabase/migrations/007_contact_submissions.sql`
+4. You should see **Success** for each query.
 
-This creates all tables, security policies, and the auto-profile trigger.
+This creates all tables, security policies, triggers, and the auto-profile trigger.
 
 ---
 
@@ -148,6 +154,12 @@ Project root/
   .env                          ← your secrets (never commit)
   .env.example                  ← template
   supabase/
-    migrations/001_initial_schema.sql   ← run first
-    seed.sql                            ← run second
+    migrations/
+      001_initial_schema.sql    ← run first
+      002_google_oauth.sql
+      003_bookmarks_notifications.sql
+      004_avatar_storage.sql
+      005_security_hardening.sql
+      006_education_progress.sql
+    seed.sql                    ← run after migrations
 ```

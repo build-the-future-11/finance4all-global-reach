@@ -3,22 +3,23 @@ import { ArrowRight, BookOpen, Globe, Newspaper, Users } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import SectionHeader from "@/components/landing/SectionHeader";
 import GlassSurface from "@/components/landing/GlassSurface";
+import { portalCopy } from "@/lib/portalCopy";
 
 const PERKS = [
   {
     icon: Newspaper,
     title: "Debriefed & explainers",
-    desc: "Curated macro news and a searchable glossary — written for members, not generated on the fly.",
+    desc: "Macro news and a searchable glossary — written by editors and chapter contributors.",
   },
   {
     icon: Globe,
     title: "Chapter events",
-    desc: "RSVP to local Markets 101 nights, lab clinics, and outreach days run by student officers.",
+    desc: "RSVP to Markets 101 nights, lab clinics, and outreach days run by chapter officers.",
   },
   {
     icon: Users,
     title: "Introductions",
-    desc: "Request warm intros to members by interest, school, or research area — opt-in only.",
+    desc: "Request introductions to members by interest or research area — opt-in only.",
   },
   {
     icon: BookOpen,
@@ -43,8 +44,8 @@ export default function MembershipSection() {
       <div className="relative mx-auto max-w-6xl">
         <SectionHeader
           eyebrow="Membership"
-          title="Free access. Real modules."
-          description="No tiered paywall — the cost is showing up. One account opens Debriefed, Education, Labs, Pathways, Network, Resources, and your chapter calendar."
+          title={portalCopy.landing.membershipTitle}
+          description={portalCopy.landing.membershipDescription}
         />
 
         <div className="mt-14 grid gap-4 sm:grid-cols-2">

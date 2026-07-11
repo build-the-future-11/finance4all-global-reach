@@ -4,6 +4,7 @@ import { Search } from "lucide-react";
 import { useExplainers } from "@/hooks/portal/useDebriefed";
 import { searchGlossary } from "@/lib/glossarySearch";
 import { sanitizeSearchQuery } from "@/lib/security";
+import { portalCopy } from "@/lib/portalCopy";
 import { PortalCard } from "@/components/portal/PortalUI";
 import { Input } from "@/components/ui/input";
 
@@ -30,10 +31,8 @@ export default function GlossarySearch({ compact }: GlossarySearchProps) {
 
   return (
     <PortalCard className={compact ? "p-4" : "p-6"}>
-      <h3 className="font-semibold text-white">Glossary search</h3>
-      <p className="mt-1 text-sm text-white/50">
-        Search explainers and Catalyst lessons written for members — results link to source pages.
-      </p>
+      <h3 className="font-semibold text-white">{portalCopy.glossary.title}</h3>
+      <p className="mt-1 text-sm text-white/50">{portalCopy.glossary.description}</p>
 
       <div className="relative mt-4">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/35" />
@@ -41,7 +40,7 @@ export default function GlossarySearch({ compact }: GlossarySearchProps) {
           value={query}
           onChange={(e) => setQuery(sanitizeSearchQuery(e.target.value))}
           maxLength={80}
-          placeholder="e.g. IPO, inflation, diversification…"
+          placeholder={portalCopy.glossary.placeholder}
           aria-label="Search glossary"
           className="border-white/15 bg-white/[0.06] pl-9 text-white placeholder:text-white/30"
         />
@@ -51,15 +50,14 @@ export default function GlossarySearch({ compact }: GlossarySearchProps) {
         <ul className="mt-4 space-y-2">
           {results.length === 0 ? (
             <li className="text-sm text-white/45">
-              No matches. Browse{" "}
+              {portalCopy.glossary.empty}{" "}
               <Link to="/portal/debriefed/explainers" className="text-emerald-300 hover:underline">
-                all explainers
+                {portalCopy.glossary.explainersLink}
               </Link>{" "}
-              or the{" "}
+              ·{" "}
               <Link to="/portal/education" className="text-emerald-300 hover:underline">
-                education hub
+                {portalCopy.glossary.educationLink}
               </Link>
-              .
             </li>
           ) : (
             results.map((r) => (

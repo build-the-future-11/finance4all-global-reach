@@ -1,13 +1,21 @@
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { LogOut, Menu, X } from "lucide-react";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { portalNav, portalRoutes } from "@/routes/portal";
 import ThemeToggle from "@/components/ThemeToggle";
 import MobileBottomNav from "@/components/portal/MobileBottomNav";
+import SessionIdleNotice from "@/components/portal/SessionIdleNotice";
 import NotificationsCenter from "@/components/portal/NotificationsCenter";
 import PortalSearch from "@/components/portal/PortalSearch";
+import SetupBanner from "@/components/portal/SetupBanner";
+import KeyboardShortcutsDialog from "@/components/portal/KeyboardShortcutsDialog";
+import PortalBreadcrumbs from "@/components/portal/PortalBreadcrumbs";
+import PageTransition from "@/components/portal/PageTransition";
+import PortalFooter from "@/components/portal/PortalFooter";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { portalCopy } from "@/lib/portalCopy";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -31,7 +39,7 @@ export default function PortalLayout() {
   const navItems = portalNav.filter((item) => !item.adminOnly || isAdmin);
 
   return (
-    <div className="min-h-screen bg-[#040810] text-white">
+    <div className="min-h-screen bg-portal-bg text-white">
       <div className="pointer-events-none fixed inset-0 -z-10">
         <div className="landing-orb left-1/4 top-0 h-[32rem] w-[32rem] bg-emerald-500/[0.08]" />
         <div className="landing-orb landing-float-delay right-0 bottom-0 h-96 w-96 bg-blue-500/[0.06]" />
@@ -50,14 +58,15 @@ export default function PortalLayout() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5">
           <div className="flex items-center gap-3">
             <button
-              className="rounded-lg p-2 text-white/60 hover:bg-white/10 lg:hidden"
+              className="portal-focus-ring portal-interactive rounded-lg p-2 text-white/60 hover:bg-white/10 hover:text-white/90 lg:hidden"
               onClick={() => setMobileOpen(!mobileOpen)}
-              aria-label="Toggle menu"
+              aria-expanded={mobileOpen}
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
             >
               {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
-            <Link to="/portal" className="flex items-center gap-2.5">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 text-xs font-bold text-white">
+            <Link to="/portal" className="portal-focus-ring group flex items-center gap-2.5 rounded-lg">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 text-xs font-bold text-white shadow-[0_2px_8px_rgba(52,211,153,0.25)] transition group-hover:shadow-[0_4px_16px_rgba(52,211,153,0.35)]">
                 F4
               </div>
               <div className="hidden sm:block">
@@ -71,7 +80,7 @@ export default function PortalLayout() {
             <PortalSearch />
             <Link
               to="/"
-              className="hidden text-xs text-white/40 transition hover:text-white/70 sm:inline"
+              className="portal-focus-ring hidden rounded-md px-2 py-1 text-xs text-white/40 transition-colors duration-portal hover:text-white/70 sm:inline"
             >
               ← Site
             </Link>
@@ -80,14 +89,15 @@ export default function PortalLayout() {
             <Button
               variant="ghost"
               size="sm"
-              className="hidden text-white/50 hover:bg-white/10 hover:text-white sm:inline-flex"
+              className="portal-focus-ring hidden text-white/50 transition-colors duration-portal hover:bg-white/10 hover:text-white sm:inline-flex"
               onClick={() => signOut()}
+              aria-label="Sign out"
             >
               <LogOut className="h-4 w-4" />
             </Button>
             {profile && (
-              <Link to={portalRoutes.settings}>
-                <Avatar className="h-8 w-8 border border-white/15 transition hover:ring-2 hover:ring-emerald-400/30">
+              <Link to={portalRoutes.settings} className="portal-focus-ring rounded-full">
+                <Avatar className="h-8 w-8 border border-white/15 transition duration-portal hover:ring-2 hover:ring-emerald-400/30">
                   <AvatarImage src={profile.avatarUrl} />
                   <AvatarFallback className="bg-emerald-500/20 text-xs text-emerald-300">
                     {initials(profile.displayName)}
@@ -103,9 +113,9 @@ export default function PortalLayout() {
         <aside
           className={`${
             mobileOpen ? "block" : "hidden"
-          } fixed inset-x-0 top-[57px] z-30 max-h-[calc(100vh-57px)] overflow-y-auto border-b border-white/[0.08] bg-[#060a12]/95 p-4 backdrop-blur-2xl lg:static lg:block lg:w-60 lg:shrink-0 lg:overflow-visible lg:border-0 lg:bg-transparent lg:p-0 xl:w-64`}
+          } fixed inset-x-0 top-[57px] z-30 max-h-[calc(100vh-57px)] overflow-y-auto border-b border-white/[0.08] bg-portal-bg-elevated/95 p-4 backdrop-blur-2xl lg:static lg:block lg:w-60 lg:shrink-0 lg:overflow-visible lg:border-0 lg:bg-transparent lg:p-0 xl:w-64`}
         >
-          <nav className="sticky top-24 flex flex-col gap-1">
+          <nav className="sticky top-24 flex flex-col gap-1" aria-label="Portal navigation">
             {navItems.map((item) => {
               const Icon = item.icon;
               const children = item.children?.filter(
@@ -118,11 +128,10 @@ export default function PortalLayout() {
                     end={item.path === portalRoutes.dashboard}
                     onClick={() => setMobileOpen(false)}
                     className={({ isActive }) =>
-                      `group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
-                        isActive
-                          ? "bg-emerald-500/15 text-emerald-300 shadow-[inset_0_0_0_1px_rgba(52,211,153,0.2)]"
-                          : "text-white/55 hover:bg-white/[0.06] hover:text-white/90"
-                      }`
+                      cn(
+                        "portal-nav-item group flex items-center gap-3",
+                        isActive && "portal-nav-active",
+                      )
                     }
                   >
                     <Icon className="h-4 w-4 shrink-0" />
@@ -137,11 +146,12 @@ export default function PortalLayout() {
                           end={!child.path.includes(":")}
                           onClick={() => setMobileOpen(false)}
                           className={({ isActive }) =>
-                            `block rounded-lg px-2.5 py-1.5 text-xs transition ${
+                            cn(
+                              "portal-focus-ring portal-interactive block rounded-lg px-2.5 py-1.5 text-xs",
                               isActive
                                 ? "font-medium text-emerald-300"
-                                : "text-white/40 hover:text-white/65"
-                            }`
+                                : "text-white/40 hover:text-white/65",
+                            )
                           }
                         >
                           {child.label}
@@ -183,11 +193,18 @@ export default function PortalLayout() {
           </nav>
         </aside>
 
-        <main className="min-w-0 flex-1 pb-20 lg:pb-8 animate-in fade-in duration-500">
-          <Outlet />
+        <main className="min-w-0 flex-1 pb-20 lg:pb-8">
+          <SetupBanner />
+          <PortalBreadcrumbs />
+          <PageTransition>
+            <Outlet />
+          </PageTransition>
+          <PortalFooter />
         </main>
       </div>
       <MobileBottomNav />
+      <SessionIdleNotice />
+      <KeyboardShortcutsDialog />
     </div>
   );
 }

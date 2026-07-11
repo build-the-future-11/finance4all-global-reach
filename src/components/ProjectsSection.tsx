@@ -8,29 +8,29 @@ const phaseOneModules = [
     icon: Newspaper,
     title: "Finance Debriefed",
     href: portalRoutes.debriefed,
-    summary: "Global macro updates, market movers, and IPO watchlists in one place.",
-    bullets: ["Daily global economic pulse", "Gainers/losers tracker", "IPO + company spotlight"],
+    summary: "Macro updates, market movers, and IPO coverage — curated for chapter reading lists.",
+    bullets: ["Daily economic pulse", "Sector and company spotlights", "Save articles to your library"],
   },
   {
     icon: BookOpenText,
-    title: "Intro to Finance",
+    title: "Explainers",
     href: portalRoutes.debriefedExplainers,
-    summary: "Beginner-friendly explainers for core buzzwords and current finance narratives.",
-    bullets: ["What is an IPO?", "Why sectors move", "Build your finance vocabulary"],
+    summary: "Short cards on finance terms and current narratives — linked to Catalyst lessons.",
+    bullets: ["What is an IPO?", "Why sectors move", "Terms before chapter meetings"],
   },
   {
     icon: FlaskConical,
-    title: "Finance Meta Labs",
+    title: "Meta Labs",
     href: portalRoutes.labs,
-    summary: "Research project directory with verified lead researchers and open applications.",
-    bullets: ["Lead researcher verification", "Student application flow", "Professor + student collaboration"],
+    summary: "Open research roles with named lead reviewers and defined deliverables.",
+    bullets: ["Lead researcher on every project", "Five-minute application flow", "Human-reviewed submissions"],
   },
   {
     icon: BriefcaseBusiness,
     title: "Axiom Pathways",
     href: portalRoutes.pathways,
-    summary: "Opportunity board for internships, programs, and project-based roles.",
-    bullets: ["Internship opportunities", "Curated pathways", "Apply and track interest"],
+    summary: "Internships, programs, and project roles — save listings and apply when ready.",
+    bullets: ["Filter by type and organization", "Essay and studio tracks", "Track saved opportunities"],
   },
 ];
 
@@ -46,13 +46,12 @@ export default function ProjectsSection() {
 
       <div ref={ref} className="mx-auto max-w-6xl">
         <div className="mx-auto max-w-3xl text-center">
-          <p className="mb-3 text-sm uppercase tracking-widest text-emerald-300">Member Portal</p>
+          <p className="mb-3 text-sm uppercase tracking-widest text-emerald-300">Inside the portal</p>
           <h2 className="text-4xl font-bold text-white sm:text-5xl">
-            FinanceMeta Ecosystem
+            Four modules to start with
           </h2>
           <p className="mt-4 text-sm text-white/70 sm:text-base">
-            Live modules for news, research labs, career pathways, and a global member network —
-            the same pillars that power Finance4All Meta worldwide.
+            News, explainers, research roles, and career pathways — the same tools chapter officers use weekly.
           </p>
         </div>
 
@@ -96,8 +95,8 @@ export default function ProjectsSection() {
               Join the network
             </p>
             <p className="mt-2 max-w-2xl text-sm text-white/80">
-              Sign in to access Debriefed news, Meta Labs research, chapter events, and connect
-              with members across Stanford, MIT, IIT, Princeton, and beyond.
+              Sign in to read Debriefed, apply to Meta Labs, RSVP to chapter events, and browse the
+              member directory — free for every student.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">

@@ -150,7 +150,7 @@ Primary sources beat aggregators. Examples: central bank statistical releases, W
 ## Identification
 
 How will you separate correlation from causation? Natural experiments, difference-in-differences, and instrumental variables are Atlas Lab methods — start by stating what would falsify your claim.`,
-    exercise: `**Draft:** Write a one-sentence research question for Meta Labs. Under it, list two data sources you could use and one paper you would cite in a literature review.`,
+    exercise: `**Draft:** Write one sentence describing a research question you could explore in a lab project. List two data sources and one prior paper you would read first.`,
   },
   writing: {
     keyTerms: ["abstract", "thesis statement", "chart discipline", "peer review"],

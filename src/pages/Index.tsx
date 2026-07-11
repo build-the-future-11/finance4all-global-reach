@@ -5,6 +5,9 @@ import SocialProofMarquee from "@/components/landing/SocialProofMarquee";
 import EcosystemBento from "@/components/landing/EcosystemBento";
 import OriginStorySection from "@/components/landing/OriginStorySection";
 import ImpactOutcomesSection from "@/components/landing/ImpactOutcomesSection";
+import InclusiveImpactSection from "@/components/landing/InclusiveImpactSection";
+import ResourcesPreviewSection from "@/components/landing/ResourcesPreviewSection";
+import TestimonialsSection from "@/components/landing/TestimonialsSection";
 import LandingCTA from "@/components/landing/LandingCTA";
 import AboutSection from "@/components/AboutSection";
 import ProgramsSection from "@/components/ProgramsSection";
@@ -42,9 +45,12 @@ const Index = () => {
         <AboutSection />
         <OriginStorySection />
         <EcosystemBento />
+        <ResourcesPreviewSection />
         <ImpactOutcomesSection />
+        <TestimonialsSection />
         <ProgramsSection />
         <ProjectsSection />
+        <InclusiveImpactSection />
         <MembershipSection />
         <LandingCTA />
         <FounderSection />

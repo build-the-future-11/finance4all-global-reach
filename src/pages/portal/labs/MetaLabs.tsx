@@ -2,6 +2,10 @@ import { useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Plus } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { portalCopy } from "@/lib/portalCopy";
+import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
+import InterestPillBar from "@/components/portal/InterestPillBar";
+import { usePersonalizedRecommendations } from "@/hooks/portal/usePersonalizedRecommendations";
 import {
   useCreateResearchProject,
   useMyLabApplications,
@@ -17,15 +21,19 @@ import BookmarkButton from "@/components/portal/BookmarkButton";
 import {
   EmptyState,
   PortalCard,
+  PortalDialogContent,
   PortalPageHeader,
+  PortalTabsList,
+  PortalTabsTrigger,
   QueryStatus,
+  portalButtonPrimary,
   portalInputClass,
+  portalTextareaClass,
 } from "@/components/portal/PortalUI";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -33,7 +41,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
@@ -127,31 +135,33 @@ function ProjectDetail({ id }: { id: string }) {
           ) : (
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-emerald-500 hover:bg-emerald-400">Apply to this project</Button>
+                <Button className={portalButtonPrimary}>Apply to this project</Button>
               </DialogTrigger>
-              <DialogContent className="border-white/15 bg-[#0c1220] text-white">
+              <PortalDialogContent>
                 <DialogHeader>
                   <DialogTitle>Apply to {project.title}</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div>
                     <Label className="text-white/70">Why are you interested?</Label>
+                    <p className="mt-1 text-xs text-white/40">{portalCopy.labs.applyMotivation}</p>
                     <Textarea
                       value={motivation}
                       onChange={(e) => setMotivation(e.target.value)}
                       rows={4}
-                      className={portalInputClass}
+                      className={portalTextareaClass}
+                      placeholder="Relevant coursework, prior research, or skills that fit this project…"
                     />
                   </div>
                   <Button
                     onClick={handleApply}
                     disabled={submitApp.isPending}
-                    className="bg-emerald-500 hover:bg-emerald-400"
+                    className={portalButtonPrimary}
                   >
                     Submit application
                   </Button>
                 </div>
-              </DialogContent>
+              </PortalDialogContent>
             </Dialog>
           )}
         </div>
@@ -165,6 +175,9 @@ export default function MetaLabs() {
   const [searchParams] = useSearchParams();
   const tagFromUrl = searchParams.get("tag") ?? "";
   const { profile } = useAuth();
+  const myInterests = new Set(profile?.interests?.map((i) => i.toLowerCase()) ?? []);
+  const { items: recommendations } = usePersonalizedRecommendations(3);
+  const labRecommendations = recommendations.filter((i) => i.id.startsWith("lab-"));
   const [statusFilter, setStatusFilter] = useState<ResearchProjectStatus | "all">("all");
   const [search, setSearch] = useState(tagFromUrl);
   const { data: projects, isLoading, error, refetch } = useResearchProjects();
@@ -218,20 +231,21 @@ export default function MetaLabs() {
   if (id) return <ProjectDetail id={id} />;
 
   return (
-    <div>
-      <PortalPageHeader
-        eyebrow="Research"
-        title="Finance Meta Labs"
-        description="Research projects with verified lead researchers and open applications."
-        action={
+    <div className="space-y-6">
+      <PortalAnimatedSection>
+        <PortalPageHeader
+          eyebrow={portalCopy.labs.eyebrow}
+          title={portalCopy.labs.title}
+          description={portalCopy.labs.description}
+          action={
           canCreate ? (
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-emerald-500 hover:bg-emerald-400">
+                <Button className={portalButtonPrimary}>
                   <Plus className="h-4 w-4" /> New project
                 </Button>
               </DialogTrigger>
-              <DialogContent className="border-white/15 bg-[#0c1220] text-white">
+              <PortalDialogContent>
                 <DialogHeader>
                   <DialogTitle>Publish research project</DialogTitle>
                 </DialogHeader>
@@ -261,33 +275,51 @@ export default function MetaLabs() {
                   <Button
                     onClick={handleCreate}
                     disabled={createProject.isPending}
-                    className="bg-emerald-500 hover:bg-emerald-400"
+                    className={portalButtonPrimary}
                   >
                     Publish
                   </Button>
                 </div>
-              </DialogContent>
+              </PortalDialogContent>
             </Dialog>
           ) : undefined
         }
       />
+      </PortalAnimatedSection>
 
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <InterestPillBar />
+
+      {labRecommendations.length > 0 && (
+        <PortalAnimatedSection delay={60}>
+          <h3 className="mb-3 text-sm font-semibold text-emerald-300">Recommended for you</h3>
+          <div className="grid gap-3 sm:grid-cols-3">
+            {labRecommendations.map((item) => (
+              <Link key={item.id} to={item.href}>
+                <PortalCard hover className="h-full p-4">
+                  <p className="line-clamp-1 font-medium text-white">{item.title}</p>
+                  <p className="mt-1 line-clamp-2 text-xs text-white/45">{item.description}</p>
+                  <p className="mt-2 text-[10px] uppercase tracking-wider text-emerald-400/80">
+                    {item.reason}
+                  </p>
+                </PortalCard>
+              </Link>
+            ))}
+          </div>
+        </PortalAnimatedSection>
+      )}
+
+      <div className="mb-2 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <Tabs
           value={statusFilter}
           onValueChange={(v) => setStatusFilter(v as ResearchProjectStatus | "all")}
         >
-          <TabsList className="h-auto flex-wrap gap-1 bg-white/[0.04] p-1">
+          <PortalTabsList>
             {STATUSES.map((s) => (
-              <TabsTrigger
-                key={s.value}
-                value={s.value}
-                className="data-[state=active]:bg-emerald-500/20 data-[state=active]:text-emerald-300"
-              >
+              <PortalTabsTrigger key={s.value} value={s.value}>
                 {s.label}
-              </TabsTrigger>
+              </PortalTabsTrigger>
             ))}
-          </TabsList>
+          </PortalTabsList>
         </Tabs>
         <Input
           value={search}
@@ -301,7 +333,7 @@ export default function MetaLabs() {
         isLoading={isLoading}
         error={error}
         isEmpty={!filtered?.length}
-        emptyMessage="No projects match your filters."
+        emptyMessage={portalCopy.labs.emptyProjects}
         onRetry={() => refetch()}
       >
         <div className="space-y-4">
@@ -316,7 +348,14 @@ export default function MetaLabs() {
                         {project.status.replace("_", " ")}
                       </Badge>
                       {project.tags.map((t) => (
-                        <span key={t} className="text-xs text-white/40">
+                        <span
+                          key={t}
+                          className={`text-xs ${
+                            myInterests.has(t.toLowerCase())
+                              ? "rounded-full bg-emerald-500/15 px-2 py-0.5 text-emerald-300"
+                              : "text-white/40"
+                          }`}
+                        >
                           #{t}
                         </span>
                       ))}

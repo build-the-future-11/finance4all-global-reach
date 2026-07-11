@@ -55,7 +55,7 @@ export const DigestPreferenceSchema = z.object({
 });
 export type DigestPreference = z.infer<typeof DigestPreferenceSchema>;
 
-// ─── Finance Meta Labs ────────────────────────────────────────────────────────
+// ─── Meta Labs ────────────────────────────────────────────────────────
 
 export const ResearchProjectStatusSchema = z.enum([
   "draft",

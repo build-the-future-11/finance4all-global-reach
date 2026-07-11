@@ -1,53 +1,52 @@
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { portalCopy } from "@/lib/portalCopy";
+import { cn } from "@/lib/utils";
+import { landingEyebrowClass } from "@/components/portal/PortalUI";
 
 const teamMembers = [
   {
     name: "Halle",
     role: "Head of Growth",
     highlights: [
-      "Growth Intern at Creddr scaling a next generation finance platform",
-      "Researcher at Synthica selected from 1000+ applicants with 1.5% acceptance rate",
-      "Ambassador at Canadian Economics Olympiad leading outreach and partnerships",
-      "Founder of Econ in 3 Mins simplifying economics for youth audiences",
-      "VP Marketing at JA Southern Alberta driving 100K+ reach campaigns",
+      "Runs outreach and partnerships for chapter expansion",
+      "Built Econ in 3 Mins, a youth economics education channel",
+      "Leads marketing for JA Southern Alberta regional campaigns",
     ],
   },
   {
     name: "Kranav Gupta",
-    role: "Co-Founder and Econscholars Lead",
+    role: "Co-Founder · EconScholars Lead",
     highlights: [
-      "Founder of Econscholars",
-      "International olympiad mentor",
-      "Leads live industry and research projects",
+      "Founded EconScholars, Finance4All's olympiad prep program",
+      "Mentors students preparing for international economics competitions",
+      "Coordinates live industry and research project placements",
     ],
   },
   {
     name: "Frank Niu",
     role: "Senior Researcher",
     highlights: [
-      "FBLA award winner",
-      "Director of Finance at Youth Civics Network",
-      "HUVTSP 25 participant",
+      "FBLA award winner and Director of Finance at Youth Civics Network",
+      "Reviews student research submissions for clarity and evidence",
+      "Supports chapter officers running their first finance events",
     ],
   },
   {
     name: "Xiurui (Ray) Chen",
     role: "Senior Researcher",
     highlights: [
-      "Portfolio Manager at CCDS Investment Club",
-      "Cofounded QIS branch and secured Jane Street sponsorship",
-      "Intern at World Artificial Intelligence Conference",
-      "Worked on logistics and sponsorship coordination in Shanghai",
-      "Stock Market Game finalist managing 100K portfolio",
+      "Portfolio manager at CCDS Investment Club; co-founded the QIS research branch",
+      "Coordinates sponsorship and logistics for chapter puzzle nights",
+      "Stock Market Game finalist — brings practitioner framing to curriculum review",
     ],
   },
   {
     name: "Joseph Augustine",
     role: "Affiliate, Youth Economy Lab",
     highlights: [
-      "Leads initiatives under Youth Economy Lab with 500+ members",
-      "Works on large scale youth driven economic research and programs",
-      "Focus on policy, education, and real world economic systems",
+      "Leads Youth Economy Lab initiatives with 500+ student members",
+      "Connects Finance4All chapters to policy and education research programs",
+      "Focuses on making economic systems legible to first-time learners",
     ],
   },
 ];
@@ -57,16 +56,16 @@ export default function FounderSection() {
 
   return (
     <section id="founder" className="relative px-4 py-28 sm:py-36">
-      <div ref={ref} className="section-fade mx-auto max-w-6xl">
+      <div ref={ref} className="mx-auto max-w-6xl">
         <div className="mb-20 text-center">
-          <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-emerald-400">
-            Leadership
+          <p className={cn(landingEyebrowClass, "mb-3")}>
+            {portalCopy.landing.founderEyebrow}
           </p>
           <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
-            Built by <span className="bg-gradient-to-r from-emerald-300 to-cyan-300 bg-clip-text text-transparent">operators</span>
+            {portalCopy.landing.founderTitle}
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-white/55">
-            A small, high-leverage team working across finance, research, and execution.
+            {portalCopy.landing.founderSubtext}
           </p>
         </div>
 
@@ -77,11 +76,10 @@ export default function FounderSection() {
               <h3 className="text-2xl font-semibold text-white">Ryan Gomez</h3>
               <p className="mt-1 font-medium text-emerald-300">Founder and ML Researcher</p>
               <div className="mt-6 grid gap-3 text-sm text-white/60 sm:grid-cols-2">
-                <p>• 16 year old ML researcher and entrepreneur</p>
-                <p>• Top 200 at World Scholars Cup Yale</p>
-                <p>• 1M+ cumulative global reads</p>
-                <p>• Built EdTech platform used worldwide</p>
-                <p>• Backed by leading EdTech institutions</p>
+                <p>• Founded Finance4All from classroom outreach in India</p>
+                <p>• Built the Catalyst curriculum and member portal</p>
+                <p>• ML researcher focused on education tooling</p>
+                <p>• Oversees Atlas Economics Lab and editorial standards</p>
               </div>
             </div>
           </div>
@@ -93,7 +91,7 @@ export default function FounderSection() {
           {teamMembers.map((member) => (
             <div
               key={member.name}
-              className="relative overflow-hidden rounded-2xl border border-white/15 bg-white/5 p-6 backdrop-blur-2xl transition-all duration-500 hover:-translate-y-1 hover:bg-white/10 hover:shadow-[0_15px_50px_rgba(0,0,0,0.2)]"
+              className="portal-interactive relative overflow-hidden rounded-2xl border border-white/15 bg-white/5 p-6 backdrop-blur-2xl motion-safe:hover:-translate-y-1 motion-safe:hover:bg-white/10 motion-safe:hover:shadow-[0_15px_50px_rgba(0,0,0,0.2)]"
             >
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.08),transparent_50%)]" />
 

@@ -12,11 +12,12 @@ import { useScrollReveal } from "@/hooks/useScrollReveal";
 import SectionHeader from "@/components/landing/SectionHeader";
 import GlassSurface from "@/components/landing/GlassSurface";
 import { portalRoutes } from "@/routes/portal";
+import { portalCopy } from "@/lib/portalCopy";
 
 const MODULES = [
   {
     title: "Finance Debriefed",
-    desc: "Macro pulse, IPO watchlists, live headlines, and member explainers — the reading list before your chapter meeting.",
+    desc: "Macro pulse, IPO coverage, live headlines, and explainers — the reading list before your chapter meeting.",
     icon: Newspaper,
     href: portalRoutes.debriefed,
     tag: "News",
@@ -25,7 +26,7 @@ const MODULES = [
   },
   {
     title: "Meta Labs",
-    desc: "Apply to mentor-led research. Atlas, IYERN, fintech — each project has a lead and a deliverable.",
+    desc: "Apply to mentor-led research. Atlas, IYERN, and fintech tracks — each project names a lead and a deliverable.",
     icon: FlaskConical,
     href: portalRoutes.labs,
     tag: "Research",
@@ -34,7 +35,7 @@ const MODULES = [
   },
   {
     title: "Axiom Pathways",
-    desc: "Internships, competitions, essay submissions, and office hours for career strategy.",
+    desc: "Internships, essay submissions, studio projects, and career resources from partner organizations.",
     icon: Route,
     href: portalRoutes.pathways,
     tag: "Opportunities",
@@ -42,8 +43,8 @@ const MODULES = [
     gradient: "from-violet-500/18 to-transparent",
   },
   {
-    title: "Global Network",
-    desc: "Member directory, warm introductions, chapter pages, and collaboration matching.",
+    title: "Network",
+    desc: "Member directory, connection requests, chapter pages, and collaboration matching.",
     icon: Users,
     href: portalRoutes.network,
     tag: "Community",
@@ -77,9 +78,9 @@ export default function EcosystemBento() {
     <section className="relative px-4 py-28 sm:py-36">
       <div ref={ref} className="mx-auto max-w-6xl">
         <SectionHeader
-          eyebrow="Member portal"
-          title="Seven modules. One login."
-          description="Everything on this page exists inside the portal — sign in to read Debriefed, apply to labs, or RSVP to your chapter's next event."
+          eyebrow={portalCopy.landing.ecosystemEyebrow}
+          title={portalCopy.landing.ecosystemTitle}
+          description={portalCopy.landing.ecosystemDescription}
         />
 
         <div className="mt-14 grid auto-rows-[minmax(150px,auto)] gap-4 sm:grid-cols-3">

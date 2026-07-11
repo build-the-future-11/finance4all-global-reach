@@ -1,15 +1,21 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { KeyRound } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import AuthLayout from "@/components/portal/AuthLayout";
 import PasswordStrengthMeter from "@/components/portal/PasswordStrengthMeter";
-import { portalInputClass } from "@/components/portal/PortalUI";
+import {
+  PortalAlert,
+  PortalInput,
+  PortalLabel,
+  portalButtonPrimary,
+  portalLinkClass,
+} from "@/components/portal/PortalUI";
 import { assessPassword, isPasswordAcceptable } from "@/lib/security";
+import { portalCopy } from "@/lib/portalCopy";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 export default function ResetPassword() {
   useDocumentTitle("Set new password");
@@ -39,11 +45,11 @@ export default function ResetPassword() {
     setError("");
 
     if (!isPasswordAcceptable(password)) {
-      setError("Password must be at least 8 characters with letters and numbers.");
+      setError(portalCopy.security.passwordTooShort);
       return;
     }
     if (password !== confirm) {
-      setError("Passwords do not match.");
+      setError(portalCopy.settings.passwordsMismatch);
       return;
     }
 
@@ -52,64 +58,57 @@ export default function ResetPassword() {
     setSubmitting(false);
 
     if (err) setError(err);
-    else navigate("/login", { replace: true, state: { message: "Password updated. Sign in with your new password." } });
+    else navigate("/login", { replace: true, state: { message: portalCopy.auth.resetPasswordSuccess } });
   };
 
   if (loading || !ready) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-[#060a12] text-white">
-        <KeyRound className="h-8 w-8 text-emerald-400" />
-        <p className="text-sm text-white/50">Verifying reset link…</p>
+      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-portal-bg text-white">
+        <KeyRound className="h-8 w-8 text-emerald-400" aria-hidden />
+        <p className="text-sm text-white/50" role="status">
+          {portalCopy.auth.resetPasswordVerifying}
+        </p>
       </div>
     );
   }
 
   return (
     <AuthLayout
-      title="Set new password"
-      subtitle="Choose a strong password for your Finance4All account."
+      title={portalCopy.auth.resetPasswordTitle}
+      subtitle={portalCopy.auth.resetPasswordSubtitle}
       footer={
-        <Link to="/login" className="font-medium text-emerald-400 hover:underline">
+        <Link to="/login" className={portalLinkClass}>
           Back to sign in
         </Link>
       }
     >
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <Label htmlFor="password" className="text-white/70">
-            New password
-          </Label>
-          <Input
+          <PortalLabel htmlFor="password">New password</PortalLabel>
+          <PortalInput
             id="password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
             autoComplete="new-password"
-            className={portalInputClass}
           />
           <PasswordStrengthMeter strength={passwordCheck.strength} hints={passwordCheck.hints} />
+          <p className="mt-2 text-xs text-white/40">{portalCopy.security.passwordHints}</p>
         </div>
         <div>
-          <Label htmlFor="confirm" className="text-white/70">
-            Confirm password
-          </Label>
-          <Input
+          <PortalLabel htmlFor="confirm">Confirm password</PortalLabel>
+          <PortalInput
             id="confirm"
             type="password"
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
             required
             autoComplete="new-password"
-            className={portalInputClass}
           />
         </div>
-        {error && (
-          <p className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300">
-            {error}
-          </p>
-        )}
-        <Button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-400" disabled={submitting}>
+        {error && <PortalAlert variant="error">{error}</PortalAlert>}
+        <Button type="submit" className={cn("w-full", portalButtonPrimary)} disabled={submitting}>
           {submitting ? "Updating…" : "Update password"}
         </Button>
       </form>

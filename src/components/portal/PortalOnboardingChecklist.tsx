@@ -3,19 +3,25 @@ import { CheckCircle2, Circle, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { computeProfileCompleteness, useMyMemberStats } from "@/hooks/portal/useMemberStats";
 import { portalRoutes } from "@/routes/portal";
-import { PortalCard } from "@/components/portal/PortalUI";
+import {
+  PortalCard,
+  portalButtonPrimary,
+} from "@/components/portal/PortalUI";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
+import { portalCopy } from "@/lib/portalCopy";
 
 const STORAGE_KEY = "f4a-onboarding-dismissed";
 export const DEBRIEFED_VISITED_KEY = "f4a-visited-debriefed";
 
+const { onboarding } = portalCopy;
+
 const STEPS = [
-  { id: "profile", label: "Complete your profile", path: portalRoutes.settings },
-  { id: "debriefed", label: "Read the latest news", path: portalRoutes.debriefed },
-  { id: "education", label: "Complete a Catalyst lesson", path: portalRoutes.education },
-  { id: "network", label: "Connect with a member", path: portalRoutes.network },
-  { id: "saved", label: "Save an article or project", path: portalRoutes.saved },
+  { id: "profile", label: onboarding.steps.profile, path: portalRoutes.settings },
+  { id: "debriefed", label: onboarding.steps.debriefed, path: portalRoutes.debriefed },
+  { id: "education", label: onboarding.steps.education, path: portalRoutes.education },
+  { id: "network", label: onboarding.steps.network, path: portalRoutes.network },
+  { id: "saved", label: onboarding.steps.saved, path: portalRoutes.saved },
 ] as const;
 
 function isStepDone(
@@ -72,12 +78,12 @@ export default function PortalOnboardingChecklist() {
       </button>
 
       <p className="text-xs font-medium uppercase tracking-[0.2em] text-emerald-400/90">
-        Welcome to the portal
+        {onboarding.eyebrow}
       </p>
-      <h3 className="mt-1 text-lg font-semibold text-white">Get the most from your membership</h3>
+      <h3 className="mt-1 text-lg font-semibold text-white">{onboarding.title}</h3>
       <p className="mt-1 text-sm text-white/50">
-        {completedCount}/{STEPS.length} steps complete
-        {missing.length > 0 && percent < 80 && ` — add ${missing[0].toLowerCase()}`}
+        {completedCount}/{STEPS.length} complete
+        {missing.length > 0 && percent < 80 && ` — still need ${missing[0].toLowerCase()}`}
       </p>
 
       <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-white/10">
@@ -110,8 +116,8 @@ export default function PortalOnboardingChecklist() {
       </ul>
 
       <Link to={portalRoutes.settings} className="mt-4 inline-block">
-        <Button size="sm" className="bg-emerald-500 hover:bg-emerald-400">
-          {percent < 80 ? "Complete profile" : "Explore the network"}
+        <Button size="sm" className={portalButtonPrimary}>
+          {percent < 80 ? onboarding.ctaProfile : onboarding.ctaExplore}
         </Button>
       </Link>
     </PortalCard>

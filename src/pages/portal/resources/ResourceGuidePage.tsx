@@ -6,6 +6,8 @@ import MarkdownContent from "@/components/portal/MarkdownContent";
 import { PortalCard, PortalPageHeader } from "@/components/portal/PortalUI";
 import { portalRoutes } from "@/routes/portal";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { portalCopy } from "@/lib/portalCopy";
+import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
 
 export default function ResourceGuidePage() {
   const { id } = useParams();
@@ -20,21 +22,23 @@ export default function ResourceGuidePage() {
         <Link to={portalRoutes.resources} className="text-sm text-emerald-300 hover:underline">
           ← Resources
         </Link>
-        <p className="mt-6 text-white/60">Guide not found.</p>
+        <p className="mt-6 text-white/60">{portalCopy.resources.guideNotFound}</p>
       </div>
     );
   }
 
   return (
     <div>
-      <Link
-        to={portalRoutes.resources}
-        className="mb-6 inline-flex items-center gap-2 text-sm text-emerald-300 hover:underline"
-      >
-        <ArrowLeft className="h-4 w-4" /> Resources
-      </Link>
+      <PortalAnimatedSection>
+        <Link
+          to={portalRoutes.resources}
+          className="mb-6 inline-flex items-center gap-2 text-sm text-emerald-300 hover:underline"
+        >
+          <ArrowLeft className="h-4 w-4" /> Resources
+        </Link>
 
-      <PortalPageHeader title={guide.title} description={guide.summary} />
+        <PortalPageHeader title={guide.title} description={guide.summary} />
+      </PortalAnimatedSection>
 
       {guide.checklist && (
         <PortalCard className="mb-6 p-6">

@@ -1,17 +1,23 @@
 import { useMemo, useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { CheckCircle2, Mail } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 import AuthLayout from "@/components/portal/AuthLayout";
 import GoogleSignInButton, { AuthDivider } from "@/components/portal/GoogleSignInButton";
 import PasswordStrengthMeter from "@/components/portal/PasswordStrengthMeter";
-import { assessPassword } from "@/lib/security";
-import { portalInputClass } from "@/components/portal/PortalUI";
+import { assessPassword, isDisposableEmail, isPasswordAcceptable, isValidEmail } from "@/lib/security";
+import {
+  PortalAlert,
+  PortalInput,
+  PortalLabel,
+  portalButtonPrimary,
+  portalLinkClass,
+} from "@/components/portal/PortalUI";
+import { portalCopy } from "@/lib/portalCopy";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 export default function Signup() {
   useDocumentTitle("Sign up");
@@ -26,16 +32,34 @@ export default function Signup() {
   const [needsEmailConfirm, setNeedsEmailConfirm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-
-  if (!loading && user) return <Navigate to="/portal" replace />;
+  const [honeypot, setHoneypot] = useState("");
 
   const passwordCheck = useMemo(() => assessPassword(password), [password]);
+
+  if (!loading && user) return <Navigate to="/portal" replace />;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    if (honeypot) {
+      setError(portalCopy.security.honeypotTriggered);
+      return;
+    }
+    const trimmedEmail = email.trim();
+    if (!isValidEmail(trimmedEmail)) {
+      setError(
+        isDisposableEmail(trimmedEmail)
+          ? portalCopy.security.disposableEmail
+          : portalCopy.security.invalidEmail,
+      );
+      return;
+    }
+    if (!isPasswordAcceptable(password)) {
+      setError(portalCopy.security.passwordTooShort);
+      return;
+    }
     setSubmitting(true);
-    const { error: err } = await signUp(email, password, displayName);
+    const { error: err } = await signUp(trimmedEmail, password, displayName);
     setSubmitting(false);
     if (err) setError(err);
     else {
@@ -61,32 +85,32 @@ export default function Signup() {
 
   return (
     <AuthLayout
-      title="Join Finance4All"
-      subtitle="Create your member account to unlock the full portal."
+      title={portalCopy.auth.signupTitle}
+      subtitle={portalCopy.auth.signupSubtitle}
       footer={
         <>
-          Already have an account?{" "}
-          <Link to="/login" className="font-medium text-emerald-400 hover:underline">
-            Sign in
+          {portalCopy.auth.signupFooter}{" "}
+          <Link to="/login" className={portalLinkClass}>
+            {portalCopy.auth.signupFooterLink}
           </Link>
         </>
       }
     >
       {needsEmailConfirm ? (
         <div className="flex flex-col items-center gap-3 py-4 text-center">
-          <Mail className="h-10 w-10 text-emerald-400" />
-          <p className="text-sm font-medium text-white">Check your email</p>
+          <Mail className="h-10 w-10 text-emerald-400" aria-hidden />
+          <p className="text-sm font-medium text-white">{portalCopy.auth.emailConfirmTitle}</p>
           <p className="text-sm text-white/55">
-            We sent a confirmation link to <span className="text-white/80">{email}</span>. Click it
-            to activate your account, then sign in.
+            {portalCopy.auth.emailConfirmBody}{" "}
+            <span className="text-white/80">{email}</span>
           </p>
-          <Link to="/login" className="mt-2 text-sm font-medium text-emerald-400 hover:underline">
+          <Link to="/login" className={cn(portalLinkClass, "mt-2 text-sm")}>
             Go to sign in
           </Link>
         </div>
       ) : success ? (
-        <div className="flex flex-col items-center gap-3 py-4 text-center">
-          <CheckCircle2 className="h-10 w-10 text-emerald-400" />
+        <div className="flex flex-col items-center gap-3 py-4 text-center" role="status">
+          <CheckCircle2 className="h-10 w-10 text-emerald-400" aria-hidden />
           <p className="text-sm text-emerald-300">Account created! Redirecting…</p>
         </div>
       ) : (
@@ -95,36 +119,38 @@ export default function Signup() {
           <AuthDivider />
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            <input
+              type="text"
+              name="company"
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden
+              className="absolute -left-[9999px] h-0 w-0 opacity-0"
+            />
             <div>
-              <Label htmlFor="name" className="text-white/70">
-                Display name
-              </Label>
-              <Input
+              <PortalLabel htmlFor="name">Display name</PortalLabel>
+              <PortalInput
                 id="name"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 required
-                className={portalInputClass}
               />
             </div>
             <div>
-              <Label htmlFor="email" className="text-white/70">
-                Email
-              </Label>
-              <Input
+              <PortalLabel htmlFor="email">Email</PortalLabel>
+              <PortalInput
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className={portalInputClass}
               />
             </div>
             <div>
-              <Label htmlFor="password" className="text-white/70">
-                Password
-              </Label>
-              <Input
+              <PortalLabel htmlFor="password">Password</PortalLabel>
+              <PortalInput
                 id="password"
                 type="password"
                 value={password}
@@ -132,18 +158,14 @@ export default function Signup() {
                 required
                 minLength={8}
                 autoComplete="new-password"
-                className={portalInputClass}
               />
               {password.length > 0 && (
                 <PasswordStrengthMeter strength={passwordCheck.strength} hints={passwordCheck.hints} />
               )}
+              <p className="mt-2 text-xs text-white/40">{portalCopy.security.passwordHints}</p>
             </div>
-            {error && (
-              <p className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300">
-                {error}
-              </p>
-            )}
-            <Button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-400" disabled={submitting}>
+            {error && <PortalAlert variant="error">{error}</PortalAlert>}
+            <Button type="submit" className={cn("w-full", portalButtonPrimary)} disabled={submitting}>
               {submitting ? "Creating account…" : "Create account with email"}
             </Button>
           </form>

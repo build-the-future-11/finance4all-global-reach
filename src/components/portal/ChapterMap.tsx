@@ -16,7 +16,7 @@ interface ChapterMapProps {
 
 export default function ChapterMap({ chapters, selectedId, onSelect }: ChapterMapProps) {
   return (
-    <div className="relative aspect-[2/1] w-full overflow-hidden rounded-2xl border border-white/10 bg-[#0a1628]">
+    <div className="relative aspect-[2/1] w-full overflow-hidden rounded-2xl border border-white/10 bg-landing-map-bg">
       {/* Grid lines */}
       <div
         className="absolute inset-0 opacity-20"
@@ -37,7 +37,7 @@ export default function ChapterMap({ chapters, selectedId, onSelect }: ChapterMa
             type="button"
             title={`${chapter.name}, ${chapter.country}`}
             onClick={() => onSelect?.(chapter.id)}
-            className="group absolute z-10 -translate-x-1/2 -translate-y-1/2"
+            className="portal-focus-ring group absolute z-10 -translate-x-1/2 -translate-y-1/2"
             style={{ left: pos.left, top: pos.top }}
           >
             <span

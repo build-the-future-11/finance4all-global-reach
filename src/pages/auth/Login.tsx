@@ -1,20 +1,28 @@
 import { useState } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { safeInternalPath } from "@/lib/security";
+import { sanitizeUserFacingError } from "@/lib/authErrors";
 import AuthLayout from "@/components/portal/AuthLayout";
 import GoogleSignInButton, { AuthDivider } from "@/components/portal/GoogleSignInButton";
-import { portalInputClass } from "@/components/portal/PortalUI";
+import {
+  PortalAlert,
+  PortalInput,
+  PortalLabel,
+  portalButtonPrimary,
+  portalLinkClass,
+} from "@/components/portal/PortalUI";
+import { portalCopy } from "@/lib/portalCopy";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 export default function Login() {
   const { signIn, signInWithGoogle, user, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = safeInternalPath((location.state as { from?: string })?.from);
-  const flashMessage = (location.state as { message?: string })?.message;
+  const rawFlash = (location.state as { message?: string })?.message;
+  const flashMessage = rawFlash ? sanitizeUserFacingError(rawFlash) : undefined;
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,8 +38,11 @@ export default function Login() {
     setSubmitting(true);
     const { error: err } = await signIn(email, password);
     setSubmitting(false);
-    if (err) setError(err);
-    else navigate(from);
+    if (err) {
+      setError(err);
+    } else {
+      navigate(from);
+    }
   };
 
   const handleGoogle = async () => {
@@ -46,13 +57,13 @@ export default function Login() {
 
   return (
     <AuthLayout
-      title="Welcome back"
-      subtitle="Sign in to access the Finance4All member portal."
+      title={portalCopy.auth.loginTitle}
+      subtitle={portalCopy.auth.loginSubtitle}
       footer={
         <>
-          No account?{" "}
-          <Link to="/signup" className="font-medium text-emerald-400 hover:underline">
-            Create one
+          {portalCopy.auth.loginFooter}{" "}
+          <Link to="/signup" className={portalLinkClass}>
+            {portalCopy.auth.loginFooterLink}
           </Link>
         </>
       }
@@ -60,52 +71,38 @@ export default function Login() {
       <GoogleSignInButton onClick={handleGoogle} loading={googleLoading} />
       <AuthDivider />
 
-      {flashMessage && (
-        <p className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">
-          {flashMessage}
-        </p>
-      )}
+      {flashMessage && <PortalAlert variant="success">{flashMessage}</PortalAlert>}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <Label htmlFor="email" className="text-white/70">
-            Email
-          </Label>
-          <Input
+          <PortalLabel htmlFor="email">Email</PortalLabel>
+          <PortalInput
             id="email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
             autoComplete="email"
-            className={portalInputClass}
           />
         </div>
         <div>
           <div className="flex items-center justify-between">
-            <Label htmlFor="password" className="text-white/70">
-              Password
-            </Label>
-            <Link to="/forgot-password" className="text-xs text-emerald-400 hover:underline">
+            <PortalLabel htmlFor="password">Password</PortalLabel>
+            <Link to="/forgot-password" className={cn(portalLinkClass, "text-xs")}>
               Forgot password?
             </Link>
           </div>
-          <Input
+          <PortalInput
             id="password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
             autoComplete="current-password"
-            className={portalInputClass}
           />
         </div>
-        {error && (
-          <p className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300">
-            {error}
-          </p>
-        )}
-        <Button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-400" disabled={submitting}>
+        {error && <PortalAlert variant="error">{error}</PortalAlert>}
+        <Button type="submit" className={cn("w-full", portalButtonPrimary)} disabled={submitting}>
           {submitting ? "Signing in…" : "Sign in with email"}
         </Button>
       </form>

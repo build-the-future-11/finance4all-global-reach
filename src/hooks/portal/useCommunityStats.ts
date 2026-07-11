@@ -25,6 +25,13 @@ export function useCommunityStats() {
         supabase.from("introduction_posts").select("id", { count: "exact", head: true }),
       ]);
 
+      const errors = [membersRes, chaptersRes, projectsRes, introsRes]
+        .map((res) => res.error)
+        .filter(Boolean);
+      if (errors.length > 0) {
+        throw errors[0];
+      }
+
       return {
         members: membersRes.count ?? 0,
         chapters: chaptersRes.count ?? 0,

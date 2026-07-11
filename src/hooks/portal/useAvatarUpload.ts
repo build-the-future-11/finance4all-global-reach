@@ -1,9 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
-
-const MAX_BYTES = 2 * 1024 * 1024;
-const ALLOWED = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+import { validateImageFile } from "@/lib/fileValidation";
 
 export function useAvatarUpload() {
   const { user } = useAuth();
@@ -12,17 +10,15 @@ export function useAvatarUpload() {
   return useMutation({
     mutationFn: async (file: File) => {
       if (!user) throw new Error("Not signed in");
-      if (!ALLOWED.includes(file.type)) {
-        throw new Error("Use JPEG, PNG, WebP, or GIF.");
-      }
-      if (file.size > MAX_BYTES) throw new Error("Image must be under 2 MB.");
 
-      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-      const path = `${user.id}/avatar.${ext}`;
+      const validation = await validateImageFile(file);
+      if (!validation.ok) throw new Error(validation.error);
+
+      const path = `${user.id}/avatar.${validation.ext}`;
 
       const { error: uploadError } = await supabase.storage
         .from("avatars")
-        .upload(path, file, { upsert: true, contentType: file.type });
+        .upload(path, file, { upsert: true, contentType: validation.mime });
 
       if (uploadError) throw uploadError;
 

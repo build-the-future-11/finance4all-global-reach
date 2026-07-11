@@ -5,13 +5,14 @@ import { portalRoutes } from "@/routes/portal";
 import MarkdownContent from "@/components/portal/MarkdownContent";
 import GlossarySearch from "@/components/portal/GlossarySearch";
 import {
-  EmptyState,
   PortalCard,
   PortalPageHeader,
   QueryStatus,
 } from "@/components/portal/PortalUI";
 import { Badge } from "@/components/ui/badge";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { portalCopy } from "@/lib/portalCopy";
+import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
 
 function ExplainerDetail({ slug }: { slug: string }) {
   const { data: explainer, isLoading, error, refetch } = useExplainerBySlug(slug);
@@ -22,39 +23,41 @@ function ExplainerDetail({ slug }: { slug: string }) {
       isLoading={isLoading}
       error={error}
       isEmpty={!explainer}
-      emptyMessage="Explainer not found."
+      emptyMessage={portalCopy.explainers.notFound}
       onRetry={() => refetch()}
       skeletonCount={1}
     >
       {explainer && (
-        <div>
-          <Link
-            to={portalRoutes.debriefedExplainers}
-            className="mb-6 inline-flex items-center gap-2 text-sm text-emerald-300 hover:underline"
-          >
-            <ArrowLeft className="h-4 w-4" /> All explainers
-          </Link>
-          <Badge variant="outline" className="border-white/20 capitalize text-white/60">
-            {explainer.difficulty}
-          </Badge>
-          <h1 className="mt-3 text-3xl font-bold text-white">{explainer.title}</h1>
-          <p className="mt-2 text-white/60">{explainer.summary}</p>
-          <PortalCard className="mt-6 p-6">
-            <MarkdownContent content={explainer.body} />
-            {explainer.relatedTerms.length > 0 && (
-              <div className="mt-6 flex flex-wrap gap-2 border-t border-white/10 pt-4">
-                {explainer.relatedTerms.map((term) => (
-                  <span key={term} className="rounded-full bg-white/5 px-3 py-1 text-xs text-white/50">
-                    {term}
-                  </span>
-                ))}
-              </div>
-            )}
-          </PortalCard>
-          <div className="mt-6">
-            <GlossarySearch compact />
+        <PortalAnimatedSection>
+          <div>
+            <Link
+              to={portalRoutes.debriefedExplainers}
+              className="mb-6 inline-flex items-center gap-2 text-sm text-emerald-300 hover:underline"
+            >
+              <ArrowLeft className="h-4 w-4" /> All explainers
+            </Link>
+            <Badge variant="outline" className="border-white/20 capitalize text-white/60">
+              {explainer.difficulty}
+            </Badge>
+            <h1 className="mt-3 text-3xl font-bold text-white">{explainer.title}</h1>
+            <p className="mt-2 text-white/60">{explainer.summary}</p>
+            <PortalCard className="mt-6 p-6">
+              <MarkdownContent content={explainer.body} />
+              {explainer.relatedTerms.length > 0 && (
+                <div className="mt-6 flex flex-wrap gap-2 border-t border-white/10 pt-4">
+                  {explainer.relatedTerms.map((term) => (
+                    <span key={term} className="rounded-full bg-white/5 px-3 py-1 text-xs text-white/50">
+                      {term}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </PortalCard>
+            <div className="mt-6">
+              <GlossarySearch compact />
+            </div>
           </div>
-        </div>
+        </PortalAnimatedSection>
       )}
     </QueryStatus>
   );
@@ -69,11 +72,13 @@ export default function DebriefedExplainers() {
 
   return (
     <div>
-      <PortalPageHeader
-        eyebrow="Finance Debriefed"
-        title="Explain This"
-        description="Beginner-friendly cards that decode finance buzzwords and current narratives."
-      />
+      <PortalAnimatedSection>
+        <PortalPageHeader
+          eyebrow={portalCopy.explainers.eyebrow}
+          title={portalCopy.explainers.title}
+          description={portalCopy.explainers.description}
+        />
+      </PortalAnimatedSection>
 
       <div className="mb-8">
         <GlossarySearch />
@@ -83,7 +88,7 @@ export default function DebriefedExplainers() {
         isLoading={isLoading}
         error={error}
         isEmpty={!explainers?.length}
-        emptyMessage="No explainers yet. Admins can publish them from the admin panel."
+        emptyMessage={portalCopy.explainers.empty}
         onRetry={() => refetch()}
       >
         <div className="grid gap-4 md:grid-cols-2">

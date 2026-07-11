@@ -1,4 +1,7 @@
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { portalButtonOutline, portalSurfaceClass } from "@/components/portal/PortalUI";
+import { portalCopy } from "@/lib/portalCopy";
 
 function GoogleIcon() {
   return (
@@ -38,7 +41,7 @@ export default function GoogleSignInButton({
     <Button
       type="button"
       variant="outline"
-      className="w-full border-white/15 bg-white/[0.06] text-white hover:bg-white/10 hover:text-white"
+      className={cn(portalButtonOutline, "w-full")}
       onClick={onClick}
       disabled={loading}
     >
@@ -55,7 +58,7 @@ export function AuthDivider() {
         <span className="w-full border-t border-white/10" />
       </div>
       <div className="relative flex justify-center text-xs uppercase">
-        <span className="bg-[#0c1220] px-3 text-white/35">or</span>
+        <span className={cn(portalSurfaceClass, "rounded-full px-3 py-0.5 text-white/35")}>or</span>
       </div>
     </div>
   );

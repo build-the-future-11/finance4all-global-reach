@@ -52,6 +52,11 @@ export function useActivityFeed(limit = 8) {
           .limit(2),
       ]);
 
+      const criticalErrors = [newsRes, appsRes, connRes, eventsRes]
+        .map((res) => res.error)
+        .filter(Boolean);
+      if (criticalErrors.length > 0) throw criticalErrors[0];
+
       newsRes.data?.forEach((a) => {
         items.push({
           id: `news-${a.id}`,

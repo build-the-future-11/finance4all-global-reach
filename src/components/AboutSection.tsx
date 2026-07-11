@@ -1,6 +1,7 @@
 import { BookOpen, FlaskConical, Globe } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import SectionHeader from "@/components/landing/SectionHeader";
+import { portalCopy } from "@/lib/portalCopy";
 import GlassSurface from "@/components/landing/GlassSurface";
 
 const pillars = [
@@ -9,21 +10,21 @@ const pillars = [
     number: "01",
     title: "Chapters on the ground",
     description:
-      "Faculty-backed clubs run Catalyst workshops, host Markets 101 nights, and report attendance back to the network. Mumbai, London, and New York chapters share one portal — not three disconnected WhatsApp groups.",
+      "Faculty-backed clubs run Catalyst workshops and Markets 101 nights. Officers log attendance in the portal; members in Mumbai, London, and New York share one directory.",
   },
   {
     icon: FlaskConical,
     number: "02",
     title: "Research with reviewers",
     description:
-      "Meta Labs pairs students with lead researchers on publication-oriented projects. Applications are read by humans. Atlas Economics Lab, IYERN, and fintech tracks each have defined deliverables — not open-ended \"internship\" listings.",
+      "Meta Labs pairs students with lead researchers on bounded projects. Applications are read by the lead. Atlas, IYERN, and fintech tracks each publish deliverables upfront.",
   },
   {
     icon: BookOpen,
     number: "03",
     title: "Writing that ships",
     description:
-      "The Economics Journal takes opinion and market analysis from members worldwide. Editors work to external standards before pieces are promoted. Pathways handles submissions; Debriefed handles the reading list.",
+      "The Economics Journal takes opinion and market analysis from members. Editors request revisions on unsupported claims before external promotion. Submit on Pathways; read standards in Resources.",
   },
 ];
 
@@ -41,12 +42,15 @@ export default function AboutSection() {
           eyebrow="What we build"
           title={
             <>
-              Infrastructure for students who take{" "}
-              <span className="text-emerald-300/95">markets seriously</span>
+              What chapters, labs, and editors{" "}
+              <span className="text-emerald-300/95">actually run</span>
             </>
           }
-          description="Finance4All Meta is a nonprofit network — outreach programs, a member portal, and chapter events designed so a first budgeting lesson can lead to a published macro note."
+          description="Finance4All is a nonprofit — school outreach, a member portal, and chapter events. The through-line: a budgeting workshop can lead to a lab application, then a journal submission."
         />
+        <p className="mx-auto mt-4 max-w-3xl text-center text-sm leading-relaxed text-white/45">
+          {portalCopy.landing.aboutSubtext}
+        </p>
 
         <div className="mt-16 grid gap-5 lg:grid-cols-3">
           {pillars.map((pillar) => {

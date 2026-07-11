@@ -81,6 +81,9 @@ If not done yet, run in Supabase SQL Editor (in order):
 3. `supabase/migrations/002_google_oauth.sql` (Google login)
 4. `supabase/migrations/003_bookmarks_notifications.sql` (bookmarks + notifications)
 5. `supabase/migrations/004_avatar_storage.sql` (profile avatars)
+6. `supabase/migrations/005_security_hardening.sql` (RLS hardening + chapter counts)
+7. `supabase/migrations/006_education_progress.sql` (synced lesson completion)
+8. `supabase/migrations/007_contact_submissions.sql` (landing contact form)
 
 ## 5. Deploy
 

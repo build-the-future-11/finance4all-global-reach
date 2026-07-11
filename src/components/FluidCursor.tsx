@@ -1,5 +1,6 @@
 // src/components/FluidCursor.tsx
 import React, { useEffect, useRef } from "react";
+import { cn } from "@/lib/utils";
 
 // Tiny classname helper
 function cn(base: string, extra?: string) {
@@ -93,6 +94,10 @@ export default function FluidCursor(props: Props) {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+
+    const prefersReducedMotion =
+      window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
+    if (prefersReducedMotion) return;
 
     function clientToCanvasPixel(clientX: number, clientY: number) {
       const rect = canvas.getBoundingClientRect();
@@ -1355,6 +1360,12 @@ export default function FluidCursor(props: Props) {
       window.removeEventListener("touchend", onTouchEnd as any);
     };
   }, [props]);
+
+  const prefersReducedMotion =
+    typeof window !== "undefined" &&
+    (window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false);
+
+  if (prefersReducedMotion) return null;
 
   return (
     <div className={cn("pointer-events-none fixed left-0 top-0 z-50 h-full w-full", props.className)}>

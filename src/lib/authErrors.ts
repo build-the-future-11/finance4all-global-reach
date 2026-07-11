@@ -25,5 +25,25 @@ export function formatAuthError(message: string): string {
     return "New signups are temporarily disabled. Contact your chapter lead.";
   }
 
-  return message;
+  return sanitizeUserFacingError(message);
+}
+
+const INTERNAL_ERROR_PATTERNS = [
+  /jwt/i,
+  /postgres/i,
+  /sql/i,
+  /rls/i,
+  /policy/i,
+  /pgrst/i,
+  /duplicate key/i,
+  /violates/i,
+  /permission denied/i,
+];
+
+/** Strip internal server/database details from errors shown to end users. */
+export function sanitizeUserFacingError(message: string, fallback = "Something went wrong. Please try again."): string {
+  const trimmed = message.trim();
+  if (!trimmed || trimmed.length > 300) return fallback;
+  if (INTERNAL_ERROR_PATTERNS.some((re) => re.test(trimmed))) return fallback;
+  return trimmed;
 }

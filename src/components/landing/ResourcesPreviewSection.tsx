@@ -1,30 +1,33 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, BookOpen, FileText, Headphones, GraduationCap } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import SectionHeader from "@/components/landing/SectionHeader";
+import GlassSurface from "@/components/landing/GlassSurface";
+import { portalCopy } from "@/lib/portalCopy";
 
 const PREVIEW = [
   {
     icon: GraduationCap,
     title: "Catalyst curriculum",
-    desc: "Free lessons from budgeting to investing — track progress in the portal.",
+    desc: "Seven modules from budgeting to research writing — track progress in the portal.",
     href: "/portal/education",
   },
   {
     icon: FileText,
     title: "Economics Journal",
-    desc: "Submit analysis and opinion pieces for global editorial review.",
+    desc: "Submit opinion and market analysis for editorial review before external promotion.",
     href: "/portal/pathways/essays",
   },
   {
     icon: Headphones,
     title: "Podcasts & media",
-    desc: "Student founder conversations and Debriefed audio content.",
+    desc: "Founder interviews and Debriefed audio — linked from the Resources library.",
     href: "/portal/resources",
   },
   {
     icon: BookOpen,
     title: "Club toolkit",
-    desc: "Launch a Finance4All chapter at your school with our playbooks.",
+    desc: "Month-by-month playbook for launching a Finance4All chapter at your school.",
     href: "/portal/resources",
   },
 ];
@@ -40,23 +43,18 @@ export default function ResourcesPreviewSection() {
 
       <div ref={ref} className="mx-auto max-w-6xl">
         <div className="flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-end">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-400/90">
-              Write & learn
-            </p>
-            <h2 className="mt-3 text-3xl font-bold text-white sm:text-5xl">
-              Resources members actually use
-            </h2>
-            <p className="mt-4 max-w-xl text-white/55">
-              Curriculum, journal submissions, podcasts, and partner programs — not just landing-page
-              copy. Sign in to access everything FinanceMeta publishes.
-            </p>
-          </div>
+          <SectionHeader
+            align="left"
+            eyebrow={portalCopy.landing.resourcesEyebrow}
+            title={portalCopy.landing.resourcesTitle}
+            description={portalCopy.landing.resourcesBody}
+            className="max-w-xl"
+          />
           <Link
             to="/signup"
-            className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+            className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition motion-safe:hover:bg-white/10"
           >
-            Get free access <ArrowRight className="h-4 w-4" />
+            {portalCopy.landing.resourcesCta} <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
 
@@ -64,18 +62,18 @@ export default function ResourcesPreviewSection() {
           {PREVIEW.map((item) => {
             const Icon = item.icon;
             return (
-              <Link
-                key={item.title}
-                to={item.href}
-                className="group flex gap-4 rounded-3xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl transition hover:border-white/25 hover:bg-white/[0.07]"
-              >
-                <div className="rounded-2xl border border-white/10 bg-emerald-500/10 p-3 text-emerald-300 transition group-hover:scale-105">
-                  <Icon className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-white group-hover:text-emerald-200">{item.title}</h3>
-                  <p className="mt-1 text-sm text-white/50">{item.desc}</p>
-                </div>
+              <Link key={item.title} to={item.href}>
+                <GlassSurface className="group flex h-full gap-4 p-6">
+                  <div className="landing-glass-inner flex gap-4">
+                  <div className="rounded-2xl border border-white/10 bg-emerald-500/10 p-3 text-emerald-300 transition motion-safe:group-hover:scale-105">
+                    <Icon className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-white motion-safe:group-hover:text-emerald-200">{item.title}</h3>
+                    <p className="mt-1 text-sm text-white/50">{item.desc}</p>
+                  </div>
+                  </div>
+                </GlassSurface>
               </Link>
             );
           })}

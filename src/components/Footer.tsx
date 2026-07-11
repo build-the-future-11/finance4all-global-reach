@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { portalCopy } from "@/lib/portalCopy";
 
 export default function Footer() {
   return (
@@ -11,9 +12,9 @@ export default function Footer() {
       <div className="mx-auto max-w-6xl">
         <div className="mb-8 grid gap-8 rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl sm:grid-cols-3">
           <div>
-            <p className="font-semibold text-white">Finance4All Meta</p>
+            <p className="font-semibold text-white">Finance4All</p>
             <p className="mt-2 text-sm text-white/55">
-              Global financial literacy outreach and member community.
+              {portalCopy.landing.footerTagline}
             </p>
           </div>
           <div>
@@ -41,8 +42,8 @@ export default function Footer() {
         </div>
 
         <div className="flex flex-col items-center justify-between gap-4 text-sm text-white/45 sm:flex-row">
-          <p>© {new Date().getFullYear()} Finance4All Meta. All rights reserved.</p>
-          <p>Empowering global financial literacy.</p>
+          <p>© {new Date().getFullYear()} Finance4All. All rights reserved.</p>
+          <p>{portalCopy.landing.footerMission}</p>
         </div>
       </div>
     </footer>

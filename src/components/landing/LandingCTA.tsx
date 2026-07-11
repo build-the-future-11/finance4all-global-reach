@@ -2,12 +2,14 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Check } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import GlassSurface from "@/components/landing/GlassSurface";
+import { landingEyebrowClass } from "@/components/portal/PortalUI";
+import { portalCopy } from "@/lib/portalCopy";
 
 const INCLUDES = [
-  "Full Catalyst lesson library with exercises",
-  "Meta Labs applications & mentor matching",
-  "Economics Journal submission workflow",
-  "Chapter events & member introductions",
+  "Catalyst lesson library with exercises and glossary",
+  "Meta Labs applications with named lead researchers",
+  "Economics Journal submission workflow with editorial review",
+  "Chapter events, RSVPs, and member introductions",
 ];
 
 export default function LandingCTA() {
@@ -19,15 +21,14 @@ export default function LandingCTA() {
         <GlassSurface strong>
           <div className="landing-glass-inner grid gap-10 p-10 sm:p-14 lg:grid-cols-2 lg:items-center lg:gap-16">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-emerald-400/90">
-              Get started
+            <p className={landingEyebrowClass}>
+              {portalCopy.landing.ctaEyebrow}
             </p>
             <h2 className="mt-4 text-3xl font-bold leading-tight text-white sm:text-4xl">
-              500+ members. One portal. Zero membership fee.
+              {portalCopy.landing.ctaTitle}
             </h2>
             <p className="mt-4 text-base leading-relaxed text-white/55">
-              Students join to read Debriefed, run chapter events, apply to labs, and publish — not
-              to unlock a premium tier that does not exist.
+              {portalCopy.landing.ctaBody}
             </p>
           </div>
 

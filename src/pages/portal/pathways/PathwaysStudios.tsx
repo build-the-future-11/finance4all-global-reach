@@ -2,11 +2,17 @@ import { useState } from "react";
 import { ExternalLink, Plus } from "lucide-react";
 import { useStudioSubmissions, useSubmitStudio } from "@/hooks/portal/usePathways";
 import { useProfilesByIds } from "@/hooks/portal/useLabs";
-import { PortalCard, PortalPageHeader, QueryStatus, portalInputClass } from "@/components/portal/PortalUI";
+import {
+  PortalCard,
+  PortalDialogContent,
+  PortalPageHeader,
+  QueryStatus,
+  portalButtonPrimary,
+  portalInputClass,
+} from "@/components/portal/PortalUI";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -16,6 +22,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { sanitizeUrl } from "@/lib/security";
+import { portalCopy } from "@/lib/portalCopy";
+import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
 
 export default function PathwaysStudios() {
   const { data: submissions, isLoading, error, refetch } = useStudioSubmissions();
@@ -61,18 +69,20 @@ export default function PathwaysStudios() {
 
   return (
     <div>
-      <PortalPageHeader
-        title="Finance Studios"
-        description="Showcase repos, demos, and writeups from student-built finance projects."
+      <PortalAnimatedSection>
+        <PortalPageHeader
+          eyebrow={portalCopy.pathways.studios.eyebrow}
+          title={portalCopy.pathways.studios.title}
+          description={portalCopy.pathways.studios.description}
         action={
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-emerald-500 hover:bg-emerald-400">
-                <Plus className="h-4 w-4" /> Submit project
+              <Button className={portalButtonPrimary}>
+                <Plus className="h-4 w-4" /> {portalCopy.pathwaysUi.submitProject}
               </Button>
             </DialogTrigger>
-            <DialogContent className="border-white/15 bg-[#0c1220] text-white">
-              <DialogHeader><DialogTitle>Submit to Studios</DialogTitle></DialogHeader>
+            <PortalDialogContent>
+              <DialogHeader><DialogTitle>{portalCopy.pathwaysUi.submitStudios}</DialogTitle></DialogHeader>
               <div className="space-y-4">
                 <div>
                   <Label>Title</Label>
@@ -90,20 +100,21 @@ export default function PathwaysStudios() {
                   <Label>Demo URL (optional)</Label>
                   <Input value={demoUrl} onChange={(e) => setDemoUrl(e.target.value)} className={portalInputClass} />
                 </div>
-                <Button onClick={handleSubmit} disabled={submit.isPending} className="bg-emerald-500 hover:bg-emerald-400">
-                  Publish
+                <Button onClick={handleSubmit} disabled={submit.isPending} className={portalButtonPrimary}>
+                  {portalCopy.pathwaysUi.publish}
                 </Button>
               </div>
-            </DialogContent>
+            </PortalDialogContent>
           </Dialog>
         }
       />
+      </PortalAnimatedSection>
 
       <QueryStatus
         isLoading={isLoading}
         error={error}
         isEmpty={!submissions?.length}
-        emptyMessage="No studio submissions yet — share a repo, demo, or project writeup."
+        emptyMessage={portalCopy.pathways.studios.empty}
         onRetry={() => refetch()}
         skeletonCount={2}
       >

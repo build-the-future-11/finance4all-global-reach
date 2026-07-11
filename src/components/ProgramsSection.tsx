@@ -14,14 +14,15 @@ import {
 } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import SectionHeader from "@/components/landing/SectionHeader";
+import { portalCopy } from "@/lib/portalCopy";
 
 const programs = [
   {
     icon: School,
     title: "Global Literacy Outreach",
-    short: "Catalyst workshops in underserved schools — budgeting, banking, investing.",
+    short: "90-minute Catalyst workshops in schools — budgeting, banking, investing.",
     detail:
-      "Volunteers deliver the same 90-minute Catalyst modules found in the Education hub. Chapters report attendance; curriculum updates sync to the portal so Mumbai and London teach from one source.",
+      "Volunteers use the facilitator guide in Resources. Attendance is logged by chapter; lesson updates sync to the Education hub so every chapter teaches from the same source.",
     href: "/portal/education",
   },
   {
@@ -37,7 +38,7 @@ const programs = [
     title: "Meta Labs",
     short: "Mentor-led research with defined deliverables.",
     detail:
-      "Atlas Economics Lab, IYERN, and fintech tracks each list open projects with lead researchers. Applications include motivation statements — reviewed by humans, not auto-scored.",
+      "Atlas, IYERN, and fintech tracks list open projects with named leads. Applications include a short motivation statement — reviewed by the lead, not auto-scored.",
     href: "/portal/labs",
   },
   {
@@ -45,15 +46,15 @@ const programs = [
     title: "Global School Clubs",
     short: "Faculty-backed chapters with a month-by-month playbook.",
     detail:
-      "The club toolkit covers officer roles, first events, and sponsor outreach. Quant firms often support puzzle nights when chapters document learning outcomes.",
+      "The club toolkit covers officer roles, first events, and sponsor outreach. Chapters that document attendance and learning outcomes have a stronger case for local sponsorship.",
     href: "/portal/resources/club-toolkit",
   },
   {
     icon: GraduationCap,
     title: "Catalyst Education",
-    short: "Full lesson library — the outreach curriculum, online.",
+    short: "Seven lessons from budgeting through research writing.",
     detail:
-      "Seven modules from financial foundations through research writing. Each lesson includes key terms, markdown body, and an exercise members can complete at their own pace.",
+      "Three modules on the Education hub. Each lesson has key terms, a reading, and an exercise you can complete at your own pace. Progress saves on this device.",
     href: "/portal/education",
   },
   {
@@ -91,15 +92,12 @@ const programs = [
 ];
 
 const partners = [
-  "Jane Street",
-  "The Economics Lab",
-  "Colgate",
-  "KFC",
-  "Stanford Researchers",
-  "MIT Researchers",
-  "UC Berkeley Researchers",
-  "Harvard Researchers",
-  "EconScholars",
+  { name: "Jane Street", role: "Puzzle nights & club sponsorships" },
+  { name: "The Economics Lab", role: "Research mentorship" },
+  { name: "EconScholars", role: "Olympiad prep program" },
+  { name: "Youth Economy Lab", role: "Policy research affiliate" },
+  { name: "Atlas Economics Lab", role: "Student macro research" },
+  { name: "University chapter sponsors", role: "Faculty-backed clubs" },
 ];
 
 function ProgramCard({ program }: { program: typeof programs[0] }) {
@@ -195,18 +193,18 @@ function PartnersSection() {
       <div className="text-center">
         <h3 className="text-2xl font-bold text-white sm:text-3xl">Partners & collaborators</h3>
         <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-white/50">
-          Researchers, chapter sponsors, and programs that connect members to real mentorship —
-          not logo walls without substance.
+          Organizations that run events, review research, or sponsor chapter activities — with a named contact through your chapter lead.
         </p>
       </div>
 
-      <div className="mt-10 flex flex-wrap justify-center gap-3">
+      <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {partners.map((p) => (
           <div
-            key={p}
-            className="rounded-full border border-white/12 bg-white/[0.04] px-5 py-2 text-sm text-white/65 transition hover:border-white/25 hover:text-white/90"
+            key={p.name}
+            className="rounded-2xl border border-white/12 bg-white/[0.04] px-5 py-4 text-left transition hover:border-white/25"
           >
-            {p}
+            <p className="font-medium text-white/90">{p.name}</p>
+            <p className="mt-1 text-xs text-white/45">{p.role}</p>
           </div>
         ))}
       </div>
@@ -231,7 +229,7 @@ export default function ProgramsSection() {
         <SectionHeader
           eyebrow="Initiatives"
           title="Nine programs. Each links to the portal."
-          description="Expand a card to read how it works — then open the module where members actually participate."
+          description={portalCopy.landing.programsSubtext}
           className="mb-16"
         />
 
