@@ -1,9 +1,9 @@
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import { RESOURCE_GUIDES } from "@/data/resourceGuides";
 import { RESOURCE_LIBRARY } from "@/data/resources";
+import { useResourceGuide, useResourceLibrary } from "@/hooks/portal/useResources";
 import MarkdownContent from "@/components/portal/MarkdownContent";
-import { PortalCard, PortalPageHeader } from "@/components/portal/PortalUI";
+import { LoadingState, PortalCard, PortalPageHeader } from "@/components/portal/PortalUI";
 import { portalRoutes } from "@/routes/portal";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { portalCopy } from "@/lib/portalCopy";
@@ -11,10 +11,20 @@ import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
 
 export default function ResourceGuidePage() {
   const { id } = useParams();
-  const guide = id ? RESOURCE_GUIDES[id] : undefined;
-  const meta = RESOURCE_LIBRARY.find((r) => r.id === id);
+  const { data: guide, isLoading } = useResourceGuide(id);
+  const { data: library } = useResourceLibrary();
+  const meta =
+    library?.find((r) => r.id === id) ?? RESOURCE_LIBRARY.find((r) => r.id === id);
 
   useDocumentTitle(guide?.title ?? "Resource");
+
+  if (isLoading) {
+    return (
+      <div className="min-h-[40vh]">
+        <LoadingState />
+      </div>
+    );
+  }
 
   if (!guide) {
     return (

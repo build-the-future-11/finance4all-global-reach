@@ -39,6 +39,12 @@ function resolveSupabaseKey(): string {
 const supabaseUrl = resolveSupabaseUrl();
 const supabaseKey = resolveSupabaseKey();
 
+if (import.meta.env.PROD && (!supabaseUrl || !supabaseKey)) {
+  throw new Error(
+    "[Finance4All] VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are required in production.",
+  );
+}
+
 export const isSupabaseConfigured = Boolean(
   supabaseUrl && supabaseKey && supabaseUrl.includes("supabase.co"),
 );

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Award, CheckCircle2, Circle, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { EDUCATION_MODULES } from "@/data/educationModules";
+import { useEducationModules } from "@/hooks/portal/useEducation";
 import { useEducationProgress } from "@/hooks/portal/useEducationProgress";
 import GlossarySearch from "@/components/portal/GlossarySearch";
 import ModuleProgressRing from "@/components/portal/ModuleProgressRing";
@@ -17,11 +18,13 @@ const CELEBRATION_KEY = "f4a-education-celebrated";
 
 export default function EducationHub() {
   useDocumentTitle("Education");
+  const { data: educationModules, isLoading: modulesLoading } = useEducationModules();
+  const modules = modulesLoading ? EDUCATION_MODULES : (educationModules ?? EDUCATION_MODULES);
   const { isLessonComplete, totalLessons } = useEducationProgress();
   const celebratedRef = useRef(false);
   const [showConfetti, setShowConfetti] = useState(false);
 
-  const allLessonIds = EDUCATION_MODULES.flatMap((m) => m.lessons.map((l) => l.id));
+  const allLessonIds = modules.flatMap((m) => m.lessons.map((l) => l.id));
   const completedCount = totalLessons(allLessonIds);
   const allComplete = completedCount === allLessonIds.length && allLessonIds.length > 0;
 
@@ -91,7 +94,7 @@ export default function EducationHub() {
       </div>
 
       <div className="space-y-10">
-        {EDUCATION_MODULES.map((mod) => {
+        {modules.map((mod) => {
           const modDone = totalLessons(mod.lessons.map((l) => l.id));
 
           return (

@@ -1,10 +1,9 @@
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, CheckCircle2, Clock } from "lucide-react";
-import { EDUCATION_MODULES } from "@/data/educationModules";
-import { LESSON_CONTENT } from "@/data/lessonContent";
+import { useEducationLesson } from "@/hooks/portal/useEducation";
 import { useEducationProgress } from "@/hooks/portal/useEducationProgress";
 import MarkdownContent from "@/components/portal/MarkdownContent";
-import { PortalCard, PortalPageHeader, portalButtonOutline, portalButtonPrimary } from "@/components/portal/PortalUI";
+import { LoadingState, PortalCard, PortalPageHeader, portalButtonOutline, portalButtonPrimary } from "@/components/portal/PortalUI";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { portalRoutes } from "@/routes/portal";
@@ -14,16 +13,22 @@ import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
 
 export default function EducationLesson() {
   const { lessonId } = useParams();
+  const { data: lessonData, isLoading } = useEducationLesson(lessonId);
   const { toggleLesson, isLessonComplete, isSyncing } = useEducationProgress();
 
-  const lesson = EDUCATION_MODULES.flatMap((m) =>
-    m.lessons.map((l) => ({ ...l, module: m })),
-  ).find((l) => l.id === lessonId);
-
-  const content = lessonId ? LESSON_CONTENT[lessonId] : undefined;
+  const lesson = lessonData?.lesson;
+  const content = lessonData?.content;
   const done = lessonId ? isLessonComplete(lessonId) : false;
 
   useDocumentTitle(lesson?.title ?? "Lesson");
+
+  if (isLoading) {
+    return (
+      <div className="min-h-[40vh]">
+        <LoadingState />
+      </div>
+    );
+  }
 
   if (!lesson || !content) {
     return (

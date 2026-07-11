@@ -1,14 +1,37 @@
-// @ts-nocheck — Deno runtime (Supabase Edge Functions)
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-digest-cron-secret",
 };
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
+  }
+
+  const cronSecret = Deno.env.get("DIGEST_CRON_SECRET");
+  if (!cronSecret) {
+    return new Response(JSON.stringify({ error: "Digest cron not configured" }), {
+      status: 503,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  if (req.headers.get("x-digest-cron-secret") !== cronSecret) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 
   try {
@@ -19,6 +42,7 @@ Deno.serve(async (req) => {
 
     const resendKey = Deno.env.get("RESEND_API_KEY");
     const fromEmail = Deno.env.get("DIGEST_FROM_EMAIL") ?? "digest@finance4all.org";
+    const siteUrl = (Deno.env.get("SITE_URL") ?? "").replace(/\/$/, "");
 
     const { data: prefs, error: prefsErr } = await supabase
       .from("digest_preferences")
@@ -49,13 +73,19 @@ Deno.serve(async (req) => {
 
       if (!picks.length) continue;
 
+      const displayName = escapeHtml(profile.display_name || "there");
       const html = `
         <h2>Your Finance4All weekly digest</h2>
-        <p>Hi ${profile.display_name || "there"},</p>
+        <p>Hi ${displayName},</p>
         <ul>
-          ${picks.map((a) => `<li><strong>${a.title}</strong><br/>${a.summary}</li>`).join("")}
+          ${picks
+            .map(
+              (a) =>
+                `<li><strong>${escapeHtml(a.title)}</strong><br/>${escapeHtml(a.summary)}</li>`,
+            )
+            .join("")}
         </ul>
-        <p><a href="${Deno.env.get("SITE_URL") ?? ""}/portal/debriefed">Read more on Debriefed →</a></p>
+        <p><a href="${escapeHtml(`${siteUrl}/portal/debriefed`)}">Read more on Debriefed →</a></p>
       `;
 
       let status = "skipped";

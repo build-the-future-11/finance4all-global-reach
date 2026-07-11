@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ExternalLink, Search } from "lucide-react";
 import { RESOURCE_LIBRARY, UPCOMING_WEBINARS } from "@/data/resources";
 import { RESOURCE_GUIDES } from "@/data/resourceGuides";
+import { useResourceGuidesIndex, useResourceLibrary, useWebinars } from "@/hooks/portal/useResources";
 import GlossarySearch from "@/components/portal/GlossarySearch";
 import { PortalCard, PortalPageHeader, PortalSection, portalInputClass } from "@/components/portal/PortalUI";
 import { Input } from "@/components/ui/input";
@@ -16,12 +17,22 @@ import PersonalizedForYou from "@/components/portal/PersonalizedForYou";
 export default function ResourcesHub() {
   useDocumentTitle("Resources");
   const [query, setQuery] = useState("");
+  const { data: resourceLibrary, isLoading: libraryLoading } = useResourceLibrary();
+  const { data: webinars, isLoading: webinarsLoading } = useWebinars();
+  const { data: guidesIndex } = useResourceGuidesIndex();
 
-  const guides = useMemo(() => RESOURCE_LIBRARY.filter((r) => RESOURCE_GUIDES[r.id]), []);
-  const external = useMemo(() => RESOURCE_LIBRARY.filter((r) => r.external), []);
+  const library = libraryLoading ? RESOURCE_LIBRARY : (resourceLibrary ?? RESOURCE_LIBRARY);
+  const upcomingWebinars = webinarsLoading ? UPCOMING_WEBINARS : (webinars ?? UPCOMING_WEBINARS);
+  const guideIds = useMemo(
+    () => new Set(guidesIndex ? Object.keys(guidesIndex) : Object.keys(RESOURCE_GUIDES)),
+    [guidesIndex],
+  );
+
+  const guides = useMemo(() => library.filter((r) => guideIds.has(r.id)), [library, guideIds]);
+  const external = useMemo(() => library.filter((r) => r.external), [library]);
   const portalLinks = useMemo(
-    () => RESOURCE_LIBRARY.filter((r) => !r.external && !RESOURCE_GUIDES[r.id]),
-    [],
+    () => library.filter((r) => !r.external && !guideIds.has(r.id)),
+    [library, guideIds],
   );
 
   const q = query.trim().toLowerCase();
@@ -40,7 +51,7 @@ export default function ResourcesHub() {
   );
 
   const filteredGuides = useMemo(() => filterItems(guides), [filterItems, guides]);
-  const filteredWebinars = useMemo(() => filterItems(UPCOMING_WEBINARS), [filterItems]);
+  const filteredWebinars = useMemo(() => filterItems(upcomingWebinars), [filterItems, upcomingWebinars]);
   const filteredPortal = useMemo(() => filterItems(portalLinks), [filterItems, portalLinks]);
   const filteredExternal = useMemo(() => filterItems(external), [filterItems, external]);
 
@@ -76,7 +87,7 @@ export default function ResourcesHub() {
           <p className="text-xs text-white/45">Written guides</p>
         </PortalCard>
         <PortalCard className="p-4 text-center">
-          <p className="text-2xl font-bold text-blue-300">{UPCOMING_WEBINARS.length}</p>
+          <p className="text-2xl font-bold text-blue-300">{upcomingWebinars.length}</p>
           <p className="text-xs text-white/45">Sessions</p>
         </PortalCard>
         <PortalCard className="p-4 text-center">
