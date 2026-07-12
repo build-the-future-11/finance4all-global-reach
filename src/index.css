@@ -36,6 +36,29 @@
 
     --radius: 0.75rem;
 
+    /* Portal is intentionally dark in every application theme. Keeping these
+       tokens at the root prevents an invalid/transparent UI during theme
+       hydration or a user theme change. */
+    --portal-bg: 222 47% 3%;
+    --portal-bg-elevated: 222 35% 5%;
+    --portal-surface: 222 30% 8%;
+    --portal-surface-hover: 0 0% 100% / 0.06;
+    --portal-border: 0 0% 100% / 0.1;
+    --portal-border-strong: 0 0% 100% / 0.15;
+    --portal-text: 0 0% 100%;
+    --portal-text-muted: 0 0% 100% / 0.64;
+    --portal-text-subtle: 0 0% 100% / 0.46;
+    --portal-text-faint: 0 0% 100% / 0.34;
+    --portal-accent: 160 84% 39%;
+    --portal-accent-muted: 160 84% 39% / 0.15;
+    --portal-accent-text: 158 64% 72%;
+    --portal-header-bg: 222 35% 5% / 0.82;
+    --portal-focus-ring: 160 84% 39% / 0.55;
+    --portal-radius: 1rem;
+    --portal-radius-lg: 1.25rem;
+    --portal-ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --portal-duration: 200ms;
+
     --glass-bg: 0 0% 100% / 0.45;
     --glass-border: 0 0% 100% / 0.5;
     --glass-shadow: 0 0% 0% / 0.04;
@@ -128,10 +151,17 @@
 
   html {
     scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
+    min-width: 320px;
+  }
+
+  ::selection {
+    background: hsl(160 84% 39% / 0.3);
+    color: white;
   }
 }
 
@@ -438,6 +468,14 @@
     --tw-ring-color: hsl(var(--portal-focus-ring));
   }
 
+  .portal-skip-link {
+    @apply sr-only rounded-lg bg-emerald-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg;
+  }
+
+  .portal-skip-link:focus {
+    @apply fixed left-4 top-4 z-[100] not-sr-only;
+  }
+
   .portal-interactive {
     transition:
       background-color var(--portal-duration) var(--portal-ease),
@@ -583,6 +621,11 @@
     color: hsl(0 0% 100% / 0.9);
   }
 
+  .portal-nav-item:focus-visible,
+  .portal-mobile-nav-active:focus-visible {
+    color: hsl(0 0% 100% / 0.95);
+  }
+
   .portal-mobile-nav-active {
     color: hsl(var(--portal-accent-text));
   }
@@ -600,6 +643,15 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      scroll-behavior: auto !important;
+      transition-duration: 1ms !important;
+      animation-duration: 1ms !important;
+      animation-iteration-count: 1 !important;
+    }
+
     .portal-stagger > *,
     .portal-fade-up,
     .portal-orb-float,

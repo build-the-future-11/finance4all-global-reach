@@ -40,6 +40,9 @@ export default function PortalLayout() {
 
   return (
     <div className="min-h-screen bg-portal-bg text-white">
+      <a href="#portal-main" className="portal-skip-link">
+        Skip to main content
+      </a>
       <div className="pointer-events-none fixed inset-0 -z-10">
         <div className="landing-orb left-1/4 top-0 h-[32rem] w-[32rem] bg-emerald-500/[0.08]" />
         <div className="landing-orb landing-float-delay right-0 bottom-0 h-96 w-96 bg-blue-500/[0.06]" />
@@ -193,7 +196,7 @@ export default function PortalLayout() {
           </nav>
         </aside>
 
-        <main className="min-w-0 flex-1 pb-20 lg:pb-8">
+        <main id="portal-main" tabIndex={-1} className="min-w-0 flex-1 pb-24 outline-none lg:pb-8">
           <SetupBanner />
           <PortalBreadcrumbs />
           <PageTransition>

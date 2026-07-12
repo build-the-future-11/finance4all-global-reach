@@ -32,16 +32,16 @@ export const ACTIVITY_ICONS = {
 
 /** Shared portal form & surface class strings */
 export const portalInputClass =
-  "mt-1.5 border-white/15 bg-white/[0.06] text-white placeholder:text-white/30 transition-colors duration-200 focus-visible:border-emerald-400/40 focus-visible:ring-emerald-400/20 focus-visible:ring-offset-0";
+  "mt-1.5 min-h-10 border-white/15 bg-white/[0.06] text-white placeholder:text-white/35 transition-[border-color,background-color,box-shadow] duration-200 focus-visible:border-emerald-400/60 focus-visible:ring-2 focus-visible:ring-emerald-400/25 focus-visible:ring-offset-0";
 
 export const portalTextareaClass =
-  "mt-1.5 min-h-[100px] border-white/15 bg-white/[0.06] text-white placeholder:text-white/30 transition-colors duration-200 focus-visible:border-emerald-400/40 focus-visible:ring-emerald-400/20 focus-visible:ring-offset-0";
+  "mt-1.5 min-h-[100px] border-white/15 bg-white/[0.06] text-white placeholder:text-white/35 transition-[border-color,background-color,box-shadow] duration-200 focus-visible:border-emerald-400/60 focus-visible:ring-2 focus-visible:ring-emerald-400/25 focus-visible:ring-offset-0";
 
 export const portalButtonOutline =
   "border-white/20 bg-white/5 text-white transition-colors duration-200 hover:bg-white/10 hover:text-white focus-visible:ring-emerald-400/30";
 
 export const portalButtonPrimary =
-  "bg-emerald-500 text-white transition-colors duration-200 hover:bg-emerald-400 focus-visible:ring-emerald-400/40";
+  "bg-emerald-500 text-white shadow-[0_4px_14px_rgba(16,185,129,0.18)] transition-[background-color,box-shadow] duration-200 hover:bg-emerald-400 hover:shadow-[0_6px_20px_rgba(16,185,129,0.28)] focus-visible:ring-emerald-400/40";
 
 export const portalLinkClass =
   "font-medium text-emerald-400 underline-offset-4 transition-colors duration-200 hover:text-emerald-300 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/40 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent rounded-sm";
@@ -417,7 +417,7 @@ export function PortalPageHeader({
 }) {
   return (
     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-      <div>
+      <div className="min-w-0">
         {eyebrow && (
           <p className={cn("mb-2", landingEyebrowClass)}>
             {eyebrow}
@@ -432,7 +432,7 @@ export function PortalPageHeader({
           </p>
         )}
       </div>
-      {action && <div className="shrink-0">{action}</div>}
+      {action && <div className="shrink-0 max-sm:w-full max-sm:[&>button]:w-full">{action}</div>}
     </div>
   );
 }
