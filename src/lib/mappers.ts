@@ -1,4 +1,4 @@
-import type { Tables } from "@/types/database";
+import type { Database, Tables } from "@/types/database";
 import type {
   Chapter,
   ConnectionRequest,
@@ -14,6 +14,7 @@ import type {
   ResearchProject,
   StudioSubmission,
   UserProfile,
+  MemberDirectoryProfile,
 } from "@/types/domain";
 import {
   EventSchema,
@@ -22,6 +23,7 @@ import {
   NotificationSchema,
   OpportunitySchema,
   UserProfileSchema,
+  MemberDirectoryProfileSchema,
 } from "@/types/domain";
 import { z } from "zod";
 
@@ -47,10 +49,32 @@ export function mapProfile(row: Tables<"profiles">): UserProfile {
       interests: row.interests,
       openToCollaborate: row.open_to_collaborate,
       chapterId: row.chapter_id ?? undefined,
+      onboardingCompletedAt: row.onboarding_completed_at ?? undefined,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     },
     "profile",
+  );
+}
+
+export function mapMemberDirectoryProfile(
+  row: Database["public"]["Views"]["member_directory"]["Row"],
+): MemberDirectoryProfile {
+  return assertMapped(
+    MemberDirectoryProfileSchema,
+    {
+      id: row.id,
+      displayName: row.display_name,
+      role: row.role,
+      bio: row.bio ?? undefined,
+      avatarUrl: row.avatar_url ?? undefined,
+      interests: row.interests,
+      openToCollaborate: row.open_to_collaborate,
+      chapterId: row.chapter_id ?? undefined,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    },
+    "member directory profile",
   );
 }
 
@@ -64,6 +88,7 @@ export function mapNewsArticle(row: Tables<"news_articles">): NewsArticle {
       category: row.category,
       sourceUrl: row.source_url ?? undefined,
       publishedAt: row.published_at,
+      isPublished: row.is_published,
       tags: row.tags,
     },
     "news article",
@@ -193,6 +218,9 @@ export function mapEvent(row: Tables<"events">): Event {
       startsAt: row.starts_at,
       endsAt: row.ends_at ?? undefined,
       registrationUrl: row.registration_url ?? undefined,
+      registrationOpensAt: row.registration_opens_at ?? undefined,
+      registrationClosesAt: row.registration_closes_at ?? undefined,
+      registrationCapacity: row.registration_capacity ?? undefined,
       programLinks: links,
     },
     "event",

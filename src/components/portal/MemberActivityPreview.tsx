@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Calendar, MapPin, Users, Handshake } from "lucide-react";
-import type { UserProfile } from "@/types/domain";
+import type { MemberDirectoryProfile } from "@/types/domain";
 import { portalRoutes } from "@/routes/portal";
 import { portalCopy } from "@/lib/portalCopy";
 import { PortalCard } from "@/components/portal/PortalUI";
@@ -9,7 +9,7 @@ import { EDUCATION_MODULES } from "@/data/educationModules";
 import { useEducationProgress } from "@/hooks/portal/useEducationProgress";
 
 interface MemberActivityPreviewProps {
-  profile: UserProfile;
+  profile: MemberDirectoryProfile;
   chapterName?: string;
   connectionCount: number;
   isOwnProfile?: boolean;

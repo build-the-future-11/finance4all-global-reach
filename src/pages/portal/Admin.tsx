@@ -47,13 +47,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { Tabs } from "@/components/ui/tabs";
 import {
   Select,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { NewsCategory, OpportunityType, UserRole } from "@/types/domain";
+import type { EventStatus, NewsCategory, OpportunityType, UserRole } from "@/types/domain";
 import { toast } from "sonner";
 import { Pencil } from "lucide-react";
 import { portalCopy } from "@/lib/portalCopy";
@@ -106,6 +107,7 @@ export default function Admin() {
     category: "macro" as NewsCategory,
     tags: "",
     sourceUrl: "",
+    isPublished: true,
   });
   const [oppForm, setOppForm] = useState({
     title: "",
@@ -119,8 +121,13 @@ export default function Admin() {
     chapterId: "",
     title: "",
     description: "",
+    status: "upcoming" as EventStatus,
     startsAt: "",
+    endsAt: "",
     registrationUrl: "",
+    registrationOpensAt: "",
+    registrationClosesAt: "",
+    registrationCapacity: "",
   });
   const [explainerForm, setExplainerForm] = useState({
     slug: "",
@@ -240,6 +247,13 @@ export default function Admin() {
                 <Label className="text-white/70">Source URL (optional)</Label>
                 <Input value={newsForm.sourceUrl} onChange={(e) => setNewsForm({ ...newsForm, sourceUrl: e.target.value })} className={portalInputClass} />
               </div>
+              <div className="sm:col-span-2 flex items-center justify-between gap-4 rounded-lg border border-white/10 px-3 py-2">
+                <div>
+                  <Label htmlFor="news-published" className="text-white/80">Visible to members</Label>
+                  <p className="mt-1 text-xs text-white/45">Turn this off to save a draft only administrators can view.</p>
+                </div>
+                <Switch id="news-published" checked={newsForm.isPublished} onCheckedChange={(isPublished) => setNewsForm({ ...newsForm, isPublished })} />
+              </div>
             </div>
             <Button
               className={cn("mt-4", portalButtonPrimary)}
@@ -252,6 +266,7 @@ export default function Admin() {
                     category: newsForm.category,
                     tags: parseTags(newsForm.tags),
                     sourceUrl: sanitizeOptionalUrl(newsForm.sourceUrl),
+                    isPublished: newsForm.isPublished,
                   };
                   if (editingNewsId) {
                     await updateNews.mutateAsync({ id: editingNewsId, ...payload });
@@ -261,7 +276,7 @@ export default function Admin() {
                     await createNews.mutateAsync(payload);
                     toast.success("Article published");
                   }
-                  setNewsForm({ title: "", summary: "", category: "macro", tags: "", sourceUrl: "" });
+                  setNewsForm({ title: "", summary: "", category: "macro", tags: "", sourceUrl: "", isPublished: true });
                 } catch (e) {
                   toast.error(e instanceof Error ? e.message : "Failed");
                 }
@@ -275,7 +290,7 @@ export default function Admin() {
                 className={cn("ml-2 mt-4", portalButtonOutline)}
                 onClick={() => {
                   setEditingNewsId(null);
-                  setNewsForm({ title: "", summary: "", category: "macro", tags: "", sourceUrl: "" });
+                  setNewsForm({ title: "", summary: "", category: "macro", tags: "", sourceUrl: "", isPublished: true });
                 }}
               >
                 Cancel edit
@@ -306,6 +321,7 @@ export default function Admin() {
                         category: a.category,
                         tags: a.tags.join(", "),
                         sourceUrl: a.sourceUrl ?? "",
+                        isPublished: a.isPublished,
                       });
                     }}
                   >
@@ -459,6 +475,19 @@ export default function Admin() {
                 <Label className="text-white/70">Starts at</Label>
                 <Input type="datetime-local" value={eventForm.startsAt} onChange={(e) => setEventForm({ ...eventForm, startsAt: e.target.value })} className={portalInputClass} />
               </div>
+              <div>
+                <Label className="text-white/70">Ends at (optional)</Label>
+                <Input type="datetime-local" value={eventForm.endsAt} onChange={(e) => setEventForm({ ...eventForm, endsAt: e.target.value })} className={portalInputClass} />
+              </div>
+              <div>
+                <Label className="text-white/70">Status</Label>
+                <Select value={eventForm.status} onValueChange={(value) => setEventForm({ ...eventForm, status: value as EventStatus })}>
+                  <SelectTrigger className={portalInputClass}><SelectValue /></SelectTrigger>
+                  <PortalSelectContent>
+                    {(["upcoming", "live", "completed"] as const).map((status) => <PortalSelectItem key={status} value={status}>{status}</PortalSelectItem>)}
+                  </PortalSelectContent>
+                </Select>
+              </div>
               <div className="sm:col-span-2">
                 <Label className="text-white/70">Title</Label>
                 <Input value={eventForm.title} onChange={(e) => setEventForm({ ...eventForm, title: e.target.value })} className={portalInputClass} />
@@ -471,6 +500,18 @@ export default function Admin() {
                 <Label className="text-white/70">Registration URL (optional)</Label>
                 <Input value={eventForm.registrationUrl} onChange={(e) => setEventForm({ ...eventForm, registrationUrl: e.target.value })} className={portalInputClass} />
               </div>
+              <div>
+                <Label className="text-white/70">Registration opens (optional)</Label>
+                <Input type="datetime-local" value={eventForm.registrationOpensAt} onChange={(e) => setEventForm({ ...eventForm, registrationOpensAt: e.target.value })} className={portalInputClass} />
+              </div>
+              <div>
+                <Label className="text-white/70">Registration closes (optional)</Label>
+                <Input type="datetime-local" value={eventForm.registrationClosesAt} onChange={(e) => setEventForm({ ...eventForm, registrationClosesAt: e.target.value })} className={portalInputClass} />
+              </div>
+              <div>
+                <Label className="text-white/70">Registration capacity (optional)</Label>
+                <Input type="number" min="1" step="1" value={eventForm.registrationCapacity} onChange={(e) => setEventForm({ ...eventForm, registrationCapacity: e.target.value })} className={portalInputClass} />
+              </div>
             </div>
             <Button className={cn("mt-4", portalButtonPrimary)} disabled={createEvent.isPending || updateEvent.isPending || !eventForm.title.trim() || !eventForm.chapterId || !eventForm.startsAt} onClick={async () => {
               try {
@@ -478,9 +519,13 @@ export default function Admin() {
                   chapterId: eventForm.chapterId,
                   title: sanitizeTextInput(eventForm.title, 200),
                   description: sanitizeTextInput(eventForm.description, 1000),
-                  status: "upcoming" as const,
-                  startsAt: new Date(eventForm.startsAt).toISOString(),
+                  status: eventForm.status,
+                  startsAt: eventForm.startsAt,
+                  endsAt: eventForm.endsAt || undefined,
                   registrationUrl: sanitizeOptionalUrl(eventForm.registrationUrl),
+                  registrationOpensAt: eventForm.registrationOpensAt || undefined,
+                  registrationClosesAt: eventForm.registrationClosesAt || undefined,
+                  registrationCapacity: eventForm.registrationCapacity ? Number(eventForm.registrationCapacity) : undefined,
                 };
                 if (editingEventId) {
                   await updateEvent.mutateAsync({ id: editingEventId, ...payload });
@@ -490,7 +535,7 @@ export default function Admin() {
                   await createEvent.mutateAsync(payload);
                   toast.success("Event created");
                 }
-                setEventForm({ chapterId: "", title: "", description: "", startsAt: "", registrationUrl: "" });
+                setEventForm({ chapterId: "", title: "", description: "", status: "upcoming", startsAt: "", endsAt: "", registrationUrl: "", registrationOpensAt: "", registrationClosesAt: "", registrationCapacity: "" });
               } catch (e) {
                 toast.error(e instanceof Error ? e.message : "Failed");
               }
@@ -500,7 +545,7 @@ export default function Admin() {
             {editingEventId && (
               <Button variant="outline" className={cn("ml-2 mt-4", portalButtonOutline)} onClick={() => {
                 setEditingEventId(null);
-                setEventForm({ chapterId: "", title: "", description: "", startsAt: "", registrationUrl: "" });
+                setEventForm({ chapterId: "", title: "", description: "", status: "upcoming", startsAt: "", endsAt: "", registrationUrl: "", registrationOpensAt: "", registrationClosesAt: "", registrationCapacity: "" });
               }}>
                 Cancel edit
               </Button>
@@ -525,8 +570,13 @@ export default function Admin() {
                       chapterId: ev.chapterId,
                       title: ev.title,
                       description: ev.description,
+                      status: ev.status,
                       startsAt: ev.startsAt.slice(0, 16),
+                      endsAt: ev.endsAt?.slice(0, 16) ?? "",
                       registrationUrl: ev.registrationUrl ?? "",
+                      registrationOpensAt: ev.registrationOpensAt?.slice(0, 16) ?? "",
+                      registrationClosesAt: ev.registrationClosesAt?.slice(0, 16) ?? "",
+                      registrationCapacity: ev.registrationCapacity?.toString() ?? "",
                     });
                   }}>
                     <Pencil className="h-4 w-4" />

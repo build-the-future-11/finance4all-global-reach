@@ -20,6 +20,7 @@ export function useCreateNewsArticle() {
       category: NewsCategory;
       tags: string[];
       sourceUrl?: string;
+      isPublished?: boolean;
     }) => {
       const safe = sanitizeNewsInput(input);
       const { error } = await supabase.from("news_articles").insert({
@@ -28,6 +29,7 @@ export function useCreateNewsArticle() {
         category: safe.category,
         tags: safe.tags,
         source_url: safe.sourceUrl ?? null,
+        is_published: safe.isPublished,
       });
       if (error) throwSanitizedDbError(error);
     },
@@ -70,7 +72,11 @@ export function useCreateEvent() {
       description: string;
       status: EventStatus;
       startsAt: string;
+      endsAt?: string;
       registrationUrl?: string;
+      registrationOpensAt?: string;
+      registrationClosesAt?: string;
+      registrationCapacity?: number;
     }) => {
       const safe = sanitizeEventInput(input);
       const { error } = await supabase.from("events").insert({
@@ -79,7 +85,11 @@ export function useCreateEvent() {
         description: safe.description,
         status: safe.status,
         starts_at: safe.startsAt,
+        ends_at: safe.endsAt ?? null,
         registration_url: safe.registrationUrl ?? null,
+        registration_opens_at: safe.registrationOpensAt ?? null,
+        registration_closes_at: safe.registrationClosesAt ?? null,
+        registration_capacity: safe.registrationCapacity ?? null,
       });
       if (error) throwSanitizedDbError(error);
     },
@@ -135,6 +145,7 @@ export function useUpdateNewsArticle() {
       category: NewsCategory;
       tags: string[];
       sourceUrl?: string;
+      isPublished?: boolean;
     }) => {
       const safe = sanitizeNewsInput(input);
       const { error } = await supabase
@@ -145,6 +156,7 @@ export function useUpdateNewsArticle() {
           category: safe.category,
           tags: safe.tags,
           source_url: safe.sourceUrl ?? null,
+          is_published: safe.isPublished,
         })
         .eq("id", id);
       if (error) throwSanitizedDbError(error);
@@ -221,7 +233,11 @@ export function useUpdateEvent() {
       description: string;
       status: EventStatus;
       startsAt: string;
+      endsAt?: string;
       registrationUrl?: string;
+      registrationOpensAt?: string;
+      registrationClosesAt?: string;
+      registrationCapacity?: number;
     }) => {
       const safe = sanitizeEventInput(input);
       const { error } = await supabase
@@ -232,7 +248,11 @@ export function useUpdateEvent() {
           description: safe.description,
           status: safe.status,
           starts_at: safe.startsAt,
+          ends_at: safe.endsAt ?? null,
           registration_url: safe.registrationUrl ?? null,
+          registration_opens_at: safe.registrationOpensAt ?? null,
+          registration_closes_at: safe.registrationClosesAt ?? null,
+          registration_capacity: safe.registrationCapacity ?? null,
         })
         .eq("id", id);
       if (error) throwSanitizedDbError(error);

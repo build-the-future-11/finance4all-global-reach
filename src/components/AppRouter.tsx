@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/portal/ProtectedRoute";
 import RoleGuard from "@/components/portal/RoleGuard";
@@ -13,6 +13,7 @@ import Signup from "@/pages/auth/Signup";
 import Onboarding from "@/pages/auth/Onboarding";
 import AuthCallback from "@/pages/auth/AuthCallback";
 import PortalLayout from "@/layouts/PortalLayout";
+import Legal from "@/pages/Legal";
 
 const Dashboard = lazy(() => import("@/pages/portal/Dashboard"));
 const DebriefedHub = lazy(() => import("@/pages/portal/debriefed/DebriefedHub"));
@@ -35,8 +36,6 @@ const Saved = lazy(() => import("@/pages/portal/Saved"));
 const ActivityPage = lazy(() => import("@/pages/portal/ActivityPage"));
 const Settings = lazy(() => import("@/pages/portal/Settings"));
 
-const FluidCursor = lazy(() => import("@/components/FluidCursor"));
-
 function PortalFallback() {
   return (
     <div className="min-h-[50vh]">
@@ -46,17 +45,8 @@ function PortalFallback() {
 }
 
 function AppRoutes() {
-  const location = useLocation();
-  const isLanding = location.pathname === "/";
-
   return (
-    <>
-      {isLanding && (
-        <Suspense fallback={null}>
-          <FluidCursor />
-        </Suspense>
-      )}
-      <Suspense fallback={<PortalFallback />}>
+    <Suspense fallback={<PortalFallback />}>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
@@ -64,6 +54,8 @@ function AppRoutes() {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/privacy" element={<Legal kind="privacy" />} />
+          <Route path="/terms" element={<Legal kind="terms" />} />
 
           <Route
             path="/onboarding"
@@ -122,8 +114,7 @@ function AppRoutes() {
 
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </Suspense>
-    </>
+    </Suspense>
   );
 }
 

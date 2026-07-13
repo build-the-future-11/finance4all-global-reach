@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Camera, Lock, Shield } from "lucide-react";
+import { Camera, Download, Lock, Shield, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChapters } from "@/hooks/portal/useEvents";
@@ -45,12 +45,24 @@ import { useDigestPreferences, useUpdateDigestPreferences } from "@/hooks/portal
 import { portalCopy } from "@/lib/portalCopy";
 import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
 import InterestPillBar from "@/components/portal/InterestPillBar";
+import { buildAccountExport, deleteAccount, downloadAccountExport } from "@/lib/accountData";
+import { supabase } from "@/lib/supabase";
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const SUGGESTED_INTERESTS = ["macro", "equities", "fintech", "credit", "startups", "research"];
 
 export default function Settings() {
   useDocumentTitle("Settings");
-  const { profile, signOut, refreshProfile, updatePassword } = useAuth();
+  const { profile, user, signOut, refreshProfile, updatePassword } = useAuth();
   const isAdmin = profile?.role === "admin";
   const { data: digestPrefs } = useDigestPreferences();
   const updateDigest = useUpdateDigestPreferences();
@@ -68,6 +80,10 @@ export default function Settings() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordSaving, setPasswordSaving] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (!profile) return;
@@ -147,12 +163,39 @@ export default function Settings() {
 
   const passwordAssessment = assessPassword(newPassword);
 
-  const handleDigestToggle = async (key: "weeklyDigestEnabled" | "substackSubscribed", value: boolean) => {
+  const handleDigestToggle = async (value: boolean) => {
     try {
-      await updateDigest.mutateAsync({ [key]: value });
+      await updateDigest.mutateAsync({ weeklyDigestEnabled: value });
       toast.success("Communication preferences saved");
     } catch {
       toast.error("Could not save preferences");
+    }
+  };
+
+  const handleExport = async () => {
+    if (!user) return;
+    setExporting(true);
+    try {
+      downloadAccountExport(await buildAccountExport(user.id));
+      toast.success("Account export downloaded");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not export your account data");
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const requiredDeleteConfirmation = user?.email ? `DELETE ${user.email}` : "";
+  const handleDeleteAccount = async () => {
+    if (!requiredDeleteConfirmation || deleteConfirmation !== requiredDeleteConfirmation) return;
+    setDeleting(true);
+    try {
+      await deleteAccount(deleteConfirmation);
+      await supabase.auth.signOut({ scope: "local" });
+      window.location.assign("/");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not delete your account");
+      setDeleting(false);
     }
   };
 
@@ -320,20 +363,12 @@ export default function Settings() {
         <div className="space-y-4">
           <PortalToggleRow
             title="Weekly Debriefed digest"
-            description="Email summary of top stories (when enabled for your region)"
+            description="A weekly email containing newly published Finance Debrief updates in your selected categories"
           >
             <Switch
               checked={digestPrefs?.weeklyDigestEnabled ?? false}
-              onCheckedChange={(v) => handleDigestToggle("weeklyDigestEnabled", v)}
-            />
-          </PortalToggleRow>
-          <PortalToggleRow
-            title="Substack subscriber"
-            description="Shows on your digest preferences in Debriefed"
-          >
-            <Switch
-              checked={digestPrefs?.substackSubscribed ?? false}
-              onCheckedChange={(v) => handleDigestToggle("substackSubscribed", v)}
+              disabled={updateDigest.isPending}
+              onCheckedChange={handleDigestToggle}
             />
           </PortalToggleRow>
         </div>
@@ -405,6 +440,78 @@ export default function Settings() {
                 Replay portal tour
               </Button>
             </div>
+          </div>
+        </div>
+      </PortalCard>
+
+      <PortalCard className="mt-6 p-6">
+        <PortalSectionHeading
+          title="Your account data"
+          description="Download a JSON record of your profile, saved content, applications, registrations, submissions, connections, notifications, lesson progress, and digest history."
+        />
+        <div className="mt-4 flex flex-wrap gap-3">
+          <Button
+            variant="outline"
+            className={portalButtonOutline}
+            disabled={!user || exporting}
+            onClick={handleExport}
+          >
+            <Download className="mr-2 h-4 w-4" aria-hidden />
+            {exporting ? "Preparing export…" : "Download my data"}
+          </Button>
+        </div>
+      </PortalCard>
+
+      <PortalCard className="mt-6 border-red-400/20 p-6">
+        <div className="flex items-start gap-3">
+          <Trash2 className="mt-0.5 h-5 w-5 shrink-0 text-red-300" aria-hidden />
+          <div className="min-w-0 flex-1">
+            <PortalSectionHeading
+              title="Delete account"
+              description="Permanently remove your sign-in, profile, avatar, saved content, applications, progress, submissions, registrations, and other member records. This cannot be undone."
+            />
+            <AlertDialog
+              open={deleteOpen}
+              onOpenChange={(open) => {
+                if (deleting) return;
+                setDeleteOpen(open);
+                if (!open) setDeleteConfirmation("");
+              }}
+            >
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" className="mt-4 border-red-400/30 text-red-200 hover:bg-red-500/10 hover:text-red-100">
+                  Delete my account
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="border-white/15 bg-slate-950 text-white">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete your Finance4All account?</AlertDialogTitle>
+                  <AlertDialogDescription className="text-white/60">
+                    Download your data first if you need a record. To confirm permanent deletion, type <strong className="break-all text-white">{requiredDeleteConfirmation}</strong>.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <div>
+                  <PortalLabel htmlFor="delete-account-confirmation">Confirmation</PortalLabel>
+                  <PortalInput
+                    id="delete-account-confirmation"
+                    value={deleteConfirmation}
+                    onChange={(event) => setDeleteConfirmation(event.target.value)}
+                    autoComplete="off"
+                    spellCheck={false}
+                  />
+                </div>
+                <AlertDialogFooter>
+                  <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+                  <Button
+                    className={portalButtonDanger}
+                    disabled={deleting || deleteConfirmation !== requiredDeleteConfirmation}
+                    onClick={handleDeleteAccount}
+                  >
+                    {deleting ? "Deleting account…" : "Permanently delete account"}
+                  </Button>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </div>
       </PortalCard>

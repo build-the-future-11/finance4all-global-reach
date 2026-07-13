@@ -12,14 +12,14 @@ export const portalCopy = {
     communityTab: "Chapter counts, open labs, and recent member activity across the network.",
     exploreTab: "All portal modules — news, research, pathways, events, education, and network.",
     chapterSpotlight:
-      "Your chapter runs meetups, speaker nights, and workshops. Browse upcoming events and members in your city.",
+      "See members and published events connected to your selected chapter.",
     exploreIntro:
       "Jump to any module from the sidebar — or use ⌘K to search across the portal.",
     labEmptyTitle: "No lab applications yet",
     labEmptyDescription:
-      "Meta Labs lists open research roles with named lead reviewers. Most applications take five minutes — motivation and relevant coursework matter more than a long résumé.",
+      "Meta Labs lists research roles when they are open. Each application asks for a short motivation statement and relevant experience.",
     newsEmpty:
-      "Your chapter hasn't published articles yet. Read live headlines and explainers on Debriefed in the meantime.",
+      "No published articles are available yet. Browse explainers or return when new content is added.",
     activityEmpty:
       "Saves, lab applications, event RSVPs, and connections show up here as you use the portal.",
     engagementTitle: "Your activity",
@@ -56,7 +56,7 @@ export const portalCopy = {
     description:
       "Macro, markets, IPO, and company coverage from Finance4All editors and chapter contributors. Save articles to your library and set digest preferences below.",
     digestNote:
-      "Weekly email digests roll out chapter by chapter. Saving your preference here puts you first in line when delivery goes live in your region.",
+      "Save your weekly digest preference here. Email delivery is available only when it is configured for this portal.",
     liveSection:
       "Headlines refresh from live sources when configured, or from your chapter's published feed.",
     emptyArticles:
@@ -95,11 +95,11 @@ export const portalCopy = {
     eyebrow: "Meta Labs",
     title: "Research projects",
     description:
-      "Open roles on macro, markets, and policy projects — data collection, writing, and modeling. Each listing names a lead researcher and expected deliverables.",
+      "Open roles on macro, markets, and policy projects. Listings describe the work, deadline, and lead researcher when those details are provided.",
     emptyProjects:
       "No projects match this filter. Check back as leads publish new roles, or save projects you want to watch.",
     applyMotivation:
-      "Why this project? Mention relevant coursework, prior research, or skills (Python, writing, data viz) — leads read every application personally.",
+      "Why this project? Mention relevant coursework, prior research, or skills such as Python, writing, or data visualization.",
     reviewTitle: "Reviewer dashboard",
     reviewDescription: "Pending applications for projects where you are the lead researcher.",
     reviewAccessDenied: "Reviewer access requires lead_researcher or admin role.",
@@ -110,13 +110,13 @@ export const portalCopy = {
     eyebrow: "Axiom Pathways",
     title: "Pathways",
     description:
-      "Three tracks: paid and volunteer opportunities, studio project showcases, and essay challenges with editorial review.",
+      "Three places to participate: published opportunities, student project showcases, and essay submissions.",
     opportunities: {
       eyebrow: "Careers",
       title: "Opportunity board",
       description:
-        "Internships, programs, challenges, and project roles from partner organizations. Save roles to revisit later.",
-      empty: "No opportunities match your filters. Try another type or check back as partners publish new roles.",
+        "Internships, programs, challenges, and project roles added by administrators. Save listings to revisit later.",
+      empty: "No opportunities match your filters. Try another type or return when administrators add new listings.",
     },
     studios: {
       eyebrow: "Creative",
@@ -129,13 +129,13 @@ export const portalCopy = {
       eyebrow: "Editorial",
       title: "Financial Takes Challenge",
       description:
-        "Submit opinion and market analysis. Community upvotes surface strong writing for editorial review and chapter showcases.",
+        "Submit opinion and market analysis for other members to read. Members can upvote entries they find useful.",
       empty: "No essays yet. Submit the first take on markets, policy, or investing.",
     },
     hubCtaTitle: "Browse opportunities",
     hubCtaDescription: "Filter by type, organization, or tag — and save roles you want to apply to later.",
     emptyOpportunities:
-      "No opportunities listed yet. Ask your chapter lead about partner programs, or check back soon.",
+      "No opportunities are listed yet. Check back when administrators publish new listings.",
     emptyStudios: "Be the first to submit a studio project.",
     emptyEssays: "Submit your first essay challenge entry.",
   },
@@ -143,7 +143,7 @@ export const portalCopy = {
     eyebrow: "Chapters",
     title: "Events & chapters",
     description:
-      "Chapter meetups, speaker series, and workshops worldwide. Register interest for reminders; external links open partner signup pages.",
+      "Published chapter meetups, speaker sessions, and workshops. Register in the portal when registration is open; external links open the organizer's signup page.",
     emptyEvents:
       "No events scheduled for this chapter yet. Select another chapter on the map, or register for events elsewhere.",
     emptyChapters:
@@ -153,12 +153,12 @@ export const portalCopy = {
     eyebrow: "Member network",
     title: "Network",
     description:
-      "Browse members by chapter and interest. Send connection requests and post introductions when you're looking for collaborators, mentors, or co-authors.",
+      "Browse members by chapter and interest. Send connection requests and post introductions when you are looking for collaborators or co-authors.",
     emptyMembers:
       "No members match your filters. Clear the chapter filter or search with a broader interest tag.",
     introFeed: "Introductions feed",
     introEmptyTitle: "No introductions yet",
-    introEmptyBody: "Post what you're looking for — collaborators, mentors, or co-authors for a project.",
+    introEmptyBody: "Post what you are looking for, such as a collaborator or co-author for a project.",
     postIntro: "Post introduction",
     introDialogTitle: "Introduction",
     introHeadline: "Headline",
@@ -210,13 +210,13 @@ export const portalCopy = {
     markComplete: "Mark lesson complete",
     markUndo: "Completed — click to undo",
     relatedExplainers: "Related explainers",
-    progressNote: "Progress saves locally on this device. Complete all lessons to earn the Catalyst certificate.",
+    progressNote: "Progress saves locally on this device. Completing every lesson marks the Catalyst track complete on this device.",
   },
   resources: {
     eyebrow: "Member library",
     title: "Resources",
     description:
-      "Facilitator guides, journal submission standards, club toolkits, and partner programs — written for chapter volunteers running events on the ground.",
+      "Facilitator guides, submission standards, club toolkits, and external resources for members and chapter volunteers.",
     guideNotFound: "This guide could not be found. Browse the resource library for facilitator materials.",
     searchPlaceholder: "Search guides, tags, webinars…",
     sections: {
@@ -250,7 +250,7 @@ export const portalCopy = {
     eyebrow: "Your account",
     title: "Settings",
     description:
-      "Your profile drives recommendations across Debriefed, Meta Labs, Pathways, and the member network. Interests are the strongest signal.",
+      "Your interests are used to order suggestions across Debriefed, Meta Labs, Pathways, and the member directory.",
     digestNote: "Weekly digest delivery is rolling out chapter by chapter.",
     securityAdmin:
       "Admin: run migrations 003, 005, 006, and 007 in Supabase if bookmarks, notifications, contact inbox, or education progress fail.",
@@ -277,7 +277,7 @@ export const portalCopy = {
     eyebrow: "Administration",
     title: "Content management",
     description:
-      "Publish news, opportunities, events, and explainers for your chapter and the global network.",
+      "Create and manage the articles, opportunities, events, explainers, chapters, and member roles available in the portal.",
     emptyNews: "No articles published yet. Use the form above to add your first Debriefed story.",
     emptyOpportunities: "No opportunities listed. Add internships, programs, or project roles for members.",
     emptyEvents: "No events scheduled. Create a chapter meetup or speaker session above.",
@@ -311,7 +311,7 @@ export const portalCopy = {
       "We sent a confirmation link. Click it to activate your account, then return here to sign in.",
     onboardingTitle: "Complete your profile",
     onboardingSubtitle:
-      "A few details help us surface relevant news, lab openings, and members in your chapter and across the network.",
+      "A few details help the portal order relevant articles, opportunities, and member suggestions. You can update them later in Settings.",
     onboardingFooter: "You can update your profile anytime in Settings.",
     onboardingGoogleNote: "Your photo will appear on your profile",
     securityFooter: "Finance4All never asks for your password by email. Use a unique password for this account.",
@@ -365,7 +365,7 @@ export const portalCopy = {
     noInterests:
       "Add interests in Settings — we'll surface news, labs, opportunities, events, and members that match what you care about.",
     learning:
-      "Recommendations improve as you explore. Read Debriefed and browse Meta Labs — picks will appear as content grows.",
+      "Suggestions use your saved interests and the content currently available in the portal.",
     suggestedEmpty:
       "Add interests in Settings to see members with overlapping focus areas who are open to connect.",
     loadError: "Could not load personalized picks. Try refreshing the page.",
@@ -449,7 +449,7 @@ export const portalCopy = {
     progress: "Still on the list for this week.",
   },
   footer: {
-    tagline: "Finance4All — student-run finance education and research network.",
+    tagline: "Finance learning and member portal.",
     settings: "Settings",
     saved: "Saved items",
     activity: "Activity feed",
@@ -462,14 +462,14 @@ export const portalCopy = {
     heroTitle: "A global network for",
     heroTitleAccent: "finance education and research.",
     heroSubtext:
-      "Finance4All runs chapter workshops, a member portal, mentor-reviewed research, and a student writing pipeline. Free to join — built for students who want to learn markets by doing, not by watching.",
+      "Finance4All brings learning content, a member portal, research applications, writing submissions, and chapter activity into one place.",
     heroCtaPrimary: "Create free account",
     heroCtaSecondary: "Sign in to portal",
     heroScrollHint: "What we build",
     heroPortalPreview: "Member portal preview",
     heroPortalFooter: "News, research, pathways, and chapter events — one dashboard",
     aboutSubtext:
-      "Chapter outreach, mentor-led research, and editorial review share one portal — so a first budgeting lesson can lead to a published macro note.",
+      "Learning materials, research applications, writing submissions, and chapter activity are available through one portal.",
     programsSubtext:
       "Each program below opens a live portal module: Catalyst lessons, lab applications, Pathways submissions, or facilitator guides your chapter can run this month.",
     ecosystemEyebrow: "Member portal",
@@ -496,22 +496,21 @@ export const portalCopy = {
       "One account for news, curriculum, lab applications, chapter events, and the member directory.",
     contactEyebrow: "Get in touch",
     contactTitle: "Questions, submissions, or chapter inquiries",
-    contactBody:
-      "Send journal drafts, lab project ideas, chapter launch questions, or general inquiries. We read every message.",
-    contactSubmit: "General inquiries & submissions",
-    contactFounder: "Founder & partnerships",
+    contactBody: "Use the form for an account, chapter, content, or general inquiry.",
+    contactSubmit: "General inquiries",
+    contactFounder: "Contact",
     contactSend: "Send message",
-    contactSuccess: "Message received — we'll get back to you soon.",
-    contactSuccessDetail: "You can also reach us directly via the email links below.",
+    contactSuccess: "Message received.",
+    contactSuccessDetail: "Your message is now available to portal administrators.",
     contactError: "Could not send your message. Try again or email us directly.",
     founderEyebrow: "Leadership",
     founderTitle: "The team behind Finance4All",
     founderSubtext:
       "Students and recent graduates who run outreach, build curriculum, and review research — not a distant advisory board.",
-    footerTagline: "Student-run finance education and research network.",
-    footerMission: "Outreach, curriculum, and research — free for every student.",
+    footerTagline: "Finance learning and member portal.",
+    footerMission: "Learning content and member tools in one place.",
     socialProofLabel: "Programs inside Finance4All",
-    documentTitle: "Student-run finance education and research network",
+    documentTitle: "Finance learning and member portal",
     skipToContent: "Skip to content",
     contactSending: "Sending…",
     contactSendAnother: "Send another message",

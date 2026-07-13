@@ -93,7 +93,7 @@ export function usePortalSearch(query: string) {
         supabase.from("research_projects").select("id, title, description").neq("status", "draft").ilike("title", `%${q}%`).limit(12),
         supabase.from("opportunities").select("id, title, organization").eq("is_active", true).ilike("title", `%${q}%`).limit(12),
         supabase.from("events").select("id, title, description").ilike("title", `%${q}%`).limit(12),
-        supabase.from("profiles").select("id, display_name, bio").neq("display_name", "").ilike("display_name", `%${q}%`).limit(12),
+        supabase.from("member_directory").select("id, display_name, bio").ilike("display_name", `%${q}%`).limit(12),
         supabase.from("explainer_cards").select("id, slug, title, summary").ilike("title", `%${q}%`).limit(12),
       ]);
 

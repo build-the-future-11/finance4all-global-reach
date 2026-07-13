@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import ProtectedRoute from "@/components/portal/ProtectedRoute";
 
 vi.mock("@/contexts/AuthContext", () => ({
@@ -28,6 +28,11 @@ function renderAt(path: string) {
   );
 }
 
+function LoginState() {
+  const location = useLocation();
+  return <p>{(location.state as { from?: string } | null)?.from ?? "no destination"}</p>;
+}
+
 describe("ProtectedRoute", () => {
   it("redirects unauthenticated users to login", () => {
     vi.mocked(useAuth).mockReturnValue({
@@ -38,6 +43,25 @@ describe("ProtectedRoute", () => {
 
     renderAt("/portal");
     expect(screen.getByText("Login page")).toBeInTheDocument();
+  });
+
+  it("preserves query strings and hashes after an auth redirect", () => {
+    vi.mocked(useAuth).mockReturnValue({
+      user: null,
+      loading: false,
+      needsOnboarding: false,
+    } as ReturnType<typeof useAuth>);
+
+    render(
+      <MemoryRouter initialEntries={["/portal?article=123#saved"]}>
+        <Routes>
+          <Route path="/login" element={<LoginState />} />
+          <Route path="/portal" element={<ProtectedRoute><p>Portal home</p></ProtectedRoute>} />
+        </Routes>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText("/portal?article=123#saved")).toBeInTheDocument();
   });
 
   it("shows loading state while session resolves", () => {

@@ -1,7 +1,6 @@
 import { sanitizeUserFacingError } from "@/lib/authErrors";
 import { useMutation } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { checkServerRateLimit, recordServerRateLimit } from "@/lib/rateLimit";
 import { trackEvent } from "@/lib/analytics";
 import {
   isValidEmail,
@@ -42,27 +41,25 @@ export function useContactSubmission() {
         throw new Error(`Too many submissions. Try again in about ${minutes} minute${minutes === 1 ? "" : "s"}.`);
       }
 
-      const serverAllowed = await checkServerRateLimit("contact_submit", email, 3, 3600);
-      if (!serverAllowed) {
-        throw new Error("Too many submissions. Try again in about an hour.");
-      }
-
-      const { error } = await supabase.from("contact_submissions").insert({
-        name,
-        email,
-        subject,
-        message,
+      const { error } = await supabase.rpc("submit_contact_submission", {
+        p_name: name,
+        p_email: email,
+        p_subject: subject,
+        p_message: message,
       });
 
       if (error) {
-        if (error.code === "42P01" || error.message?.includes("does not exist")) {
+        if (
+          error.code === "42P01" ||
+          error.code === "42883" ||
+          error.message?.includes("does not exist")
+        ) {
           throw new Error("Contact form is not available yet. Please email finance4alledu@gmail.com directly.");
         }
         throw new Error(sanitizeUserFacingError(error.message ?? "Submission failed."));
       }
 
       recordContactSubmission(email);
-      await recordServerRateLimit("contact_submit", email);
       trackEvent("contact.submit", { source: "landing" });
       return { ok: true as const };
     },

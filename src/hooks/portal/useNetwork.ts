@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { mapConnectionRequest, mapIntroductionPost, mapProfile } from "@/lib/mappers";
+import { mapConnectionRequest, mapIntroductionPost, mapMemberDirectoryProfile } from "@/lib/mappers";
 import type { ConnectionStatus } from "@/types/domain";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -21,7 +21,7 @@ export function useMemberProfiles(options?: MemberProfilesOptions) {
     queryKey: ["member-profiles", page, pageSize, search],
     queryFn: async () => {
       let query = supabase
-        .from("profiles")
+        .from("member_directory")
         .select("*", { count: "exact" })
         .neq("display_name", "")
         .order("display_name");
@@ -38,7 +38,7 @@ export function useMemberProfiles(options?: MemberProfilesOptions) {
       const { data, error, count } = await query;
       if (error) throw error;
       return {
-        members: data.map(mapProfile),
+        members: data.map(mapMemberDirectoryProfile),
         total: count ?? data.length,
       };
     },
@@ -50,9 +50,9 @@ export function useProfileById(id: string | undefined) {
     queryKey: ["profile", id],
     enabled: Boolean(id),
     queryFn: async () => {
-      const { data, error } = await supabase.from("profiles").select("*").eq("id", id!).single();
+      const { data, error } = await supabase.from("member_directory").select("*").eq("id", id!).single();
       if (error) throw error;
-      return mapProfile(data);
+      return mapMemberDirectoryProfile(data);
     },
   });
 }

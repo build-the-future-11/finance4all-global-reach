@@ -1,5 +1,5 @@
 import type { MemberStats } from "@/hooks/portal/useMemberStats";
-import type { UserProfile } from "@/types/domain";
+import type { MemberDirectoryProfile, UserProfile } from "@/types/domain";
 
 export interface MemberBadge {
   id: string;
@@ -9,7 +9,7 @@ export interface MemberBadge {
 }
 
 export function computeMemberBadges(
-  profile: UserProfile | null,
+  profile: UserProfile | MemberDirectoryProfile | null,
   stats: MemberStats | undefined,
 ): MemberBadge[] {
   if (!profile) return [];

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Mail, Send, CheckCircle2 } from "lucide-react";
+import { Send, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
@@ -37,17 +37,17 @@ export default function ContactSection() {
   return (
     <section id="contact" className="relative px-4 py-24 sm:py-32">
       <div ref={ref} className="mx-auto max-w-3xl text-center">
-        <p className={cn(landingEyebrowClass, "mb-3")}>{portalCopy.landing.contactEyebrow}</p>
+        <p className={cn(landingEyebrowClass, "mb-3")}>Contact</p>
         <h2 className="mb-4 text-balance text-3xl font-bold tracking-tight text-white sm:text-4xl">
-          {portalCopy.landing.contactTitle}
+          Questions about Finance4All
         </h2>
-        <p className="mx-auto mb-10 max-w-xl text-pretty text-white/55">{portalCopy.landing.contactBody}</p>
+        <p className="mx-auto mb-10 max-w-xl text-pretty text-white/55">Use the form for an account, chapter, content, or general inquiry. Do not include passwords or sensitive financial information.</p>
 
         {sent ? (
           <div className="mx-auto max-w-md rounded-3xl border border-emerald-400/30 bg-emerald-500/10 p-8">
             <CheckCircle2 className="mx-auto h-10 w-10 text-emerald-400" aria-hidden />
-            <p className="mt-4 font-semibold text-white">{portalCopy.landing.contactSuccess}</p>
-            <p className="mt-2 text-sm text-white/50">{portalCopy.landing.contactSuccessDetail}</p>
+            <p className="mt-4 font-semibold text-white">Message received</p>
+            <p className="mt-2 text-sm text-white/50">Your message is now available to portal administrators.</p>
             <Button variant="outline" className={cn("mt-6", portalButtonOutline)} onClick={() => setSent(false)}>
               Send another message
             </Button>
@@ -95,7 +95,7 @@ export default function ContactSection() {
                 required
                 value={form.subject}
                 onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                placeholder="Chapter inquiry, submission, partnership…"
+                placeholder="Account, chapter, or general inquiry"
               />
             </div>
             <div>
@@ -116,27 +116,16 @@ export default function ContactSection() {
           </form>
         )}
 
-        <div className="mt-10 grid gap-4 sm:grid-cols-2">
+        <div className="mt-10">
           <a
             href="mailto:finance4alledu@gmail.com"
-            className="portal-focus-ring group flex flex-col items-center gap-3 rounded-3xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl transition duration-500 motion-safe:hover:-translate-y-1 hover:border-emerald-400/30 hover:bg-white/[0.07]"
+            className="portal-focus-ring group mx-auto flex max-w-sm flex-col items-center gap-3 rounded-md border border-white/10 bg-white/[0.04] p-6 transition hover:border-emerald-400/30 hover:bg-white/[0.07]"
           >
             <div className="rounded-xl border border-white/10 bg-emerald-500/15 p-3 text-emerald-300">
               <Send className="h-5 w-5" aria-hidden />
             </div>
-            <p className="font-semibold text-white">{portalCopy.landing.contactSubmit}</p>
+            <p className="font-semibold text-white">General inquiries</p>
             <p className="text-sm text-white/45">finance4alledu@gmail.com</p>
-          </a>
-
-          <a
-            href="mailto:ryangomez.hs@gmail.com"
-            className="portal-focus-ring group flex flex-col items-center gap-3 rounded-3xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl transition duration-500 motion-safe:hover:-translate-y-1 hover:border-emerald-400/30 hover:bg-white/[0.07]"
-          >
-            <div className="rounded-xl border border-white/10 bg-emerald-500/15 p-3 text-emerald-300">
-              <Mail className="h-5 w-5" aria-hidden />
-            </div>
-            <p className="font-semibold text-white">{portalCopy.landing.contactFounder}</p>
-            <p className="text-sm text-white/45">ryangomez.hs@gmail.com</p>
           </a>
         </div>
       </div>

@@ -18,6 +18,7 @@ In Vercel → Project → **Settings** → **Environment Variables**, add:
 | `VITE_SUPABASE_URL` | `https://pnemeegkwyaicsbnbnmg.supabase.co` | Production, Preview, Development |
 | `VITE_SUPABASE_ANON_KEY` | Your Supabase **anon** JWT (`eyJ...`) | Production, Preview, Development |
 | `VITE_APP_URL` | `https://YOUR-PROJECT.vercel.app` (recommended) | Production |
+| `VITE_ERROR_REPORTING_ENDPOINT` | Same-origin, approved error-collection endpoint (optional) | Production |
 
 Optional (only if you omit `VITE_SUPABASE_ANON_KEY`):
 
@@ -84,6 +85,12 @@ If not done yet, run in Supabase SQL Editor (in order):
 6. `supabase/migrations/005_security_hardening.sql` (RLS hardening + chapter counts)
 7. `supabase/migrations/006_education_progress.sql` (synced lesson completion)
 8. `supabase/migrations/007_contact_submissions.sql` (landing contact form)
+9. `supabase/migrations/008_platform_cms.sql` (CMS tables, rate limiting, search, and policies)
+10. `supabase/migrations/009_membership_integrity.sql` (onboarding integrity, registration validation, draft visibility, and contact abuse controls)
+11. `supabase/migrations/010_directory_privacy.sql` (member directory view and account-email isolation)
+12. `supabase/migrations/011_profile_write_boundary.sql` (server-validated profile and avatar writes)
+
+After applying migrations, run `supabase/verify_migration_status.sql` in the SQL editor and resolve any missing object before deploying.
 
 ## 5. Deploy
 
@@ -109,7 +116,12 @@ npx vercel --prod
 2. No `placeholder.supabase.co` or missing-env errors in console
 3. Google sign-in completes and lands on `/portal`
 4. Portal loads news/events data
-5. Promote your account to admin (Supabase SQL Editor):
+5. Create a new account, complete onboarding once, sign out, then sign back in and verify the profile persists
+6. As an administrator, save a Finance Debrief article as a draft and confirm it is not visible to a member account; publish it and confirm visibility
+7. Create an event with a future registration-open time and confirm member registration is disabled until the window opens
+8. Submit a short contact form message and verify it appears in the administrator inbox
+9. As a member, open the directory and verify profiles load without exposing any member email address; as an administrator, verify the member-management view still loads account emails
+10. Promote your account to admin (Supabase SQL Editor):
 
 ```sql
 UPDATE profiles SET role = 'admin' WHERE email = 'your@email.com';

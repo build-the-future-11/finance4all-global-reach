@@ -49,7 +49,9 @@ export const isSupabaseConfigured = Boolean(
   supabaseUrl && supabaseKey && supabaseUrl.includes("supabase.co"),
 );
 
-export const supabase = createClient<Database>(supabaseUrl || "https://placeholder.supabase.co", supabaseKey || "placeholder", {
+// The invalid fallback keeps public, configuration-free local previews usable;
+// production builds reject missing credentials before this client is created.
+export const supabase = createClient<Database>(supabaseUrl || "https://config-required.invalid", supabaseKey || "config-required", {
   auth: {
     autoRefreshToken: true,
     persistSession: true,

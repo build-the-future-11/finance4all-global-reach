@@ -25,7 +25,7 @@ import { Select, SelectTrigger, SelectValue } from "@/components/ui/select";
 const SUGGESTED_INTERESTS = ["macro", "equities", "fintech", "credit", "startups", "research"];
 
 export default function Onboarding() {
-  const { profile, user, updateProfile } = useAuth();
+  const { profile, user, completeOnboarding } = useAuth();
   const { data: chapters } = useChapters();
   const navigate = useNavigate();
 
@@ -50,7 +50,7 @@ export default function Onboarding() {
       return;
     }
     setSubmitting(true);
-    const { error: err } = await updateProfile({
+    const { error: err } = await completeOnboarding({
       displayName: displayName.trim(),
       bio: bio.trim() || undefined,
       interests,
@@ -133,7 +133,7 @@ export default function Onboarding() {
             </Select>
           </div>
         )}
-        <PortalToggleRow title="Open to collaborate" description="Visible on your profile">
+        <PortalToggleRow title="Open to collaborate" description="Shown to other signed-in members in the portal">
           <Switch checked={openToCollaborate} onCheckedChange={setOpenToCollaborate} />
         </PortalToggleRow>
         {error && <PortalAlert variant="error">{error}</PortalAlert>}

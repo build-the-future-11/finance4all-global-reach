@@ -67,11 +67,23 @@ function ProjectDetail({ id }: { id: string }) {
   const alreadyApplied = myApps?.some((a) => a.projectId === id);
   const lead = project ? leads?.[project.leadResearcherId] : undefined;
   const saved = bookmarks?.has(id) ?? false;
+  const deadlineClosed =
+    Boolean(project?.applicationDeadline) &&
+    new Date(project.applicationDeadline!).getTime() < Date.now();
+  const canApply =
+    project?.status === "open" &&
+    !deadlineClosed &&
+    profile &&
+    project.leadResearcherId !== profile.id;
 
   const handleApply = async () => {
-    if (!motivation.trim()) return;
+    const trimmedMotivation = motivation.trim();
+    if (trimmedMotivation.length < 30) {
+      toast.error("Please share a short motivation statement with at least 30 characters.");
+      return;
+    }
     try {
-      await submitApp.mutateAsync({ projectId: id, motivation });
+      await submitApp.mutateAsync({ projectId: id, motivation: trimmedMotivation });
       toast.success("Application submitted");
       setOpen(false);
       setMotivation("");
@@ -128,7 +140,7 @@ function ProjectDetail({ id }: { id: string }) {
         )}
       </PortalCard>
 
-      {project.status === "open" && profile && project.leadResearcherId !== profile.id && (
+      {canApply && (
         <div className="mt-6">
           {alreadyApplied ? (
             <Badge className="bg-emerald-400/15 text-emerald-300">Application submitted</Badge>
@@ -152,10 +164,11 @@ function ProjectDetail({ id }: { id: string }) {
                       className={portalTextareaClass}
                       placeholder="Relevant coursework, prior research, or skills that fit this project…"
                     />
+                    <p className="mt-2 text-xs text-white/40">Minimum 30 characters.</p>
                   </div>
                   <Button
                     onClick={handleApply}
-                    disabled={submitApp.isPending}
+                    disabled={submitApp.isPending || motivation.trim().length < 30}
                     className={portalButtonPrimary}
                   >
                     Submit application
@@ -165,6 +178,9 @@ function ProjectDetail({ id }: { id: string }) {
             </Dialog>
           )}
         </div>
+      )}
+      {project.status === "open" && deadlineClosed && (
+        <Badge className="mt-6 bg-white/10 text-white/70">Applications closed</Badge>
       )}
     </div>
   );

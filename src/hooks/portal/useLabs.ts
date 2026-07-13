@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { mapLabApplication, mapProfile, mapResearchProject } from "@/lib/mappers";
+import { mapLabApplication, mapMemberDirectoryProfile, mapResearchProject } from "@/lib/mappers";
 import type { LabApplicationStatus, ResearchProjectStatus } from "@/types/domain";
 import { useAuth } from "@/contexts/AuthContext";
+import { trackEvent } from "@/lib/analytics";
 
 export function useResearchProjects(status?: ResearchProjectStatus | "all") {
   return useQuery({
@@ -115,14 +116,20 @@ export function useSubmitLabApplication() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ projectId, motivation }: { projectId: string; motivation: string }) => {
+      const trimmedMotivation = motivation.trim();
+      if (trimmedMotivation.length < 30) {
+        throw new Error("Please share a short motivation statement with at least 30 characters.");
+      }
+
       const { error } = await supabase.from("lab_applications").insert({
         project_id: projectId,
         applicant_id: user!.id,
-        motivation,
+        motivation: trimmedMotivation,
       });
       if (error) throw error;
     },
     onSuccess: () => {
+      trackEvent("research.application_submitted");
       qc.invalidateQueries({ queryKey: ["my-lab-applications"] });
       qc.invalidateQueries({ queryKey: ["project-applications"] });
     },
@@ -187,9 +194,9 @@ export function useProfilesByIds(ids: string[]) {
     queryKey: ["profiles", ids],
     enabled: ids.length > 0,
     queryFn: async () => {
-      const { data, error } = await supabase.from("profiles").select("*").in("id", ids);
+      const { data, error } = await supabase.from("member_directory").select("*").in("id", ids);
       if (error) throw error;
-      return Object.fromEntries(data.map((p) => [p.id, mapProfile(p)]));
+      return Object.fromEntries(data.map((p) => [p.id, mapMemberDirectoryProfile(p)]));
     },
   });
 }

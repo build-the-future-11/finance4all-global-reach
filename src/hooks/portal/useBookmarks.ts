@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { mapNewsArticle, mapOpportunity, mapResearchProject } from "@/lib/mappers";
 import { useAuth } from "@/contexts/AuthContext";
+import { trackEvent } from "@/lib/analytics";
 
 export function useNewsBookmarks() {
   const { user } = useAuth();
@@ -39,7 +40,8 @@ export function useToggleNewsBookmark() {
         if (error) throw error;
       }
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
+      if (!variables.saved) trackEvent("content.saved", { content_type: "debrief" });
       qc.invalidateQueries({ queryKey: ["news-bookmarks"] });
       qc.invalidateQueries({ queryKey: ["saved-articles"] });
     },
@@ -104,7 +106,8 @@ export function useToggleProjectBookmark() {
         if (error) throw error;
       }
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
+      if (!variables.saved) trackEvent("content.saved", { content_type: "research" });
       qc.invalidateQueries({ queryKey: ["project-bookmarks"] });
       qc.invalidateQueries({ queryKey: ["saved-projects"] });
     },

@@ -195,17 +195,9 @@ export default function MemberProfile() {
           )}
 
           <PortalAnimatedSection delay={80}>
-            <div className="grid gap-4 lg:grid-cols-3">
-              <MemberActivityPreview
-                profile={profile}
-                chapterName={chapter ? `${chapter.name}, ${chapter.country}` : undefined}
-                connectionCount={connectionCount}
-                isOwnProfile={isOwnProfile}
-              />
-              <div className="sm:col-span-2 grid gap-4 sm:grid-cols-2">
-                <StatCard label="Connections" value={connectionCount} icon={Users} accent="emerald" />
-                <StatCard label="Chapter city" value={chapter?.city ?? "—"} icon={MapPin} accent="blue" />
-              </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <StatCard label="Connections" value={connectionCount} icon={Users} accent="emerald" />
+              <StatCard label="Chapter city" value={chapter?.city ?? "—"} icon={MapPin} accent="blue" />
             </div>
           </PortalAnimatedSection>
 

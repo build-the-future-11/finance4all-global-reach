@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import type { UserProfile } from "@/types/domain";
+import type { MemberDirectoryProfile } from "@/types/domain";
 import { portalRoutes } from "@/routes/portal";
 import { PortalCard } from "@/components/portal/PortalUI";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 interface MemberDirectoryCardProps {
-  member: UserProfile;
+  member: MemberDirectoryProfile;
   chapterName?: string;
   connectionStatus?: "none" | "pending" | "accepted" | "declined";
   sharedInterestCount?: number;

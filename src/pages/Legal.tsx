@@ -1,0 +1,47 @@
+import { Link } from "react-router-dom";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+
+type LegalKind = "privacy" | "terms";
+
+const privacySections = [
+  ["Information used by the portal", "When you create an account, the portal processes the details needed to provide it, including your email address, profile details, saved content, course progress, applications, registrations, and settings. Contact form submissions are processed to respond to the message."],
+  ["How it is used", "This information is used to authenticate you, show your account state, provide the member tools you request, administer published content and applications, protect the service, and respond to support or contact requests."],
+  ["Visibility", "Profile and community features may make the details you choose to publish visible to other authenticated members. Do not add sensitive personal information to public profile fields, introductions, or applications unless a specific form clearly requires it."],
+  ["Service providers and retention", "The application uses Supabase for authentication and database services and hosting providers to operate the site. Information is retained only for as long as it is needed to operate the account, meet legal obligations, resolve disputes, or enforce agreements."],
+  ["Your choices", "You can update profile details and settings in the portal. To ask about account data or deletion, use the contact route below. Requests may require identity verification before action is taken."],
+];
+
+const termsSections = [
+  ["Using the portal", "Use the portal lawfully and only for its intended learning and community purposes. Keep your account credentials private, provide accurate information, and do not attempt to access another person’s account or administrator tools."],
+  ["Member contributions", "You remain responsible for material you submit, including applications, posts, and messages. Do not submit unlawful, infringing, deceptive, abusive, or private material that you do not have permission to share."],
+  ["Content and opportunities", "Learning content is educational and is not financial, investment, legal, or career advice. Published opportunities, events, and external links can change or close. Finance4All does not guarantee selection, placement, outcomes, availability, or accuracy of third-party material."],
+  ["Account action", "Access may be limited or removed when necessary to protect members, the service, or legal rights. Administrators may moderate or remove content that violates these terms."],
+  ["Changes and contact", "These terms may be updated as the service develops. Continued use after an update means you accept the revised terms. Questions can be sent through the contact route below."],
+];
+
+export default function Legal({ kind }: { kind: LegalKind }) {
+  const isPrivacy = kind === "privacy";
+  const title = isPrivacy ? "Privacy" : "Terms of use";
+  const sections = isPrivacy ? privacySections : termsSections;
+  useDocumentTitle(title);
+
+  return (
+    <main className="min-h-screen bg-[#f6f8f6] px-4 py-12 text-slate-900 sm:py-20">
+      <div className="mx-auto max-w-3xl">
+        <Link to="/" className="text-sm font-semibold text-emerald-800 underline underline-offset-4">Finance4All home</Link>
+        <p className="mt-10 text-sm font-semibold uppercase tracking-[0.16em] text-emerald-800">Finance4All</p>
+        <h1 className="mt-4 text-4xl font-semibold">{title}</h1>
+        <p className="mt-5 leading-7 text-slate-700">This policy describes the current portal behavior in plain language. It should be reviewed by the organization’s authorized legal representative before public launch.</p>
+        <div className="mt-12 space-y-10">
+          {sections.map(([heading, body]) => (
+            <section key={heading}>
+              <h2 className="text-xl font-semibold">{heading}</h2>
+              <p className="mt-3 leading-7 text-slate-700">{body}</p>
+            </section>
+          ))}
+        </div>
+        <p className="mt-12 border-t border-slate-300 pt-6 text-sm text-slate-600">For privacy or terms questions, <a href="mailto:finance4alledu@gmail.com" className="font-medium text-emerald-800 underline underline-offset-4">contact Finance4All</a>.</p>
+      </div>
+    </main>
+  );
+}

@@ -25,10 +25,10 @@ export function useAvatarUpload() {
       const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
       const avatarUrl = `${urlData.publicUrl}?t=${Date.now()}`;
 
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .update({ avatar_url: avatarUrl })
-        .eq("id", user.id);
+      const { error: profileError } = await supabase.rpc("set_my_avatar", {
+        p_object_name: path,
+        p_avatar_url: avatarUrl,
+      });
 
       if (profileError) throw profileError;
 

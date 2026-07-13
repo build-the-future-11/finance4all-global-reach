@@ -24,6 +24,7 @@ import { Tabs } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { portalCopy } from "@/lib/portalCopy";
 import { downloadIcal } from "@/lib/downloadIcal";
+import { getEventRegistrationState } from "@/lib/eventRegistration";
 import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
 
 function groupEventsByMonth(events: { id: string; title: string; startsAt: string }[]) {
@@ -225,6 +226,7 @@ export default function EventsChapters() {
                       const d = new Date(event.startsAt);
                       const chapter = chapterMap[full?.chapterId ?? ""];
                       const registered = registrations?.has(event.id) ?? false;
+                      const registration = full ? getEventRegistrationState(full) : { open: false, reason: "Registration is unavailable" };
                       return (
                         <PortalCard key={event.id} className="flex flex-col p-4">
                           <p className="text-2xl font-bold text-emerald-300">{d.getDate()}</p>
@@ -238,8 +240,9 @@ export default function EventsChapters() {
                             variant={registered ? "default" : "outline"}
                             className={`mt-3 ${registered ? portalButtonPrimary : portalButtonOutline}`}
                             onClick={() => handleRegister(event.id, registered)}
+                            disabled={!registered && !registration.open}
                           >
-                            {registered ? "Registered" : "Register"}
+                            {registered ? "Registered" : registration.open ? "Register" : registration.reason}
                           </Button>
                           {full && (
                             <Button
@@ -273,6 +276,7 @@ export default function EventsChapters() {
             {displayEvents.map((event) => {
               const chapter = chapterMap[event.chapterId];
               const registered = registrations?.has(event.id) ?? false;
+              const registration = getEventRegistrationState(event);
               return (
                 <PortalCard key={event.id} className="p-5">
                   <div className="flex flex-wrap items-start justify-between gap-4">
@@ -311,8 +315,9 @@ export default function EventsChapters() {
                         variant={registered ? "default" : "outline"}
                         className={registered ? portalButtonPrimary : portalButtonOutline}
                         onClick={() => handleRegister(event.id, registered)}
+                        disabled={!registered && !registration.open}
                       >
-                        {registered ? "Registered" : "Register interest"}
+                        {registered ? "Registered" : registration.open ? "Register" : registration.reason}
                       </Button>
                       <Button
                         size="sm"

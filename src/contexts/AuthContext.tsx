@@ -39,6 +39,13 @@ interface AuthContextValue {
   updatePassword: (password: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  completeOnboarding: (updates: {
+    displayName: string;
+    bio?: string;
+    interests?: string[];
+    openToCollaborate?: boolean;
+    chapterId?: string;
+  }) => Promise<{ error: string | null }>;
   updateProfile: (updates: Partial<Pick<UserProfile, "displayName" | "bio" | "interests" | "openToCollaborate" | "chapterId">>) => Promise<{ error: string | null }>;
 }
 
@@ -54,45 +61,32 @@ function googleDisplayName(user: User) {
   );
 }
 
-function googleAvatarUrl(user: User) {
-  const meta = user.user_metadata ?? {};
-  return (meta.avatar_url as string) || (meta.picture as string) || undefined;
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
   const ensureProfile = useCallback(async (user: User) => {
-    const { data: existing } = await supabase
+    const { error: ensureError } = await supabase.rpc("ensure_my_profile");
+
+    if (ensureError) {
+      console.error("Profile ensure failed:", ensureError.message);
+      return null;
+    }
+
+    const { data: existing, error } = await supabase
       .from("profiles")
       .select("*")
       .eq("id", user.id)
       .maybeSingle();
 
-    if (existing) return mapProfile(existing);
-
-    const displayName = googleDisplayName(user);
-    const avatarUrl = googleAvatarUrl(user);
-
-    const { data: created, error } = await supabase
-      .from("profiles")
-      .insert({
-        id: user.id,
-        email: user.email ?? "",
-        display_name: displayName,
-        avatar_url: avatarUrl ?? null,
-      })
-      .select("*")
-      .single();
-
     if (error) {
-      console.error("Profile ensure failed:", error.message);
+      console.error("Profile fetch after ensure failed:", error.message);
       return null;
     }
 
-    return mapProfile(created);
+    if (existing) return mapProfile(existing);
+    return null;
   }, []);
 
   const fetchProfile = useCallback(
@@ -116,13 +110,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       const mapped = mapProfile(data);
-
-      // Sync Google avatar if profile is missing one
-      const avatarUrl = googleAvatarUrl(user);
-      if (!mapped.avatarUrl && avatarUrl) {
-        await supabase.from("profiles").update({ avatar_url: avatarUrl }).eq("id", user.id);
-        mapped.avatarUrl = avatarUrl;
-      }
 
       setProfile(mapped);
     },
@@ -236,27 +223,62 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async (
       updates: Partial<Pick<UserProfile, "displayName" | "bio" | "interests" | "openToCollaborate" | "chapterId">>,
     ) => {
+      if (!session?.user || !profile) return { error: "Profile is not available yet." };
+
+      const displayName = sanitizeDisplayName(updates.displayName ?? profile.displayName);
+      if (!displayName) return { error: "Display name is required." };
+
+      const { error } = await supabase.rpc("update_my_profile", {
+        p_display_name: displayName,
+        p_bio: updates.bio !== undefined ? sanitizeBio(updates.bio) || null : profile.bio ?? null,
+        p_interests: updates.interests !== undefined ? sanitizeInterests(updates.interests) : profile.interests,
+        p_open_to_collaborate: updates.openToCollaborate ?? profile.openToCollaborate,
+        p_chapter_id: updates.chapterId !== undefined ? updates.chapterId ?? null : profile.chapterId ?? null,
+      });
+      if (!error) await fetchProfile(session.user);
+      return { error: error ? sanitizeUserFacingError(error.message) : null };
+    },
+    [session?.user, profile, fetchProfile],
+  );
+
+  const completeOnboarding = useCallback(
+    async ({
+      displayName,
+      bio,
+      interests,
+      openToCollaborate,
+      chapterId,
+    }: {
+      displayName: string;
+      bio?: string;
+      interests?: string[];
+      openToCollaborate?: boolean;
+      chapterId?: string;
+    }) => {
       if (!session?.user) return { error: "Not authenticated" };
 
-      const payload: Record<string, unknown> = {};
-      if (updates.displayName !== undefined) {
-        const name = sanitizeDisplayName(updates.displayName);
-        if (!name) return { error: "Display name is required." };
-        payload.display_name = name;
-      }
-      if (updates.bio !== undefined) payload.bio = sanitizeBio(updates.bio);
-      if (updates.interests !== undefined) payload.interests = sanitizeInterests(updates.interests);
-      if (updates.openToCollaborate !== undefined) payload.open_to_collaborate = updates.openToCollaborate;
-      if (updates.chapterId !== undefined) payload.chapter_id = updates.chapterId ?? null;
+      const name = sanitizeDisplayName(displayName);
+      if (!name) return { error: "Display name is required." };
 
-      const { error } = await supabase.from("profiles").update(payload).eq("id", session.user.id);
-      if (!error) await fetchProfile(session.user);
+      const { error } = await supabase.rpc("complete_profile_onboarding", {
+        p_display_name: name,
+        p_bio: sanitizeBio(bio),
+        p_interests: sanitizeInterests(interests),
+        p_open_to_collaborate: openToCollaborate ?? false,
+        p_chapter_id: chapterId ?? null,
+      });
+
+      if (!error) {
+        await fetchProfile(session.user);
+        trackEvent("auth.onboarding_completed");
+      }
+
       return { error: error ? sanitizeUserFacingError(error.message) : null };
     },
     [session?.user, fetchProfile],
   );
 
-  const needsOnboarding = Boolean(profile && !profile.displayName?.trim());
+  const needsOnboarding = Boolean(profile && !profile.onboardingCompletedAt);
 
   const value = useMemo(
     () => ({
@@ -272,9 +294,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       updatePassword,
       signOut,
       refreshProfile,
+      completeOnboarding,
       updateProfile,
     }),
-    [session, profile, loading, needsOnboarding, signIn, signUp, signInWithGoogle, resetPassword, updatePassword, signOut, refreshProfile, updateProfile],
+    [session, profile, loading, needsOnboarding, signIn, signUp, signInWithGoogle, resetPassword, updatePassword, signOut, refreshProfile, completeOnboarding, updateProfile],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

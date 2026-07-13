@@ -1,188 +1,58 @@
-import { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
-import ThemeToggle from "./ThemeToggle";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const links = [
   { label: "About", href: "#about" },
-  { label: "Programs", href: "#programs" },
-  { label: "Projects", href: "#projects" },
-  { label: "Founder", href: "#founder" },
+  { label: "Member experience", href: "#experience" },
+  { label: "Membership", href: "#membership" },
   { label: "Contact", href: "#contact" },
 ];
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
-  const navRef = useRef<HTMLDivElement>(null);
-  const rafRef = useRef<number | null>(null);
-
-  // Close mobile menu on resize
-  useEffect(() => {
-    const resize = () => {
-      if (window.innerWidth >= 768) setOpen(false);
-    };
-    window.addEventListener("resize", resize);
-    return () => window.removeEventListener("resize", resize);
-  }, []);
-
-  // Optimized mouse move (RAF throttled)
-  const handleMove = (e: React.MouseEvent) => {
-    if (!navRef.current) return;
-
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
-
-    rafRef.current = requestAnimationFrame(() => {
-      const rect = navRef.current!.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      navRef.current!.style.setProperty("--x", `${x}px`);
-      navRef.current!.style.setProperty("--y", `${y}px`);
-    });
-  };
 
   return (
-    <>
-      {/* SVG FILTER (lighter + smoother) */}
-      <svg className="pointer-events-none fixed w-0 h-0">
-        <filter id="liquid-glass" x="-20%" y="-20%" width="140%" height="140%">
-          <feTurbulence
-            type="fractalNoise"
-            baseFrequency="0.01 0.018"
-            numOctaves="2"
-            seed="6"
-            result="turbulence"
-          >
-            <animate
-              attributeName="baseFrequency"
-              values="0.01 0.018;0.018 0.025;0.01 0.018"
-              dur="30s"
-              repeatCount="indefinite"
-            />
-          </feTurbulence>
-
-          <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="8" />
-        </filter>
-      </svg>
-
-      <nav className="fixed inset-x-0 top-0 z-50 px-4 py-3">
-        <div className="relative mx-auto max-w-6xl">
-
-          {/* Ambient glow */}
-          <div className="pointer-events-none absolute left-1/4 top-0 h-32 w-32 rounded-full bg-emerald-300/20 blur-[120px]" />
-          <div className="pointer-events-none absolute right-1/3 bottom-0 h-36 w-36 rounded-full bg-purple-300/20 blur-[140px]" />
-
-          {/* NAV CONTAINER */}
-          <div
-            ref={navRef}
-            onMouseMove={handleMove}
-            className="group relative overflow-hidden rounded-full border border-white/20 px-6 py-3 backdrop-blur-xl bg-white/[0.05] shadow-[0_20px_60px_rgba(0,0,0,0.35)]"
-          >
-
-            {/* Glass distortion (isolated layer) */}
-            <div
-              className="absolute inset-0 rounded-full opacity-70"
-              style={{
-                filter: "url(#liquid-glass)",
-                WebkitFilter: "url(#liquid-glass)",
-              }}
-            />
-
-            {/* Cursor light */}
-            <div
-              className="pointer-events-none absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100"
-              style={{
-                background:
-                  "radial-gradient(circle 180px at var(--x) var(--y), rgba(255,255,255,0.15), transparent 70%)",
-              }}
-            />
-
-            {/* Subtle top sheen */}
-            <div className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-br from-white/40 via-white/10 to-transparent opacity-30" />
-
-            {/* Border highlight */}
-            <div className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-inset ring-white/25" />
-
-            {/* CONTENT */}
-            <div className="relative z-10 flex items-center justify-between">
-
-              {/* Logo */}
-              <a href="/" className="portal-focus-ring flex items-center gap-2 rounded-lg text-lg tracking-tight">
-                <span className="font-semibold text-white">Finance4All</span>
-              </a>
-
-              {/* Desktop */}
-              <div className="hidden items-center gap-2 md:flex">
-                {links.map((l) => (
-                  <a
-                    key={l.href}
-                    href={l.href}
-                    className="portal-focus-ring rounded-full px-4 py-2 text-sm font-medium text-white/80 transition-all duration-300 hover:bg-white/15 hover:text-white motion-safe:hover:scale-[1.05]"
-                  >
-                    {l.label}
-                  </a>
-                ))}
-                <Link
-                  to="/login"
-                  className="portal-focus-ring rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-black transition hover:bg-white"
-                >
-                  Portal
-                </Link>
-                <ThemeToggle />
-              </div>
-
-              {/* Mobile toggle */}
-              <div className="flex items-center gap-2 md:hidden">
-                <ThemeToggle />
-
-                <button
-                  type="button"
-                  aria-expanded={open}
-                  aria-label={open ? "Close menu" : "Open menu"}
-                  onClick={() => setOpen((v) => !v)}
-                  className="portal-focus-ring rounded-full border border-white/30 bg-white/10 p-2 backdrop-blur-xl transition hover:bg-white/20"
-                >
-                  {open ? (
-                    <X className="h-5 w-5 text-white" />
-                  ) : (
-                    <Menu className="h-5 w-5 text-white" />
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Mobile menu (animated) */}
-          <div
-            className={`md:hidden transition-all duration-300 ease-out ${
-              open
-                ? "opacity-100 translate-y-0 pointer-events-auto"
-                : "opacity-0 -translate-y-2 pointer-events-none"
-            }`}
-          >
-            <div className="mt-3 rounded-3xl border border-white/20 bg-white/[0.07] p-3 backdrop-blur-xl">
-              {links.map((l) => (
-                <a
-                  key={l.href}
-                  href={l.href}
-                  onClick={() => setOpen(false)}
-                  className="portal-focus-ring block rounded-xl px-4 py-3 text-white/80 transition hover:bg-white/15 hover:text-white"
-                >
-                  {l.label}
-                </a>
-              ))}
-              <Link
-                to="/login"
-                onClick={() => setOpen(false)}
-                className="portal-focus-ring block rounded-xl px-4 py-3 font-semibold text-emerald-300 transition hover:bg-white/15"
-              >
-                Portal
-              </Link>
-            </div>
-          </div>
-
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#071412]/95 backdrop-blur">
+      <nav className="mx-auto flex min-h-16 max-w-6xl items-center justify-between px-4" aria-label="Primary navigation">
+        <a href="/" className="rounded-sm text-lg font-semibold text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-300">
+          Finance4All
+        </a>
+        <div className="hidden items-center gap-6 md:flex">
+          {links.map((link) => (
+            <a key={link.href} href={link.href} className="rounded-sm text-sm font-medium text-slate-300 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-300">
+              {link.label}
+            </a>
+          ))}
+          <Link to="/login" className="rounded-md border border-emerald-300/70 px-3 py-2 text-sm font-semibold text-emerald-200 transition hover:bg-emerald-300 hover:text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-300">
+            Sign in
+          </Link>
         </div>
+        <button
+          type="button"
+          className="rounded-md p-2 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300 md:hidden"
+          aria-expanded={open}
+          aria-controls="mobile-navigation"
+          aria-label={open ? "Close menu" : "Open menu"}
+          onClick={() => setOpen((value) => !value)}
+        >
+          {open ? <X className="h-5 w-5" aria-hidden /> : <Menu className="h-5 w-5" aria-hidden />}
+        </button>
       </nav>
-    </>
+      {open && (
+        <div id="mobile-navigation" className="border-t border-white/10 bg-[#071412] px-4 pb-4 md:hidden">
+          <div className="mx-auto flex max-w-6xl flex-col pt-2">
+            {links.map((link) => (
+              <a key={link.href} href={link.href} onClick={() => setOpen(false)} className="rounded-md px-3 py-3 text-sm font-medium text-slate-200 hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300">
+                {link.label}
+              </a>
+            ))}
+            <Link to="/login" onClick={() => setOpen(false)} className="mt-2 rounded-md bg-emerald-300 px-3 py-3 text-center text-sm font-semibold text-slate-950">
+              Sign in
+            </Link>
+          </div>
+        </div>
+      )}
+    </header>
   );
 }

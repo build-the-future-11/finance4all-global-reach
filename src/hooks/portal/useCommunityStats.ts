@@ -14,7 +14,7 @@ export function useCommunityStats() {
     queryFn: async (): Promise<CommunityStats> => {
       const [membersRes, chaptersRes, projectsRes, introsRes] = await Promise.all([
         supabase
-          .from("profiles")
+          .from("member_directory")
           .select("id", { count: "exact", head: true })
           .neq("display_name", ""),
         supabase.from("chapters").select("id", { count: "exact", head: true }),

@@ -28,6 +28,7 @@ export interface Database {
           interests: string[];
           open_to_collaborate: boolean;
           chapter_id: string | null;
+          onboarding_completed_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -41,6 +42,7 @@ export interface Database {
           interests?: string[];
           open_to_collaborate?: boolean;
           chapter_id?: string | null;
+          onboarding_completed_at?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["profiles"]["Insert"]>;
       };
@@ -68,6 +70,7 @@ export interface Database {
           category: NewsCategory;
           source_url: string | null;
           published_at: string;
+          is_published: boolean;
           tags: string[];
           created_at: string;
         };
@@ -211,6 +214,9 @@ export interface Database {
           starts_at: string;
           ends_at: string | null;
           registration_url: string | null;
+          registration_opens_at: string | null;
+          registration_closes_at: string | null;
+          registration_capacity: number | null;
           program_links: Json;
           created_at: string;
         };
@@ -312,13 +318,111 @@ export interface Database {
         };
         Update: Partial<Pick<Database["public"]["Tables"]["contact_submissions"]["Row"], "status">>;
       };
+      digest_send_log: {
+        Row: {
+          id: string;
+          user_id: string;
+          sent_at: string;
+          period_start: string;
+          status: "sent" | "failed" | "skipped";
+          article_count: number;
+          error_message: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          sent_at?: string;
+          period_start?: string;
+          status: "sent" | "failed" | "skipped";
+          article_count?: number;
+          error_message?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["digest_send_log"]["Insert"]>;
+      };
+      product_analytics_events: {
+        Row: {
+          id: string;
+          user_id: string;
+          event_name: string;
+          properties: Json;
+          occurred_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          event_name: string;
+          properties?: Json;
+          occurred_at?: string;
+        };
+        Update: never;
+      };
+      client_error_events: {
+        Row: {
+          id: string;
+          user_id: string;
+          error_name: string;
+          message: string;
+          tags: Json;
+          occurred_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          error_name: string;
+          message: string;
+          tags?: Json;
+          occurred_at?: string;
+        };
+        Update: never;
+      };
     };
     Views: {
       essay_submissions_with_counts: {
         Row: Database["public"]["Tables"]["essay_submissions"]["Row"] & { upvote_count: number };
       };
+      member_directory: {
+        Row: Omit<Database["public"]["Tables"]["profiles"]["Row"], "email" | "onboarding_completed_at">;
+      };
     };
-    Functions: Record<string, never>;
+    Functions: {
+      check_rate_limit: {
+        Args: { p_action: string; p_identifier: string; p_max_attempts: number; p_window_seconds: number };
+        Returns: boolean;
+      };
+      complete_profile_onboarding: {
+        Args: { p_display_name: string; p_bio?: string | null; p_interests?: string[]; p_open_to_collaborate?: boolean; p_chapter_id?: string | null };
+        Returns: undefined;
+      };
+      ensure_my_profile: { Args: Record<PropertyKey, never>; Returns: undefined };
+      portal_search: { Args: { p_query: string; p_limit?: number }; Returns: unknown[] };
+      record_rate_limit: { Args: { p_action: string; p_identifier: string }; Returns: undefined };
+      submit_contact_submission: {
+        Args: { p_name: string; p_email: string; p_subject: string; p_message: string };
+        Returns: string;
+      };
+      update_my_profile: {
+        Args: {
+          p_display_name: string;
+          p_bio?: string | null;
+          p_interests?: string[];
+          p_open_to_collaborate?: boolean;
+          p_chapter_id?: string | null;
+        };
+        Returns: undefined;
+      };
+      set_my_avatar: {
+        Args: { p_object_name: string; p_avatar_url: string };
+        Returns: string;
+      };
+      track_product_event: {
+        Args: { p_event_name: string; p_properties?: Json };
+        Returns: string;
+      };
+      report_client_error: {
+        Args: { p_error_name: string; p_message: string; p_tags?: Json };
+        Returns: string;
+      };
+    };
     Enums: Record<string, never>;
   };
 }

@@ -1,49 +1,18 @@
 import { Link } from "react-router-dom";
-import { portalCopy } from "@/lib/portalCopy";
 
 export default function Footer() {
   return (
-    <footer className="relative z-10 px-6 py-12">
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute top-[-50%] left-[-50%] h-[400px] w-[400px] rounded-full bg-primary/10 blur-3xl" />
-        <div className="absolute bottom-[-40%] right-[-40%] h-[500px] w-[500px] rounded-full bg-cyan-400/10 blur-3xl" />
-      </div>
-
-      <div className="mx-auto max-w-6xl">
-        <div className="mb-8 grid gap-8 rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl sm:grid-cols-3">
-          <div>
-            <p className="font-semibold text-white">Finance4All</p>
-            <p className="mt-2 text-sm text-white/55">
-              {portalCopy.landing.footerTagline}
-            </p>
-          </div>
-          <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-white/40">Portal</p>
-            <div className="mt-3 flex flex-col gap-2 text-sm">
-              <Link to="/login" className="text-white/70 transition hover:text-emerald-300">
-                Sign in
-              </Link>
-              <Link to="/signup" className="text-white/70 transition hover:text-emerald-300">
-                Create account
-              </Link>
-              <Link to="/portal" className="text-white/70 transition hover:text-emerald-300">
-                Dashboard
-              </Link>
-            </div>
-          </div>
-          <div>
-            <p className="text-xs font-medium uppercase tracking-wider text-white/40">Site</p>
-            <div className="mt-3 flex flex-col gap-2 text-sm">
-              <a href="#about" className="text-white/70 transition hover:text-white">About</a>
-              <a href="#programs" className="text-white/70 transition hover:text-white">Programs</a>
-              <a href="#contact" className="text-white/70 transition hover:text-white">Contact</a>
-            </div>
-          </div>
+    <footer className="border-t border-white/10 bg-[#071412] px-4 py-10 text-sm text-slate-400">
+      <div className="mx-auto flex max-w-6xl flex-col justify-between gap-6 sm:flex-row sm:items-end">
+        <div>
+          <p className="font-semibold text-white">Finance4All</p>
+          <p className="mt-2 max-w-md leading-6">A student-facing finance learning and participation portal.</p>
         </div>
-
-        <div className="flex flex-col items-center justify-between gap-4 text-sm text-white/45 sm:flex-row">
-          <p>© {new Date().getFullYear()} Finance4All. All rights reserved.</p>
-          <p>{portalCopy.landing.footerMission}</p>
+        <div className="flex flex-wrap gap-x-5 gap-y-3">
+          <Link to="/privacy" className="hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300">Privacy</Link>
+          <Link to="/terms" className="hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300">Terms</Link>
+          <a href="#contact" className="hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300">Contact</a>
+          <p>© {new Date().getFullYear()} Finance4All</p>
         </div>
       </div>
     </footer>

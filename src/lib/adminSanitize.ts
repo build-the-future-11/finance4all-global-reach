@@ -12,6 +12,7 @@ export function sanitizeNewsInput(input: {
   category: NewsCategory;
   tags: string[];
   sourceUrl?: string;
+  isPublished?: boolean;
 }) {
   return {
     title: sanitizeTextInput(input.title, 200),
@@ -19,6 +20,7 @@ export function sanitizeNewsInput(input: {
     category: input.category,
     tags: sanitizeTags(input.tags.join(",")),
     sourceUrl: sanitizeOptionalUrl(input.sourceUrl),
+    isPublished: input.isPublished ?? true,
   };
 }
 
@@ -46,15 +48,39 @@ export function sanitizeEventInput(input: {
   description: string;
   status: EventStatus;
   startsAt: string;
+  endsAt?: string;
   registrationUrl?: string;
+  registrationOpensAt?: string;
+  registrationClosesAt?: string;
+  registrationCapacity?: number;
 }) {
+  const startsAt = new Date(input.startsAt);
+  const endsAt = input.endsAt ? new Date(input.endsAt) : undefined;
+  const registrationOpensAt = input.registrationOpensAt ? new Date(input.registrationOpensAt) : undefined;
+  const registrationClosesAt = input.registrationClosesAt ? new Date(input.registrationClosesAt) : undefined;
+
+  if (Number.isNaN(startsAt.getTime()) || (endsAt && Number.isNaN(endsAt.getTime()))) {
+    throw new Error("Enter valid event dates.");
+  }
+  if (endsAt && endsAt < startsAt) throw new Error("The event end must be after its start.");
+  if (registrationOpensAt && registrationClosesAt && registrationOpensAt > registrationClosesAt) {
+    throw new Error("Registration cannot close before it opens.");
+  }
+  if (input.registrationCapacity !== undefined && (!Number.isInteger(input.registrationCapacity) || input.registrationCapacity < 1)) {
+    throw new Error("Registration capacity must be a whole number greater than zero.");
+  }
+
   return {
     chapterId: input.chapterId,
     title: sanitizeTextInput(input.title, 200),
     description: sanitizeTextInput(input.description, 1000),
     status: input.status,
-    startsAt: input.startsAt,
+    startsAt: startsAt.toISOString(),
+    endsAt: endsAt?.toISOString(),
     registrationUrl: sanitizeOptionalUrl(input.registrationUrl),
+    registrationOpensAt: registrationOpensAt?.toISOString(),
+    registrationClosesAt: registrationClosesAt?.toISOString(),
+    registrationCapacity: input.registrationCapacity,
   };
 }
 

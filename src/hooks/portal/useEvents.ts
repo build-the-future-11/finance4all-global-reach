@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { mapChapter, mapEvent } from "@/lib/mappers";
 import { useAuth } from "@/contexts/AuthContext";
+import { trackEvent } from "@/lib/analytics";
 
 export function useChapters() {
   return useQuery({
@@ -63,6 +64,9 @@ export function useToggleEventRegistration() {
         if (error) throw error;
       }
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["event-registrations"] }),
+    onSuccess: (_data, variables) => {
+      if (variables.registered) trackEvent("event.registered");
+      qc.invalidateQueries({ queryKey: ["event-registrations"] });
+    },
   });
 }

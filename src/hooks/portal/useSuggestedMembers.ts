@@ -2,14 +2,14 @@ import { useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMemberProfiles, useConnectionRequests } from "@/hooks/portal/useNetwork";
 import { interestMatchScore } from "@/lib/personalization";
-import type { UserProfile } from "@/types/domain";
+import type { MemberDirectoryProfile } from "@/types/domain";
 
 export function useSuggestedMembers(limit = 6) {
   const { profile, user } = useAuth();
   const membersQuery = useMemberProfiles();
   const connectionsQuery = useConnectionRequests();
 
-  const members = useMemo((): UserProfile[] => {
+  const members = useMemo((): MemberDirectoryProfile[] => {
     if (!profile || !membersQuery.data) return [];
 
     const connectedOrPending = new Set<string>();

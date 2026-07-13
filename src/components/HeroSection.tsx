@@ -1,222 +1,64 @@
+import { ArrowRight, Bookmark, BookOpen, CalendarDays, FlaskConical, Newspaper } from "lucide-react";
 import { Link } from "react-router-dom";
-import { ArrowRight, ChevronDown, FlaskConical, Newspaper, Users } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import GlassSurface from "@/components/landing/GlassSurface";
-import { portalCopy } from "@/lib/portalCopy";
 
-const STATS = [
-  { value: 25000, suffix: "+", label: "Students reached", context: "outreach since 2023" },
-  { value: 15, suffix: "+", label: "Chapter countries", context: "India, UK, US, and more" },
-  { value: 500, suffix: "+", label: "Portal accounts", context: "research, events, writing" },
+const portalItems = [
+  { icon: Newspaper, title: "Finance Debrief", detail: "Read short market and economics explainers." },
+  { icon: FlaskConical, title: "Research opportunities", detail: "Review project scopes and apply when a role is open." },
+  { icon: BookOpen, title: "Courses", detail: "Work through lessons and keep your progress." },
+  { icon: CalendarDays, title: "Chapters and events", detail: "Find updates and register for upcoming sessions." },
 ];
-
-const PORTAL_SNIPPETS = [
-  {
-    icon: Newspaper,
-    label: "Debriefed",
-    headline: "Fed holds; yields slip on soft CPI print",
-    meta: "Macro · 4 min read",
-    accent: "emerald",
-  },
-  {
-    icon: FlaskConical,
-    label: "Meta Labs",
-    headline: "Atlas: Emerging-market FX pass-through",
-    meta: "Open · 3 mentor slots",
-    accent: "blue",
-  },
-  {
-    icon: Users,
-    label: "Network",
-    headline: "Mumbai chapter · Markets 101 this Thursday",
-    meta: "12 members attending",
-    accent: "amber",
-  },
-];
-
-function AnimatedStat({ value, suffix, label, context }: (typeof STATS)[0]) {
-  const [display, setDisplay] = useState(0);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return;
-        const start = performance.now();
-        const duration = 1600;
-
-        const tick = (now: number) => {
-          const t = Math.min((now - start) / duration, 1);
-          const eased = 1 - Math.pow(1 - t, 3);
-          setDisplay(Math.round(value * eased));
-          if (t < 1) requestAnimationFrame(tick);
-        };
-        requestAnimationFrame(tick);
-        observer.disconnect();
-      },
-      { threshold: 0.3 },
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [value]);
-
-  return (
-    <div ref={ref} className="relative pl-4">
-      <div className="absolute left-0 top-1 h-full w-px bg-gradient-to-b from-emerald-400/60 to-transparent" />
-      <p className="text-2xl font-bold tabular-nums text-white sm:text-3xl">
-        {display.toLocaleString()}
-        {suffix}
-      </p>
-      <p className="mt-1 text-xs font-medium text-white/80">{label}</p>
-      <p className="text-[10px] uppercase tracking-wider text-white/35">{context}</p>
-    </div>
-  );
-}
-
-const accentMap = {
-  emerald: "border-emerald-400/25 bg-emerald-500/10 text-emerald-300",
-  blue: "border-blue-400/25 bg-blue-500/10 text-blue-300",
-  amber: "border-amber-400/25 bg-amber-500/10 text-amber-300",
-};
 
 export default function HeroSection() {
-  const glareRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const move = (e: MouseEvent) => {
-      const x = (e.clientX / window.innerWidth - 0.5) * 2;
-      const y = (e.clientY / window.innerHeight - 0.5) * 2;
-      if (glareRef.current) {
-        glareRef.current.style.transform = `translate(${x * 16}px, ${y * 16}px)`;
-      }
-    };
-    window.addEventListener("mousemove", move);
-    return () => window.removeEventListener("mousemove", move);
-  }, []);
-
   return (
-    <section className="relative flex min-h-[100dvh] flex-col justify-center overflow-hidden px-4 pb-20 pt-28">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="landing-float absolute left-[20%] top-[18%] h-96 w-96 rounded-full bg-emerald-500/12 blur-[130px]" />
-        <div className="absolute right-0 top-1/3 h-px w-1/3 bg-gradient-to-l from-emerald-400/20 to-transparent" />
-      </div>
-
-      <div className="relative z-10 mx-auto grid w-full max-w-6xl items-center gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
+    <section className="border-b border-emerald-100/10 bg-[#071412] px-4 pb-14 pt-32 sm:pb-20 sm:pt-40">
+      <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[1.08fr_0.92fr] lg:gap-16">
         <div>
-          <GlassSurface className="mb-8 inline-flex w-fit rounded-full p-1.5 pr-4" interactive={false}>
-            <div className="landing-glass-inner flex items-center gap-3">
-              <span className="glass-pill !text-emerald-200">{portalCopy.landing.heroBadge}</span>
-              <span className="text-xs text-white/55">{portalCopy.landing.heroBadgeModules}</span>
-            </div>
-          </GlassSurface>
-
-          <h1 className="text-balance text-4xl font-bold leading-[1.06] tracking-tight text-white sm:text-5xl lg:text-[3.35rem]">
-            {portalCopy.landing.heroTitle}{" "}
-            <span className="bg-gradient-to-r from-emerald-200 via-white to-emerald-100 bg-clip-text text-transparent">
-              {portalCopy.landing.heroTitleAccent}
-            </span>
+          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-300">Finance4All</p>
+          <h1 className="mt-5 max-w-3xl text-4xl font-semibold leading-tight text-white sm:text-5xl">
+            Learn finance by reading, practicing, and taking part.
           </h1>
-
-          <p className="mt-6 max-w-xl text-base leading-[1.7] text-white/58 sm:text-lg">
-            {portalCopy.landing.heroSubtext}
+          <p className="mt-6 max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">
+            Finance4All is a member portal for students who want a clearer way into finance and economics. Use it to study foundational concepts, follow Finance Debrief, explore opportunities, and stay connected to chapter activity.
           </p>
-
-          <div className="mt-10 flex flex-wrap gap-3">
+          <div className="mt-8 flex flex-wrap gap-3">
             <Link
               to="/signup"
-              className="landing-shimmer group inline-flex items-center gap-2 rounded-full bg-emerald-500 px-7 py-3.5 text-sm font-semibold text-black shadow-[0_8px_32px_rgba(52,211,153,0.35)] transition hover:bg-emerald-400"
+              className="inline-flex min-h-11 items-center gap-2 rounded-md bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-200"
             >
-              {portalCopy.landing.heroCtaPrimary}
-              <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+              Create a member account
+              <ArrowRight className="h-4 w-4" aria-hidden />
             </Link>
-            <Link
-              to="/login"
-              className="landing-glass inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-semibold text-white transition hover:border-white/25"
+            <a
+              href="#membership"
+              className="inline-flex min-h-11 items-center rounded-md border border-white/25 px-5 py-3 text-sm font-semibold text-white transition hover:border-white/50 hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
-              <span className="landing-glass-inner">{portalCopy.landing.heroCtaSecondary}</span>
-            </Link>
+              See what membership includes
+            </a>
           </div>
-
-          <GlassSurface className="mt-12 p-6 sm:p-8" strong>
-            <div className="landing-glass-inner grid gap-8 sm:grid-cols-3">
-              {STATS.map((s) => (
-                <AnimatedStat key={s.label} {...s} />
-              ))}
-            </div>
-          </GlassSurface>
+          <p className="mt-5 text-sm text-slate-400">No finance background is assumed. Content availability changes as editors and administrators publish it.</p>
         </div>
 
-        <div className="relative">
-          <div
-            ref={glareRef}
-            className="pointer-events-none absolute -inset-6 rounded-[40px] bg-[radial-gradient(circle,rgba(52,211,153,0.16),transparent_68%)] transition-transform duration-500"
-          />
-          <GlassSurface strong className="rounded-[28px]">
-            <div className="landing-glass-inner">
-              <div className="flex items-center justify-between border-b border-white/10 px-5 py-3.5">
-                <div className="flex gap-1.5">
-                  <div className="h-2.5 w-2.5 rounded-full bg-red-400/60" />
-                  <div className="h-2.5 w-2.5 rounded-full bg-amber-400/60" />
-                  <div className="h-2.5 w-2.5 rounded-full bg-emerald-400/60" />
-                </div>
-                <p className="font-mono text-[10px] text-white/30">
-                  {portalCopy.landing.heroPortalPreview}
-                </p>
-              </div>
-
-              <div className="space-y-3 p-5">
-                {PORTAL_SNIPPETS.map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <div
-                      key={item.label}
-                      className="landing-glass rounded-2xl p-4 transition"
-                    >
-                      <div className="landing-glass-inner flex items-start gap-3">
-                        <div
-                          className={`rounded-xl border p-2.5 ${accentMap[item.accent as keyof typeof accentMap]}`}
-                        >
-                          <Icon className="h-4 w-4" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center justify-between gap-2">
-                            <p className="text-[10px] font-semibold uppercase tracking-wider text-white/40">
-                              {item.label}
-                            </p>
-                            <span className="text-[10px] text-white/25">{item.meta}</span>
-                          </div>
-                          <p className="mt-1 text-sm font-medium leading-snug text-white/90">
-                            {item.headline}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className="border-t border-white/10 px-5 py-3">
-                <p className="text-center text-[11px] text-white/40">
-                  {portalCopy.landing.heroPortalFooter}
-                </p>
-              </div>
+        <div className="border border-white/15 bg-[#0d211d] p-5 shadow-2xl shadow-black/20 sm:p-7">
+          <div className="flex items-center justify-between border-b border-white/10 pb-4">
+            <div>
+              <p className="text-sm font-semibold text-white">Inside the member portal</p>
+              <p className="mt-1 text-sm text-slate-400">A single place to return to your learning and activity.</p>
             </div>
-          </GlassSurface>
+            <Bookmark className="h-5 w-5 text-emerald-300" aria-hidden />
+          </div>
+          <ul className="divide-y divide-white/10">
+            {portalItems.map(({ icon: Icon, title, detail }) => (
+              <li key={title} className="flex gap-4 py-5">
+                <Icon className="mt-0.5 h-5 w-5 shrink-0 text-emerald-300" aria-hidden />
+                <div>
+                  <h2 className="font-medium text-white">{title}</h2>
+                  <p className="mt-1 text-sm leading-6 text-slate-400">{detail}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
-
-      <a
-        href="#about"
-        className="absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-1 text-white/25 transition hover:text-white/55"
-        aria-label="Scroll to learn more"
-      >
-        <span className="text-[10px] uppercase tracking-[0.2em]">{portalCopy.landing.heroScrollHint}</span>
-        <ChevronDown className="h-5 w-5 animate-bounce" />
-      </a>
     </section>
   );
 }

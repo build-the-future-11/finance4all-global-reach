@@ -7,7 +7,7 @@ export type UserRole = z.infer<typeof UserRoleSchema>;
 
 export const UserProfileSchema = z.object({
   id: z.string().uuid(),
-  displayName: z.string().min(1),
+  displayName: z.string().max(120),
   email: z.string().email(),
   role: UserRoleSchema,
   bio: z.string().optional(),
@@ -15,10 +15,15 @@ export const UserProfileSchema = z.object({
   interests: z.array(z.string()).default([]),
   openToCollaborate: z.boolean().default(false),
   chapterId: z.string().uuid().optional(),
+  onboardingCompletedAt: z.string().datetime().optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });
 export type UserProfile = z.infer<typeof UserProfileSchema>;
+
+// Directory records intentionally exclude account email and onboarding state.
+export const MemberDirectoryProfileSchema = UserProfileSchema.omit({ email: true });
+export type MemberDirectoryProfile = z.infer<typeof MemberDirectoryProfileSchema>;
 
 // ─── Finance Debriefed Hub ────────────────────────────────────────────────────
 
@@ -32,6 +37,7 @@ export const NewsArticleSchema = z.object({
   category: NewsCategorySchema,
   sourceUrl: z.string().url().optional(),
   publishedAt: z.string().datetime(),
+  isPublished: z.boolean().default(true),
   tags: z.array(z.string()).default([]),
 });
 export type NewsArticle = z.infer<typeof NewsArticleSchema>;
@@ -168,6 +174,9 @@ export const EventSchema = z.object({
   startsAt: z.string().datetime(),
   endsAt: z.string().datetime().optional(),
   registrationUrl: z.string().url().optional(),
+  registrationOpensAt: z.string().datetime().optional(),
+  registrationClosesAt: z.string().datetime().optional(),
+  registrationCapacity: z.number().int().positive().optional(),
   programLinks: z
     .array(z.object({ label: z.string(), url: z.string().url() }))
     .default([]),

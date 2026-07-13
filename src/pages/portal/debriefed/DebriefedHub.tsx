@@ -93,11 +93,10 @@ export default function DebriefedHub() {
   }, [articles]);
 
   const handleDigestToggle = async (
-    key: "weeklyDigestEnabled" | "substackSubscribed",
     value: boolean,
   ) => {
     try {
-      await updatePrefs.mutateAsync({ [key]: value });
+      await updatePrefs.mutateAsync({ weeklyDigestEnabled: value });
       toast.success("Preferences saved");
     } catch {
       toast.error("Failed to save preferences");
@@ -137,20 +136,14 @@ export default function DebriefedHub() {
             <span className="text-sm text-white/70">Interested in weekly digest</span>
             <Switch
               checked={prefs?.weeklyDigestEnabled ?? false}
-              onCheckedChange={(v) => handleDigestToggle("weeklyDigestEnabled", v)}
+              disabled={updatePrefs.isPending}
+              onCheckedChange={handleDigestToggle}
             />
           </div>
         </PortalCard>
         <PortalCard className="p-5">
           <h3 className="font-semibold text-white">Substack</h3>
-          <p className="mt-1 text-sm text-white/55">Subscribe to Finance Debriefed on Substack.</p>
-          <div className="mt-4 flex items-center justify-between">
-            <span className="text-sm text-white/70">I'm subscribed</span>
-            <Switch
-              checked={prefs?.substackSubscribed ?? false}
-              onCheckedChange={(v) => handleDigestToggle("substackSubscribed", v)}
-            />
-          </div>
+          <p className="mt-1 text-sm text-white/55">Read and subscribe to the public Finance Debriefed publication on Substack.</p>
           <a
             href="https://financedebriefed.substack.com"
             target="_blank"
