@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { parseAuthHashError } from "@/lib/appOrigin";
-import { sanitizeUserFacingError } from "@/lib/authErrors";
 import { Button } from "@/components/ui/button";
 import { PortalFullPageShell } from "@/components/portal/PortalUI";
 
@@ -12,9 +11,7 @@ export default function AuthCallback() {
   const navigate = useNavigate();
   const hashError = parseAuthHashError();
   const friendlyHashError = hashError
-    ? hashError.includes("localhost")
-      ? "Auth redirected to localhost. In Supabase → URL Configuration, set Site URL to your Vercel domain and add it to Redirect URLs."
-      : sanitizeUserFacingError(hashError, "Sign-in was cancelled or could not be completed.")
+    ? "Sign-in was cancelled or could not be completed. Please try again."
     : null;
 
   useEffect(() => {
@@ -36,7 +33,7 @@ export default function AuthCallback() {
             replace: true,
             state: {
               message:
-                "Sign-in could not be completed. If you used Google, check Supabase redirect URLs match your live site URL.",
+                "Sign-in could not be completed. Please try again or contact support if it continues.",
             },
           }),
         4000,

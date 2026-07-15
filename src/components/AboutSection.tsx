@@ -10,21 +10,21 @@ const pillars = [
     number: "01",
     title: "Chapters on the ground",
     description:
-      "Faculty-backed clubs run Catalyst workshops and Markets 101 nights. Officers log attendance in the portal; members in Mumbai, London, and New York share one directory.",
+      "Chapter pages help local organizers publish updates, events, and resources. Members see what is active without confusing an empty chapter record for a live program.",
   },
   {
     icon: FlaskConical,
     number: "02",
     title: "Research with reviewers",
     description:
-      "Meta Labs pairs students with lead researchers on bounded projects. Applications are read by the lead. Atlas, IYERN, and fintech tracks each publish deliverables upfront.",
+      "Research projects define their scope, deadline, and application expectations before members apply. Leads review submissions only for projects they are allowed to manage.",
   },
   {
     icon: BookOpen,
     number: "03",
     title: "Writing that ships",
     description:
-      "The Economics Journal takes opinion and market analysis from members. Editors request revisions on unsupported claims before external promotion. Submit on Pathways; read standards in Resources.",
+      "Finance Debrief and member writing stay educational. Editors ask for source support before publishing claims beyond basic explanation.",
   },
 ];
 
@@ -46,7 +46,7 @@ export default function AboutSection() {
               <span className="text-emerald-300/95">actually run</span>
             </>
           }
-          description="Finance4All is a nonprofit — school outreach, a member portal, and chapter events. The through-line: a budgeting workshop can lead to a lab application, then a journal submission."
+          description="Finance4All brings school outreach, a member portal, and chapter activity into one system. The through-line is practical: learn the basics, save useful reading, apply to real projects, and follow what your chapter publishes."
         />
         <p className="mx-auto mt-4 max-w-3xl text-center text-sm leading-relaxed text-white/45">
           {portalCopy.landing.aboutSubtext}

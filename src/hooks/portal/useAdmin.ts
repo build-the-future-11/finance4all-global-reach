@@ -400,6 +400,54 @@ export function useUpdateMemberRole() {
   });
 }
 
+export function useProductAnalyticsEvents() {
+  return useQuery({
+    queryKey: ["admin", "product-analytics-events"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("product_analytics_events")
+        .select("*")
+        .order("occurred_at", { ascending: false })
+        .limit(250);
+      if (error) throwSanitizedDbError(error);
+      return data;
+    },
+    staleTime: 30_000,
+  });
+}
+
+export function useClientErrorEvents() {
+  return useQuery({
+    queryKey: ["admin", "client-error-events"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("client_error_events")
+        .select("*")
+        .order("occurred_at", { ascending: false })
+        .limit(100);
+      if (error) throwSanitizedDbError(error);
+      return data;
+    },
+    staleTime: 30_000,
+  });
+}
+
+export function useDigestDeliveryLog() {
+  return useQuery({
+    queryKey: ["admin", "digest-delivery-log"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("digest_send_log")
+        .select("*")
+        .order("sent_at", { ascending: false })
+        .limit(100);
+      if (error) throwSanitizedDbError(error);
+      return data;
+    },
+    staleTime: 30_000,
+  });
+}
+
 export function useSeedCmsContent() {
   const qc = useQueryClient();
   return useMutation({

@@ -1,165 +1,108 @@
-# Supabase Setup — Step by Step
+# Supabase Setup
 
-Follow these steps to connect your Finance4All portal to Supabase.
+Use this guide to connect Finance4All to a real Supabase project for production.
 
----
+## 1. Create Or Select The Project
 
-## Step 1: Create a Supabase project
+Create a Supabase project, choose the region closest to your expected members, and store the database password in a secure password manager.
 
-1. Go to [https://supabase.com](https://supabase.com) and sign in (or create an account).
-2. Click **New project**.
-3. Choose your organization, then set:
-   - **Name:** `finance4all` (or anything you like)
-   - **Database password:** save this somewhere safe
-   - **Region:** pick the closest to your users
-4. Click **Create new project** and wait ~2 minutes for it to provision.
+In **Project Settings -> API**, copy:
 
----
+- `VITE_SUPABASE_URL`: the project URL.
+- `VITE_SUPABASE_ANON_KEY`: the anon public JWT.
 
-## Step 2: Run the database migrations
+Never place the `service_role` key in frontend, Vercel, or Vite client variables.
 
-1. In your Supabase dashboard, open **SQL Editor** (left sidebar).
-2. Click **New query**.
-3. Run each migration file **in order** (copy entire file, paste, **Run**):
-   - `supabase/migrations/001_initial_schema.sql`
-   - `supabase/migrations/002_google_oauth.sql`
-   - `supabase/migrations/003_bookmarks_notifications.sql`
-   - `supabase/migrations/004_avatar_storage.sql`
-   - `supabase/migrations/005_security_hardening.sql`
-   - `supabase/migrations/006_education_progress.sql`
-   - `supabase/migrations/007_contact_submissions.sql`
-4. You should see **Success** for each query.
+## 2. Run Migrations
 
-This creates all tables, security policies, triggers, and the auto-profile trigger.
+Open **SQL Editor** and run the migration files in order. If a file has already been applied, verify its objects and continue with the next file.
 
----
+1. `supabase/migrations/001_initial_schema.sql`
+2. `supabase/migrations/002_google_oauth.sql`
+3. `supabase/migrations/003_bookmarks_notifications.sql`
+4. `supabase/migrations/004_avatar_storage.sql`
+5. `supabase/migrations/005_security_hardening.sql`
+6. `supabase/migrations/006_education_progress.sql`
+7. `supabase/migrations/007_contact_submissions.sql`
+8. `supabase/migrations/008_platform_cms.sql`
+9. `supabase/migrations/009_membership_integrity.sql`
+10. `supabase/migrations/010_public_claims_content.sql`
+11. `supabase/migrations/011_directory_privacy.sql`
+12. `supabase/migrations/012_operational_integrity.sql`
 
-## Step 3: Add seed data (optional but recommended)
+Run `supabase/verify_migration_status.sql` afterward and resolve any missing object before inviting real users.
 
-1. In SQL Editor, click **New query** again.
-2. Copy everything from `supabase/seed.sql`, paste, and **Run**.
-3. This adds sample news, explainers, chapters, events, and opportunities so the portal isn't empty.
+## 3. Seed Carefully
 
----
+`supabase/seed.sql` is useful for development and internal testing. Do not open public registration with unverified seed content, demo opportunities, or placeholder chapter records still visible.
 
-## Step 4: Configure authentication
+## 4. Configure Auth
 
-1. Go to **Authentication** → **Providers**.
-2. Make sure **Email** is enabled (on by default).
-3. For local development, disable email confirmation:
-   - Go to **Authentication** → **Settings** (or **Sign In / Providers** → email settings)
-   - Turn off **Confirm email** so you can sign up instantly without checking inbox.
+In **Authentication -> URL Configuration**:
 
----
+- Set the production Site URL to the canonical app URL.
+- Add local and production redirects for `/auth/callback` and `/reset-password`.
+- If Google sign-in is enabled, add Supabase's Google callback URL in Google Cloud Console.
 
-## Step 5: Get your API keys
+Email sign-up should use production confirmation settings before public launch. Local development can temporarily disable confirmation.
 
-1. Go to **Project Settings** (gear icon) → **API**.
-2. Copy these two values:
-   - **Project URL** — looks like `https://abcdefgh.supabase.co`
-   - **anon public** key — long string starting with `eyJ...`
+## 5. Deploy Edge Functions
 
-> Use the **anon** key, not the service_role key. The anon key is safe for the browser.
-
----
-
-## Step 6: Create your `.env` file
-
-In the project root (same folder as `package.json`):
+Install and authenticate the Supabase CLI outside this repository, then deploy:
 
 ```bash
-cp .env.example .env
+supabase functions deploy weekly-digest --no-verify-jwt
+supabase functions deploy delete-account
 ```
 
-Open `.env` and paste your values:
+`weekly-digest` is protected by `DIGEST_CRON_SECRET`, so it intentionally does not rely on user JWT verification. `delete-account` keeps JWT verification enabled and validates the member again inside the function.
 
-```env
-VITE_SUPABASE_URL=https://YOUR_PROJECT_ID.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJYOUR_ANON_KEY_HERE
+Set these function secrets:
+
+- `SUPABASE_URL`
+- `SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `SITE_URL`
+- `DIGEST_CRON_SECRET`
+- `RESEND_API_KEY`
+- `DIGEST_FROM_EMAIL`
+
+Configure Supabase Cron or an external scheduler to `POST` the weekly digest endpoint with:
+
+```text
+Authorization: Bearer DIGEST_CRON_SECRET
 ```
 
-Save the file. **Restart** the dev server if it's already running:
+## 6. Environment Variables
 
-```bash
-npm run dev
-```
+Frontend hosting needs:
 
----
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+- `VITE_APP_URL`
 
-## Step 7: Test it
+Restart local dev or redeploy production after changing any `VITE_*` variable.
 
-1. Open [http://localhost:8080/signup](http://localhost:8080/signup)
-2. Create an account with any email + password (6+ chars).
-3. Complete onboarding.
-4. You should land on `/portal` with stats and sample content.
+## 7. Initial Admin
 
-If you see data on the dashboard, Supabase is connected.
-
----
-
-## Step 8: Promote your role (optional)
-
-New accounts are `member` by default. To test lead researcher features (create projects, review applications):
-
-1. Go to **SQL Editor** in Supabase.
-2. Run:
-
-```sql
-UPDATE profiles
-SET role = 'lead_researcher'
-WHERE email = 'your-email@example.com';
-```
-
-For full admin access:
+After the first trusted admin signs up, promote that account with a controlled SQL update:
 
 ```sql
 UPDATE profiles
 SET role = 'admin'
-WHERE email = 'your-email@example.com';
+WHERE email = 'admin@example.org';
 ```
 
-Sign out and back in to see the updated role.
+Then sign out and back in before opening `/portal/admin`.
 
----
+## 8. Production Checks
 
-## Deploying (Vercel / Lovable / Netlify)
+Before public launch:
 
-Add the same two env vars in your hosting dashboard:
-
-| Variable | Value |
-|----------|-------|
-| `VITE_SUPABASE_URL` | Your project URL |
-| `VITE_SUPABASE_ANON_KEY` | Your anon key |
-
-Redeploy after saving. The portal won't work in production without these.
-
----
-
-## Troubleshooting
-
-| Problem | Fix |
-|---------|-----|
-| "Supabase not connected" banner on login | `.env` missing or dev server not restarted |
-| Sign up works but no data loads | Run migration + seed SQL |
-| "new row violates row-level security" | Migration didn't run fully — re-run `001_initial_schema.sql` |
-| Sign up but can't log in | Disable email confirmation in Auth settings, or check your inbox |
-| Profile not created on signup | Re-run migration (the `handle_new_user` trigger may be missing) |
-
----
-
-## Quick reference
-
-```
-Project root/
-  .env                          ← your secrets (never commit)
-  .env.example                  ← template
-  supabase/
-    migrations/
-      001_initial_schema.sql    ← run first
-      002_google_oauth.sql
-      003_bookmarks_notifications.sql
-      004_avatar_storage.sql
-      005_security_hardening.sql
-      006_education_progress.sql
-    seed.sql                    ← run after migrations
-```
+- Confirm every public table has RLS enabled.
+- Confirm only trusted accounts have `admin` or `lead_researcher` roles.
+- Verify avatar uploads accept only expected image types and member-owned paths.
+- Verify account export works from Settings.
+- Verify account deletion is blocked for the sole admin and succeeds for a non-admin test account.
+- Verify the weekly digest sends only published current-week Finance Debrief items and creates one log row per member per week.
+- Verify the Admin System tab shows analytics, client errors, and digest delivery logs after test activity.

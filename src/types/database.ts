@@ -103,6 +103,7 @@ export interface Database {
           weekly_digest_enabled: boolean;
           substack_subscribed: boolean;
           preferred_categories: NewsCategory[];
+          last_digest_sent_at: string | null;
           updated_at: string;
         };
         Insert: {
@@ -110,6 +111,7 @@ export interface Database {
           weekly_digest_enabled?: boolean;
           substack_subscribed?: boolean;
           preferred_categories?: NewsCategory[];
+          last_digest_sent_at?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["digest_preferences"]["Insert"]>;
       };

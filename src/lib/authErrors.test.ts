@@ -22,6 +22,15 @@ describe("authErrors", () => {
     expect(sanitizeUserFacingError("JWT expired")).toBe("Something went wrong. Please try again.");
   });
 
+  it("strips deployment and provider details from user-facing messages", () => {
+    expect(sanitizeUserFacingError("Auth redirected to localhost because Supabase redirect URL is wrong")).toBe(
+      "Something went wrong. Please try again.",
+    );
+    expect(sanitizeUserFacingError("Missing VITE_SUPABASE_URL environment variable")).toBe(
+      "Something went wrong. Please try again.",
+    );
+  });
+
   it("preserves safe application errors", () => {
     expect(sanitizeUserFacingError("Enter a valid email address.")).toBe("Enter a valid email address.");
   });

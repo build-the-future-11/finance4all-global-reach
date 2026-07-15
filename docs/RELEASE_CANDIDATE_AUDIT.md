@@ -1,6 +1,6 @@
 # Release Candidate Audit
 
-Status: **Code release candidate**
+Status: **Production code baseline**
 
 ## Passed evidence
 
@@ -18,20 +18,26 @@ Status: **Code release candidate**
 - Members update profiles and avatar references only through authenticated, server-validated functions. Direct member profile updates are removed, preserving role, email, and onboarding lifecycle fields from browser writes.
 - Auth redirects preserve the requested path, query string, and hash so deep links resume after sign-in.
 - Production configuration rejects builds without `VITE_APP_URL`; Vercel config supplies security headers, SPA rewrites, CSP, HSTS, and frame protection.
-- Client analytics records only product event names and non-identifying properties. Error reporting supports an optional same-origin endpoint and cannot interrupt recovery.
+- Client analytics records only allowlisted product event names and bounded non-identifying scalar properties through the authenticated `track_product_event` RPC.
+- Client error reporting stores sanitized authenticated reports through the `report_client_error` RPC; stack traces and free-form user content are not transmitted.
+- Account export is available from member settings, and account deletion is implemented through a JWT-protected Edge Function with sole-admin protection.
+- Weekly digest delivery sends only published current-week Finance Debrief articles, reserves one member/week log row before email delivery, and exposes delivery status in the Admin System tab.
+- The Admin System tab now surfaces product event counts, recent client error reports, and weekly digest delivery logs for production operations.
 
 ## Automated verification
 
-- `npm run test`: 16 test files and 68 tests passed.
+- `npm run test`: 19 test files and 78 tests passed.
 - `npm run lint`: passed with 11 existing Fast Refresh advisory warnings and no errors.
+- `npx tsc --noEmit`: passed.
 - `VITE_APP_URL=https://finance4all.example.org npm run build`: passed.
-- `npm run audit:ci`: passed with zero high-severity production dependency vulnerabilities.
+- `npm run test:e2e`: 7 Playwright tests passed after the local browser sandbox permission was granted.
+- `npm audit --omit=dev --audit-level=high`: passed with 0 vulnerabilities.
 
 ## Browser verification
 
 - Desktop landing view checked at 1440 x 900.
 - Mobile landing view checked at 390 x 844, including the menu interaction.
-- Public routes and protected-route redirect checked locally with no browser console errors.
+- Public routes, signup honeypot visibility, and protected-route redirect checked locally with no browser console errors.
 
 ## External release gate
 

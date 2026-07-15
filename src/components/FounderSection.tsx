@@ -5,48 +5,48 @@ import { landingEyebrowClass } from "@/components/portal/PortalUI";
 
 const teamMembers = [
   {
-    name: "Halle",
-    role: "Head of Growth",
+    name: "Chapter operations",
+    role: "Student outreach",
     highlights: [
-      "Runs outreach and partnerships for chapter expansion",
-      "Built Econ in 3 Mins, a youth economics education channel",
-      "Leads marketing for JA Southern Alberta regional campaigns",
+      "Helps students start and maintain local finance-literacy activity",
+      "Keeps chapter updates, events, and member requests organized",
+      "Turns student questions into clearer learning and support material",
     ],
   },
   {
-    name: "Kranav Gupta",
-    role: "Co-Founder · EconScholars Lead",
+    name: "Learning team",
+    role: "Curriculum and workshops",
     highlights: [
-      "Founded EconScholars, Finance4All's olympiad prep program",
-      "Mentors students preparing for international economics competitions",
-      "Coordinates live industry and research project placements",
+      "Maintains the beginner finance and economics learning path",
+      "Reviews lessons for plain language and practical examples",
+      "Builds course progress around real member next steps",
     ],
   },
   {
-    name: "Frank Niu",
-    role: "Senior Researcher",
+    name: "Research leads",
+    role: "Projects and review",
     highlights: [
-      "FBLA award winner and Director of Finance at Youth Civics Network",
-      "Reviews student research submissions for clarity and evidence",
-      "Supports chapter officers running their first finance events",
+      "Scope research projects so students know what they are applying to do",
+      "Review applications and submissions for clarity and evidence",
+      "Keep opportunities bounded, current, and honest about expectations",
     ],
   },
   {
-    name: "Xiurui (Ray) Chen",
-    role: "Senior Researcher",
+    name: "Editorial team",
+    role: "Finance Debrief",
     highlights: [
-      "Portfolio manager at CCDS Investment Club; co-founded the QIS research branch",
-      "Coordinates sponsorship and logistics for chapter puzzle nights",
-      "Stock Market Game finalist — brings practitioner framing to curriculum review",
+      "Publishes Finance Debrief summaries with source attribution",
+      "Avoids investment advice and unsupported market claims",
+      "Keeps saved reading and weekly digest content useful for students",
     ],
   },
   {
-    name: "Joseph Augustine",
-    role: "Affiliate, Youth Economy Lab",
+    name: "Platform operations",
+    role: "Member support",
     highlights: [
-      "Leads Youth Economy Lab initiatives with 500+ student members",
-      "Connects Finance4All chapters to policy and education research programs",
-      "Focuses on making economic systems legible to first-time learners",
+      "Maintains account, privacy, notification, and deletion workflows",
+      "Reviews member feedback and service errors before they become patterns",
+      "Keeps administrative publishing tied to real, approved content",
     ],
   },
 ];
@@ -73,13 +73,13 @@ export default function FounderSection() {
           <div className="relative overflow-hidden rounded-3xl border border-white/15 bg-white/[0.05] p-8 backdrop-blur-3xl sm:p-10">
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(52,211,153,0.12),transparent_40%)]" />
             <div className="relative z-10">
-              <h3 className="text-2xl font-semibold text-white">Ryan Gomez</h3>
-              <p className="mt-1 font-medium text-emerald-300">Founder and ML Researcher</p>
+              <h3 className="text-2xl font-semibold text-white">A student-led operating model</h3>
+              <p className="mt-1 font-medium text-emerald-300">Built around learning, chapters, research, and editorial review</p>
               <div className="mt-6 grid gap-3 text-sm text-white/60 sm:grid-cols-2">
-                <p>• Founded Finance4All from classroom outreach in India</p>
-                <p>• Built the Catalyst curriculum and member portal</p>
-                <p>• ML researcher focused on education tooling</p>
-                <p>• Oversees Atlas Economics Lab and editorial standards</p>
+                <p>• Public claims stay tied to approved program records</p>
+                <p>• Finance Debrief separates education from investment advice</p>
+                <p>• Research projects define scope before members apply</p>
+                <p>• Administrators publish only content they can stand behind</p>
               </div>
             </div>
           </div>

@@ -6,18 +6,18 @@ import GlassSurface from "@/components/landing/GlassSurface";
 const TIMELINE = [
   {
     year: "2023",
-    title: "Classroom outreach in India",
-    body: "Volunteers taught budgeting and compound interest in schools where finance was never on the syllabus. No apps required — whiteboards, worksheets, and translated examples.",
+    title: "Classroom outreach",
+    body: "The work began with beginner finance lessons built for students who did not have a formal finance class. No jargon first; just budgeting, interest, tradeoffs, and questions students could actually use.",
   },
   {
     year: "2024",
-    title: "Catalyst curriculum & first chapters",
-    body: "Lessons were packaged into the Catalyst CFEI track. Students who wanted more than workshops started Meta Labs projects and submitted writing to the Economics Journal.",
+    title: "Curriculum and member pathways",
+    body: "Lessons, research opportunities, writing, and chapter updates were organized into repeatable workflows so members could move from reading to participation without guessing where to go next.",
   },
   {
     year: "2025",
     title: "Finance4All portal launch",
-    body: "Debriefed news, lab applications, Pathways opportunities, and chapter events moved into one member dashboard. Membership stayed free; the gate became effort, not payment.",
+    body: "Finance Debrief, research applications, opportunities, saved content, course progress, and chapter activity moved into one member dashboard.",
   },
 ];
 
@@ -32,8 +32,8 @@ export default function OriginStorySection() {
             <SectionHeader
               align="left"
               eyebrow="Origin"
-              title="From one classroom to a network students run themselves"
-              description="Meet students where they are: worksheets and translated examples in classrooms, then the portal when they want labs, writing, or chapter events. Officers and leads step in; the network does not run students' projects for them."
+              title="From basic lessons to a working member portal"
+              description="Meet students where they are: clear explanations first, then the portal when they want saved reading, learning progress, research applications, opportunities, or chapter events."
             />
             <Link
               to="/signup"

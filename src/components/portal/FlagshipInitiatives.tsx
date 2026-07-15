@@ -8,9 +8,9 @@ const INITIATIVES = [
     id: "atlas",
     icon: FlaskConical,
     eyebrow: "Research lab",
-    title: "Atlas Economics Lab",
+    title: "Research projects",
     description:
-      "Student-led macro research on FX, inflation, and policy. Browse open roles or read past project notes.",
+      "Browse open research roles, read project scope, and apply only where the listing is active.",
     href: `${portalRoutes.labs}?tag=macro`,
     accent: "from-blue-500/20 to-emerald-500/10",
   },
@@ -30,7 +30,7 @@ const INITIATIVES = [
     eyebrow: "Library",
     title: "Resources & media",
     description:
-      "Facilitator guides, journal standards, club toolkits, podcasts, and partner programs.",
+      "Facilitator guides, writing standards, club toolkits, podcasts, and practical templates.",
     href: portalRoutes.resources,
     accent: "from-violet-500/20 to-blue-500/10",
   },
@@ -50,7 +50,7 @@ const INITIATIVES = [
     eyebrow: "Opportunities",
     title: "Axiom Pathways",
     description:
-      "Internships, research programs, and project roles from partner organizations worldwide.",
+      "Opportunities, research programs, and project roles published by administrators.",
     href: portalRoutes.pathways,
     accent: "from-purple-500/20 to-blue-500/10",
   },

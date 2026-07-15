@@ -35,7 +35,9 @@ Deno.serve(async (request) => {
 
   try {
     const cronSecret = requiredEnv("DIGEST_CRON_SECRET");
-    if (request.headers.get("x-digest-cron-secret") !== cronSecret) {
+    const bearerToken = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "").trim();
+    const explicitToken = request.headers.get("x-digest-cron-secret")?.trim();
+    if (bearerToken !== cronSecret && explicitToken !== cronSecret) {
       return json({ error: "Unauthorized" }, 401);
     }
 

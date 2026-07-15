@@ -19,8 +19,11 @@ import {
   useCreateChapter,
   useDeleteChapter,
   useContactSubmissions,
+  useClientErrorEvents,
+  useDigestDeliveryLog,
   useUpdateContactStatus,
   useAdminMembers,
+  useProductAnalyticsEvents,
   useUpdateMemberRole,
 } from "@/hooks/portal/useAdmin";
 import {
@@ -56,7 +59,7 @@ import {
 } from "@/components/ui/select";
 import type { EventStatus, NewsCategory, OpportunityType, UserRole } from "@/types/domain";
 import { toast } from "sonner";
-import { Pencil } from "lucide-react";
+import { Activity, AlertTriangle, MailCheck, Pencil, Signal } from "lucide-react";
 import { portalCopy } from "@/lib/portalCopy";
 import { sanitizeTextInput, sanitizeTags, sanitizeOptionalUrl } from "@/lib/security";
 import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
@@ -214,6 +217,7 @@ export default function Admin() {
           <PortalTabsTrigger value="chapters">Chapters ({chapters?.length ?? 0})</PortalTabsTrigger>
           <PortalTabsTrigger value="inbox">Inbox</PortalTabsTrigger>
           <PortalTabsTrigger value="members">Members</PortalTabsTrigger>
+          <PortalTabsTrigger value="system">System</PortalTabsTrigger>
         </PortalTabsList>
 
         <PortalTabsContent value="news" className="space-y-6">
@@ -807,6 +811,7 @@ export default function Admin() {
 
         <AdminInboxTab />
         <AdminMembersTab />
+        <AdminSystemTab />
       </Tabs>
     </div>
   );
@@ -913,4 +918,145 @@ function AdminMembersTab() {
       </QueryStatus>
     </PortalTabsContent>
   );
+}
+
+function AdminSystemTab() {
+  const analytics = useProductAnalyticsEvents();
+  const errors = useClientErrorEvents();
+  const digests = useDigestDeliveryLog();
+  const isLoading = analytics.isLoading || errors.isLoading || digests.isLoading;
+  const error = analytics.error ?? errors.error ?? digests.error;
+
+  const eventCounts = (analytics.data ?? []).reduce<Record<string, number>>((acc, event) => {
+    acc[event.event_name] = (acc[event.event_name] ?? 0) + 1;
+    return acc;
+  }, {});
+  const totalEvents = analytics.data?.length ?? 0;
+  const recentErrors = errors.data?.length ?? 0;
+  const sentDigests = digests.data?.filter((row) => row.status === "sent").length ?? 0;
+  const failedDigests = digests.data?.filter((row) => row.status === "failed").length ?? 0;
+
+  return (
+    <PortalTabsContent value="system" className="space-y-4">
+      <QueryStatus
+        isLoading={isLoading}
+        error={error}
+        onRetry={() => {
+          void analytics.refetch();
+          void errors.refetch();
+          void digests.refetch();
+        }}
+        isEmpty={!totalEvents && !recentErrors && !digests.data?.length}
+        emptyMessage="No operational events have been recorded yet."
+      >
+        <div className="grid gap-3 md:grid-cols-4">
+          <SystemMetric icon={Signal} label="Tracked events" value={totalEvents.toLocaleString()} />
+          <SystemMetric icon={Activity} label="Event types" value={Object.keys(eventCounts).length.toString()} />
+          <SystemMetric icon={AlertTriangle} label="Recent client errors" value={recentErrors.toLocaleString()} tone={recentErrors ? "warn" : "default"} />
+          <SystemMetric icon={MailCheck} label="Digest deliveries" value={`${sentDigests} sent / ${failedDigests} failed`} tone={failedDigests ? "warn" : "default"} />
+        </div>
+
+        <PortalCard className="p-5">
+          <h3 className="font-semibold text-white">Product events</h3>
+          <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {Object.entries(eventCounts)
+              .sort((a, b) => b[1] - a[1])
+              .map(([name, count]) => (
+                <div key={name} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
+                  <p className="break-words text-sm font-medium text-white">{name}</p>
+                  <p className="mt-1 text-2xl font-semibold text-emerald-200">{count}</p>
+                </div>
+              ))}
+          </div>
+          <div className="mt-5 space-y-2">
+            {(analytics.data ?? []).slice(0, 12).map((event) => (
+              <PortalDataRow key={event.id}>
+                <div className="min-w-0">
+                  <p className="break-words font-medium text-white">{event.event_name}</p>
+                  <p className="text-sm text-white/50">{new Date(event.occurred_at).toLocaleString()}</p>
+                </div>
+                <p className="max-w-md break-words text-right text-xs text-white/45">
+                  {formatSystemJson(event.properties)}
+                </p>
+              </PortalDataRow>
+            ))}
+          </div>
+        </PortalCard>
+
+        <PortalCard className="p-5">
+          <h3 className="font-semibold text-white">Client error reports</h3>
+          <div className="mt-4 space-y-2">
+            {(errors.data ?? []).length ? (
+              errors.data?.map((item) => (
+                <PortalDataRow key={item.id}>
+                  <div className="min-w-0">
+                    <p className="break-words font-medium text-white">{item.error_name}</p>
+                    <p className="break-words text-sm text-white/60">{item.message}</p>
+                  </div>
+                  <p className="text-right text-xs text-white/45">{new Date(item.occurred_at).toLocaleString()}</p>
+                </PortalDataRow>
+              ))
+            ) : (
+              <p className="text-sm text-white/45">No client errors have been reported.</p>
+            )}
+          </div>
+        </PortalCard>
+
+        <PortalCard className="p-5">
+          <h3 className="font-semibold text-white">Digest delivery log</h3>
+          <div className="mt-4 space-y-2">
+            {(digests.data ?? []).length ? (
+              digests.data?.map((item) => (
+                <PortalDataRow key={item.id}>
+                  <div>
+                    <p className="font-medium capitalize text-white">{item.status}</p>
+                    <p className="text-sm text-white/50">
+                      Week of {new Date(item.period_start).toLocaleDateString()} · {item.article_count} articles
+                    </p>
+                  </div>
+                  <p className="max-w-sm break-words text-right text-xs text-white/45">
+                    {item.error_message ?? new Date(item.sent_at).toLocaleString()}
+                  </p>
+                </PortalDataRow>
+              ))
+            ) : (
+              <p className="text-sm text-white/45">No digest attempts have been logged.</p>
+            )}
+          </div>
+        </PortalCard>
+      </QueryStatus>
+    </PortalTabsContent>
+  );
+}
+
+function SystemMetric({
+  icon: Icon,
+  label,
+  value,
+  tone = "default",
+}: {
+  icon: typeof Activity;
+  label: string;
+  value: string;
+  tone?: "default" | "warn";
+}) {
+  return (
+    <PortalCard className="p-4">
+      <div className="flex items-center gap-2 text-white/55">
+        <Icon className={cn("h-4 w-4", tone === "warn" ? "text-amber-300" : "text-emerald-300")} aria-hidden />
+        <p className="text-xs uppercase tracking-[0.18em]">{label}</p>
+      </div>
+      <p className="mt-3 break-words text-2xl font-semibold text-white">{value}</p>
+    </PortalCard>
+  );
+}
+
+function formatSystemJson(value: unknown): string {
+  if (!value || typeof value !== "object") return "";
+  try {
+    const text = JSON.stringify(value);
+    return text.length > 120 ? `${text.slice(0, 117)}...` : text;
+  } catch {
+    return "";
+  }
 }

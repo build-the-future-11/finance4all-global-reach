@@ -217,13 +217,13 @@ plan, operational ownership, and monitoring hooks.
 
 | Status | Scope |
 | --- | --- |
-| Existing | Auth, OAuth integration points, protected portal routes, profile editing, bookmarks, notifications, education progress, research applications, event RSVPs, admin area, RLS baseline, avatar storage, error boundary, basic metadata, unit tests |
-| Must complete for release | Name and claim reconciliation; canonical navigation; database-enforced lifecycle rules; competition registration; reliable onboarding state; privacy/legal routes; production metadata; public mutation protection; critical-flow and authorization E2E coverage |
+| Existing | Auth, OAuth integration points, protected portal routes, profile editing, onboarding lifecycle, bookmarks, notifications, education progress, research applications, event registration, admin publishing, admin inbox, admin member management, operational system view, RLS hardening, avatar storage, account export, account deletion, error boundary, production metadata, privacy/terms routes, unit tests, and E2E smoke/security tests |
+| External for launch | Production Supabase migration application, Edge Function deployment, digest scheduler, verified mail sender, production OAuth URLs, canonical domain, legal approval, real content approval, monitoring ownership, and dependency audit from an approved environment |
 | Deferred | Open social-network features, unmoderated messaging, investment tools/advice, automatic partner logos/impact counters, public member profiles by default, and any AI-generated editorial content without human review |
 
 ## Release gate
 
-The release candidate passes only when all core acceptance criteria above are
+The production baseline passes only when all core acceptance criteria above are
 automated where feasible, manually verified across desktop and mobile, and all
 public claims have a verified owner/source. Remaining launch tasks must be
 external operational tasks only, not known product, security, accessibility, or

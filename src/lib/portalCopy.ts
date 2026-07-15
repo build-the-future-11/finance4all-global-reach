@@ -58,7 +58,7 @@ export const portalCopy = {
     digestNote:
       "Save your weekly digest preference here. Email delivery is available only when it is configured for this portal.",
     liveSection:
-      "Headlines refresh from live sources when configured, or from your chapter's published feed.",
+      "Headlines come from published Finance Debrief updates curated inside the portal.",
     emptyArticles:
       "No articles in this category yet. Try another filter, read explainers for background, or check back after your chapter publishes.",
     digestPreferences: "Digest preferences",
@@ -66,7 +66,6 @@ export const portalCopy = {
     preferencesSaved: "Preferences saved",
     substackTitle: "Substack",
     substackBody: "Subscribe to Finance Debriefed on Substack for the weekly digest outside the portal.",
-    substackSubscribed: "I'm subscribed",
     substackOpen: "Open Substack",
     marketHeadlines: "Market headlines",
     explainersSection: "Explainers",
@@ -253,7 +252,7 @@ export const portalCopy = {
       "Your interests are used to order suggestions across Debriefed, Meta Labs, Pathways, and the member directory.",
     digestNote: "Weekly digest delivery is rolling out chapter by chapter.",
     securityAdmin:
-      "Admin: run migrations 003, 005, 006, and 007 in Supabase if bookmarks, notifications, contact inbox, or education progress fail.",
+      "Admin: if saved items, notifications, contact inbox, or lesson progress fail, check the Admin System tab and production database status.",
     securityMember:
       "If Saved items or notifications aren't working, contact your chapter lead — the workspace may need a one-time setup.",
     profileStrength: "Profile strength",
@@ -349,8 +348,6 @@ export const portalCopy = {
     updatePasswordButton: "Update password",
     enterPortal: "Enter portal",
     signedInWithGoogle: "Signed in with Google",
-    supabaseWarningTitle: "Supabase not connected",
-    supabaseWarningBody: "Copy .env.example to .env and add your anon key.",
     sidebarTagline: "One login for news, curriculum, labs, pathways, events, and the member network.",
     modules: [
       { name: "Debriefed", desc: "Macro news and explainers" },

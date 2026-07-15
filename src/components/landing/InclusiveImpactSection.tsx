@@ -8,25 +8,25 @@ const PILLARS = [
     icon: Heart,
     title: "Free and accessible",
     description:
-      "Catalyst CFEI, S.I.S.T.E.R tracks, and school outreach — no program fees for students who need it most.",
+      "Learning, member tools, and chapter support are designed to be useful before a student has any finance background.",
   },
   {
     icon: Globe2,
-    title: "Truly global",
+    title: "Chapter-ready",
     description:
-      "Chapters across India, the UK, the US, and growing — content in plain language for every time zone.",
+      "Chapter pages and event tools give local organizers a place to publish updates without pretending every school has the same needs.",
   },
   {
     icon: Users,
     title: "Beginner-friendly",
     description:
-      "No finance background required. Explainers, lesson modules, and chapter mentors meet you where you are.",
+      "No finance background required. Explainers, lesson modules, and guided opportunities meet members where they are.",
   },
   {
     icon: Languages,
-    title: "Multilingual outreach",
+    title: "Plain language",
     description:
-      "Grassroots literacy programs adapted for local schools — scaling the model that started in India.",
+      "Definitions, examples, and Debrief summaries are written for students who are still learning the vocabulary.",
   },
 ];
 
@@ -39,7 +39,7 @@ export default function InclusiveImpactSection() {
         <SectionHeader
           eyebrow="Inclusion first"
           title="Built for students without a finance class"
-          description="Finance4All started with school outreach where economics was not on the syllabus. The portal keeps that same bar: free access, plain language, and chapter support when you need it."
+          description="Finance4All keeps the bar practical: free access, plain language, chapter support where available, and member tools that make the next step visible."
         />
 
         <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">

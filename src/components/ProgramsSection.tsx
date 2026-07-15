@@ -76,9 +76,9 @@ const programs = [
   {
     icon: Trophy,
     title: "Economics Olympiad",
-    short: "Competition prep and partner links.",
+    short: "Competition prep and resource links.",
     detail:
-      "Practice cases and olympiad resources aggregated in Pathways for members preparing for national and international rounds.",
+      "Practice cases and economics resources aggregated in Pathways for members preparing for competition-style work.",
     href: "/portal/pathways",
   },
   {
@@ -91,13 +91,13 @@ const programs = [
   },
 ];
 
-const partners = [
-  { name: "Jane Street", role: "Puzzle nights & club sponsorships" },
-  { name: "The Economics Lab", role: "Research mentorship" },
-  { name: "EconScholars", role: "Olympiad prep program" },
-  { name: "Youth Economy Lab", role: "Policy research affiliate" },
-  { name: "Atlas Economics Lab", role: "Student macro research" },
-  { name: "University chapter sponsors", role: "Faculty-backed clubs" },
+const platformWorkflows = [
+  { name: "Chapter events", role: "Published only when a real chapter update is available" },
+  { name: "Research applications", role: "Scoped projects with eligibility, deadlines, and review status" },
+  { name: "Finance Debrief", role: "Educational summaries with source attribution" },
+  { name: "Learning modules", role: "Lessons and member progress stored in the portal" },
+  { name: "Saved content", role: "One library for articles, opportunities, lessons, and events" },
+  { name: "Admin review", role: "Publishing controls for content, opportunities, chapters, and members" },
 ];
 
 function ProgramCard({ program }: { program: typeof programs[0] }) {
@@ -191,14 +191,14 @@ function PartnersSection() {
   return (
     <div className="mt-24 rounded-3xl border border-white/10 bg-white/[0.02] p-10 sm:p-12">
       <div className="text-center">
-        <h3 className="text-2xl font-bold text-white sm:text-3xl">Partners & collaborators</h3>
+        <h3 className="text-2xl font-bold text-white sm:text-3xl">What the portal actually supports</h3>
         <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-white/50">
-          Organizations that run events, review research, or sponsor chapter activities — with a named contact through your chapter lead.
+          Each area below is backed by a real route, database workflow, and administrator-owned publishing path.
         </p>
       </div>
 
       <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {partners.map((p) => (
+        {platformWorkflows.map((p) => (
           <div
             key={p.name}
             className="rounded-2xl border border-white/12 bg-white/[0.04] px-5 py-4 text-left transition hover:border-white/25"

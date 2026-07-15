@@ -198,6 +198,35 @@ GRANT SELECT ON TABLE client_error_events TO authenticated;
 REVOKE ALL ON FUNCTION report_client_error(TEXT, TEXT, JSONB) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION report_client_error(TEXT, TEXT, JSONB) TO authenticated;
 
+CREATE OR REPLACE FUNCTION purge_operational_events()
+RETURNS TABLE (
+  deleted_product_events INTEGER,
+  deleted_client_errors INTEGER,
+  deleted_rate_limit_events INTEGER
+)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  DELETE FROM product_analytics_events
+  WHERE occurred_at < now() - interval '180 days';
+  GET DIAGNOSTICS deleted_product_events = ROW_COUNT;
+
+  DELETE FROM client_error_events
+  WHERE occurred_at < now() - interval '30 days';
+  GET DIAGNOSTICS deleted_client_errors = ROW_COUNT;
+
+  DELETE FROM rate_limit_events
+  WHERE created_at < now() - interval '90 days';
+  GET DIAGNOSTICS deleted_rate_limit_events = ROW_COUNT;
+
+  RETURN NEXT;
+END;
+$$;
+
+REVOKE ALL ON FUNCTION purge_operational_events() FROM PUBLIC, anon, authenticated;
+
 -- ─── Member-content write boundaries ────────────────────────────────────────
 
 CREATE OR REPLACE FUNCTION validate_connection_request()
@@ -400,3 +429,9 @@ REVOKE ALL ON FUNCTION validate_connection_request() FROM PUBLIC, anon, authenti
 REVOKE ALL ON FUNCTION validate_studio_submission() FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION validate_essay_submission() FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION validate_introduction_post() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION is_admin() FROM PUBLIC, anon;
+REVOKE ALL ON FUNCTION get_user_role() FROM PUBLIC, anon;
+REVOKE ALL ON FUNCTION is_lead_or_admin() FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION is_admin() TO authenticated;
+GRANT EXECUTE ON FUNCTION get_user_role() TO authenticated;
+GRANT EXECUTE ON FUNCTION is_lead_or_admin() TO authenticated;

@@ -19,10 +19,10 @@ export function formatAuthError(message: string): string {
     return "Too many attempts. Wait a minute and try again.";
   }
   if (m.includes("fetch") || m.includes("network")) {
-    return "Could not reach the auth server. Check your connection and try again.";
+    return "Could not reach the account service. Check your connection and try again.";
   }
   if (m.includes("signup is disabled")) {
-    return "New signups are temporarily disabled. Contact your chapter lead.";
+    return "New signups are temporarily disabled. Contact the Finance4All team.";
   }
 
   return sanitizeUserFacingError(message);
@@ -38,6 +38,12 @@ const INTERNAL_ERROR_PATTERNS = [
   /duplicate key/i,
   /violates/i,
   /permission denied/i,
+  /localhost/i,
+  /supabase/i,
+  /vercel/i,
+  /redirect url/i,
+  /environment/i,
+  /vite_/i,
 ];
 
 /** Strip internal server/database details from errors shown to end users. */

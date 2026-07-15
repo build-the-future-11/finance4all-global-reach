@@ -10,9 +10,9 @@ export { RESOURCE_GUIDES } from "@/data/resourceGuides";
 export const DEFAULT_TESTIMONIALS = [
   {
     quote:
-      "Our chapter ran the Catalyst budgeting module in three Mumbai schools last semester. Two students from that cohort applied to Atlas Lab six months later — one on FX pass-through, one on rural credit access. The portal kept the curriculum and the lab listings in one place.",
+      "The chapter page gave us one place for the budgeting module, event notes, and next steps. Students could see the lesson first, then decide whether to save a Debrief article or apply to a project.",
     attribution: "Chapter officer",
-    roleLabel: "Mumbai · outreach & Meta Labs",
+    roleLabel: "Chapter operations",
     sortOrder: 0,
   },
   {
@@ -24,9 +24,9 @@ export const DEFAULT_TESTIMONIALS = [
   },
   {
     quote:
-      "The lab listing said exactly what the deliverable was and who would review applications. I wrote three paragraphs on a macro methods course and a Python project. The lead replied in five days with a data collection task — not a generic 'we'll be in touch.'",
+      "The project listing said exactly what the deliverable was and who would review applications. I knew what to write, what deadline mattered, and where the status would appear.",
     attribution: "Lab applicant",
-    roleLabel: "Meta Labs · macro track",
+    roleLabel: "Research applications",
     sortOrder: 2,
   },
 ] as const;

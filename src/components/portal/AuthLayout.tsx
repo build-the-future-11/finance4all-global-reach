@@ -69,10 +69,10 @@ export default function AuthLayout({
 
               {!isSupabaseConfigured && (
                 <div className="mt-5 rounded-xl border border-amber-500/25 bg-amber-500/10 p-4 text-sm text-amber-100/90">
-                  <p className="font-medium text-amber-200">Supabase not connected</p>
+                  <p className="font-medium text-amber-200">Account service unavailable</p>
                   <p className="mt-1 text-amber-100/70">
-                    Copy <code className="rounded bg-black/20 px-1">.env.example</code> to{" "}
-                    <code className="rounded bg-black/20 px-1">.env</code> and add your anon key.
+                    Sign-in is temporarily unavailable. Please try again later or contact the
+                    Finance4All team if this continues.
                   </p>
                 </div>
               )}

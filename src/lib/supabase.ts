@@ -3,19 +3,16 @@ import type { Database } from "@/types/database";
 import { getAuthCallbackUrl } from "@/lib/appOrigin";
 import { isClientSafeSupabaseKey } from "@/lib/security";
 
-/**
- * Supabase client — credentials come only from environment variables.
- * Copy .env.example to .env for local development; set vars in Vercel for production.
- */
+/** Supabase client — credentials come only from environment variables. */
 function resolveSupabaseUrl(): string {
   const fromEnv = import.meta.env.VITE_SUPABASE_URL?.trim();
   if (fromEnv && fromEnv.startsWith("https://") && fromEnv.includes("supabase.co")) {
     return fromEnv.replace(/\/$/, "");
   }
   if (import.meta.env.DEV) {
-    console.warn("[Finance4All] Set VITE_SUPABASE_URL in .env (see .env.example).");
+    console.warn("[Finance4All] Account service URL is not configured for this local environment.");
   } else {
-    console.error("[Finance4All] VITE_SUPABASE_URL is required in production.");
+    console.error("[Finance4All] Account service URL is required in production.");
   }
   return "";
 }
@@ -26,12 +23,12 @@ function resolveSupabaseKey(): string {
     return anon;
   }
   if (anon && !isClientSafeSupabaseKey(anon)) {
-    console.error("[Finance4All] VITE_SUPABASE_ANON_KEY looks like a secret key. Use the anon JWT only.");
+    console.error("[Finance4All] Account service key is not a valid browser-safe anon key.");
   }
   if (import.meta.env.DEV) {
-    console.warn("[Finance4All] Set VITE_SUPABASE_ANON_KEY in .env (see .env.example).");
+    console.warn("[Finance4All] Account service key is not configured for this local environment.");
   } else {
-    console.error("[Finance4All] VITE_SUPABASE_ANON_KEY is required in production.");
+    console.error("[Finance4All] Account service key is required in production.");
   }
   return "";
 }
@@ -41,7 +38,7 @@ const supabaseKey = resolveSupabaseKey();
 
 if (import.meta.env.PROD && (!supabaseUrl || !supabaseKey)) {
   throw new Error(
-    "[Finance4All] VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are required in production.",
+    "[Finance4All] Account service configuration is required in production.",
   );
 }
 

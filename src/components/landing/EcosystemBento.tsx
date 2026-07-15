@@ -26,7 +26,7 @@ const MODULES = [
   },
   {
     title: "Meta Labs",
-    desc: "Apply to mentor-led research. Atlas, IYERN, and fintech tracks — each project names a lead and a deliverable.",
+    desc: "Apply to bounded research projects. Each approved listing names the scope, lead, and deliverable.",
     icon: FlaskConical,
     href: portalRoutes.labs,
     tag: "Research",
@@ -35,7 +35,7 @@ const MODULES = [
   },
   {
     title: "Axiom Pathways",
-    desc: "Internships, essay submissions, studio projects, and career resources from partner organizations.",
+    desc: "Opportunities, essay submissions, studio projects, and career resources published by administrators.",
     icon: Route,
     href: portalRoutes.pathways,
     tag: "Opportunities",
@@ -62,7 +62,7 @@ const MODULES = [
   },
   {
     title: "Resources",
-    desc: "Club toolkit, facilitator guides, journal standards, webinars, and partner programs.",
+    desc: "Club toolkit, facilitator guides, writing standards, webinars, and practical templates.",
     icon: BookOpen,
     href: portalRoutes.resources,
     tag: "Guides",

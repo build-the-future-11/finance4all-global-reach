@@ -1,78 +1,58 @@
-# Finance4All — Quick Setup (test in 5 minutes)
+# Finance4All Supabase Quickstart
 
-Your `.env` is already configured locally. Follow these steps in order.
+Use this as the shortest safe path for production setup. For full detail, read `supabase/SUPABASE_SETUP.md` and `DEPLOYMENT.md`.
 
----
+## 1. Configure The Project
 
-## Step 1: Add redirect URL in Supabase (required for Google login)
+Create or select the Supabase project, then set production Auth URLs:
 
-1. Open [Supabase Dashboard](https://supabase.com/dashboard/project/pnemeegkwyaicsbnbnmg)
-2. Go to **Authentication** → **URL Configuration**
-3. Set **Site URL** to: `http://localhost:8080`
-4. Under **Redirect URLs**, add:
-   ```
-   http://localhost:8080/auth/callback
-   ```
-5. Click **Save**
+- Site URL: the canonical production URL.
+- Redirect URLs: `/auth/callback` and `/reset-password` for production, preview, and local development.
+- Google OAuth callback in Google Cloud Console if Google sign-in is enabled.
 
-> When you deploy, also add `https://your-domain.com/auth/callback`
+## 2. Apply Migrations
 
----
-
-## Step 2: Run database setup (one paste)
-
-1. Go to **SQL Editor** → **New query**
-2. Open `supabase/migrations/001_initial_schema.sql` from this repo
-3. Copy **all** of it → paste → **Run**
-4. New query → open `supabase/seed.sql` → copy → paste → **Run**
-
-If you already ran step 2 before, just run `supabase/migrations/002_google_oauth.sql` instead.
-
----
-
-## Step 3: Start the app
-
-```bash
-npm install
-npm run dev
-```
-
-Open: **http://localhost:8080/login**
-
----
-
-## Step 4: Sign in
-
-Click **Continue with Google** — or use email/password on `/signup`.
-
-After login you'll land on `/portal` with news, events, opportunities, and more.
-
----
-
-## Google OAuth checklist
-
-| Setting | Value |
-|---------|-------|
-| Provider enabled | Authentication → Providers → Google ✅ |
-| Site URL | `http://localhost:8080` |
-| Redirect URL | `http://localhost:8080/auth/callback` |
-| Google Cloud redirect | `https://pnemeegkwyaicsbnbnmg.supabase.co/auth/v1/callback` (set in Google Console) |
-
----
-
-## Promote your account (optional)
+Run every migration from `001` through `012` in order. Then run:
 
 ```sql
-UPDATE profiles SET role = 'lead_researcher' WHERE email = 'you@gmail.com';
+SELECT * FROM verify_migration_status;
 ```
 
----
+Do not open member registration until the verification query is clean.
 
-## Troubleshooting
+## 3. Deploy Functions
 
-| Error | Fix |
-|-------|-----|
-| Google redirects but login fails | Add `http://localhost:8080/auth/callback` to Redirect URLs |
-| Blank portal / no data | Run `001_initial_schema.sql` + `seed.sql` |
-| "relation does not exist" | Migration not run yet |
-| Profile not created | Run `002_google_oauth.sql` |
+```bash
+supabase functions deploy weekly-digest --no-verify-jwt
+supabase functions deploy delete-account
+```
+
+Set the secrets listed in `supabase/SUPABASE_SETUP.md`, then schedule `weekly-digest` with:
+
+```text
+Authorization: Bearer DIGEST_CRON_SECRET
+```
+
+## 4. Promote Initial Admins
+
+After trusted operators sign up:
+
+```sql
+UPDATE profiles
+SET role = 'admin'
+WHERE email IN ('admin@example.org', 'backup-admin@example.org');
+```
+
+Keep at least two admin accounts before public launch.
+
+## 5. Verify Production Behavior
+
+- Sign up, complete onboarding, sign out, and sign back in.
+- Publish and save a Finance Debrief article.
+- Register for an event.
+- Submit and review a research application.
+- Export account data.
+- Delete a non-admin test account.
+- Confirm the sole-admin deletion guard.
+- Confirm Admin System shows analytics, client errors, and digest logs after test activity.
+- Remove or replace seed content before inviting members.

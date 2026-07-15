@@ -1,40 +1,53 @@
-# Finance4All Global Reach
+# Finance4All
 
-Global nonprofit landing site and **Supabase-powered member portal**.
+Finance4All is a public financial-literacy site and authenticated member portal for learning, Finance Debrief publishing, research applications, opportunities, chapters, events, saved content, notifications, and administration.
 
-**Live on Vercel:** set env vars (see [DEPLOYMENT.md](DEPLOYMENT.md)) then deploy.
+## Production Readiness
 
-## Portal modules
+The frontend, portal workflows, Supabase schema, Edge Function contracts, and operator documentation are designed for production deployment. Production launch still requires the external steps in [docs/LAUNCH_CHECKLIST.md](docs/LAUNCH_CHECKLIST.md): real Supabase credentials, migrations, Edge Function deployment, mail sender approval, OAuth URLs, legal review, content review, monitoring, and dependency audit from an approved security environment.
 
-| Route | Feature |
-|-------|---------|
-| `/portal` | Dashboard |
-| `/portal/debriefed` | News + digest prefs |
-| `/portal/labs` | Research projects + apply |
-| `/portal/pathways` | Opportunities, studios, essays |
-| `/portal/events` | Chapters + events |
-| `/portal/network` | Profiles + connections |
-| `/portal/settings` | Profile settings |
+## Main Areas
 
-## Vercel deploy (required env vars)
+| Route | Purpose |
+| --- | --- |
+| `/` | Public landing page |
+| `/login`, `/signup`, `/reset-password` | Authentication |
+| `/portal` | Personalized member dashboard |
+| `/portal/debriefed` | Finance Debrief articles, explainers, saved reading, digest preferences |
+| `/portal/labs` | Research projects and applications |
+| `/portal/pathways` | Opportunities, studios, and essays |
+| `/portal/education` | Courses and lesson progress |
+| `/portal/events` | Chapters and event registration |
+| `/portal/network` | Member directory, introductions, and connection requests |
+| `/portal/settings` | Profile, communications, export, password, account deletion |
+| `/portal/admin` | Publishing, inbox, member roles, and operational system view |
 
-```
-VITE_SUPABASE_URL=https://pnemeegkwyaicsbnbnmg.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
-```
+## Deployment
 
-Add redirect URL in Supabase: `https://YOUR-APP.vercel.app/auth/callback`
+Use [DEPLOYMENT.md](DEPLOYMENT.md) for the complete production deployment path and [supabase/SUPABASE_SETUP.md](supabase/SUPABASE_SETUP.md) for Supabase-specific setup.
 
-Full guide: **[DEPLOYMENT.md](DEPLOYMENT.md)**
-
-## Local dev
+## Local Development
 
 ```bash
 npm install
-cp .env.example .env   # add Supabase keys
+cp .env.example .env
 npm run dev
 ```
 
+Local development needs the same browser-safe client variables documented in `.env.example`.
+
+## Verification
+
+```bash
+npm test
+npm run lint
+npx tsc --noEmit
+VITE_APP_URL=https://finance4all.example.org npm run build
+npm run test:e2e
+```
+
+Run `npm audit --omit=dev --audit-level=high` from an approved security environment before public launch.
+
 ## Stack
 
-React · Vite · Tailwind · shadcn/ui · Supabase · TanStack Query
+React, Vite, TypeScript, Tailwind, shadcn/ui, Supabase, TanStack Query, and Playwright.

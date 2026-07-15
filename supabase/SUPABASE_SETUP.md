@@ -1,121 +1,81 @@
-# Supabase — complete setup guide
+# Supabase Production Setup
 
-Follow these steps **in order** for a working production portal.
+This file is the operator checklist for bringing Finance4All online against Supabase.
 
-## 1. Project credentials
+## Credentials
 
-In [Supabase Dashboard](https://supabase.com/dashboard/project/pnemeegkwyaicsbnbnmg) → **Settings → API**:
+Set these in local `.env` and production hosting:
 
-| Use in app | Value |
-|------------|-------|
-| `VITE_SUPABASE_URL` | `https://pnemeegkwyaicsbnbnmg.supabase.co` |
-| `VITE_SUPABASE_ANON_KEY` | Your **anon** JWT (`eyJ...`) |
+| Variable | Required | Notes |
+| --- | --- | --- |
+| `VITE_SUPABASE_URL` | Yes | Supabase project URL |
+| `VITE_SUPABASE_ANON_KEY` | Yes | Browser-safe anon JWT |
+| `VITE_APP_URL` | Yes | Canonical production URL |
 
-**Never** put `service_role` / `sb_secret_...` in the frontend or Vercel client env vars.
+Do not expose `service_role` or secret keys to the frontend.
 
-The app includes safe project defaults if Vercel env vars are missing, but you should still set them for production.
+## Database
 
-## 2. Run SQL migrations (in order)
-
-**If you see `type "user_role" already exists`** — you already ran `001`. Do **not** re-run it from scratch. Instead:
-
-1. Run `supabase/verify_migration_status.sql` to see what's installed
-2. Skip files you've already run; continue with the next number
-
-| Step | File | Skip if… |
-|------|------|----------|
-| 1 | `001_initial_schema.sql` | `user_role` enum already exists |
-| 2 | `seed.sql` | you already have chapters/news data |
-| 3 | `002_google_oauth.sql` | always safe to re-run |
-| 4 | `003_bookmarks_notifications.sql` | `news_bookmarks` table exists |
-| 5 | `004_avatar_storage.sql` | avatars bucket exists |
-| 6 | `005_security_hardening.sql` | always safe to re-run (RLS + role triggers) |
-| 7 | `006_education_progress.sql` | `education_lesson_progress` table exists |
-| 8 | `007_contact_submissions.sql` | `contact_submissions` table exists |
-
-Open **SQL Editor** and run each file you still need:
-
-1. `supabase/migrations/001_initial_schema.sql`
-2. `supabase/seed.sql`
-3. `supabase/migrations/002_google_oauth.sql`
-4. `supabase/migrations/003_bookmarks_notifications.sql`
-5. `supabase/migrations/004_avatar_storage.sql`
-6. `supabase/migrations/005_security_hardening.sql`
-7. `supabase/migrations/006_education_progress.sql`
-8. `supabase/migrations/007_contact_submissions.sql`
-
-## 3. Auth redirect URLs
-
-**Authentication → URL Configuration**
-
-**Site URL:**
-```
-https://YOUR-APP.vercel.app
-```
-
-**Redirect URLs:**
-```
-http://localhost:8080/auth/callback
-http://localhost:8080/reset-password
-https://YOUR-APP.vercel.app/auth/callback
-https://YOUR-APP.vercel.app/reset-password
-https://YOUR-APP-*.vercel.app/auth/callback
-https://YOUR-APP-*.vercel.app/reset-password
-```
-
-**Google OAuth** (if enabled): add in Google Cloud Console:
-```
-https://pnemeegkwyaicsbnbnmg.supabase.co/auth/v1/callback
-```
-
-## 4. Enable Google login (optional)
-
-1. Supabase → **Authentication → Providers → Google** → Enable
-2. Add Client ID + Secret from Google Cloud Console
-
-## 5. Promote yourself to admin
+Run migrations `001` through `012` in order, then run:
 
 ```sql
-UPDATE profiles SET role = 'admin' WHERE email = 'your@email.com';
+SELECT * FROM verify_migration_status;
 ```
 
-Then open `/portal/admin` to publish content.
+If your project was partially migrated before, skip only the files whose objects are already present and continue forward. Do not delete production data to re-run an early migration.
 
-## 6. Vercel environment variables
+## Edge Functions
 
-| Variable | Required |
-|----------|----------|
-| `VITE_SUPABASE_URL` | Yes |
-| `VITE_SUPABASE_ANON_KEY` | Yes |
-| `VITE_NEWSAPI_KEY` | Optional — enables live headlines on Debriefed |
-
-Redeploy after changing env vars (Vite bakes them at build time).
-
-## 7. Verify connection
+Deploy:
 
 ```bash
-curl -s -o /dev/null -w "%{http_code}\n" \
-  -H "apikey: YOUR_ANON_JWT" \
-  -H "Authorization: Bearer YOUR_ANON_JWT" \
-  "https://pnemeegkwyaicsbnbnmg.supabase.co/rest/v1/chapters?select=id&limit=1"
+supabase functions deploy weekly-digest --no-verify-jwt
+supabase functions deploy delete-account
 ```
 
-Expect `200`.
+Set these Supabase function secrets:
 
-## 8. Troubleshooting
+| Secret | Used By |
+| --- | --- |
+| `SUPABASE_URL` | Both functions |
+| `SUPABASE_ANON_KEY` | `delete-account` |
+| `SUPABASE_SERVICE_ROLE_KEY` | Both functions |
+| `SITE_URL` | Both functions |
+| `DIGEST_CRON_SECRET` | `weekly-digest` |
+| `RESEND_API_KEY` | `weekly-digest` |
+| `DIGEST_FROM_EMAIL` | `weekly-digest` |
 
-| Error | Fix |
-|-------|-----|
-| `Missing Supabase env vars` | Set `VITE_*` in `.env` locally or Vercel; restart dev server |
-| `type "user_role" already exists` | Migration 001 already ran — skip to 002–004 + seed |
-| `Failed to fetch` on signup | Check redirect URLs; confirm anon key is JWT not publishable key |
-| Bookmarks/notifications fail | Run migration `003` |
-| Avatar upload fails | Run migration `004`; check Storage → avatars bucket exists |
-| Google login loops | Add exact callback URL to Supabase + Google Console |
+Schedule `weekly-digest` with a weekly `POST` request and an `Authorization: Bearer DIGEST_CRON_SECRET` header.
 
-## 9. Security checklist
+## Auth
 
-- [ ] Rotate secret key if it was ever pasted in chat
-- [ ] RLS enabled on all tables (migrations handle this)
-- [ ] Only anon key in client env vars
-- [ ] Admin role assigned only to trusted emails
+Configure:
+
+- Production Site URL.
+- Redirect URLs for `/auth/callback` and `/reset-password`.
+- Google OAuth credentials and callback URL if Google sign-in is enabled.
+- Email confirmation policy appropriate for public launch.
+
+## First Admin
+
+After signup:
+
+```sql
+UPDATE profiles SET role = 'admin' WHERE email = 'admin@example.org';
+```
+
+Keep at least one admin account active. The account deletion function blocks deletion of the sole admin.
+
+## Verification
+
+Before inviting users:
+
+- Sign up, complete onboarding, sign out, and sign back in.
+- Publish one Finance Debrief item, save it as a member, and confirm it appears in export data.
+- Register for an event and confirm duplicate registration is blocked.
+- Submit a research application and verify only the applicant, project lead, and admins can see the right records.
+- Upload and replace an avatar.
+- Download account data.
+- Delete a non-admin test account.
+- Trigger the weekly digest in a test project and confirm one log row per user/week.
+- Open `/portal/admin` as an admin and review Inbox, Members, and System.

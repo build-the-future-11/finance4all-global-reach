@@ -76,6 +76,7 @@ describe("security", () => {
   it("rejects secret supabase keys in client", () => {
     expect(isClientSafeSupabaseKey("eyJhbGciOiJIUzI1NiJ9.test")).toBe(true);
     expect(isClientSafeSupabaseKey("sb_secret_abc")).toBe(false);
+    expect(isClientSafeSupabaseKey("sb_publishable_abc")).toBe(false);
   });
 
   it("blocks open redirect paths", () => {

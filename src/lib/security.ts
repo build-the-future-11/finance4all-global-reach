@@ -126,7 +126,7 @@ export function isClientSafeSupabaseKey(key: string): boolean {
   const k = key.trim();
   if (!k) return false;
   if (k.includes("service_role") || k.startsWith("sb_secret_")) return false;
-  return k.startsWith("eyJ") || k.startsWith("sb_publishable_");
+  return k.startsWith("eyJ");
 }
 
 const UUID_RE =

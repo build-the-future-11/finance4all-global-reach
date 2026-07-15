@@ -1,141 +1,99 @@
-# Deploy to Vercel (Production)
+# Production Deployment
 
-This is a **Vite** app. All client env vars must use the `VITE_` prefix so they are exposed at build time. Do **not** use `NEXT_PUBLIC_`.
+Finance4All is a Vite application with Supabase Auth, Database, Storage, and Edge Functions. Production deployment is complete only when the frontend, database migrations, Edge Functions, scheduled digest, email sender, auth redirects, and content review are all configured.
 
-## 1. Connect repo to Vercel
+## 1. Hosting Environment
 
-1. Go to [vercel.com/new](https://vercel.com/new)
-2. Import `build-the-future-11/finance4all-global-reach`
-3. Framework: **Vite** (auto-detected)
-4. **Do not deploy yet** — add env vars first
+Set these client variables in the hosting provider before deploying:
 
-## 2. Environment variables (REQUIRED)
+| Name | Required | Notes |
+| --- | --- | --- |
+| `VITE_SUPABASE_URL` | Yes | Supabase project URL |
+| `VITE_SUPABASE_ANON_KEY` | Yes | Browser-safe anon JWT |
+| `VITE_APP_URL` | Yes | Canonical public URL, including `https://` |
 
-In Vercel → Project → **Settings** → **Environment Variables**, add:
+Do not expose `SUPABASE_SERVICE_ROLE_KEY`, `sb_secret_...`, provider API keys, cron secrets, or mail credentials in frontend variables.
 
-| Name | Value | Environments |
-|------|-------|--------------|
-| `VITE_SUPABASE_URL` | `https://pnemeegkwyaicsbnbnmg.supabase.co` | Production, Preview, Development |
-| `VITE_SUPABASE_ANON_KEY` | Your Supabase **anon** JWT (`eyJ...`) | Production, Preview, Development |
-| `VITE_APP_URL` | `https://YOUR-PROJECT.vercel.app` (recommended) | Production |
-| `VITE_ERROR_REPORTING_ENDPOINT` | Same-origin, approved error-collection endpoint (optional) | Production |
+After changing any `VITE_*` value, rebuild and redeploy. Vite reads these values at build time.
 
-Optional (only if you omit `VITE_SUPABASE_ANON_KEY`):
+## 2. Supabase Database
 
-| Name | Value |
-|------|-------|
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | `sb_publishable_...` from Supabase dashboard |
-
-**Never** add `SUPABASE_SERVICE_ROLE_KEY`, `sb_secret_...`, or any secret key to Vercel env vars that ship to the browser. Those are server-only.
-
-Then click **Redeploy** — Vite bakes env vars in at **build** time, so changing them requires a new deploy.
-
-### Local development
-
-```bash
-cp .env.example .env
-# Edit .env with your anon JWT, then:
-npm run dev
-```
-
-Dev server runs at **http://localhost:8080** (see `vite.config.ts`).
-
-## 3. Supabase redirect URLs (REQUIRED for Google login)
-
-In [Supabase Dashboard](https://supabase.com/dashboard/project/pnemeegkwyaicsbnbnmg) → **Authentication** → **URL Configuration**:
-
-**Site URL** (production) — must be your **live Vercel URL**, NOT localhost:
-
-```
-https://YOUR-PROJECT.vercel.app
-```
-
-If Site URL is `http://localhost:8080`, Google sign-in on production will redirect to localhost and fail with `ERR_CONNECTION_REFUSED`.
-
-**Redirect URLs** — add ALL of these:
-
-```
-http://localhost:8080/auth/callback
-http://localhost:8080/reset-password
-https://YOUR-PROJECT.vercel.app/auth/callback
-https://YOUR-PROJECT.vercel.app/reset-password
-https://YOUR-PROJECT-*.vercel.app/auth/callback
-https://YOUR-PROJECT-*.vercel.app/reset-password
-```
-
-Replace `YOUR-PROJECT` with your Vercel subdomain (e.g. `finance4all-global-reach`).
-
-The app callback route is `/auth/callback` (`src/lib/supabase.ts` → `getAuthRedirectUrl()`).
-
-**Google Cloud Console** (if using Google OAuth): authorized redirect URI must be:
-
-```
-https://pnemeegkwyaicsbnbnmg.supabase.co/auth/v1/callback
-```
-
-## 4. Database
-
-If not done yet, run in Supabase SQL Editor (in order):
+Apply migrations in order:
 
 1. `supabase/migrations/001_initial_schema.sql`
-2. `supabase/seed.sql`
-3. `supabase/migrations/002_google_oauth.sql` (Google login)
-4. `supabase/migrations/003_bookmarks_notifications.sql` (bookmarks + notifications)
-5. `supabase/migrations/004_avatar_storage.sql` (profile avatars)
-6. `supabase/migrations/005_security_hardening.sql` (RLS hardening + chapter counts)
-7. `supabase/migrations/006_education_progress.sql` (synced lesson completion)
-8. `supabase/migrations/007_contact_submissions.sql` (landing contact form)
-9. `supabase/migrations/008_platform_cms.sql` (CMS tables, rate limiting, search, and policies)
-10. `supabase/migrations/009_membership_integrity.sql` (onboarding integrity, registration validation, draft visibility, and contact abuse controls)
-11. `supabase/migrations/010_directory_privacy.sql` (member directory view and account-email isolation)
-12. `supabase/migrations/011_profile_write_boundary.sql` (server-validated profile and avatar writes)
+2. `supabase/migrations/002_google_oauth.sql`
+3. `supabase/migrations/003_bookmarks_notifications.sql`
+4. `supabase/migrations/004_avatar_storage.sql`
+5. `supabase/migrations/005_security_hardening.sql`
+6. `supabase/migrations/006_education_progress.sql`
+7. `supabase/migrations/007_contact_submissions.sql`
+8. `supabase/migrations/008_platform_cms.sql`
+9. `supabase/migrations/009_membership_integrity.sql`
+10. `supabase/migrations/010_public_claims_content.sql`
+11. `supabase/migrations/011_directory_privacy.sql`
+12. `supabase/migrations/012_operational_integrity.sql`
 
-After applying migrations, run `supabase/verify_migration_status.sql` in the SQL editor and resolve any missing object before deploying.
+Then run `supabase/verify_migration_status.sql`. Do not open registration until the verification query shows the expected objects and RLS policies.
 
-## 5. Deploy
+Seed data is for internal review only. Remove or replace unverified seed records before public launch.
 
-Push to `main` from **your** GitHub account — Vercel Hobby only deploys commits authored by the repo owner on private repos.
+## 3. Supabase Auth
 
-```bash
-# Use your GitHub noreply email (Settings → Emails on github.com)
-git config user.email "271452460+build-the-future-11@users.noreply.github.com"
-git push origin main
-```
+In Supabase Authentication URL settings:
 
-If a deploy is blocked for “commit author did not have contributing access”, the push was made with the wrong email (e.g. `youremail@example.com`). Amend or recommit with your GitHub-linked email, then push again.
+- Site URL: the canonical production URL.
+- Redirect URLs: production and preview URLs for `/auth/callback` and `/reset-password`, plus local development URLs if needed.
+- Google OAuth callback, if enabled: the Supabase project callback URL in Google Cloud Console.
 
-Or deploy manually:
+Email confirmation settings should match the production membership policy before invitations are sent.
 
-```bash
-npx vercel --prod
-```
+## 4. Edge Functions
 
-## Verify
-
-1. Open `https://YOUR-PROJECT.vercel.app/login`
-2. No `placeholder.supabase.co` or missing-env errors in console
-3. Google sign-in completes and lands on `/portal`
-4. Portal loads news/events data
-5. Create a new account, complete onboarding once, sign out, then sign back in and verify the profile persists
-6. As an administrator, save a Finance Debrief article as a draft and confirm it is not visible to a member account; publish it and confirm visibility
-7. Create an event with a future registration-open time and confirm member registration is disabled until the window opens
-8. Submit a short contact form message and verify it appears in the administrator inbox
-9. As a member, open the directory and verify profiles load without exposing any member email address; as an administrator, verify the member-management view still loads account emails
-10. Promote your account to admin (Supabase SQL Editor):
-
-```sql
-UPDATE profiles SET role = 'admin' WHERE email = 'your@email.com';
-```
-
-Then open `/portal/admin` to publish content.
-
-### Quick API check (local or CI)
+Deploy:
 
 ```bash
-curl -s -o /dev/null -w "%{http_code}\n" \
-  -H "apikey: YOUR_ANON_JWT" \
-  -H "Authorization: Bearer YOUR_ANON_JWT" \
-  "https://pnemeegkwyaicsbnbnmg.supabase.co/rest/v1/"
+supabase functions deploy weekly-digest --no-verify-jwt
+supabase functions deploy delete-account
 ```
 
-Expect `200` — confirms URL and anon key are valid.
+`weekly-digest` uses a cron secret and must be called only by the scheduler. `delete-account` keeps JWT verification enabled and validates the member inside the function.
+
+Set these function secrets:
+
+| Secret | Used By |
+| --- | --- |
+| `SUPABASE_URL` | Both |
+| `SUPABASE_ANON_KEY` | `delete-account` |
+| `SUPABASE_SERVICE_ROLE_KEY` | Both |
+| `SITE_URL` | Both |
+| `DIGEST_CRON_SECRET` | `weekly-digest` |
+| `RESEND_API_KEY` | `weekly-digest` |
+| `DIGEST_FROM_EMAIL` | `weekly-digest` |
+
+Schedule the weekly digest as a `POST` with:
+
+```text
+Authorization: Bearer DIGEST_CRON_SECRET
+```
+
+## 5. Production Verification
+
+Run these checks against the production deployment:
+
+1. Public landing page loads on desktop and mobile without console errors or horizontal overflow.
+2. Sign up with email, complete onboarding once, sign out, and sign back in.
+3. Google sign-in returns to `/portal` if OAuth is enabled.
+4. Member dashboard, Finance Debrief, saved content, courses, chapters, opportunities, research applications, notifications, and settings load from production data.
+5. Draft Finance Debrief articles are visible only to admins; published articles are visible to members.
+6. Event registration respects status, open/close windows, capacity, duplicate prevention, and preserved state after sign-in.
+7. A member can export account data and delete a non-admin test account.
+8. Sole-admin account deletion is blocked.
+9. Avatar uploads reject unsupported files and store only in the member-owned path.
+10. Admin Inbox, Members, content editors, and System tab load and enforce role permissions.
+11. Weekly digest sends only published current-week articles and writes one delivery log row per member/week.
+12. Privacy, terms, support contact, canonical URL, metadata, and social previews are approved.
+13. `npm audit --omit=dev --audit-level=high` passes from an approved security environment.
+
+## 6. Rollback
+
+Keep the previous hosting deployment available until production verification passes. If a migration or Edge Function deploy fails, stop inviting users, restore the previous frontend deployment, and resolve the Supabase issue before retrying.
