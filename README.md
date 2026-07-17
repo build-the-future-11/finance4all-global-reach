@@ -42,7 +42,8 @@ Local development needs the same browser-safe client variables documented in `.e
 npm test
 npm run lint
 npx tsc --noEmit
-VITE_APP_URL=https://finance4all.example.org npm run build
+VITE_APP_URL=<canonical-production-url> npm run build
+npm run release:static
 npm run test:e2e
 ```
 

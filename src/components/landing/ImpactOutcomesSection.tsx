@@ -9,28 +9,28 @@ import GlassSurface from "@/components/landing/GlassSurface";
 const OUTCOMES = [
   {
     icon: GraduationCap,
-    stat: "25,000+",
-    label: "Students in outreach",
+    stat: "Lessons",
+    label: "Outreach and learning",
     detail:
-      "Volunteer-led Catalyst sessions on budgeting, banking, and investing — logged by chapter officers and tracked in the Education hub.",
+      "Beginner lessons on budgeting, banking, investing, macro, markets, research, and writing — tracked through member progress.",
     href: portalRoutes.education,
     cta: "Catalyst curriculum",
   },
   {
     icon: Microscope,
-    stat: "Atlas Lab",
-    label: "Macro research track",
+    stat: "Projects",
+    label: "Research applications",
     detail:
-      "FX pass-through, inflation dynamics, and emerging-market policy projects with mentor review. Deliverables are specified on each listing before you apply.",
+      "Approved projects list scope, expectations, deadlines, and review status before a member applies.",
     href: portalRoutes.labs,
     cta: "Browse open projects",
   },
   {
     icon: FileText,
-    stat: "Economics Journal",
-    label: "Student writing pipeline",
+    stat: "Writing",
+    label: "Student submissions",
     detail:
-      "Opinion and market analysis edited for thesis clarity and cited evidence. Submission standards are in Resources; submit through Pathways → Essays.",
+      "Educational analysis and member writing are reviewed for thesis clarity, cited evidence, and appropriate disclaimers.",
     href: `${portalRoutes.pathways}/essays`,
     cta: "Submission standards",
   },

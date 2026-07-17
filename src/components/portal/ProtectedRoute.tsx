@@ -1,11 +1,12 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { PortalFullPageShell } from "@/components/portal/PortalUI";
-import { portalCopy } from "@/lib/portalCopy";
+import { PortalFullPageShell, portalButtonPrimary } from "@/components/portal/PortalUI";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading, needsOnboarding } = useAuth();
+  const { user, profile, loading, needsOnboarding, refreshProfile, signOut } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -26,6 +27,29 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
 
   if (!user) {
     return <Navigate to="/login" state={{ from: `${location.pathname}${location.search}${location.hash}` }} replace />;
+  }
+
+  if (!profile) {
+    return (
+      <PortalFullPageShell>
+        <div className="portal-glass max-w-md space-y-4 rounded-2xl px-8 py-10 text-center">
+          <h1 className="text-lg font-semibold text-white">Profile unavailable</h1>
+          <p className="text-sm text-white/55">
+            Your account session is active, but we could not load your member profile. Retry or sign
+            out and try again. If this continues, ask an admin to confirm migrations 009–011 are
+            applied.
+          </p>
+          <div className="flex flex-col gap-2 sm:flex-row sm:justify-center">
+            <Button type="button" className={cn(portalButtonPrimary)} onClick={() => void refreshProfile()}>
+              Retry
+            </Button>
+            <Button type="button" variant="outline" onClick={() => void signOut()}>
+              Sign out
+            </Button>
+          </div>
+        </div>
+      </PortalFullPageShell>
+    );
   }
 
   if (needsOnboarding && location.pathname !== "/onboarding") {

@@ -17,7 +17,7 @@ Status: final release checklist. Only external/manual tasks remain.
 
 - [ ] Create or confirm the production Supabase project.
 - [ ] Apply migrations `001` through `012` in order.
-- [ ] Run `supabase/verify_migration_status.sql`.
+- [ ] Run `supabase/VERIFY_SETUP.sql` and confirm every row returns `ok = true`.
 - [ ] Confirm RLS is enabled and policies match the release audit.
 - [ ] Configure storage bucket and avatar policies.
 - [ ] Promote two real administrators through a controlled database operation.

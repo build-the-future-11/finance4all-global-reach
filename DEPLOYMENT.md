@@ -2,6 +2,13 @@
 
 Finance4All is a Vite application with Supabase Auth, Database, Storage, and Edge Functions. Production deployment is complete only when the frontend, database migrations, Edge Functions, scheduled digest, email sender, auth redirects, and content review are all configured.
 
+For a new Supabase project, the fastest setup path is:
+
+1. Run `supabase/FINAL_SETUP.sql` in the Supabase SQL Editor.
+2. Run `supabase/VERIFY_SETUP.sql`.
+3. Resolve any row where `ok = false`.
+4. Deploy the frontend with the environment variables below.
+
 ## 1. Hosting Environment
 
 Set these client variables in the hosting provider before deploying:
@@ -29,11 +36,12 @@ Apply migrations in order:
 7. `supabase/migrations/007_contact_submissions.sql`
 8. `supabase/migrations/008_platform_cms.sql`
 9. `supabase/migrations/009_membership_integrity.sql`
-10. `supabase/migrations/010_public_claims_content.sql`
-11. `supabase/migrations/011_directory_privacy.sql`
+10. `supabase/migrations/010_directory_privacy.sql`
+11. `supabase/migrations/011_profile_write_boundary.sql`
 12. `supabase/migrations/012_operational_integrity.sql`
 
-Then run `supabase/verify_migration_status.sql`. Do not open registration until the verification query shows the expected objects and RLS policies.
+Then run `supabase/VERIFY_SETUP.sql`. Do not open registration until every row
+returns `ok = true`.
 
 Seed data is for internal review only. Remove or replace unverified seed records before public launch.
 

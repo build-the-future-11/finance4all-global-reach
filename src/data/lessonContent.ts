@@ -1,4 +1,4 @@
-/** Full lesson bodies — written for Catalyst / Debriefed / Atlas tracks. */
+/** Full lesson bodies — written for Finance4All learning and Debrief content. */
 
 export interface LessonContent {
   body: string;
@@ -21,7 +21,7 @@ A simple framework used in Catalyst outreach workshops:
 - **30%** — wants (entertainment, dining out, subscriptions)
 - **20%** — savings and debt repayment
 
-Adjust ratios for your situation. A student in Mumbai might spend more on transport; a London member might spend more on rent. The point is separating **needs from wants**.
+Adjust ratios for your situation. One student might spend more on transport; another might spend more on rent or family support. The point is separating **needs from wants**.
 
 ## Building an emergency fund
 
@@ -141,7 +141,7 @@ A strong question is **specific**, **testable**, and **bounded** in time and geo
 
 ## Literature review
 
-Before collecting data, read what exists: working papers, Atlas Lab notes, IMF country reports. Your contribution should be clear — new geography, new method, or new mechanism.
+Before collecting data, read what exists: working papers, project notes, central bank releases, and public datasets. Your contribution should be clear — new geography, new method, or new mechanism.
 
 ## Data credibility
 
@@ -149,7 +149,7 @@ Primary sources beat aggregators. Examples: central bank statistical releases, W
 
 ## Identification
 
-How will you separate correlation from causation? Natural experiments, difference-in-differences, and instrumental variables are Atlas Lab methods — start by stating what would falsify your claim.`,
+How will you separate correlation from causation? Natural experiments, difference-in-differences, and instrumental variables are common research methods — start by stating what would falsify your claim.`,
     exercise: `**Draft:** Write one sentence describing a research question you could explore in a lab project. List two data sources and one prior paper you would read first.`,
   },
   writing: {

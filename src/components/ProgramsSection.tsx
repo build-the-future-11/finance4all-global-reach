@@ -35,16 +35,16 @@ const programs = [
   },
   {
     icon: FlaskConical,
-    title: "Meta Labs",
-    short: "Mentor-led research with defined deliverables.",
+    title: "Research projects",
+    short: "Member research with defined deliverables.",
     detail:
-      "Atlas, IYERN, and fintech tracks list open projects with named leads. Applications include a short motivation statement — reviewed by the lead, not auto-scored.",
+      "Open projects list a scope, deadline, lead, and deliverable. Applications include a short motivation statement and are reviewed by authorized leads.",
     href: "/portal/labs",
   },
   {
     icon: BookOpen,
-    title: "Global School Clubs",
-    short: "Faculty-backed chapters with a month-by-month playbook.",
+    title: "School chapters",
+    short: "Chapter pages with a month-by-month playbook.",
     detail:
       "The club toolkit covers officer roles, first events, and sponsor outreach. Chapters that document attendance and learning outcomes have a stronger case for local sponsorship.",
     href: "/portal/resources/club-toolkit",
@@ -54,7 +54,7 @@ const programs = [
     title: "Catalyst Education",
     short: "Seven lessons from budgeting through research writing.",
     detail:
-      "Three modules on the Education hub. Each lesson has key terms, a reading, and an exercise you can complete at your own pace. Progress saves on this device.",
+      "Three modules on the Education hub. Each lesson has key terms, a reading, and an exercise you can complete at your own pace. Progress saves to your member account.",
     href: "/portal/education",
   },
   {

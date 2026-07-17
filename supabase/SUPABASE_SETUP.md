@@ -16,11 +16,9 @@ Do not expose `service_role` or secret keys to the frontend.
 
 ## Database
 
-Run migrations `001` through `012` in order, then run:
-
-```sql
-SELECT * FROM verify_migration_status;
-```
+Run migrations `001` through `012` in order, or run `supabase/FINAL_SETUP.sql`
+once in a new project. Then run `supabase/VERIFY_SETUP.sql` in the SQL Editor.
+Every row must return `ok = true`.
 
 If your project was partially migrated before, skip only the files whose objects are already present and continue forward. Do not delete production data to re-run an early migration.
 
@@ -61,7 +59,7 @@ Configure:
 After signup:
 
 ```sql
-UPDATE profiles SET role = 'admin' WHERE email = 'admin@example.org';
+UPDATE profiles SET role = 'admin' WHERE email = '<admin-email>';
 ```
 
 Keep at least one admin account active. The account deletion function blocks deletion of the sole admin.

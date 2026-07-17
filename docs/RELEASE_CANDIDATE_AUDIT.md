@@ -29,7 +29,7 @@ Status: **Production code baseline**
 - `npm run test`: 19 test files and 78 tests passed.
 - `npm run lint`: passed with 11 existing Fast Refresh advisory warnings and no errors.
 - `npx tsc --noEmit`: passed.
-- `VITE_APP_URL=https://finance4all.example.org npm run build`: passed.
+- Production build with `VITE_APP_URL` set: passed.
 - `npm run test:e2e`: 7 Playwright tests passed after the local browser sandbox permission was granted.
 - `npm audit --omit=dev --audit-level=high`: passed with 0 vulnerabilities.
 

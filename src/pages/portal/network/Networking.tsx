@@ -288,7 +288,7 @@ export default function Networking() {
           <PortalCard className="flex flex-wrap items-center justify-between gap-4 p-5">
             <div>
               <p className="font-medium text-white">No introductions yet</p>
-              <p className="text-sm text-white/50">Post what you're looking for — collaborators, mentors, or project partners.</p>
+              <p className="text-sm text-white/50">Post what you're looking for — collaborators, reviewers, or project teammates.</p>
             </div>
             <Button className={portalButtonPrimary} onClick={() => setIntroOpen(true)}>
               <Plus className="mr-1 h-4 w-4" /> Post introduction

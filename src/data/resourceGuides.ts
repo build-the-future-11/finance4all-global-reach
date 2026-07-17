@@ -38,7 +38,7 @@ Local firms and university departments sometimes support puzzle nights or tradin
 
 ## Reporting
 
-Treasurer submits quarterly: income, expenses, event count, students reached. This mirrors how Finance4All reports outreach to partner organizations.`,
+Treasurer submits quarterly: income, expenses, event count, and attendance. Keep the report factual so an administrator can approve or correct it before anything public uses it.`,
   },
   "catalyst-curriculum": {
     id: "catalyst-curriculum",
@@ -54,8 +54,8 @@ Treasurer submits quarterly: income, expenses, event count, students reached. Th
 
 ## Adaptation notes
 
-- **India outreach:** use ₹ examples, UPI, and post office savings context  
-- **UK/US chapters:** use direct deposit, student loans, and credit score basics in banking lesson  
+- **Local payments:** use examples students actually recognize, such as mobile payments, debit cards, bank transfers, or cash envelopes
+- **Local credit systems:** adapt the credit lesson to the banking terms used in your country
 - **First-gen students:** do not assume parents discuss investing at home; define every term on first use
 
 ## Materials

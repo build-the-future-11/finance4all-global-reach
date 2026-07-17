@@ -3,44 +3,11 @@ import { Link } from "react-router-dom";
 import { Bookmark, CheckCircle2, Circle, GraduationCap, Users } from "lucide-react";
 import { useMyMemberStats } from "@/hooks/portal/useMemberStats";
 import { useEducationProgress } from "@/hooks/portal/useEducationProgress";
+import { useWeeklyGoalsBaseline } from "@/hooks/portal/useWeeklyGoals";
 import { EDUCATION_MODULES } from "@/data/educationModules";
 import { portalRoutes } from "@/routes/portal";
 import { portalCopy } from "@/lib/portalCopy";
 import { PortalCard } from "@/components/portal/PortalUI";
-
-const STORAGE_KEY = "f4a-weekly-goals-baseline";
-
-function getWeekKey(): string {
-  const d = new Date();
-  const day = d.getDay();
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-  const monday = new Date(d.getFullYear(), d.getMonth(), diff);
-  return monday.toISOString().slice(0, 10);
-}
-
-interface Baseline {
-  week: string;
-  savedArticles: number;
-  connections: number;
-  completedLessons: number;
-}
-
-function readBaseline(): Baseline | null {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as Baseline) : null;
-  } catch {
-    return null;
-  }
-}
-
-function writeBaseline(baseline: Baseline) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(baseline));
-  } catch {
-    /* ignore quota */
-  }
-}
 
 export default function WeeklyGoalsCard() {
   const { data: stats } = useMyMemberStats();
@@ -48,29 +15,35 @@ export default function WeeklyGoalsCard() {
   const allLessonIds = EDUCATION_MODULES.flatMap((m) => m.lessons.map((l) => l.id));
   const completedLessons = totalLessons(allLessonIds);
 
-  const goals = useMemo(() => {
-    const week = getWeekKey();
-    let baseline = readBaseline();
-    if (!baseline || baseline.week !== week) {
-      baseline = {
-        week,
-        savedArticles: stats?.savedArticles ?? 0,
-        connections: stats?.connections ?? 0,
-        completedLessons,
-      };
-      writeBaseline(baseline);
-    }
+  const current = useMemo(
+    () => ({
+      savedArticles: stats?.savedArticles ?? 0,
+      connections: stats?.connections ?? 0,
+      completedLessons,
+    }),
+    [stats?.savedArticles, stats?.connections, completedLessons],
+  );
 
-    const savedDone = (stats?.savedArticles ?? 0) > baseline.savedArticles;
-    const connectDone = (stats?.connections ?? 0) > baseline.connections;
-    const lessonDone = completedLessons > baseline.completedLessons;
+  const { data: baseline } = useWeeklyGoalsBaseline(current);
+
+  const goals = useMemo(() => {
+    const base = baseline ?? {
+      weekStart: "",
+      savedArticles: current.savedArticles,
+      connections: current.connections,
+      completedLessons: current.completedLessons,
+    };
+
+    const savedDone = current.savedArticles > base.savedArticles;
+    const connectDone = current.connections > base.connections;
+    const lessonDone = current.completedLessons > base.completedLessons;
 
     return [
       { id: "save", label: portalCopy.goals.saveArticle, done: savedDone, href: portalRoutes.debriefed, icon: Bookmark },
       { id: "connect", label: portalCopy.goals.connectMember, done: connectDone, href: portalRoutes.network, icon: Users },
       { id: "lesson", label: portalCopy.goals.completeLesson, done: lessonDone, href: portalRoutes.education, icon: GraduationCap },
     ];
-  }, [stats, completedLessons]);
+  }, [baseline, current]);
 
   const allDone = goals.every((g) => g.done);
   const doneCount = goals.filter((g) => g.done).length;

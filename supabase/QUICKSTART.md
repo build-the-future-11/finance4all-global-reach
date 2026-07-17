@@ -12,13 +12,11 @@ Create or select the Supabase project, then set production Auth URLs:
 
 ## 2. Apply Migrations
 
-Run every migration from `001` through `012` in order. Then run:
+Run every migration from `001` through `012` in order, or paste
+`supabase/FINAL_SETUP.sql` once into a new project's SQL Editor. Then run
+`supabase/VERIFY_SETUP.sql`.
 
-```sql
-SELECT * FROM verify_migration_status;
-```
-
-Do not open member registration until the verification query is clean.
+Do not open member registration until every verification row returns `ok = true`.
 
 ## 3. Deploy Functions
 
@@ -40,7 +38,7 @@ After trusted operators sign up:
 ```sql
 UPDATE profiles
 SET role = 'admin'
-WHERE email IN ('admin@example.org', 'backup-admin@example.org');
+WHERE email IN ('<admin-email>', '<backup-admin-email>');
 ```
 
 Keep at least two admin accounts before public launch.

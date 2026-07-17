@@ -26,11 +26,13 @@ Open **SQL Editor** and run the migration files in order. If a file has already 
 7. `supabase/migrations/007_contact_submissions.sql`
 8. `supabase/migrations/008_platform_cms.sql`
 9. `supabase/migrations/009_membership_integrity.sql`
-10. `supabase/migrations/010_public_claims_content.sql`
-11. `supabase/migrations/011_directory_privacy.sql`
+10. `supabase/migrations/010_directory_privacy.sql`
+11. `supabase/migrations/011_profile_write_boundary.sql`
 12. `supabase/migrations/012_operational_integrity.sql`
 
-Run `supabase/verify_migration_status.sql` afterward and resolve any missing object before inviting real users.
+For a new project, you may instead paste `supabase/FINAL_SETUP.sql` into the
+SQL Editor once. Run `supabase/VERIFY_SETUP.sql` afterward and resolve any row
+where `ok = false` before inviting real users.
 
 ## 3. Seed Carefully
 
@@ -90,7 +92,7 @@ After the first trusted admin signs up, promote that account with a controlled S
 ```sql
 UPDATE profiles
 SET role = 'admin'
-WHERE email = 'admin@example.org';
+WHERE email = '<admin-email>';
 ```
 
 Then sign out and back in before opening `/portal/admin`.

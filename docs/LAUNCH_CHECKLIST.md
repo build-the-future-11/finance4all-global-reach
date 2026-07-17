@@ -2,7 +2,7 @@
 
 These are the tasks that still require production accounts, credentials, legal authority, or real organizational content outside this repository.
 
-- Apply migrations `001` through `012` to production Supabase, then run `supabase/verify_migration_status.sql`.
+- Apply migrations `001` through `012` or `supabase/FINAL_SETUP.sql` to production Supabase, then run `supabase/VERIFY_SETUP.sql`.
 - Deploy `weekly-digest` with `--no-verify-jwt`, deploy `delete-account` with default JWT verification, and set every function secret listed in `supabase/SUPABASE_SETUP.md`.
 - Configure a weekly scheduler for `weekly-digest` using `POST` and `Authorization: Bearer DIGEST_CRON_SECRET`.
 - Set production `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, and `VITE_APP_URL` in hosting.

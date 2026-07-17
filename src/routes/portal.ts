@@ -30,6 +30,7 @@ export const portalRoutes = {
   events: `${PORTAL_BASE}/events`,
   network: `${PORTAL_BASE}/network`,
   networkProfile: `${PORTAL_BASE}/network/profile`,
+  memberProfile: (id: string) => `${PORTAL_BASE}/network/profile/${id}`,
   settings: `${PORTAL_BASE}/settings`,
   saved: `${PORTAL_BASE}/saved`,
   activity: `${PORTAL_BASE}/activity`,

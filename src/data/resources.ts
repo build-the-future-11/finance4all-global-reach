@@ -1,4 +1,4 @@
-export type ResourceType = "curriculum" | "journal" | "podcast" | "toolkit" | "partner" | "webinar";
+export type ResourceType = "curriculum" | "journal" | "podcast" | "toolkit" | "external" | "webinar";
 
 export interface ResourceItem {
   id: string;
@@ -41,7 +41,7 @@ export const RESOURCE_LIBRARY: ResourceItem[] = [
   },
   {
     id: "debriefed-substack",
-    type: "partner",
+    type: "external",
     title: "Finance Debriefed newsletter",
     description: "Weekly macro and markets digest on Substack — optional alongside the portal feed.",
     href: "https://financedebriefed.substack.com",
@@ -61,7 +61,7 @@ export const RESOURCE_LIBRARY: ResourceItem[] = [
   },
   {
     id: "econ-olympiad",
-    type: "partner",
+    type: "external",
     title: "Economics Olympiad prep",
     description: "Practice cases and competition links collected on the Pathways opportunity board.",
     href: "/portal/pathways",
@@ -69,14 +69,13 @@ export const RESOURCE_LIBRARY: ResourceItem[] = [
     free: true,
   },
   {
-    id: "sister-program",
-    type: "partner",
-    title: "S.I.S.T.E.R summer cohorts",
-    description: "Partner-run summer economics research program — application details on Pathways.",
-    href: "https://www.linkedin.com/company/finance-4-all-meta",
-    tags: ["summer", "research"],
+    id: "research-opportunity-guide",
+    type: "external",
+    title: "Research opportunity guide",
+    description: "How to evaluate external economics and finance programs before applying.",
+    href: "/portal/pathways",
+    tags: ["research", "applications"],
     free: true,
-    external: true,
   },
   {
     id: "explainers-hub",
@@ -101,7 +100,7 @@ export const UPCOMING_WEBINARS = [
   {
     id: "lab-info",
     title: "Lab application workshop",
-    host: "Atlas Economics Lab",
+    host: "Finance4All research",
     date: "Bi-weekly",
     description: "How to write a motivation statement, pick a project, and what leads look for in applications.",
     href: "/portal/labs",

@@ -51,20 +51,11 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-function googleDisplayName(user: User) {
-  const meta = user.user_metadata ?? {};
-  return (
-    (meta.display_name as string) ||
-    (meta.full_name as string) ||
-    (meta.name as string) ||
-    ""
-  );
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [profileReady, setProfileReady] = useState(false);
 
   const ensureProfile = useCallback(async (user: User) => {
     const { error: ensureError } = await supabase.rpc("ensure_my_profile");
@@ -91,27 +82,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const fetchProfile = useCallback(
     async (user: User) => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .maybeSingle();
+      setProfileReady(false);
+      try {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .maybeSingle();
 
-      if (error) {
-        console.error("Profile fetch failed:", error.message);
-        setProfile(null);
-        return;
+        if (error) {
+          console.error("Profile fetch failed:", error.message);
+          setProfile(null);
+          return;
+        }
+
+        if (!data) {
+          const ensured = await ensureProfile(user);
+          setProfile(ensured);
+          return;
+        }
+
+        setProfile(mapProfile(data));
+      } finally {
+        setProfileReady(true);
       }
-
-      if (!data) {
-        const ensured = await ensureProfile(user);
-        setProfile(ensured);
-        return;
-      }
-
-      const mapped = mapProfile(data);
-
-      setProfile(mapped);
     },
     [ensureProfile],
   );
@@ -121,26 +115,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [session?.user, fetchProfile]);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
+    let cancelled = false;
+
+    supabase.auth.getSession().then(async ({ data }) => {
+      if (cancelled) return;
       setSession(data.session);
       if (data.session?.user) {
-        fetchProfile(data.session.user).finally(() => setLoading(false));
+        await fetchProfile(data.session.user);
       } else {
-        setLoading(false);
+        setProfile(null);
+        setProfileReady(true);
       }
+      if (!cancelled) setLoading(false);
     });
 
     const { data: sub } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       setSession(nextSession);
       if (nextSession?.user) {
-        fetchProfile(nextSession.user);
+        void fetchProfile(nextSession.user).finally(() => {
+          if (!cancelled) setLoading(false);
+        });
       } else {
         setProfile(null);
+        setProfileReady(true);
+        setLoading(false);
       }
-      setLoading(false);
     });
 
-    return () => sub.subscription.unsubscribe();
+    return () => {
+      cancelled = true;
+      sub.subscription.unsubscribe();
+    };
   }, [fetchProfile]);
 
   const signIn = useCallback(async (email: string, password: string) => {
@@ -278,6 +283,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [session?.user, fetchProfile],
   );
 
+  // Keep auth loading until the profile fetch settles for an authenticated user.
+  const authLoading = loading || Boolean(session?.user && !profileReady);
   const needsOnboarding = Boolean(profile && !profile.onboardingCompletedAt);
 
   const value = useMemo(
@@ -285,7 +292,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       session,
       user: session?.user ?? null,
       profile,
-      loading,
+      loading: authLoading,
       needsOnboarding,
       signIn,
       signUp,
@@ -297,7 +304,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       completeOnboarding,
       updateProfile,
     }),
-    [session, profile, loading, needsOnboarding, signIn, signUp, signInWithGoogle, resetPassword, updatePassword, signOut, refreshProfile, completeOnboarding, updateProfile],
+    [session, profile, authLoading, needsOnboarding, signIn, signUp, signInWithGoogle, resetPassword, updatePassword, signOut, refreshProfile, completeOnboarding, updateProfile],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

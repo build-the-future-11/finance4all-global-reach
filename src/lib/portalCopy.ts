@@ -520,7 +520,7 @@ export const portalCopy = {
     contactPlaceholders: {
       name: "Your name",
       email: "you@school.edu",
-      subject: "Chapter inquiry, submission, partnership…",
+      subject: "Chapter inquiry, submission, or support…",
       message: "How can we help?",
     },
   },
