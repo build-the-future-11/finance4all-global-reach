@@ -3,7 +3,7 @@
 **Recorded:** 2026-07-17 (Pass 3 Wave 2 close)  
 **Git branch:** `cursor/membership-security-supabase-fix`  
 **Prior Pass 2:** `3f3f43d` / `43e2c14`  
-**Pass 3 checkpoint:** see latest commit after this file update
+**Pass 3 checkpoint:** `14a20ed` — Implement Pass 3 portal depth: moderation, certificates, chapters.
 
 ## Validation snapshot
 

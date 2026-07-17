@@ -3,7 +3,7 @@
 **Pass:** 3 of 4  
 **State:** COMPLETE (Wave 2 portal completeness in source; owner blockers remain)  
 **Updated:** 2026-07-17T14:00:00Z  
-**Checkpoint commit:** pending
+**Checkpoint commit:** `14a20ed`
 
 ## Completed this pass
 
