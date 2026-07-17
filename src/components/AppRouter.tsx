@@ -5,6 +5,7 @@ import ProtectedRoute from "@/components/portal/ProtectedRoute";
 import RoleGuard from "@/components/portal/RoleGuard";
 import { LoadingState } from "@/components/portal/PortalUI";
 import Index from "@/pages/Index";
+import Discover from "@/pages/Discover";
 import NotFound from "@/pages/NotFound";
 import Login from "@/pages/auth/Login";
 import ForgotPassword from "@/pages/auth/ForgotPassword";
@@ -49,6 +50,7 @@ function AppRoutes() {
     <Suspense fallback={<PortalFallback />}>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/discover" element={<Discover />} />
           <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />

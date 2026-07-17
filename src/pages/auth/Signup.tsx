@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { CheckCircle2, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -7,7 +7,7 @@ import { supabase } from "@/lib/supabase";
 import AuthLayout from "@/components/portal/AuthLayout";
 import GoogleSignInButton, { AuthDivider } from "@/components/portal/GoogleSignInButton";
 import PasswordStrengthMeter from "@/components/portal/PasswordStrengthMeter";
-import { assessPassword, isDisposableEmail, isPasswordAcceptable, isValidEmail } from "@/lib/security";
+import { assessPassword, isDisposableEmail, isPasswordAcceptable, isValidEmail, safeInternalPath } from "@/lib/security";
 import {
   PortalAlert,
   PortalInput,
@@ -23,6 +23,8 @@ export default function Signup() {
   useDocumentTitle("Sign up");
   const { signUp, signInWithGoogle, user, loading } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const nextPath = safeInternalPath(searchParams.get("next") ?? undefined, "/onboarding");
 
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
@@ -36,7 +38,7 @@ export default function Signup() {
 
   const passwordCheck = useMemo(() => assessPassword(password), [password]);
 
-  if (!loading && user) return <Navigate to="/portal" replace />;
+  if (!loading && user) return <Navigate to={nextPath === "/onboarding" ? "/portal" : nextPath} replace />;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,7 +68,8 @@ export default function Signup() {
       const { data } = await supabase.auth.getSession();
       if (data.session) {
         setSuccess(true);
-        setTimeout(() => navigate("/onboarding"), 1500);
+        const afterOnboarding = nextPath.startsWith("/portal") ? nextPath : "/portal";
+        setTimeout(() => navigate("/onboarding", { state: { from: afterOnboarding } }), 1500);
       } else {
         setNeedsEmailConfirm(true);
       }

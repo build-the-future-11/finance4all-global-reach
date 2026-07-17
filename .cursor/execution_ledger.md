@@ -70,3 +70,28 @@ Owner OA-1…OA-9 only; push requires explicit authorization.
 
 ### Next executable action
 Owner applies FINAL_SETUP 001–016 + VERIFY; or authorize `git push` if remote desired.
+
+## [2026-07-17T16:55:00Z] Work Unit — FinanceMeta visitor→member journey
+
+### Objective
+Close public discovery gaps: mount orphaned landing sections, signup-with-next CTAs, /discover, dashboard participation summary.
+
+### Files changed
+- src/pages/Index.tsx, Discover.tsx
+- Navbar, Footer, EcosystemBento, ProgramsSection, ImpactOutcomes, ResourcesPreview
+- Signup/Login/Onboarding next-path handling
+- ParticipationSummary + Dashboard
+- public/sitemap.xml, e2e/smoke.spec.ts, memberEntry helpers
+
+### Implementation
+Public journey no longer deep-links logged-out users into /portal (login bounce). Discover page documents programs honestly. Dashboard shows lab/event/opportunity participation counts from live hooks.
+
+### Verification
+- Command: typecheck; npm test; CI=true npm run test:e2e
+- Result: typecheck pass; 105 unit; e2e 13 pass / 2 skip
+
+### Remaining issue
+Owner OA-*; other product repos (Bu1LD/VertexED/Obscured) not in workspace.
+
+### Next executable action
+Owner OA-1 or authorize push; optional anon-readable competitions listing if desired later.

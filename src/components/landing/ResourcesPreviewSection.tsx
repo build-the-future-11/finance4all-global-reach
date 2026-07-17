@@ -4,31 +4,32 @@ import { useScrollReveal } from "@/hooks/useScrollReveal";
 import SectionHeader from "@/components/landing/SectionHeader";
 import GlassSurface from "@/components/landing/GlassSurface";
 import { portalCopy } from "@/lib/portalCopy";
+import { signupWithNext } from "@/lib/memberEntry";
 
 const PREVIEW = [
   {
     icon: GraduationCap,
     title: "Catalyst curriculum",
     desc: "Seven modules from budgeting to research writing — track progress in the portal.",
-    href: "/portal/education",
+    href: signupWithNext("/portal/education"),
   },
   {
     icon: FileText,
     title: "Economics Journal",
     desc: "Submit opinion and market analysis for editorial review before external promotion.",
-    href: "/portal/pathways/essays",
+    href: signupWithNext("/portal/pathways/essays"),
   },
   {
     icon: Headphones,
     title: "Podcasts & media",
     desc: "Founder interviews and Debriefed audio — linked from the Resources library.",
-    href: "/portal/resources",
+    href: signupWithNext("/portal/resources"),
   },
   {
     icon: BookOpen,
     title: "Club toolkit",
     desc: "Month-by-month playbook for launching a Finance4All chapter at your school.",
-    href: "/portal/resources",
+    href: signupWithNext("/portal/resources"),
   },
 ];
 

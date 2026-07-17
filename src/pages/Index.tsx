@@ -2,6 +2,9 @@ import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
 import HeroSection from "@/components/HeroSection";
 import Navbar from "@/components/Navbar";
+import AboutSection from "@/components/AboutSection";
+import MembershipSection from "@/components/MembershipSection";
+import ProgramsSection from "@/components/ProgramsSection";
 import EcosystemBento from "@/components/landing/EcosystemBento";
 import ImpactOutcomesSection from "@/components/landing/ImpactOutcomesSection";
 import LandingBackground from "@/components/landing/LandingBackground";
@@ -40,8 +43,11 @@ export default function Index() {
       <Navbar />
       <main id="main">
         <HeroSection />
+        <AboutSection />
         <OriginStorySection />
         <EcosystemBento />
+        <ProgramsSection />
+        <MembershipSection />
         <ImpactOutcomesSection />
         <ResourcesPreviewSection />
         <TestimonialsSection />

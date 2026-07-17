@@ -47,6 +47,7 @@ import EngagementSummary from "@/components/portal/EngagementSummary";
 import SuggestedMembersRail from "@/components/portal/SuggestedMembersRail";
 import WeeklyGoalsCard from "@/components/portal/WeeklyGoalsCard";
 import LabApplicationsPanel from "@/components/portal/LabApplicationsPanel";
+import ParticipationSummary from "@/components/portal/ParticipationSummary";
 import { openPortalSearch } from "@/lib/portalSearch";
 import { computeMemberBadges } from "@/lib/badges";
 import { timeGreeting } from "@/lib/personalization";
@@ -224,7 +225,11 @@ export default function Dashboard() {
             </QueryStatus>
           </PortalSection>
 
-          <PortalAnimatedSection delay={120}>
+          <PortalAnimatedSection>
+            <ParticipationSummary />
+          </PortalAnimatedSection>
+
+          <PortalAnimatedSection>
             <LabApplicationsPanel />
           </PortalAnimatedSection>
 

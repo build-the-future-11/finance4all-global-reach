@@ -24,6 +24,18 @@ test.describe("public site smoke", () => {
     await expect(page.getByRole("button", { name: /send message/i })).toBeVisible();
   });
 
+  test("discover page explains programs and signup path", async ({ page }) => {
+    await page.goto("/discover");
+    await expect(page.getByRole("heading", { name: /find a program/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: /browse research after signup/i })).toBeVisible();
+  });
+
+  test("landing module CTA routes to signup with next", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("link", { name: /meta labs/i }).first().click();
+    await expect(page).toHaveURL(/\/signup\?next=/);
+  });
+
   test("portal redirects unauthenticated users to login", async ({ page }) => {
     await page.goto("/portal");
     await expect(page).toHaveURL(/\/login/);

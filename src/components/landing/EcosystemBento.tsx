@@ -13,13 +13,14 @@ import SectionHeader from "@/components/landing/SectionHeader";
 import GlassSurface from "@/components/landing/GlassSurface";
 import { portalRoutes } from "@/routes/portal";
 import { portalCopy } from "@/lib/portalCopy";
+import { signupWithNext } from "@/lib/memberEntry";
 
 const MODULES = [
   {
     title: "Finance Debriefed",
     desc: "Macro pulse, IPO coverage, live headlines, and explainers — the reading list before your chapter meeting.",
     icon: Newspaper,
-    href: portalRoutes.debriefed,
+    href: signupWithNext(portalRoutes.debriefed),
     tag: "News",
     className: "sm:col-span-2 sm:row-span-2",
     gradient: "from-emerald-500/20 via-emerald-500/5 to-transparent",
@@ -28,7 +29,7 @@ const MODULES = [
     title: "Meta Labs",
     desc: "Apply to bounded research projects. Each approved listing names the scope, lead, and deliverable.",
     icon: FlaskConical,
-    href: portalRoutes.labs,
+    href: signupWithNext(portalRoutes.labs),
     tag: "Research",
     className: "",
     gradient: "from-blue-500/18 to-transparent",
@@ -37,7 +38,7 @@ const MODULES = [
     title: "Axiom Pathways",
     desc: "Opportunities, essay submissions, studio projects, and career resources published by administrators.",
     icon: Route,
-    href: portalRoutes.pathways,
+    href: signupWithNext(portalRoutes.pathways),
     tag: "Opportunities",
     className: "",
     gradient: "from-violet-500/18 to-transparent",
@@ -46,7 +47,7 @@ const MODULES = [
     title: "Network",
     desc: "Member directory, connection requests, chapter pages, and collaboration matching.",
     icon: Users,
-    href: portalRoutes.network,
+    href: signupWithNext(portalRoutes.network),
     tag: "Community",
     className: "sm:col-span-2",
     gradient: "from-amber-500/12 to-transparent",
@@ -55,7 +56,7 @@ const MODULES = [
     title: "Catalyst Education",
     desc: "Full lesson library with exercises — the same material volunteers teach in outreach.",
     icon: GraduationCap,
-    href: portalRoutes.education,
+    href: signupWithNext(portalRoutes.education),
     tag: "Curriculum",
     className: "",
     gradient: "from-teal-500/15 to-transparent",
@@ -64,7 +65,7 @@ const MODULES = [
     title: "Resources",
     desc: "Club toolkit, facilitator guides, writing standards, webinars, and practical templates.",
     icon: BookOpen,
-    href: portalRoutes.resources,
+    href: signupWithNext(portalRoutes.resources),
     tag: "Guides",
     className: "",
     gradient: "from-rose-500/12 to-transparent",
@@ -75,7 +76,7 @@ export default function EcosystemBento() {
   const ref = useScrollReveal();
 
   return (
-    <section className="relative px-4 py-28 sm:py-36">
+    <section id="experience" className="relative px-4 py-28 sm:py-36">
       <div ref={ref} className="mx-auto max-w-6xl">
         <SectionHeader
           eyebrow={portalCopy.landing.ecosystemEyebrow}

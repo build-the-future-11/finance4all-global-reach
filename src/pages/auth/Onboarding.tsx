@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChapters } from "@/hooks/portal/useEvents";
@@ -17,6 +17,7 @@ import {
   portalInputClass,
 } from "@/components/portal/PortalUI";
 import { portalCopy } from "@/lib/portalCopy";
+import { safeInternalPath } from "@/lib/security";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -28,6 +29,11 @@ export default function Onboarding() {
   const { profile, user, completeOnboarding } = useAuth();
   const { data: chapters } = useChapters();
   const navigate = useNavigate();
+  const location = useLocation();
+  const afterOnboarding = safeInternalPath(
+    (location.state as { from?: string })?.from,
+    "/portal",
+  );
 
   const [displayName, setDisplayName] = useState(profile?.displayName ?? "");
   const [bio, setBio] = useState(profile?.bio ?? "");
@@ -59,7 +65,7 @@ export default function Onboarding() {
     });
     setSubmitting(false);
     if (err) setError(err);
-    else navigate("/portal");
+    else navigate(afterOnboarding);
   };
 
   const avatarUrl =

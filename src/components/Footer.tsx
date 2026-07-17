@@ -9,9 +9,11 @@ export default function Footer() {
           <p className="mt-2 max-w-md leading-6">A student-facing finance learning and participation portal.</p>
         </div>
         <div className="flex flex-wrap gap-x-5 gap-y-3">
+          <Link to="/discover" className="hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300">Discover</Link>
+          <Link to="/signup" className="hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300">Join</Link>
           <Link to="/privacy" className="hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300">Privacy</Link>
           <Link to="/terms" className="hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300">Terms</Link>
-          <a href="#contact" className="hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300">Contact</a>
+          <a href="/#contact" className="hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-300">Contact</a>
           <p>© {new Date().getFullYear()} Finance4All</p>
         </div>
       </div>

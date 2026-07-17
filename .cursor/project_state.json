@@ -1,43 +1,36 @@
 {
   "current_phase": 4,
   "completed_phases": [1, 2, 3, 4],
+  "product_wave": "financemeta_visitor_member_journey",
   "completed_work": [
-    "Pass 1-4 portal/Debrief/security",
-    "Migrations 001-016",
-    "Finisher harden + Phase 4 release docs",
-    "Playwright CI Vite env coerce (tested) + debug instrumentation removed",
-    "Resource href sanitize; portalSearch unit test",
-    "gitignore test-results/playwright-report/coverage",
-    "Validation: typecheck, unit, build, release:static, package:source, 11 e2e/2 skip"
+    "Engineering Phases 1-4 through a244e19",
+    "Mounted About/Programs/Membership; fixed nav anchors + #experience",
+    "Visitor CTAs → /signup?next=…; Discover page; sitemap",
+    "Dashboard ParticipationSummary; onboarding return path",
+    "e2e discover + signup-next smoke"
   ],
-  "remaining_work": [],
+  "remaining_work": [
+    "Optional: public competitions feed if anon RLS allows live data"
+  ],
   "blocked_work": [
-    "OA-1 live FINAL_SETUP 001-016 + VERIFY",
-    "OA-2 Auth URLs",
-    "OA-3 Vercel VITE_*",
-    "OA-4 Google OAuth (optional)",
-    "OA-5 Edge secrets",
-    "OA-6 admin promote + seed review",
-    "OA-7 legal brand D-001",
-    "OA-8 privacy/terms review",
-    "OA-9 E2E staging credentials",
-    "Push to remote (requires explicit owner authorization)"
+    "OA-1…OA-9 owner live config",
+    "Bu1LD / VertexED / ObscuredRecords — repositories not open in this workspace",
+    "Push requires explicit authorization"
   ],
   "commands_executed": [
     "npm run typecheck",
     "npm test",
-    "CI=true npm run test:e2e (post-fix + after instrumentation removal)"
+    "CI=true npm run test:e2e"
   ],
   "tests_executed": [
-    "vitest ciViteEnv 5 + full suite",
-    "playwright 11 passed / 2 skipped"
+    "vitest 105 passed",
+    "playwright 13 passed / 2 skipped"
   ],
   "artifacts_created": [
-    "src/lib/ciViteEnv.ts",
-    "src/lib/ciViteEnv.test.ts",
-    "DEMO_GUIDE.md",
-    "KNOWN_LIMITATIONS.md"
+    "src/pages/Discover.tsx",
+    "src/components/portal/ParticipationSummary.tsx",
+    "src/lib/memberEntry.ts"
   ],
-  "last_updated": "2026-07-17T16:35:00Z",
-  "phase_4_status": "engineering_complete_owner_blocked"
+  "last_updated": "2026-07-17T16:55:00Z",
+  "phase_4_status": "engineering_complete_product_journey_improved"
 }

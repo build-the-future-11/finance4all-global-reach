@@ -15,10 +15,12 @@ Without a live schema, public pages still load; authenticated portal data will f
 
 ## Visitor (public)
 
-1. Open `/` — mission, modules, contact.
-2. Open `/privacy` and `/terms`.
-3. Submit the contact form (honeypot must stay empty).
-4. Open `/login` and `/signup`.
+1. Open `/` — about, programs, membership, contact (nav anchors work).
+2. Open `/discover` — program tracks with signup return paths.
+3. Open `/privacy` and `/terms`.
+4. Submit the contact form (honeypot must stay empty).
+5. From a module card (e.g. Meta Labs), land on `/signup?next=/portal/labs`.
+6. Open `/login` or complete signup → onboarding → destination.
 
 ## Member (after signup + email confirm if required)
 

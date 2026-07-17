@@ -15,6 +15,7 @@ import {
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import SectionHeader from "@/components/landing/SectionHeader";
 import { portalCopy } from "@/lib/portalCopy";
+import { signupWithNext } from "@/lib/memberEntry";
 
 const programs = [
   {
@@ -23,7 +24,7 @@ const programs = [
     short: "90-minute Catalyst workshops in schools — budgeting, banking, investing.",
     detail:
       "Volunteers use the facilitator guide in Resources. Attendance is logged by chapter; lesson updates sync to the Education hub so every chapter teaches from the same source.",
-    href: "/portal/education",
+    href: signupWithNext("/portal/education"),
   },
   {
     icon: Newspaper,
@@ -31,7 +32,7 @@ const programs = [
     short: "Student opinion and market analysis with editorial review.",
     detail:
       "Submissions flow through Pathways. Editors push back on unsupported claims and unclear structure before pieces are promoted externally. Standards live in the Resources library.",
-    href: "/portal/pathways/essays",
+    href: signupWithNext("/portal/pathways/essays"),
   },
   {
     icon: FlaskConical,
@@ -39,7 +40,7 @@ const programs = [
     short: "Member research with defined deliverables.",
     detail:
       "Open projects list a scope, deadline, lead, and deliverable. Applications include a short motivation statement and are reviewed by authorized leads.",
-    href: "/portal/labs",
+    href: signupWithNext("/portal/labs"),
   },
   {
     icon: BookOpen,
@@ -47,7 +48,7 @@ const programs = [
     short: "Chapter pages with a month-by-month playbook.",
     detail:
       "The club toolkit covers officer roles, first events, and sponsor outreach. Chapters that document attendance and learning outcomes have a stronger case for local sponsorship.",
-    href: "/portal/resources/club-toolkit",
+    href: signupWithNext("/portal/resources/club-toolkit"),
   },
   {
     icon: GraduationCap,
@@ -55,7 +56,7 @@ const programs = [
     short: "Seven lessons from budgeting through research writing.",
     detail:
       "Three modules on the Education hub. Each lesson has key terms, a reading, and an exercise you can complete at your own pace. Progress saves to your member account.",
-    href: "/portal/education",
+    href: signupWithNext("/portal/education"),
   },
   {
     icon: Mic,
@@ -63,7 +64,7 @@ const programs = [
     short: "Founder interviews curated for members.",
     detail:
       "External playlist linked from Resources — conversations with young entrepreneurs on building companies while still in school.",
-    href: "/portal/resources",
+    href: signupWithNext("/portal/resources"),
   },
   {
     icon: Briefcase,
@@ -71,15 +72,15 @@ const programs = [
     short: "Case-style challenges via Pathways.",
     detail:
       "Members tackle structured finance problems with rubrics aligned to how practitioners evaluate work — not open-ended \"build a startup\" prompts.",
-    href: "/portal/pathways",
+    href: signupWithNext("/portal/pathways"),
   },
   {
     icon: Trophy,
     title: "Economics Olympiad",
     short: "Competition prep and resource links.",
     detail:
-      "Practice cases and economics resources aggregated in Pathways for members preparing for competition-style work.",
-    href: "/portal/pathways",
+      "Practice cases and economics resources aggregated in Pathways for members preparing for competition-style work. Open competitions also appear under Events after signup.",
+    href: signupWithNext("/portal/events"),
   },
   {
     icon: Monitor,
@@ -87,7 +88,7 @@ const programs = [
     short: "Weekly macro digest and live headlines.",
     detail:
       "Member news hub with optional live headline feed, Substack integration, and explainers that decode the week's narratives for beginners.",
-    href: "/portal/debriefed",
+    href: signupWithNext("/portal/debriefed"),
   },
 ];
 
@@ -178,7 +179,7 @@ function ProgramCard({ program }: { program: typeof programs[0] }) {
               onClick={(e) => e.stopPropagation()}
               className="mt-3 inline-block text-xs font-medium text-emerald-300 hover:underline"
             >
-              Open in portal →
+              Open after signup →
             </Link>
           )}
         </div>

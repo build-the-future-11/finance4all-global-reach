@@ -3,10 +3,11 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 const links = [
-  { label: "About", href: "#about" },
-  { label: "Member experience", href: "#experience" },
-  { label: "Membership", href: "#membership" },
-  { label: "Contact", href: "#contact" },
+  { label: "About", href: "/#about" },
+  { label: "Discover", href: "/discover" },
+  { label: "Member experience", href: "/#experience" },
+  { label: "Membership", href: "/#membership" },
+  { label: "Contact", href: "/#contact" },
 ];
 
 export default function Navbar() {

@@ -5,6 +5,7 @@ import SectionHeader from "@/components/landing/SectionHeader";
 import { portalRoutes } from "@/routes/portal";
 import { portalCopy } from "@/lib/portalCopy";
 import GlassSurface from "@/components/landing/GlassSurface";
+import { signupWithNext } from "@/lib/memberEntry";
 
 const OUTCOMES = [
   {
@@ -13,7 +14,7 @@ const OUTCOMES = [
     label: "Outreach and learning",
     detail:
       "Beginner lessons on budgeting, banking, investing, macro, markets, research, and writing — tracked through member progress.",
-    href: portalRoutes.education,
+    href: signupWithNext(portalRoutes.education),
     cta: "Catalyst curriculum",
   },
   {
@@ -22,7 +23,7 @@ const OUTCOMES = [
     label: "Research applications",
     detail:
       "Approved projects list scope, expectations, deadlines, and review status before a member applies.",
-    href: portalRoutes.labs,
+    href: signupWithNext(portalRoutes.labs),
     cta: "Browse open projects",
   },
   {
@@ -31,7 +32,7 @@ const OUTCOMES = [
     label: "Student submissions",
     detail:
       "Educational analysis and member writing are reviewed for thesis clarity, cited evidence, and appropriate disclaimers.",
-    href: `${portalRoutes.pathways}/essays`,
+    href: signupWithNext(`${portalRoutes.pathways}/essays`),
     cta: "Submission standards",
   },
 ];

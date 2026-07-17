@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { safeInternalPath } from "@/lib/security";
@@ -20,7 +20,10 @@ export default function Login() {
   const { signIn, signInWithGoogle, user, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const from = safeInternalPath((location.state as { from?: string })?.from);
+  const [searchParams] = useSearchParams();
+  const from = safeInternalPath(
+    (location.state as { from?: string })?.from ?? searchParams.get("next") ?? undefined,
+  );
   const rawFlash = (location.state as { message?: string })?.message;
   const flashMessage = rawFlash ? sanitizeUserFacingError(rawFlash) : undefined;
 
