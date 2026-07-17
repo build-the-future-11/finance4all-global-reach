@@ -377,6 +377,134 @@ export interface Database {
         };
         Update: never;
       };
+      education_modules: {
+        Row: {
+          id: string;
+          title: string;
+          eyebrow: string;
+          description: string;
+          difficulty: "beginner" | "intermediate" | "advanced";
+          inclusive_note: string | null;
+          sort_order: number;
+          created_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["education_modules"]["Row"], "created_at"> & {
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["education_modules"]["Insert"]>;
+      };
+      education_lessons: {
+        Row: {
+          id: string;
+          module_id: string;
+          title: string;
+          duration_min: number;
+          summary: string;
+          objectives: string[];
+          body: string;
+          exercise: string;
+          key_terms: string[];
+          sort_order: number;
+          created_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["education_lessons"]["Row"], "created_at"> & {
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["education_lessons"]["Insert"]>;
+      };
+      resource_items: {
+        Row: {
+          id: string;
+          type: "curriculum" | "journal" | "podcast" | "toolkit" | "partner" | "webinar";
+          title: string;
+          description: string;
+          href: string;
+          tags: string[];
+          free: boolean;
+          external: boolean;
+          sort_order: number;
+          created_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["resource_items"]["Row"], "created_at"> & {
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["resource_items"]["Insert"]>;
+      };
+      resource_guides: {
+        Row: {
+          id: string;
+          title: string;
+          summary: string;
+          body: string;
+          checklist: string[];
+          created_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["resource_guides"]["Row"], "created_at"> & {
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["resource_guides"]["Insert"]>;
+      };
+      webinars: {
+        Row: {
+          id: string;
+          title: string;
+          host: string;
+          recurrence_label: string;
+          description: string;
+          href: string;
+          starts_at: string | null;
+          sort_order: number;
+          is_active: boolean;
+          created_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["webinars"]["Row"], "created_at"> & {
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["webinars"]["Insert"]>;
+      };
+      testimonials: {
+        Row: {
+          id: string;
+          quote: string;
+          attribution: string;
+          role_label: string;
+          sort_order: number;
+          is_published: boolean;
+          created_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["testimonials"]["Row"], "id" | "created_at"> & {
+          id?: string;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["testimonials"]["Insert"]>;
+      };
+      weekly_goal_baselines: {
+        Row: {
+          user_id: string;
+          week_start: string;
+          saved_articles: number;
+          connections: number;
+          completed_lessons: number;
+          updated_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["weekly_goal_baselines"]["Row"], "updated_at"> & {
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["weekly_goal_baselines"]["Insert"]>;
+      };
+      rate_limit_events: {
+        Row: {
+          id: string;
+          action: string;
+          identifier: string;
+          created_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["rate_limit_events"]["Row"], "id" | "created_at"> & {
+          id?: string;
+          created_at?: string;
+        };
+        Update: never;
+      };
     };
     Views: {
       essay_submissions_with_counts: {

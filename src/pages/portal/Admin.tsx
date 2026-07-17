@@ -25,6 +25,8 @@ import {
   useAdminMembers,
   useProductAnalyticsEvents,
   useUpdateMemberRole,
+  useSeedCmsContent,
+  useCmsHealth,
 } from "@/hooks/portal/useAdmin";
 import {
   PortalCard,
@@ -924,8 +926,10 @@ function AdminSystemTab() {
   const analytics = useProductAnalyticsEvents();
   const errors = useClientErrorEvents();
   const digests = useDigestDeliveryLog();
-  const isLoading = analytics.isLoading || errors.isLoading || digests.isLoading;
-  const error = analytics.error ?? errors.error ?? digests.error;
+  const cmsHealth = useCmsHealth();
+  const seedCms = useSeedCmsContent();
+  const isLoading = analytics.isLoading || errors.isLoading || digests.isLoading || cmsHealth.isLoading;
+  const error = analytics.error ?? errors.error ?? digests.error ?? cmsHealth.error;
 
   const eventCounts = (analytics.data ?? []).reduce<Record<string, number>>((acc, event) => {
     acc[event.event_name] = (acc[event.event_name] ?? 0) + 1;
@@ -945,10 +949,40 @@ function AdminSystemTab() {
           void analytics.refetch();
           void errors.refetch();
           void digests.refetch();
+          void cmsHealth.refetch();
         }}
-        isEmpty={!totalEvents && !recentErrors && !digests.data?.length}
+        isEmpty={!totalEvents && !recentErrors && !digests.data?.length && cmsHealth.data?.initialized}
         emptyMessage="No operational events have been recorded yet."
       >
+        <PortalCard className="p-5">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 className="font-semibold text-white">CMS content</h3>
+              <p className="mt-1 text-sm text-white/55">
+                {cmsHealth.data?.initialized
+                  ? "Education, resources, webinars, and testimonials are loaded in the database."
+                  : "Seed the default curriculum and resource library into Supabase (migration 008 required)."}
+              </p>
+            </div>
+            <Button
+              type="button"
+              className={cn(portalButtonPrimary)}
+              disabled={seedCms.isPending}
+              onClick={async () => {
+                try {
+                  await seedCms.mutateAsync();
+                  toast.success("CMS content seeded");
+                  void cmsHealth.refetch();
+                } catch (err) {
+                  toast.error(err instanceof Error ? err.message : "Could not seed CMS content");
+                }
+              }}
+            >
+              {seedCms.isPending ? "Seeding…" : cmsHealth.data?.initialized ? "Re-seed CMS" : "Seed CMS content"}
+            </Button>
+          </div>
+        </PortalCard>
+
         <div className="grid gap-3 md:grid-cols-4">
           <SystemMetric icon={Signal} label="Tracked events" value={totalEvents.toLocaleString()} />
           <SystemMetric icon={Activity} label="Event types" value={Object.keys(eventCounts).length.toString()} />

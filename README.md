@@ -26,6 +26,16 @@ The frontend, portal workflows, Supabase schema, Edge Function contracts, and op
 
 Use [DEPLOYMENT.md](DEPLOYMENT.md) for the complete production deployment path and [supabase/SUPABASE_SETUP.md](supabase/SUPABASE_SETUP.md) for Supabase-specific setup.
 
+Additional docs:
+
+- [docs/PROJECT_MEMORY.md](docs/PROJECT_MEMORY.md) — **canonical continuity context**
+- [docs/IMPLEMENTATION_QUEUE.md](docs/IMPLEMENTATION_QUEUE.md) — frozen pass queue
+- [docs/OWNER_ACTIONS.md](docs/OWNER_ACTIONS.md) — credential/dashboard-only steps
+- [DATABASE.md](DATABASE.md) — migrations, seeds, RLS verification
+- [SECURITY.md](SECURITY.md) — env vars, authz, edge function secrets
+- [TESTING.md](TESTING.md) — test commands and manual journeys
+- [PROJECT_STATUS.md](PROJECT_STATUS.md) — what's done vs credential blockers
+
 ## Local Development
 
 ```bash

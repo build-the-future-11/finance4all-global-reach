@@ -78,6 +78,7 @@ describe("ProtectedRoute", () => {
   it("redirects to onboarding when profile is incomplete", () => {
     vi.mocked(useAuth).mockReturnValue({
       user: { id: "u1" },
+      profile: { id: "u1", displayName: "Test" },
       loading: false,
       needsOnboarding: true,
     } as ReturnType<typeof useAuth>);
@@ -89,6 +90,7 @@ describe("ProtectedRoute", () => {
   it("renders portal content for authenticated users", () => {
     vi.mocked(useAuth).mockReturnValue({
       user: { id: "u1" },
+      profile: { id: "u1", displayName: "Test" },
       loading: false,
       needsOnboarding: false,
     } as ReturnType<typeof useAuth>);

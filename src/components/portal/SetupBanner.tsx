@@ -19,11 +19,12 @@ export function usePortalSetupHealth() {
     enabled: Boolean(user) && isSupabaseConfigured,
     staleTime: 10 * 60 * 1000,
     queryFn: async () => {
-      const [bookmarks, notifications, contact, education] = await Promise.all([
+      const [bookmarks, notifications, contact, education, cms] = await Promise.all([
         tableExists("news_bookmarks"),
         tableExists("notifications"),
         tableExists("contact_submissions"),
         tableExists("education_lesson_progress"),
+        tableExists("education_modules"),
       ]);
 
       return {
@@ -31,6 +32,7 @@ export function usePortalSetupHealth() {
         notifications,
         contact,
         education,
+        cms,
       };
     },
   });
@@ -58,7 +60,7 @@ export default function SetupBanner() {
   }
 
   if (dismissed || !data) return null;
-  if (data.bookmarks && data.notifications && data.contact && data.education) return null;
+  if (data.bookmarks && data.notifications && data.contact && data.education && data.cms) return null;
 
   return (
     <div className="mb-6 flex items-start gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">

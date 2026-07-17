@@ -1,79 +1,105 @@
 # Architecture
 
-Status: source-of-truth architecture summary for production testing.
+Status: Pass 1 source-of-truth architecture for FinanceMeta / Finance4All.
 
 ## Stack
 
-- Frontend: Vite, React, TypeScript, React Router, TanStack Query, Tailwind,
-  Radix/shadcn UI primitives.
-- Backend/data: Supabase Auth, Postgres, Row Level Security, Storage, RPCs,
-  triggers, and Edge Functions.
-- Testing: Vitest, Testing Library, Playwright, TypeScript, ESLint, npm audit.
-- Deployment: static Vite build on Vercel or equivalent static hosting with
-  Supabase as the production backend.
+| Layer | Technology |
+| --- | --- |
+| UI | React 18, TypeScript, Vite 5, React Router 6 |
+| Data client | TanStack Query + `@supabase/supabase-js` |
+| Styling | Tailwind CSS, shadcn/Radix |
+| Backend | Supabase Auth, Postgres, RLS, Storage, RPCs, Edge Functions |
+| Hosting | Vercel static SPA |
+| CI | GitHub Actions: audit, lint, typecheck, unit, build, release:static, e2e |
 
-## Application Boundaries
+## Trust boundary
 
-The browser renders public and member UI, but it is not trusted for permission
-decisions. All critical ownership, role, publication, deadline, capacity,
-duplicate, upload, and lifecycle checks belong in Supabase RLS, triggers, RPCs,
-or JWT-protected Edge Functions.
+The browser renders UI only. Permission decisions live in:
 
-Public pages may render without a session. Portal pages require an authenticated
-session. Administrator pages require both route-level guards for experience and
-database/server enforcement for security.
+- RLS policies
+- SECURITY DEFINER RPCs (`update_my_profile`, `complete_profile_onboarding`, `ensure_my_profile`, rate limits, analytics)
+- Triggers (role escalation blocks, notification inserts, registration windows)
+- JWT-protected Edge Functions (`delete-account`, `weekly-digest` with cron secret)
 
-## Data Layer
+## Application shells
 
-Primary tables and capabilities include:
+1. **Public** — landing, legal, contact section
+2. **Auth** — login/signup/forgot/reset/callback
+3. **Portal** — `PortalLayout` + lazy feature routes under `/portal`
+4. **Admin** — `/portal/admin` with `RoleGuard`
 
-- `profiles`: member identity, onboarding state, public profile fields, role.
-- Content: Debrief/news, explainer cards, courses, lessons, modules, resources.
-- Member state: bookmarks, lesson progress, notifications, preferences, RSVP or
-  registration records, opportunity interests, applications.
-- Operations: contact submissions, analytics events, client error events,
-  digest send logs.
-- Administration: publishable content records, member management views, project
-  review/application workflows.
+## Route map
 
-Migrations `001` through `012` define the production schema baseline. Production
-must not skip intermediate migrations.
+See `src/components/AppRouter.tsx` and `src/routes/portal.ts`.
 
-## Security Model
+```
+/ → Index (landing)
+/login|/signup|/forgot-password|/reset-password|/auth/callback
+/privacy|/terms
+/onboarding (auth)
+/portal (auth)
+  ├ debriefed, debriefed/explainers/:slug?
+  ├ labs, labs/:id, labs/review (lead|admin)
+  ├ pathways, pathways/opportunities|studios|essays
+  ├ events, network, network/profile/:id
+  ├ education, education/:lessonId
+  ├ resources, resources/:id
+  ├ saved, activity, settings
+  └ admin (admin)
+```
 
-- Supabase Auth issues sessions.
-- `ensure_my_profile` and onboarding functions provide idempotent profile
-  lifecycle behavior.
-- RLS policies constrain member-owned data.
-- Triggers enforce application/registration deadlines, duplicate prevention, and
-  status transitions.
-- Admin-only content writes and operational reads require admin role checks.
-- Edge Functions perform operations that require service-role capabilities,
-  including account deletion and digest delivery.
-- Client analytics and error reporting are allowlisted and sanitized before
-  storage.
+## Data domains
 
-## UI Architecture
+| Domain | Primary tables |
+| --- | --- |
+| Identity | `profiles`, `digest_preferences` |
+| Debrief | `news_articles`, `explainer_cards`, `news_bookmarks` |
+| Labs | `research_projects`, `lab_applications`, `project_bookmarks` |
+| Pathways | `opportunities`, `opportunity_interests`, `studio_submissions`, `essay_submissions`, `essay_upvotes` |
+| Chapters/events | `chapters`, `events`, `event_registrations` |
+| Network | `member_directory` view, `connection_requests`, `introduction_posts` |
+| Learning | `education_modules`, `education_lessons`, `education_lesson_progress` |
+| Resources | `resource_items`, `resource_guides`, `webinars`, `testimonials` |
+| Ops | `contact_submissions`, `notifications`, `rate_limit_events`, `product_analytics_events`, `client_error_events`, `digest_send_log`, `weekly_goal_baselines` |
 
-The product has three main UI shells:
+## Migrations
 
-- Public marketing/information shell for discovery and legal routes.
-- Auth shell for sign-in, sign-up, password recovery, and callbacks.
-- Portal shell for dashboard, content, learning, opportunities, chapters,
-  settings, notifications, and admin.
+Ordered `001`…`012`. Consolidated: `supabase/FINAL_SETUP.sql`. Verify: `supabase/VERIFY_SETUP.sql`.
 
-Shared components should remain functional and modest: buttons, forms, dialogs,
-tables, badges, layout primitives, loading states, empty states, denied states,
-and confirmation patterns.
+## Edge Functions
 
-## Production Dependencies
+| Function | Auth | Purpose |
+| --- | --- | --- |
+| `weekly-digest` | Cron secret header | Email digest via Resend |
+| `delete-account` | User JWT | Account deletion; blocks sole admin |
 
-The codebase is not enough for launch without:
+## Frontend module layout
 
-- Production Supabase project with migrations and storage policies applied.
-- Supabase Auth redirect URLs and providers configured.
-- Hosting environment variables and `VITE_APP_URL`.
-- Edge Function deployment and secrets.
-- Email/sender verification for digest and account flows.
-- Real public content and legal/privacy approval.
-- Monitoring and backup ownership.
+- `src/pages/` — routes
+- `src/hooks/portal/` — React Query data access
+- `src/components/portal/` — portal chrome + guards
+- `src/components/landing/` — public sections
+- `src/lib/` — security, mappers, analytics
+- `src/data/` — static CMS fallbacks
+- `src/types/database.ts` — typed schema
+
+## Finance Debrief target architecture (Pass 2+)
+
+Current: admin publishes `news_articles` with optional `source_url` + `is_published`.
+
+Target:
+
+```
+approved_sources ──┐
+                   ├── news_articles (editorial status machine)
+debrief_ai_logs ───┘         │
+                             ├── news_article_versions
+                             └── newsletter inclusion flags
+```
+
+Publish path must require: approved source binding + human confirmation + educational disclaimer. No automatic publish from AI output.
+
+## Production dependencies (non-code)
+
+Supabase migrations, Auth URLs, Vercel `VITE_*`, Edge secrets, email sender, real content, legal approval, monitoring.
