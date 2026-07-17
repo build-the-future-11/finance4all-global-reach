@@ -1,5 +1,6 @@
 -- Seed data for Finance4All Portal (run after migration)
--- Safe to re-run: uses ON CONFLICT where applicable
+-- DEVELOPMENT SAMPLE DATA ONLY — do not treat as production content.
+-- Titles prefixed with [Sample] so the UI can badge them. Safe to re-run: ON CONFLICT where applicable.
 
 INSERT INTO chapters (id, name, city, country, latitude, longitude, member_count) VALUES
   ('70000000-0000-4000-8000-000000000001', 'Mumbai', 'Mumbai', 'India', 19.076, 72.8777, 42),
@@ -8,10 +9,10 @@ INSERT INTO chapters (id, name, city, country, latitude, longitude, member_count
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO news_articles (title, summary, category, tags) VALUES
-  ('Fed signals patience on rate cuts amid sticky inflation', 'Central bankers emphasize data dependence as markets price in fewer 2026 cuts.', 'macro', ARRAY['fed', 'rates']),
-  ('Tech IPO pipeline heats up for Q3', 'Several late-stage fintech and AI companies file confidentially with regulators.', 'ipo', ARRAY['ipo', 'fintech']),
-  ('S&P 500 hits new high as megacap earnings beat', 'Index gains led by AI infrastructure names; breadth improves week-over-week.', 'markets', ARRAY['equities', 'earnings']),
-  ('NVIDIA supplier raises guidance on data center demand', 'Company spotlight: key semiconductor player benefits from capex cycle.', 'company', ARRAY['semiconductors', 'ai'])
+  ('[Sample] Fed signals patience on rate cuts amid sticky inflation', 'Central bankers emphasize data dependence as markets price in fewer 2026 cuts.', 'macro', ARRAY['fed', 'rates', 'sample']),
+  ('[Sample] Tech IPO pipeline heats up for Q3', 'Several late-stage fintech and AI companies file confidentially with regulators.', 'ipo', ARRAY['ipo', 'fintech', 'sample']),
+  ('[Sample] S&P 500 hits new high as megacap earnings beat', 'Index gains led by AI infrastructure names; breadth improves week-over-week.', 'markets', ARRAY['equities', 'earnings', 'sample']),
+  ('[Sample] NVIDIA supplier raises guidance on data center demand', 'Company spotlight: key semiconductor player benefits from capex cycle.', 'company', ARRAY['semiconductors', 'ai', 'sample'])
 ON CONFLICT DO NOTHING;
 
 INSERT INTO explainer_cards (slug, title, summary, body, difficulty, related_terms) VALUES
@@ -42,16 +43,16 @@ INSERT INTO explainer_cards (slug, title, summary, body, difficulty, related_ter
 ON CONFLICT (slug) DO NOTHING;
 
 INSERT INTO opportunities (title, organization, type, description, tags) VALUES
-  ('Summer Markets Analyst Internship', 'Global Asset Partners', 'internship', 'Equity research internship focused on consumer and TMT coverage.', ARRAY['internship', 'research']),
-  ('Finance4All Case Competition', 'Finance4All', 'challenge', 'Team-based valuation challenge with mentorship from industry judges.', ARRAY['competition', 'valuation']),
-  ('YC-style Fintech Fellowship', 'Axiom Labs', 'program', '12-week program building payments infrastructure with weekly mentor sessions.', ARRAY['fintech', 'fellowship']),
-  ('Research Assistant — EM Credit', 'University Research Group', 'project_role', 'Part-time role supporting sovereign credit analysis across LATAM.', ARRAY['credit', 'research'])
+  ('[Sample] Summer Markets Analyst Internship', 'Global Asset Partners', 'internship', 'Equity research internship focused on consumer and TMT coverage.', ARRAY['internship', 'research', 'sample']),
+  ('[Sample] Finance4All Case Competition', 'Finance4All', 'challenge', 'Team-based valuation challenge with mentorship from industry judges.', ARRAY['competition', 'valuation', 'sample']),
+  ('[Sample] YC-style Fintech Fellowship', 'Axiom Labs', 'program', '12-week program building payments infrastructure with weekly mentor sessions.', ARRAY['fintech', 'fellowship', 'sample']),
+  ('[Sample] Research Assistant — EM Credit', 'University Research Group', 'project_role', 'Part-time role supporting sovereign credit analysis across LATAM.', ARRAY['credit', 'research', 'sample'])
 ON CONFLICT DO NOTHING;
 
 INSERT INTO events (chapter_id, title, description, status, starts_at, registration_url, program_links) VALUES
   (
     '70000000-0000-4000-8000-000000000001',
-    'IIT Finance Case Night',
+    '[Sample] IIT Finance Case Night',
     'Live case walkthrough with alumni mentors and networking.',
     'upcoming',
     now() + interval '14 days',
@@ -60,7 +61,7 @@ INSERT INTO events (chapter_id, title, description, status, starts_at, registrat
   ),
   (
     '70000000-0000-4000-8000-000000000002',
-    'London Markets 101 Workshop',
+    '[Sample] London Markets 101 Workshop',
     'Beginner workshop covering equities, fixed income, and career paths.',
     'upcoming',
     now() + interval '21 days',

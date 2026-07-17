@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
-import { AlertCircle, Bookmark, Calendar, FlaskConical, Newspaper, RefreshCw, Users } from "lucide-react";
+import { AlertCircle, Bookmark, Briefcase, Calendar, FlaskConical, Newspaper, RefreshCw, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -31,6 +31,7 @@ export const ACTIVITY_ICONS = {
   connection: Users,
   event: Calendar,
   saved_article: Bookmark,
+  opportunity: Briefcase,
 } as const;
 
 /** Shared portal form & surface class strings */

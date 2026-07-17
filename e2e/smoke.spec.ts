@@ -24,6 +24,11 @@ test.describe("public site smoke", () => {
     await expect(page.getByRole("button", { name: /send message/i })).toBeVisible();
   });
 
+  test("competitions overview is public", async ({ page }) => {
+    await page.goto("/competitions");
+    await expect(page.getByRole("heading", { name: /competitions, workshops/i })).toBeVisible();
+  });
+
   test("discover page explains programs and signup path", async ({ page }) => {
     await page.goto("/discover");
     await expect(page.getByRole("heading", { name: /find a program/i })).toBeVisible();

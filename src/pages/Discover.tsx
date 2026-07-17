@@ -25,12 +25,14 @@ const TRACKS = [
     next: portalRoutes.pathwaysOpportunities,
     cta: "Open opportunity board after signup",
   },
-  {
-    title: "Competitions",
-    body: "Open competitions appear in Events & Chapters with status and external registration links when provided.",
-    next: portalRoutes.events,
-    cta: "View competitions after signup",
-  },
+    {
+      title: "Competitions",
+      body: "Open competitions appear under Events & Chapters with status and external registration links when provided. See the public overview first.",
+      next: portalRoutes.events,
+      cta: "View competitions after signup",
+      publicHref: "/competitions",
+      publicCta: "Read competitions overview",
+    },
   {
     title: "Chapters & workshops",
     body: "Find chapters on the map, RSVP to events, and export calendar invites. Workshops are published as chapter events.",
@@ -78,6 +80,14 @@ export default function Discover() {
               >
                 {track.cta} →
               </Link>
+              {"publicHref" in track && track.publicHref ? (
+                <Link
+                  to={track.publicHref}
+                  className="mt-2 block text-sm text-white/50 hover:text-white/70"
+                >
+                  {track.publicCta} →
+                </Link>
+              ) : null}
             </article>
           ))}
         </div>

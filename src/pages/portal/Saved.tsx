@@ -199,9 +199,9 @@ export default function Saved() {
                           </p>
                         </div>
                         <div className="flex gap-2">
-                          <Link to={portalRoutes.pathwaysOpportunities}>
+                          <Link to={portalRoutes.pathwayOpportunity(opportunity.id)}>
                             <Button size="sm" variant="outline" className={portalButtonOutline}>
-                              Open Pathways
+                              Open opportunity
                             </Button>
                           </Link>
                           <Button

@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
+import { portalRoutes } from "@/routes/portal";
 
 export interface ActivityItem {
   id: string;
-  type: "news" | "lab_application" | "connection" | "event" | "saved_article";
+  type: "news" | "lab_application" | "connection" | "event" | "saved_article" | "opportunity";
   title: string;
   description: string;
   link: string;
@@ -12,7 +13,7 @@ export interface ActivityItem {
 }
 
 export function useActivityFeed(limit = 8) {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
 
   return useQuery({
     queryKey: ["activity-feed", user?.id],
@@ -20,7 +21,7 @@ export function useActivityFeed(limit = 8) {
     queryFn: async (): Promise<ActivityItem[]> => {
       const items: ActivityItem[] = [];
 
-      const [newsRes, appsRes, connRes, eventsRes, savedRes] = await Promise.all([
+      const [newsRes, appsRes, connRes, regsRes, interestsRes, savedRes] = await Promise.all([
         supabase
           .from("news_articles")
           .select("id, title, published_at")
@@ -28,10 +29,10 @@ export function useActivityFeed(limit = 8) {
           .limit(3),
         supabase
           .from("lab_applications")
-          .select("id, status, submitted_at, research_projects(title)")
+          .select("id, status, submitted_at, project_id, research_projects(title)")
           .eq("applicant_id", user!.id)
           .order("submitted_at", { ascending: false })
-          .limit(3),
+          .limit(5),
         supabase
           .from("connection_requests")
           .select("id, status, created_at, from_user_id, to_user_id")
@@ -39,11 +40,17 @@ export function useActivityFeed(limit = 8) {
           .order("created_at", { ascending: false })
           .limit(3),
         supabase
-          .from("events")
-          .select("id, title, starts_at")
-          .eq("status", "upcoming")
-          .order("starts_at", { ascending: true })
-          .limit(3),
+          .from("event_registrations")
+          .select("created_at, event_id, events(id, title, starts_at)")
+          .eq("user_id", user!.id)
+          .order("created_at", { ascending: false })
+          .limit(5),
+        supabase
+          .from("opportunity_interests")
+          .select("created_at, opportunity_id, opportunities(id, title)")
+          .eq("user_id", user!.id)
+          .order("created_at", { ascending: false })
+          .limit(5),
         supabase
           .from("news_bookmarks")
           .select("created_at, news_articles(id, title)")
@@ -52,7 +59,7 @@ export function useActivityFeed(limit = 8) {
           .limit(2),
       ]);
 
-      const criticalErrors = [newsRes, appsRes, connRes, eventsRes]
+      const criticalErrors = [newsRes, appsRes, connRes, regsRes, interestsRes]
         .map((res) => res.error)
         .filter(Boolean);
       if (criticalErrors.length > 0) throw criticalErrors[0];
@@ -63,7 +70,7 @@ export function useActivityFeed(limit = 8) {
           type: "news",
           title: a.title,
           description: "New in Debriefed",
-          link: "/portal/debriefed",
+          link: `${portalRoutes.debriefed}?article=${a.id}`,
           timestamp: a.published_at,
         });
       });
@@ -75,7 +82,7 @@ export function useActivityFeed(limit = 8) {
           type: "lab_application",
           title: project?.title ?? "Lab application",
           description: `Status: ${app.status.replace("_", " ")}`,
-          link: "/portal/labs",
+          link: `${portalRoutes.labs}/${app.project_id}`,
           timestamp: app.submitted_at,
         });
       });
@@ -87,20 +94,37 @@ export function useActivityFeed(limit = 8) {
           type: "connection",
           title: isIncoming ? "Connection request received" : "Connection request sent",
           description: `Status: ${c.status}`,
-          link: "/portal/network",
+          link: portalRoutes.network,
           timestamp: c.created_at,
         });
       });
 
-      eventsRes.data?.forEach((e) => {
-        items.push({
-          id: `event-${e.id}`,
-          type: "event",
-          title: e.title,
-          description: "Upcoming event",
-          link: "/portal/events",
-          timestamp: e.starts_at,
-        });
+      regsRes.data?.forEach((r) => {
+        const event = r.events as { id: string; title: string; starts_at: string } | null;
+        if (event) {
+          items.push({
+            id: `rsvp-${event.id}`,
+            type: "event",
+            title: event.title,
+            description: "You registered for this event",
+            link: portalRoutes.events,
+            timestamp: r.created_at ?? event.starts_at,
+          });
+        }
+      });
+
+      interestsRes.data?.forEach((row) => {
+        const opp = row.opportunities as { id: string; title: string } | null;
+        if (opp) {
+          items.push({
+            id: `opp-${opp.id}`,
+            type: "opportunity",
+            title: opp.title,
+            description: "You saved this opportunity",
+            link: `${portalRoutes.pathwaysOpportunities}/${opp.id}`,
+            timestamp: row.created_at,
+          });
+        }
       });
 
       savedRes.data?.forEach((s) => {
@@ -111,7 +135,7 @@ export function useActivityFeed(limit = 8) {
             type: "saved_article",
             title: article.title,
             description: "You saved this article",
-            link: "/portal/debriefed",
+            link: `${portalRoutes.debriefed}?article=${article.id}`,
             timestamp: s.created_at,
           });
         }

@@ -30,6 +30,7 @@ import { downloadIcal } from "@/lib/downloadIcal";
 import { getEventRegistrationState } from "@/lib/eventRegistration";
 import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
 import { sanitizeUrl } from "@/lib/security";
+import { isSampleContent, programKindLabels, stripSamplePrefix } from "@/lib/programLabels";
 
 function groupEventsByMonth(events: { id: string; title: string; startsAt: string }[]) {
   const groups = new Map<string, typeof events>();
@@ -440,7 +441,26 @@ export default function EventsChapters() {
                         </Badge>
                         {chapter && <span className="text-xs text-white/40">{chapter.name}</span>}
                       </div>
-                      <h3 className="mt-2 text-lg font-semibold text-white">{event.title}</h3>
+                      <h3 className="mt-2 text-lg font-semibold text-white">
+                        {stripSamplePrefix(event.title)}
+                      </h3>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {programKindLabels({ title: event.title, description: event.description }).map(
+                          (label) => (
+                            <Badge
+                              key={label}
+                              className="border-0 bg-emerald-500/15 text-emerald-200"
+                            >
+                              {label}
+                            </Badge>
+                          ),
+                        )}
+                        {isSampleContent(event.title) && (
+                          <Badge variant="outline" className="border-amber-400/40 text-amber-200">
+                            Sample
+                          </Badge>
+                        )}
+                      </div>
                       <p className="mt-2 text-sm text-white/60">{event.description}</p>
                       <p className="mt-2 flex items-center gap-1 text-xs text-white/40">
                         <Calendar className="h-3 w-3" />

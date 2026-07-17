@@ -25,6 +25,7 @@ export const portalRoutes = {
   labsReview: `${PORTAL_BASE}/labs/review`,
   pathways: `${PORTAL_BASE}/pathways`,
   pathwaysOpportunities: `${PORTAL_BASE}/pathways/opportunities`,
+  pathwayOpportunity: (id: string) => `${PORTAL_BASE}/pathways/opportunities/${id}`,
   pathwaysStudios: `${PORTAL_BASE}/pathways/studios`,
   pathwaysEssays: `${PORTAL_BASE}/pathways/essays`,
   events: `${PORTAL_BASE}/events`,

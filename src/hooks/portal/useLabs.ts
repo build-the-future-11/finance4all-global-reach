@@ -126,7 +126,12 @@ export function useSubmitLabApplication() {
         applicant_id: user!.id,
         motivation: trimmedMotivation,
       });
-      if (error) throw error;
+      if (error) {
+        if (error.code === "23505") {
+          throw new Error("You already applied to this project. Check status on your dashboard.");
+        }
+        throw error;
+      }
     },
     onSuccess: () => {
       trackEvent("research.application_submitted");

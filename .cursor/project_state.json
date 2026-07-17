@@ -1,21 +1,20 @@
 {
   "current_phase": 4,
   "completed_phases": [1, 2, 3, 4],
-  "product_wave": "financemeta_visitor_member_journey",
+  "product_wave": "financemeta_post_discovery_depth",
   "completed_work": [
-    "Engineering Phases 1-4 through a244e19",
-    "Mounted About/Programs/Membership; fixed nav anchors + #experience",
-    "Visitor CTAs → /signup?next=…; Discover page; sitemap",
-    "Dashboard ParticipationSummary; onboarding return path",
-    "e2e discover + signup-next smoke"
+    "Visitor discovery journey",
+    "Public /competitions overview",
+    "Opportunity detail route + Saved deep links",
+    "Activity feed: own RSVPs + opportunity interests",
+    "Fellowship/workshop labels; [Sample] seed marking",
+    "Duplicate lab apply friendly 23505 error"
   ],
-  "remaining_work": [
-    "Optional: public competitions feed if anon RLS allows live data"
-  ],
+  "remaining_work": [],
   "blocked_work": [
-    "OA-1…OA-9 owner live config",
-    "Bu1LD / VertexED / ObscuredRecords — repositories not open in this workspace",
-    "Push requires explicit authorization"
+    "OA-1…OA-9",
+    "Bu1LD / VertexED / ObscuredRecords not in workspace",
+    "Push requires authorization"
   ],
   "commands_executed": [
     "npm run typecheck",
@@ -23,14 +22,13 @@
     "CI=true npm run test:e2e"
   ],
   "tests_executed": [
-    "vitest 105 passed",
-    "playwright 13 passed / 2 skipped"
+    "vitest 108 passed",
+    "playwright 14 passed / 2 skipped"
   ],
   "artifacts_created": [
-    "src/pages/Discover.tsx",
-    "src/components/portal/ParticipationSummary.tsx",
-    "src/lib/memberEntry.ts"
+    "src/pages/Competitions.tsx",
+    "src/pages/portal/pathways/OpportunityDetail.tsx",
+    "src/lib/programLabels.ts"
   ],
-  "last_updated": "2026-07-17T16:55:00Z",
-  "phase_4_status": "engineering_complete_product_journey_improved"
+  "last_updated": "2026-07-17T17:05:00Z"
 }

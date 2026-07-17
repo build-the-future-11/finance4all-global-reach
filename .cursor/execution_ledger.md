@@ -95,3 +95,26 @@ Owner OA-*; other product repos (Bu1LD/VertexED/Obscured) not in workspace.
 
 ### Next executable action
 Owner OA-1 or authorize push; optional anon-readable competitions listing if desired later.
+
+## [2026-07-17T17:05:00Z] Work Unit — FinanceMeta post-discovery depth
+
+### Objective
+Opportunity detail pages, public competitions overview, participation activity feed, sample seed marking, program kind labels.
+
+### Files changed
+- Competitions.tsx, OpportunityDetail.tsx, AxiomPathways, EventsChapters, Saved
+- useActivityFeed, PortalUI ACTIVITY_ICONS, programLabels, seed.sql
+- AppRouter, Navbar, Footer, sitemap, Discover, useLabs duplicate toast
+
+### Implementation
+Members can open opportunity detail routes; activity shows own RSVPs/saves; public /competitions explains listings honestly; seed titles use [Sample].
+
+### Verification
+- Command: typecheck; npm test; CI=true test:e2e
+- Result: 108 unit; e2e 14 pass / 2 skip
+
+### Remaining issue
+Owner OA-*; other product repos not open.
+
+### Next executable action
+Owner OA-1 or authorize push.

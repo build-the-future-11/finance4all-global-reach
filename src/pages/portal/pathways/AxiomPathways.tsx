@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { ExternalLink, Star } from "lucide-react";
 import {
   useOpportunities,
@@ -16,7 +17,6 @@ import {
   portalButtonPrimary,
   portalInputClass,
 } from "@/components/portal/PortalUI";
-import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +27,8 @@ import { portalCopy } from "@/lib/portalCopy";
 import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
 import InterestPillBar from "@/components/portal/InterestPillBar";
 import { sanitizeUrl } from "@/lib/security";
+import { isSampleContent, programKindLabels, stripSamplePrefix } from "@/lib/programLabels";
+import { portalRoutes } from "@/routes/portal";
 
 const TYPES: { value: OpportunityType | "all"; label: string }[] = [
   { value: "all", label: "All" },
@@ -108,6 +110,7 @@ export default function AxiomPathways() {
         <div className="space-y-4">
           {filtered?.map((opp) => {
             const saved = interests?.has(opp.id) ?? false;
+            const kinds = programKindLabels(opp);
             return (
               <PortalCard key={opp.id} className="p-5">
                 <div className="flex flex-wrap items-start justify-between gap-4">
@@ -116,15 +119,30 @@ export default function AxiomPathways() {
                       <Badge variant="outline" className="border-white/20 capitalize text-white/60">
                         {opp.type.replace("_", " ")}
                       </Badge>
+                      {kinds.map((label) => (
+                        <Badge key={label} className="border-0 bg-emerald-500/15 text-emerald-200">
+                          {label}
+                        </Badge>
+                      ))}
+                      {isSampleContent(opp.title) && (
+                        <Badge variant="outline" className="border-amber-400/40 text-amber-200">
+                          Sample
+                        </Badge>
+                      )}
                       {opp.tags.map((t) => (
                         <span key={t} className="text-xs text-white/40">
                           #{t}
                         </span>
                       ))}
                     </div>
-                    <h3 className="mt-2 text-lg font-semibold text-white">{opp.title}</h3>
+                    <Link
+                      to={portalRoutes.pathwayOpportunity(opp.id)}
+                      className="mt-2 block text-lg font-semibold text-white hover:text-emerald-200"
+                    >
+                      {stripSamplePrefix(opp.title)}
+                    </Link>
                     <p className="text-sm text-emerald-300/80">{opp.organization}</p>
-                    <p className="mt-2 text-sm text-white/60">{opp.description}</p>
+                    <p className="mt-2 line-clamp-2 text-sm text-white/60">{opp.description}</p>
                     {opp.deadline && (
                       <p className="mt-2 text-xs text-white/40">
                         Deadline: {new Date(opp.deadline).toLocaleDateString()}

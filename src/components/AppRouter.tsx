@@ -6,6 +6,7 @@ import RoleGuard from "@/components/portal/RoleGuard";
 import { LoadingState } from "@/components/portal/PortalUI";
 import Index from "@/pages/Index";
 import Discover from "@/pages/Discover";
+import Competitions from "@/pages/Competitions";
 import NotFound from "@/pages/NotFound";
 import Login from "@/pages/auth/Login";
 import ForgotPassword from "@/pages/auth/ForgotPassword";
@@ -23,6 +24,7 @@ const MetaLabs = lazy(() => import("@/pages/portal/labs/MetaLabs"));
 const LabReview = lazy(() => import("@/pages/portal/labs/LabReview"));
 const PathwaysHub = lazy(() => import("@/pages/portal/pathways/PathwaysHub"));
 const AxiomPathways = lazy(() => import("@/pages/portal/pathways/AxiomPathways"));
+const OpportunityDetail = lazy(() => import("@/pages/portal/pathways/OpportunityDetail"));
 const PathwaysStudios = lazy(() => import("@/pages/portal/pathways/PathwaysStudios"));
 const PathwaysEssays = lazy(() => import("@/pages/portal/pathways/PathwaysEssays"));
 const EventsChapters = lazy(() => import("@/pages/portal/events/EventsChapters"));
@@ -51,6 +53,7 @@ function AppRoutes() {
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/discover" element={<Discover />} />
+          <Route path="/competitions" element={<Competitions />} />
           <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
@@ -92,6 +95,7 @@ function AppRoutes() {
             <Route path="labs/:id" element={<MetaLabs />} />
             <Route path="pathways" element={<PathwaysHub />} />
             <Route path="pathways/opportunities" element={<AxiomPathways />} />
+            <Route path="pathways/opportunities/:id" element={<OpportunityDetail />} />
             <Route path="pathways/studios" element={<PathwaysStudios />} />
             <Route path="pathways/essays" element={<PathwaysEssays />} />
             <Route path="events" element={<EventsChapters />} />
