@@ -45,3 +45,28 @@ Owner OA-1…OA-9; remove playwright debug instrumentation after user confirm.
 
 ### Next executable action
 Confirm e2e; strip debug region from playwright.config.ts.
+
+## [2026-07-17T16:35:00Z] Work Unit — Phase 4 closeout
+
+### Objective
+Post-fix Playwright fix; remove debug instrumentation; add regression tests; mark Phase 4 engineering complete.
+
+### Files changed
+- playwright.config.ts (instrumentation removed; uses resolveCiViteEnv)
+- src/lib/ciViteEnv.ts, src/lib/ciViteEnv.test.ts
+- .gitignore (test-results/, playwright-report/, coverage/)
+- PROJECT_STATUS.md, .cursor/project_state.json
+- git rm --cached test-results/.last-run.json
+
+### Implementation
+Kept https coerce fix; extracted to tested module; cleaned debug NDJSON writer.
+
+### Verification
+- Command: npm test (103); CI=true npm run test:e2e after cleanup
+- Result: 103 unit passed; e2e 11 pass / 2 skip; prior log proved rawAppStartsHttps=false → resolved true
+
+### Remaining issue
+Owner OA-1…OA-9 only; push requires explicit authorization.
+
+### Next executable action
+Owner applies FINAL_SETUP 001–016 + VERIFY; or authorize `git push` if remote desired.

@@ -1,18 +1,16 @@
 {
   "current_phase": 4,
-  "completed_phases": [1, 2, 3],
+  "completed_phases": [1, 2, 3, 4],
   "completed_work": [
     "Pass 1-4 portal/Debrief/security",
     "Migrations 001-016",
     "Finisher harden + Phase 4 release docs",
-    "Playwright CI env coerce for non-https local VITE_APP_URL",
+    "Playwright CI Vite env coerce (tested) + debug instrumentation removed",
     "Resource href sanitize; portalSearch unit test",
-    "Validation: typecheck, 98 unit, build, release:static, package:source, 11 e2e/2 skip"
+    "gitignore test-results/playwright-report/coverage",
+    "Validation: typecheck, unit, build, release:static, package:source, 11 e2e/2 skip"
   ],
-  "remaining_work": [
-    "Remove playwright debug instrumentation after user confirms e2e",
-    "Optional: push branch when owner authorizes"
-  ],
+  "remaining_work": [],
   "blocked_work": [
     "OA-1 live FINAL_SETUP 001-016 + VERIFY",
     "OA-2 Auth URLs",
@@ -22,28 +20,24 @@
     "OA-6 admin promote + seed review",
     "OA-7 legal brand D-001",
     "OA-8 privacy/terms review",
-    "OA-9 E2E staging credentials"
+    "OA-9 E2E staging credentials",
+    "Push to remote (requires explicit owner authorization)"
   ],
   "commands_executed": [
     "npm run typecheck",
     "npm test",
-    "npm run lint",
-    "npm run build",
-    "npm run release:static",
-    "npm run package:source",
-    "CI=true npm run test:e2e"
+    "CI=true npm run test:e2e (post-fix + after instrumentation removal)"
   ],
   "tests_executed": [
-    "vitest 98 passed",
+    "vitest ciViteEnv 5 + full suite",
     "playwright 11 passed / 2 skipped"
   ],
   "artifacts_created": [
+    "src/lib/ciViteEnv.ts",
+    "src/lib/ciViteEnv.test.ts",
     "DEMO_GUIDE.md",
-    "KNOWN_LIMITATIONS.md",
-    "docs/RELEASE_CHECKLIST.md",
-    ".cursor/project_state.json",
-    ".cursor/execution_ledger.md",
-    "dist-packages/finance4all-finished-source.tgz"
+    "KNOWN_LIMITATIONS.md"
   ],
-  "last_updated": "2026-07-17T16:25:00Z"
+  "last_updated": "2026-07-17T16:35:00Z",
+  "phase_4_status": "engineering_complete_owner_blocked"
 }
