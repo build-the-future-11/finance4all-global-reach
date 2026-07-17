@@ -2,7 +2,8 @@
 
 **Recorded:** 2026-07-17 (Pass 1 close)  
 **Git branch:** `cursor/membership-security-supabase-fix`  
-**Base commit:** `ca56cab` (plus uncommitted Pass 1 / prior session working tree for listed files)
+**Commit:** `34d2de0` — Complete Pass 1 audit memory and low-risk production fixes.  
+**Base:** `main` @ `fbdd503`
 
 ## Validation snapshot
 
