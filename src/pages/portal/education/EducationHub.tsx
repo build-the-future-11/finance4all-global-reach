@@ -5,28 +5,38 @@ import { toast } from "sonner";
 import { EDUCATION_MODULES } from "@/data/educationModules";
 import { useEducationModules } from "@/hooks/portal/useEducation";
 import { useEducationProgress } from "@/hooks/portal/useEducationProgress";
+import {
+  useIssueCurriculumCertificate,
+  useMyCertificates,
+} from "@/hooks/portal/useCertificates";
 import GlossarySearch from "@/components/portal/GlossarySearch";
 import ModuleProgressRing from "@/components/portal/ModuleProgressRing";
-import { PortalCard, PortalPageHeader } from "@/components/portal/PortalUI";
+import { PortalCard, PortalPageHeader, portalButtonPrimary } from "@/components/portal/PortalUI";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { portalRoutes } from "@/routes/portal";
 import { portalCopy } from "@/lib/portalCopy";
 import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { useAuth } from "@/contexts/AuthContext";
 
 const CELEBRATION_KEY = "f4a-education-celebrated";
 
 export default function EducationHub() {
-  useDocumentTitle("Education");
+  useDocumentTitle("Learn");
+  const { user } = useAuth();
   const { data: educationModules, isLoading: modulesLoading } = useEducationModules();
   const modules = modulesLoading ? EDUCATION_MODULES : (educationModules ?? EDUCATION_MODULES);
   const { isLessonComplete, totalLessons } = useEducationProgress();
+  const { data: certificates } = useMyCertificates();
+  const issueCertificate = useIssueCurriculumCertificate();
   const celebratedRef = useRef(false);
   const [showConfetti, setShowConfetti] = useState(false);
 
   const allLessonIds = modules.flatMap((m) => m.lessons.map((l) => l.id));
   const completedCount = totalLessons(allLessonIds);
   const allComplete = completedCount === allLessonIds.length && allLessonIds.length > 0;
+  const existingCert = certificates?.find((c) => c.curriculumKey === "catalyst-complete");
 
   useEffect(() => {
     if (!allComplete || celebratedRef.current) return;
@@ -45,6 +55,24 @@ export default function EducationHub() {
       duration: 6000,
     });
   }, [allComplete]);
+
+  const handleIssueCertificate = async () => {
+    if (!user) {
+      toast.error("Sign in to issue a verified certificate.");
+      return;
+    }
+    try {
+      const cert = await issueCertificate.mutateAsync({
+        title: "Catalyst Curriculum Completion",
+        lessonIds: allLessonIds,
+      });
+      toast.success("Certificate issued", {
+        description: `Verification code ${cert.verificationCode}`,
+      });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not issue certificate");
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -79,12 +107,27 @@ export default function EducationHub() {
           <p className="mt-2 text-xs text-white/40">{portalCopy.education.progressNote}</p>
         </div>
         {allComplete && (
-          <PortalCard className="flex items-center gap-3 border-emerald-400/30 bg-emerald-500/10 p-4 portal-celebrate">
-            <Award className="h-8 w-8 text-emerald-300" />
-            <div>
-              <p className="font-semibold text-white">{portalCopy.educationHub.completeTitle}</p>
-              <p className="text-xs text-white/50">{portalCopy.education.certificate}</p>
+          <PortalCard className="flex flex-col gap-3 border-emerald-400/30 bg-emerald-500/10 p-4 portal-celebrate sm:min-w-[240px]">
+            <div className="flex items-center gap-3">
+              <Award className="h-8 w-8 text-emerald-300" />
+              <div>
+                <p className="font-semibold text-white">{portalCopy.educationHub.completeTitle}</p>
+                <p className="text-xs text-white/50">
+                  {existingCert
+                    ? `Code ${existingCert.verificationCode}`
+                    : portalCopy.education.certificate}
+                </p>
+              </div>
             </div>
+            {!existingCert && (
+              <Button
+                className={portalButtonPrimary}
+                disabled={issueCertificate.isPending}
+                onClick={handleIssueCertificate}
+              >
+                Issue verified certificate
+              </Button>
+            )}
           </PortalCard>
         )}
       </div>

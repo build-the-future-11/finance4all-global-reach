@@ -167,6 +167,8 @@ export const StudioSubmissionSchema = z.object({
   repoUrl: z.string().url().optional(),
   demoUrl: z.string().url().optional(),
   writeup: z.string(),
+  status: z.enum(["pending", "approved", "rejected", "archived"]).default("pending"),
+  moderationNote: z.string().optional(),
   submittedAt: z.string().datetime(),
 });
 export type StudioSubmission = z.infer<typeof StudioSubmissionSchema>;
@@ -178,9 +180,50 @@ export const EssaySubmissionSchema = z.object({
   body: z.string(),
   upvoteCount: z.number().int().nonnegative().default(0),
   isEditorialPick: z.boolean().default(false),
+  status: z.enum(["pending", "approved", "rejected", "archived"]).default("pending"),
+  moderationNote: z.string().optional(),
   submittedAt: z.string().datetime(),
 });
 export type EssaySubmission = z.infer<typeof EssaySubmissionSchema>;
+
+export const MemberCertificateSchema = z.object({
+  id: z.string().uuid(),
+  userId: z.string().uuid(),
+  curriculumKey: z.string(),
+  title: z.string(),
+  verificationCode: z.string(),
+  lessonIds: z.array(z.string()).default([]),
+  issuedAt: z.string().datetime(),
+});
+export type MemberCertificate = z.infer<typeof MemberCertificateSchema>;
+
+export const ChapterLeaderRoleSchema = z.enum(["lead", "co_lead", "coordinator"]);
+export type ChapterLeaderRole = z.infer<typeof ChapterLeaderRoleSchema>;
+
+export const ChapterLeaderSchema = z.object({
+  chapterId: z.string().uuid(),
+  userId: z.string().uuid(),
+  role: ChapterLeaderRoleSchema,
+  appointedAt: z.string().datetime(),
+});
+export type ChapterLeader = z.infer<typeof ChapterLeaderSchema>;
+
+export const CompetitionStatusSchema = z.enum(["draft", "open", "closed", "archived"]);
+export type CompetitionStatus = z.infer<typeof CompetitionStatusSchema>;
+
+export const CompetitionSchema = z.object({
+  id: z.string().uuid(),
+  title: z.string(),
+  description: z.string(),
+  status: CompetitionStatusSchema,
+  chapterId: z.string().uuid().optional(),
+  opportunityId: z.string().uuid().optional(),
+  startsAt: z.string().datetime().optional(),
+  endsAt: z.string().datetime().optional(),
+  registrationUrl: z.string().url().optional(),
+  createdAt: z.string().datetime(),
+});
+export type Competition = z.infer<typeof CompetitionSchema>;
 
 // ─── Events + Chapters ────────────────────────────────────────────────────────
 

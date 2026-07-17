@@ -10,3 +10,5 @@
 | D-006 | 2026-07-17 | Pass 1 accepts owner-blocked live schema without failing pass | Pass 1 is audit/memory, not live DB ownership | ACCEPTANCE_CRITERIA P1 |
 | D-007 | 2026-07-17 | Pass 2 implements Wave 1 Debrief only; rest of Pass 2 prompt → Pass 3 | Frozen queue; coherent vertical slice before portal expansion | IMPLEMENTATION_QUEUE Wave 1 DONE |
 | D-008 | 2026-07-17 | AI Debrief adapter ships unconfigured; queue/logs/admin without live provider keys | Credentials are owner-only; never auto-publish | FM-DEBRIEF-003 |
+| D-009 | 2026-07-17 | Pass 3 ships sitemap/nav/moderation/certs/leaders/competitions; brand unify waits on D-001 | Owner legal naming is not engineering | FM-PUBLIC-002 BLOCKED; 2.6 partial |
+| D-010 | 2026-07-17 | Certificates = verification code + DB row (no PDF binary in Pass 3) | Trusted record first; printable PDF can follow | FM-PORTAL-005 |

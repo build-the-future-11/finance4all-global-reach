@@ -7,6 +7,8 @@ import {
   useEventRegistrations,
   useToggleEventRegistration,
 } from "@/hooks/portal/useEvents";
+import { useChapterLeaders } from "@/hooks/portal/useAdmin";
+import { useCompetitions } from "@/hooks/portal/useCertificates";
 import ChapterMap from "@/components/portal/ChapterMap";
 import {
   PortalCard,
@@ -40,8 +42,10 @@ function groupEventsByMonth(events: { id: string; title: string; startsAt: strin
 }
 
 export default function EventsChapters() {
-  useDocumentTitle("Events");
+  useDocumentTitle("Events & Chapters");
   const [selectedChapter, setSelectedChapter] = useState<string>("all");
+  const [countryFilter, setCountryFilter] = useState<string>("all");
+  const [cityFilter, setCityFilter] = useState<string>("all");
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
   const [eventFilter, setEventFilter] = useState<"all" | "mine">("all");
   const {
@@ -50,6 +54,8 @@ export default function EventsChapters() {
     error: chaptersError,
     refetch: refetchChapters,
   } = useChapters();
+  const { data: competitions } = useCompetitions();
+  const { data: leaders } = useChapterLeaders();
   const {
     data: events,
     isLoading: eventsLoading,
@@ -60,6 +66,35 @@ export default function EventsChapters() {
   const toggleReg = useToggleEventRegistration();
 
   const chapterMap = Object.fromEntries(chapters?.map((c) => [c.id, c]) ?? []);
+
+  const countries = useMemo(() => {
+    const set = new Set(chapters?.map((c) => c.country) ?? []);
+    return [...set].sort();
+  }, [chapters]);
+
+  const cities = useMemo(() => {
+    const list =
+      chapters?.filter((c) => countryFilter === "all" || c.country === countryFilter) ?? [];
+    return [...new Set(list.map((c) => c.city))].sort();
+  }, [chapters, countryFilter]);
+
+  const filteredChapters = useMemo(() => {
+    return (
+      chapters?.filter((c) => {
+        if (countryFilter !== "all" && c.country !== countryFilter) return false;
+        if (cityFilter !== "all" && c.city !== cityFilter) return false;
+        return true;
+      }) ?? []
+    );
+  }, [chapters, countryFilter, cityFilter]);
+
+  const leadersByChapter = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const leader of leaders ?? []) {
+      map.set(leader.chapterId, (map.get(leader.chapterId) ?? 0) + 1);
+    }
+    return map;
+  }, [leaders]);
 
   const handleRegister = async (eventId: string, registered: boolean) => {
     try {
@@ -107,14 +142,65 @@ export default function EventsChapters() {
       >
         {chapters && chapters.length > 0 && (
           <section className="mb-8 space-y-6">
+            <div className="flex flex-wrap gap-2">
+              <select
+                aria-label="Filter chapters by country"
+                className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white"
+                value={countryFilter}
+                onChange={(e) => {
+                  setCountryFilter(e.target.value);
+                  setCityFilter("all");
+                  setSelectedChapter("all");
+                }}
+              >
+                <option value="all">All countries</option>
+                {countries.map((country) => (
+                  <option key={country} value={country}>
+                    {country}
+                  </option>
+                ))}
+              </select>
+              <select
+                aria-label="Filter chapters by city"
+                className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white"
+                value={cityFilter}
+                onChange={(e) => {
+                  setCityFilter(e.target.value);
+                  setSelectedChapter("all");
+                }}
+              >
+                <option value="all">All cities</option>
+                {cities.map((city) => (
+                  <option key={city} value={city}>
+                    {city}
+                  </option>
+                ))}
+              </select>
+              {(countryFilter !== "all" || cityFilter !== "all" || selectedChapter !== "all") && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className={portalButtonOutline}
+                  onClick={() => {
+                    setCountryFilter("all");
+                    setCityFilter("all");
+                    setSelectedChapter("all");
+                  }}
+                >
+                  Clear filters
+                </Button>
+              )}
+            </div>
+
             <ChapterMap
-              chapters={chapters}
+              chapters={filteredChapters}
               selectedId={selectedChapter === "all" ? undefined : selectedChapter}
               onSelect={handleChapterSelect}
+              highlightedCountry={countryFilter}
             />
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {chapters.map((chapter) => (
+              {filteredChapters.map((chapter) => (
                 <button
                   key={chapter.id}
                   type="button"
@@ -139,6 +225,12 @@ export default function EventsChapters() {
                         </p>
                         <p className="mt-2 flex items-center gap-1 text-xs text-white/40">
                           <Users className="h-3 w-3" /> {chapter.memberCount} members
+                          {(leadersByChapter.get(chapter.id) ?? 0) > 0 && (
+                            <span className="ml-2 text-emerald-300/80">
+                              · {leadersByChapter.get(chapter.id)} leader
+                              {(leadersByChapter.get(chapter.id) ?? 0) === 1 ? "" : "s"}
+                            </span>
+                          )}
                         </p>
                       </div>
                     </div>
@@ -149,6 +241,37 @@ export default function EventsChapters() {
           </section>
         )}
       </QueryStatus>
+
+      {competitions && competitions.length > 0 && (
+        <section className="mb-10 space-y-4">
+          <h2 className="text-lg font-semibold text-white">Competitions</h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {competitions.map((comp) => (
+              <PortalCard key={comp.id} className="p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h3 className="font-semibold text-white">{comp.title}</h3>
+                    <p className="mt-2 text-sm text-white/60">{comp.description}</p>
+                  </div>
+                  <Badge variant="outline" className="capitalize border-white/20 text-white/60">
+                    {comp.status}
+                  </Badge>
+                </div>
+                {comp.registrationUrl && (
+                  <a
+                    href={comp.registrationUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 inline-flex items-center gap-1 text-sm text-emerald-300 hover:underline"
+                  >
+                    Registration <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
+                )}
+              </PortalCard>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section>
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">

@@ -33,6 +33,16 @@ import {
   useUpsertApprovedSource,
   useQueueDebriefAiGeneration,
   useDebriefAiLogs,
+  useAdminStudioSubmissions,
+  useAdminEssaySubmissions,
+  useModerateStudioSubmission,
+  useModerateEssaySubmission,
+  useChapterLeaders,
+  useAppointChapterLeader,
+  useRemoveChapterLeader,
+  useAdminCompetitions,
+  useUpsertCompetition,
+  useDeleteCompetition,
 } from "@/hooks/portal/useAdmin";
 import { prepareDebriefAiQueue } from "@/lib/debriefAiAdapter";
 import { canTransitionToStatus, DEBRIEF_DISCLAIMER } from "@/lib/debriefPublish";
@@ -67,7 +77,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { EventStatus, NewsCategory, OpportunityType, UserRole } from "@/types/domain";
+import type {
+  CompetitionStatus,
+  EventStatus,
+  NewsCategory,
+  OpportunityType,
+  UserRole,
+} from "@/types/domain";
 import { toast } from "sonner";
 import { Activity, AlertTriangle, MailCheck, Pencil, Signal } from "lucide-react";
 import { portalCopy } from "@/lib/portalCopy";
@@ -75,6 +91,8 @@ import { sanitizeTextInput, sanitizeTags, sanitizeOptionalUrl } from "@/lib/secu
 import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
 import AdminConfirmDelete from "@/components/portal/AdminConfirmDelete";
 import { useAuth } from "@/contexts/AuthContext";
+import { moderationLabel, type SubmissionModerationStatus } from "@/lib/submissionModeration";
+import { Badge } from "@/components/ui/badge";
 
 export default function Admin() {
   const { data: news, isLoading: newsLoading, error: newsError, refetch: refetchNews } = useNewsArticles();
@@ -258,6 +276,8 @@ export default function Admin() {
             Explainers ({explainers?.length ?? 0})
           </PortalTabsTrigger>
           <PortalTabsTrigger value="chapters">Chapters ({chapters?.length ?? 0})</PortalTabsTrigger>
+          <PortalTabsTrigger value="moderation">Moderation</PortalTabsTrigger>
+          <PortalTabsTrigger value="competitions">Competitions</PortalTabsTrigger>
           <PortalTabsTrigger value="inbox">Inbox</PortalTabsTrigger>
           <PortalTabsTrigger value="members">Members</PortalTabsTrigger>
           <PortalTabsTrigger value="system">System</PortalTabsTrigger>
@@ -1067,13 +1087,411 @@ export default function Admin() {
               ))}
             </div>
           )}
+          <AdminChapterLeadersPanel chapters={chapters ?? []} />
         </PortalTabsContent>
 
+        <AdminModerationTab />
+        <AdminCompetitionsTab />
         <AdminInboxTab />
         <AdminMembersTab />
         <AdminSystemTab />
       </Tabs>
     </div>
+  );
+}
+
+function AdminChapterLeadersPanel({
+  chapters,
+}: {
+  chapters: { id: string; name: string; city: string; country: string }[];
+}) {
+  const { data: leaders, isLoading, error, refetch } = useChapterLeaders();
+  const appoint = useAppointChapterLeader();
+  const remove = useRemoveChapterLeader();
+  const [chapterId, setChapterId] = useState("");
+  const [userId, setUserId] = useState("");
+
+  return (
+    <PortalCard className="mt-6 space-y-4 p-4">
+      <h3 className="font-medium text-white">Chapter leaders</h3>
+      <p className="text-sm text-white/50">
+        Appoint verified chapter leads by member profile ID (from Members tab).
+      </p>
+      <div className="grid gap-3 sm:grid-cols-3">
+        <Select value={chapterId} onValueChange={setChapterId}>
+          <SelectTrigger className="border-white/20 bg-white/5 text-white">
+            <SelectValue placeholder="Chapter" />
+          </SelectTrigger>
+          <PortalSelectContent>
+            {chapters.map((c) => (
+              <PortalSelectItem key={c.id} value={c.id}>
+                {c.name}
+              </PortalSelectItem>
+            ))}
+          </PortalSelectContent>
+        </Select>
+        <Input
+          value={userId}
+          onChange={(e) => setUserId(e.target.value)}
+          placeholder="Member profile UUID"
+          className={portalInputClass}
+        />
+        <Button
+          className={portalButtonPrimary}
+          disabled={!chapterId || !userId.trim() || appoint.isPending}
+          onClick={async () => {
+            try {
+              await appoint.mutateAsync({ chapterId, userId: userId.trim(), role: "lead" });
+              toast.success("Chapter leader appointed");
+              setUserId("");
+            } catch (e) {
+              toast.error(e instanceof Error ? e.message : "Failed");
+            }
+          }}
+        >
+          Appoint lead
+        </Button>
+      </div>
+      <QueryStatus
+        isLoading={isLoading}
+        error={error}
+        onRetry={() => refetch()}
+        isEmpty={!leaders?.length}
+        emptyMessage="No chapter leaders appointed yet."
+      >
+        <div className="space-y-2">
+          {leaders?.map((leader) => {
+            const chapter = chapters.find((c) => c.id === leader.chapterId);
+            return (
+              <PortalDataRow key={`${leader.chapterId}-${leader.userId}`}>
+                <div>
+                  <p className="font-medium text-white">{chapter?.name ?? leader.chapterId}</p>
+                  <p className="text-sm text-white/50">
+                    {leader.role} · {leader.userId}
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  className={portalButtonDanger}
+                  onClick={async () => {
+                    try {
+                      await remove.mutateAsync({
+                        chapterId: leader.chapterId,
+                        userId: leader.userId,
+                      });
+                      toast.success("Leader removed");
+                    } catch (e) {
+                      toast.error(e instanceof Error ? e.message : "Failed");
+                    }
+                  }}
+                >
+                  Remove
+                </Button>
+              </PortalDataRow>
+            );
+          })}
+        </div>
+      </QueryStatus>
+    </PortalCard>
+  );
+}
+
+function AdminModerationTab() {
+  const {
+    data: studios,
+    isLoading: studiosLoading,
+    error: studiosError,
+    refetch: refetchStudios,
+  } = useAdminStudioSubmissions();
+  const {
+    data: essays,
+    isLoading: essaysLoading,
+    error: essaysError,
+    refetch: refetchEssays,
+  } = useAdminEssaySubmissions();
+  const moderateStudio = useModerateStudioSubmission();
+  const moderateEssay = useModerateEssaySubmission();
+
+  return (
+    <PortalTabsContent value="moderation" className="space-y-8">
+      <section className="space-y-4">
+        <h3 className="text-sm font-semibold uppercase tracking-widest text-white/50">Studios</h3>
+        <QueryStatus
+          isLoading={studiosLoading}
+          error={studiosError}
+          onRetry={() => refetchStudios()}
+          isEmpty={!studios?.length}
+          emptyMessage="No studio submissions yet."
+        >
+          <div className="space-y-3">
+            {studios?.map((studio) => (
+              <PortalCard key={studio.id} className="space-y-3 p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-white">{studio.title}</p>
+                    <p className="mt-1 line-clamp-3 text-sm text-white/60">{studio.writeup}</p>
+                    <Badge variant="outline" className="mt-2 border-white/20 text-white/60">
+                      {moderationLabel(studio.status)}
+                    </Badge>
+                  </div>
+                  <Select
+                    value={studio.status}
+                    onValueChange={async (status) => {
+                      try {
+                        await moderateStudio.mutateAsync({
+                          id: studio.id,
+                          status: status as SubmissionModerationStatus,
+                        });
+                        toast.success("Studio moderation updated");
+                      } catch (e) {
+                        toast.error(e instanceof Error ? e.message : "Failed");
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="w-36 border-white/20 bg-white/5 text-white">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <PortalSelectContent>
+                      {(["pending", "approved", "rejected", "archived"] as const).map((s) => (
+                        <PortalSelectItem key={s} value={s}>
+                          {s}
+                        </PortalSelectItem>
+                      ))}
+                    </PortalSelectContent>
+                  </Select>
+                </div>
+              </PortalCard>
+            ))}
+          </div>
+        </QueryStatus>
+      </section>
+
+      <section className="space-y-4">
+        <h3 className="text-sm font-semibold uppercase tracking-widest text-white/50">Essays</h3>
+        <QueryStatus
+          isLoading={essaysLoading}
+          error={essaysError}
+          onRetry={() => refetchEssays()}
+          isEmpty={!essays?.length}
+          emptyMessage="No essay submissions yet."
+        >
+          <div className="space-y-3">
+            {essays?.map((essay) => (
+              <PortalCard key={essay.id} className="space-y-3 p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-white">{essay.title}</p>
+                    <p className="mt-1 line-clamp-3 text-sm text-white/60">{essay.body}</p>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      <Badge variant="outline" className="border-white/20 text-white/60">
+                        {moderationLabel(essay.status)}
+                      </Badge>
+                      {essay.isEditorialPick && (
+                        <Badge className="bg-emerald-500/20 text-emerald-200">Editorial pick</Badge>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <Select
+                      value={essay.status}
+                      onValueChange={async (status) => {
+                        try {
+                          await moderateEssay.mutateAsync({
+                            id: essay.id,
+                            status: status as SubmissionModerationStatus,
+                          });
+                          toast.success("Essay moderation updated");
+                        } catch (e) {
+                          toast.error(e instanceof Error ? e.message : "Failed");
+                        }
+                      }}
+                    >
+                      <SelectTrigger className="w-36 border-white/20 bg-white/5 text-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <PortalSelectContent>
+                        {(["pending", "approved", "rejected", "archived"] as const).map((s) => (
+                          <PortalSelectItem key={s} value={s}>
+                            {s}
+                          </PortalSelectItem>
+                        ))}
+                      </PortalSelectContent>
+                    </Select>
+                    <Button
+                      type="button"
+                      className={portalButtonOutline}
+                      disabled={essay.status !== "approved"}
+                      onClick={async () => {
+                        try {
+                          await moderateEssay.mutateAsync({
+                            id: essay.id,
+                            status: "approved",
+                            editorialPick: !essay.isEditorialPick,
+                          });
+                          toast.success(
+                            essay.isEditorialPick ? "Editorial pick removed" : "Marked editorial pick",
+                          );
+                        } catch (e) {
+                          toast.error(e instanceof Error ? e.message : "Failed");
+                        }
+                      }}
+                    >
+                      {essay.isEditorialPick ? "Remove pick" : "Editorial pick"}
+                    </Button>
+                  </div>
+                </div>
+              </PortalCard>
+            ))}
+          </div>
+        </QueryStatus>
+      </section>
+    </PortalTabsContent>
+  );
+}
+
+function AdminCompetitionsTab() {
+  const { data, isLoading, error, refetch } = useAdminCompetitions();
+  const upsert = useUpsertCompetition();
+  const remove = useDeleteCompetition();
+  const [form, setForm] = useState({
+    title: "",
+    description: "",
+    status: "draft" as CompetitionStatus,
+    startsAt: "",
+    endsAt: "",
+    registrationUrl: "",
+  });
+
+  return (
+    <PortalTabsContent value="competitions" className="space-y-6">
+      <PortalCard className="space-y-4 p-4">
+        <h3 className="font-medium text-white">Create competition</h3>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="sm:col-span-2">
+            <Label className="text-white/70">Title</Label>
+            <Input
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+              className={portalInputClass}
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <Label className="text-white/70">Description</Label>
+            <Textarea
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+              className={portalInputClass}
+              rows={4}
+            />
+          </div>
+          <div>
+            <Label className="text-white/70">Status</Label>
+            <Select
+              value={form.status}
+              onValueChange={(status) => setForm({ ...form, status: status as CompetitionStatus })}
+            >
+              <SelectTrigger className="border-white/20 bg-white/5 text-white">
+                <SelectValue />
+              </SelectTrigger>
+              <PortalSelectContent>
+                {(["draft", "open", "closed", "archived"] as const).map((s) => (
+                  <PortalSelectItem key={s} value={s}>
+                    {s}
+                  </PortalSelectItem>
+                ))}
+              </PortalSelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label className="text-white/70">Registration URL</Label>
+            <Input
+              value={form.registrationUrl}
+              onChange={(e) => setForm({ ...form, registrationUrl: e.target.value })}
+              className={portalInputClass}
+            />
+          </div>
+        </div>
+        <Button
+          className={portalButtonPrimary}
+          disabled={upsert.isPending || !form.title.trim() || form.description.trim().length < 20}
+          onClick={async () => {
+            try {
+              await upsert.mutateAsync({
+                title: sanitizeTextInput(form.title, 160),
+                description: sanitizeTextInput(form.description, 5000),
+                status: form.status,
+                registrationUrl: sanitizeOptionalUrl(form.registrationUrl) ?? undefined,
+              });
+              toast.success("Competition saved");
+              setForm({
+                title: "",
+                description: "",
+                status: "draft",
+                startsAt: "",
+                endsAt: "",
+                registrationUrl: "",
+              });
+            } catch (e) {
+              toast.error(e instanceof Error ? e.message : "Failed");
+            }
+          }}
+        >
+          Add competition
+        </Button>
+      </PortalCard>
+
+      <QueryStatus
+        isLoading={isLoading}
+        error={error}
+        onRetry={() => refetch()}
+        isEmpty={!data?.length}
+        emptyMessage="No competitions yet."
+      >
+        <div className="space-y-2">
+          {data?.map((comp) => (
+            <PortalDataRow key={comp.id}>
+              <div>
+                <p className="font-medium text-white">{comp.title}</p>
+                <p className="text-sm capitalize text-white/50">{comp.status}</p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  className={portalButtonOutline}
+                  onClick={async () => {
+                    try {
+                      await upsert.mutateAsync({
+                        id: comp.id,
+                        title: comp.title,
+                        description: comp.description,
+                        status: comp.status === "open" ? "closed" : "open",
+                        registrationUrl: comp.registrationUrl,
+                      });
+                      toast.success("Competition status updated");
+                    } catch (e) {
+                      toast.error(e instanceof Error ? e.message : "Failed");
+                    }
+                  }}
+                >
+                  {comp.status === "open" ? "Close" : "Open"}
+                </Button>
+                <AdminConfirmDelete
+                  label={comp.title}
+                  onConfirm={async () => {
+                    try {
+                      await remove.mutateAsync(comp.id);
+                      toast.success("Competition deleted");
+                    } catch (e) {
+                      toast.error(e instanceof Error ? e.message : "Failed");
+                    }
+                  }}
+                />
+              </div>
+            </PortalDataRow>
+          ))}
+        </div>
+      </QueryStatus>
+    </PortalTabsContent>
   );
 }
 

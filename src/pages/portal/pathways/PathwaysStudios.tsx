@@ -24,8 +24,12 @@ import { toast } from "sonner";
 import { sanitizeUrl } from "@/lib/security";
 import { portalCopy } from "@/lib/portalCopy";
 import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
+import { Badge } from "@/components/ui/badge";
+import { moderationLabel } from "@/lib/submissionModeration";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function PathwaysStudios() {
+  const { user } = useAuth();
   const { data: submissions, isLoading, error, refetch } = useStudioSubmissions();
   const submit = useSubmitStudio();
   const authorIds = submissions?.map((s) => s.authorId) ?? [];
@@ -56,7 +60,7 @@ export default function PathwaysStudios() {
         repoUrl: safeRepo ?? undefined,
         demoUrl: safeDemo ?? undefined,
       });
-      toast.success("Submission published");
+      toast.success("Submission received — pending admin review");
       setOpen(false);
       setTitle("");
       setWriteup("");
@@ -123,7 +127,14 @@ export default function PathwaysStudios() {
             const author = authors?.[sub.authorId];
             return (
               <PortalCard key={sub.id} className="p-5">
-                <h3 className="text-lg font-semibold text-white">{sub.title}</h3>
+                <div className="flex flex-wrap items-center gap-2">
+                  {sub.status !== "approved" && sub.authorId === user?.id && (
+                    <Badge variant="outline" className="border-amber-400/40 text-amber-200">
+                      {moderationLabel(sub.status)}
+                    </Badge>
+                  )}
+                </div>
+                <h3 className="mt-2 text-lg font-semibold text-white">{sub.title}</h3>
                 <p className="mt-1 text-sm text-white/50">by {author?.displayName ?? "Member"}</p>
                 <p className="mt-3 text-sm leading-relaxed text-white/70">{sub.writeup}</p>
                 <div className="mt-4 flex flex-wrap gap-3">

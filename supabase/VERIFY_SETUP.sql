@@ -1,5 +1,5 @@
 -- FinanceMeta / Finance4All production setup verification.
--- Run after supabase/FINAL_SETUP.sql or after applying migrations 001-012.
+-- Run after supabase/FINAL_SETUP.sql or after applying migrations 001-014.
 -- Expected result: every row has ok = true.
 
 WITH expected_tables(name) AS (
@@ -38,7 +38,10 @@ WITH expected_tables(name) AS (
     ('client_error_events'),
     ('approved_sources'),
     ('news_article_versions'),
-    ('debrief_ai_generation_logs')
+    ('debrief_ai_generation_logs'),
+    ('member_certificates'),
+    ('chapter_leaders'),
+    ('competitions')
 ),
 table_checks AS (
   SELECT
@@ -75,7 +78,12 @@ expected_columns(table_name, column_name) AS (
     ('product_analytics_events', 'event_name'),
     ('client_error_events', 'message'),
     ('digest_send_log', 'user_id'),
-    ('digest_send_log', 'period_start')
+    ('digest_send_log', 'period_start'),
+    ('studio_submissions', 'status'),
+    ('essay_submissions', 'status'),
+    ('member_certificates', 'verification_code'),
+    ('chapter_leaders', 'role'),
+    ('competitions', 'status')
 ),
 column_checks AS (
   SELECT
@@ -117,7 +125,12 @@ expected_policy_tables(name) AS (
     ('education_lesson_progress'),
     ('contact_submissions'),
     ('product_analytics_events'),
-    ('client_error_events')
+    ('client_error_events'),
+    ('studio_submissions'),
+    ('essay_submissions'),
+    ('member_certificates'),
+    ('chapter_leaders'),
+    ('competitions')
 ),
 policy_table_checks AS (
   SELECT
@@ -208,7 +221,12 @@ expected_functions(name) AS (
     ('transition_news_article_status'),
     ('record_news_article_version'),
     ('queue_debrief_ai_generation'),
-    ('enforce_news_article_publish_rules')
+    ('enforce_news_article_publish_rules'),
+    ('moderate_studio_submission'),
+    ('moderate_essay_submission'),
+    ('issue_my_curriculum_certificate'),
+    ('appoint_chapter_leader'),
+    ('remove_chapter_leader')
 ),
 function_checks AS (
   SELECT
@@ -233,7 +251,12 @@ expected_function_grants(name) AS (
     ('report_client_error'),
     ('publish_news_article'),
     ('transition_news_article_status'),
-    ('queue_debrief_ai_generation')
+    ('queue_debrief_ai_generation'),
+    ('moderate_studio_submission'),
+    ('moderate_essay_submission'),
+    ('issue_my_curriculum_certificate'),
+    ('appoint_chapter_leader'),
+    ('remove_chapter_leader')
 ),
 function_grant_checks AS (
   SELECT

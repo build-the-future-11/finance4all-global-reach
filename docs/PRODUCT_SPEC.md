@@ -53,9 +53,9 @@ Manual articles and **source-bound** AI-assisted summaries for education.
 - Present AI text as human journalism without labeling when AI-assisted
 - Hide original source links when available
 
-### Current implementation gap
+### Current implementation
 
-Today’s Admin “News” tab toggles `is_published` on `news_articles`. That is a **temporary** publishing control, not the trustworthy Debrief system. Pass 2 replaces/extends it.
+Pass 2 delivered approved sources, editorial status, AI logs, versioning, publish guards, and member disclaimers (migration 013). Admin News tab is the trustworthy Debrief workflow.
 
 ## Navigation guidance
 

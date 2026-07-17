@@ -166,6 +166,58 @@ export interface Database {
         };
         Update: Partial<Database["public"]["Tables"]["debrief_ai_generation_logs"]["Insert"]>;
       };
+      member_certificates: {
+        Row: {
+          id: string;
+          user_id: string;
+          curriculum_key: string;
+          title: string;
+          verification_code: string;
+          lesson_ids: string[];
+          issued_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["member_certificates"]["Row"], "id" | "issued_at"> & {
+          id?: string;
+          issued_at?: string;
+          lesson_ids?: string[];
+        };
+        Update: Partial<Database["public"]["Tables"]["member_certificates"]["Insert"]>;
+      };
+      chapter_leaders: {
+        Row: {
+          chapter_id: string;
+          user_id: string;
+          role: "lead" | "co_lead" | "coordinator";
+          appointed_at: string;
+          appointed_by: string | null;
+        };
+        Insert: Omit<Database["public"]["Tables"]["chapter_leaders"]["Row"], "appointed_at"> & {
+          appointed_at?: string;
+          appointed_by?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["chapter_leaders"]["Insert"]>;
+      };
+      competitions: {
+        Row: {
+          id: string;
+          title: string;
+          description: string;
+          status: "draft" | "open" | "closed" | "archived";
+          chapter_id: string | null;
+          opportunity_id: string | null;
+          starts_at: string | null;
+          ends_at: string | null;
+          registration_url: string | null;
+          created_by: string | null;
+          created_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["competitions"]["Row"], "id" | "created_at"> & {
+          id?: string;
+          created_at?: string;
+          status?: "draft" | "open" | "closed" | "archived";
+        };
+        Update: Partial<Database["public"]["Tables"]["competitions"]["Insert"]>;
+      };
       explainer_cards: {
         Row: {
           id: string;
@@ -266,10 +318,18 @@ export interface Database {
           repo_url: string | null;
           demo_url: string | null;
           writeup: string;
+          status: "pending" | "approved" | "rejected" | "archived";
+          moderated_at: string | null;
+          moderated_by: string | null;
+          moderation_note: string | null;
           submitted_at: string;
         };
-        Insert: Omit<Database["public"]["Tables"]["studio_submissions"]["Row"], "id" | "submitted_at"> & {
+        Insert: Omit<Database["public"]["Tables"]["studio_submissions"]["Row"], "id" | "submitted_at" | "status" | "moderated_at" | "moderated_by" | "moderation_note"> & {
           id?: string;
+          status?: "pending" | "approved" | "rejected" | "archived";
+          moderated_at?: string | null;
+          moderated_by?: string | null;
+          moderation_note?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["studio_submissions"]["Insert"]>;
       };
@@ -280,10 +340,18 @@ export interface Database {
           title: string;
           body: string;
           is_editorial_pick: boolean;
+          status: "pending" | "approved" | "rejected" | "archived";
+          moderated_at: string | null;
+          moderated_by: string | null;
+          moderation_note: string | null;
           submitted_at: string;
         };
-        Insert: Omit<Database["public"]["Tables"]["essay_submissions"]["Row"], "id" | "submitted_at"> & {
+        Insert: Omit<Database["public"]["Tables"]["essay_submissions"]["Row"], "id" | "submitted_at" | "status" | "moderated_at" | "moderated_by" | "moderation_note"> & {
           id?: string;
+          status?: "pending" | "approved" | "rejected" | "archived";
+          moderated_at?: string | null;
+          moderated_by?: string | null;
+          moderation_note?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["essay_submissions"]["Insert"]>;
       };
@@ -663,6 +731,39 @@ export interface Database {
       record_news_article_version: {
         Args: { p_article_id: string; p_change_note?: string };
         Returns: number;
+      };
+      moderate_studio_submission: {
+        Args: {
+          p_id: string;
+          p_status: Database["public"]["Tables"]["studio_submissions"]["Row"]["status"];
+          p_note?: string | null;
+        };
+        Returns: Database["public"]["Tables"]["studio_submissions"]["Row"];
+      };
+      moderate_essay_submission: {
+        Args: {
+          p_id: string;
+          p_status: Database["public"]["Tables"]["essay_submissions"]["Row"]["status"];
+          p_note?: string | null;
+          p_editorial_pick?: boolean | null;
+        };
+        Returns: Database["public"]["Tables"]["essay_submissions"]["Row"];
+      };
+      issue_my_curriculum_certificate: {
+        Args: { p_curriculum_key: string; p_title: string; p_lesson_ids: string[] };
+        Returns: Database["public"]["Tables"]["member_certificates"]["Row"];
+      };
+      appoint_chapter_leader: {
+        Args: {
+          p_chapter_id: string;
+          p_user_id: string;
+          p_role?: Database["public"]["Tables"]["chapter_leaders"]["Row"]["role"];
+        };
+        Returns: Database["public"]["Tables"]["chapter_leaders"]["Row"];
+      };
+      remove_chapter_leader: {
+        Args: { p_chapter_id: string; p_user_id: string };
+        Returns: undefined;
       };
     };
     Enums: Record<string, never>;

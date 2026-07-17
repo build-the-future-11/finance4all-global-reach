@@ -1,6 +1,8 @@
 import type { Database, Tables } from "@/types/database";
 import type {
   Chapter,
+  ChapterLeader,
+  Competition,
   ConnectionRequest,
   DigestPreference,
   EssaySubmission,
@@ -8,6 +10,7 @@ import type {
   ExplainerCard,
   IntroductionPost,
   LabApplication,
+  MemberCertificate,
   NewsArticle,
   Notification,
   Opportunity,
@@ -197,6 +200,8 @@ export function mapStudioSubmission(row: Tables<"studio_submissions">): StudioSu
     repoUrl: row.repo_url ?? undefined,
     demoUrl: row.demo_url ?? undefined,
     writeup: row.writeup,
+    status: row.status ?? "pending",
+    moderationNote: row.moderation_note ?? undefined,
     submittedAt: row.submitted_at,
   };
 }
@@ -211,7 +216,45 @@ export function mapEssaySubmission(
     body: row.body,
     upvoteCount: row.upvote_count ?? 0,
     isEditorialPick: row.is_editorial_pick,
+    status: row.status ?? "pending",
+    moderationNote: row.moderation_note ?? undefined,
     submittedAt: row.submitted_at,
+  };
+}
+
+export function mapMemberCertificate(row: Tables<"member_certificates">): MemberCertificate {
+  return {
+    id: row.id,
+    userId: row.user_id,
+    curriculumKey: row.curriculum_key,
+    title: row.title,
+    verificationCode: row.verification_code,
+    lessonIds: row.lesson_ids ?? [],
+    issuedAt: row.issued_at,
+  };
+}
+
+export function mapChapterLeader(row: Tables<"chapter_leaders">): ChapterLeader {
+  return {
+    chapterId: row.chapter_id,
+    userId: row.user_id,
+    role: row.role,
+    appointedAt: row.appointed_at,
+  };
+}
+
+export function mapCompetition(row: Tables<"competitions">): Competition {
+  return {
+    id: row.id,
+    title: row.title,
+    description: row.description,
+    status: row.status,
+    chapterId: row.chapter_id ?? undefined,
+    opportunityId: row.opportunity_id ?? undefined,
+    startsAt: row.starts_at ?? undefined,
+    endsAt: row.ends_at ?? undefined,
+    registrationUrl: row.registration_url ?? undefined,
+    createdAt: row.created_at,
   };
 }
 

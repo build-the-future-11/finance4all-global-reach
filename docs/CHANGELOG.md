@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-07-17 — Pass 3 (Portal depth & credibility)
+
+### Schema
+- Migration `014_portal_completeness.sql`: submission moderation, `member_certificates`, `chapter_leaders`, `competitions`, moderate/issue/appoint RPCs
+- Regenerated `FINAL_SETUP.sql`; extended `VERIFY_SETUP.sql`
+
+### App
+- Admin Moderation + Competitions tabs; chapter leader appointment
+- Learn hub: issue verified curriculum certificate
+- Events: country/city filters, map legend/detail, competitions list
+- Nav labels: Learn, Opportunities, Events & Chapters, Profile
+- `public/sitemap.xml` + robots Sitemap
+- Unit tests for moderation helpers (+4 → 92 total)
+
+### Validation
+- typecheck, 92 unit, build, release:static, 7 e2e — pass
+
+### Docs
+- FM-PORTAL-003/005/006/007 RESOLVED; Wave 2 DONE; P3 acceptance recorded
+
 ## 2026-07-17 — Pass 2 (Finance Debrief trustworthy CMS)
 
 ### Schema

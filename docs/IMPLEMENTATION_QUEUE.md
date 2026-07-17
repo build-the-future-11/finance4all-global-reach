@@ -25,18 +25,18 @@ Dependency order. Do not reorder without DECISION_LOG entry.
 | 1.6 | Member Debrief UI: disclaimer, source attribution, draft hidden | FM-DEBRIEF-006 | 1.5 | DONE |
 | 1.7 | Newsletter inclusion flag wiring to digest query | FM-DEBRIEF-005 | 1.5 | DONE |
 
-## Wave 2 — Pass 3 (NEXT — portal completeness)
+## Wave 2 — Pass 3 (DONE 2026-07-17)
 
-| Order | Item | Audit IDs |
-| --- | --- | --- |
-| 2.1 | Admin moderation for studios/essays | FM-PORTAL-003 |
-| 2.2 | Certificates on curriculum completion | FM-PORTAL-005 |
-| 2.3 | Chapter leadership + competitions model | FM-PORTAL-006 |
-| 2.4 | Chapter global map UX | FM-PORTAL-007 |
-| 2.5 | Nav alignment to PRODUCT_SPEC | — |
-| 2.6 | Brand unify post D-001 (OG already absolute) | FM-PUBLIC-002 |
+| Order | Item | Audit IDs | Status |
+| --- | --- | --- | --- |
+| 2.1 | Admin moderation for studios/essays | FM-PORTAL-003 | DONE |
+| 2.2 | Certificates on curriculum completion | FM-PORTAL-005 | DONE |
+| 2.3 | Chapter leadership + competitions model | FM-PORTAL-006 | DONE |
+| 2.4 | Chapter global map UX | FM-PORTAL-007 | DONE |
+| 2.5 | Nav alignment to PRODUCT_SPEC | — | DONE |
+| 2.6 | Brand unify post D-001 (OG already absolute) | FM-PUBLIC-002 | BLOCKED (sitemap shipped) |
 
-## Wave 3 — Pass 4 (harden / prove)
+## Wave 3 — Pass 4 (NEXT — harden / prove)
 
 | Order | Item | Audit IDs |
 | --- | --- | --- |
@@ -47,6 +47,6 @@ Dependency order. Do not reorder without DECISION_LOG entry.
 
 ---
 
-## Exact next Pass 3 task
+## Exact next Pass 4 task
 
-**Start at queue 2.1:** Admin moderation UI for studios/essays (FM-PORTAL-003). Wave 1 publish guards are in source; live Debrief depends on OA-1 applying FINAL_SETUP including 013.
+**Start at queue 3.1:** Authenticated Playwright journeys (signup/onboarding smoke against staging or documented fixtures). Live Debrief/portal depth depends on OA-1 applying FINAL_SETUP including 013–014.

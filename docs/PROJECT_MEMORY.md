@@ -3,8 +3,8 @@
 **Product names:** Public/codebase brand today = **Finance4All**. Product-line / Pass branding = **FinanceMeta**. Legal public name must be unified before launch (see DECISION_LOG D-001).  
 **Repo:** `~/Downloads/finance4all-global-reach-main`  
 **Branch:** `cursor/membership-security-supabase-fix`  
-**Last updated:** 2026-07-17 (Pass 2 Wave 1)  
-**Status:** Source Wave 1 Debrief complete; production blocked on owner credential/schema steps (OA-1 includes migration 013)
+**Last updated:** 2026-07-17 (Pass 3 Wave 2)  
+**Status:** Source Wave 2 portal completeness done; production blocked on owner schema/auth (OA-1 includes 013–014)
 
 ---
 
@@ -21,6 +21,7 @@ Not investment advice. Not a placement guarantee. Claims require admin-published
 | Visitor | Understand mission; join; contact; legal |
 | Member | Learn, read, apply, RSVP, save, connect |
 | Lead researcher | Own lab projects; review applications |
+| Chapter leader | Appointed via admin; chapter visibility |
 | Administrator | Publish, moderate, roles, inbox, ops |
 
 ## Architecture (summary)
@@ -29,40 +30,38 @@ Not investment advice. Not a placement guarantee. Claims require admin-published
 - **Backend:** Supabase Auth, Postgres + RLS, Storage (avatars), RPCs, Edge Functions (`weekly-digest`, `delete-account`)
 - **Host:** Vercel static SPA (`vercel.json` rewrites + CSP/HSTS)
 - Trust boundary: browser is untrusted; RLS/RPC/Edge Functions enforce authz
-- Debrief: source-bound publish via RPC/trigger; AI adapter queues drafts only (never auto-publish)
+- Debrief: source-bound publish; AI adapter queues only
+- Pathways: submissions start `pending`; public feed shows `approved` (+ own/admin)
 
 ## Routes
 
 ### Public
-`/`, `/login`, `/signup`, `/forgot-password`, `/reset-password`, `/auth/callback`, `/privacy`, `/terms`
+`/`, `/login`, `/signup`, `/forgot-password`, `/reset-password`, `/auth/callback`, `/privacy`, `/terms`  
+SEO: `public/sitemap.xml`, `robots.txt` Sitemap directive
 
 ### Protected
 `/onboarding`, `/portal/*`
 
-### Portal (key)
-Dashboard, Debriefed (+ explainers), Meta Labs (+ review), Pathways (opportunities/studios/essays), Events, Network (+ profile), Education, Resources, Saved, Activity, Settings, Admin
+### Portal nav (Pass 3 labels)
+Dashboard, Debriefed, Meta Labs, **Opportunities**, **Events & Chapters**, Network, **Learn**, Resources, Saved, Activity, **Profile**, Admin
 
 ## Database
 
-Migrations **001–013** (+ `FINAL_SETUP.sql` / `VERIFY_SETUP.sql`).  
-Roles: `member` | `lead_researcher` | `admin`.  
-CMS tables from 008; privacy/write boundaries 009–011; ops 012; **Debrief editorial 013**.  
-Types: `src/types/database.ts` aligned through 013.
+Migrations **001–014** (+ `FINAL_SETUP.sql` / `VERIFY_SETUP.sql`).  
+013 Debrief editorial; **014** moderation, certificates, chapter leaders, competitions.
 
 ## Authentication / authorization
 
 - Email/password + Google OAuth; callback `/auth/callback`
 - Profile via `ensure_my_profile` / onboarding RPCs
-- `ProtectedRoute` (session + profile + onboarding), `RoleGuard` (admin / lab review)
-- Members cannot self-escalate role/email (RPC write boundary)
-- Debrief publish/transition: admin-only RPCs + DB trigger
+- `ProtectedRoute`, `RoleGuard`
+- Admin-only: Debrief publish, submission moderate, appoint leaders, manage competitions
 
 ## Integrations
 
 - Supabase (required)
-- Optional: Resend (digest), Google OAuth, Substack embed
-- NewsAPI optional (prefer curated DB headlines)
-- Debrief AI: adapter + queue/logs; **live provider unconfigured** until owner secrets (D-008)
+- Optional: Resend, Google OAuth, Substack
+- Debrief AI adapter unconfigured until owner secrets (D-008)
 
 ## Environment variables
 
@@ -76,35 +75,36 @@ Types: `src/types/database.ts` aligned through 013.
 
 ## Working systems (source)
 
-- Auth UI lifecycle, portal shells, labs/pathways/events/network/education/resources hybrid CMS
-- **Finance Debrief trustworthy editorial:** approved sources, status machine, versions, AI logs, publish guards, admin UI, member disclaimer, digest `newsletter_include`
+- Auth, portal shells, hybrid CMS education/resources
+- Finance Debrief trustworthy editorial (013)
+- **Pass 3:** studio/essay moderation, certificates, chapter leaders, competitions, map filters, nav alignment, sitemap
 - Bookmarks, notifications, contact inbox, analytics/error RPCs
-- typecheck / 88 unit / e2e / release:static / build green on Pass 2 baseline
-- Production deploy path exists (Vercel); env can be set via CLI
+- typecheck / 92 unit / 7 e2e / release:static / build green
 
 ## Broken / incomplete systems
 
-- **Live Supabase schema** for current project may be incomplete (owner must run `FINAL_SETUP.sql` including 013) — see OWNER_ACTIONS
-- Admin lacks studio/essay moderation UI; labs not centralized in Admin
-- E2E lacks authenticated journeys
-- Brand split Finance4All vs FinanceMeta
-- Certificates / competitions / global map / chapter leadership as first-class products: largely **missing or thin** vs Pass product brief
-- Live Debrief AI provider credentials not configured (adapter + queue ready)
+- **Live Supabase schema** until OA-1 (FINAL_SETUP with 013–014)
+- Brand split Finance4All vs FinanceMeta (D-001)
+- Labs not centralized in Admin (FM-PORTAL-004 DEFERRED)
+- E2E lacks authenticated journeys (Pass 4)
+- Live Debrief AI provider unconfigured
+- Certificate “download PDF” not built — verification code + account record only
 
-## Missing systems (product brief vs code)
+## Missing / remaining gaps (honest)
 
 | Area | State |
 | --- | --- |
-| Approved-source registry + AI-assisted Debrief pipeline | **Source done (013)**; live OA-1; AI provider unconfigured |
-| Article version history / corrections / editorial assignment | **Source done (013)** |
-| Certificates | Missing / not first-class |
-| Global chapter map (rich) | Partial (chapters + coords exist; map UX thin) |
-| Competitions as distinct module | Thin / folded into events-opportunities |
-| Newsletter editorial inclusion workflow | **Source done** (`newsletter_include` + digest filter) |
+| Authenticated e2e / live RLS proof | Pass 4 |
+| Legal brand unify | Owner D-001 |
+| Labs admin overview | DEFERRED |
+| Chapter-leader self-serve dashboard / activity reports | Thin (leaders table + counts; no full analytics suite) |
+| Event reminders / newsletter archives / Debrief collections | Not first-class beyond digest + news CMS |
+| Youth-safety dedicated workflow | Partial via moderation + rate limits; no separate youth module |
+| Impact metrics storytelling | Honest qualitative only (no fake counts) |
 
 ## Design constraints
 
-- Preserve valuable existing portal UX; no shallow rewrites
+- Preserve valuable portal UX; no shallow rewrites
 - Honest copy; no fake metrics
 - Educational-not-financial-advice framing on Debrief
 - Accessible forms, skip link, focus states
@@ -113,25 +113,24 @@ Types: `src/types/database.ts` aligned through 013.
 
 - No service role in browser
 - Least privilege RLS
-- Sanitized redirects, rate limits, honeypot
-- Production build fails without valid VITE_*
-- Unsourced / AI-without-log content cannot publish (server trigger + RPC)
+- Unsourced / AI-without-log cannot publish
+- Pending submissions not publicly listed
 
 ## Frozen priorities
 
-1. Owner completes Supabase schema + auth URLs on live project (OA-1 includes 013)
-2. ~~Pass 2: Finance Debrief trustworthy editorial~~ **DONE (source)**
-3. Pass 3: Portal completeness (moderation, certificates, map polish, nav alignment)
-4. Pass 4: Hardening, authenticated e2e, launch checklist closeout
+1. Owner completes Supabase schema + auth URLs (OA-1 includes 014)
+2. ~~Pass 2 Debrief~~ DONE · ~~Pass 3 portal depth~~ DONE
+3. Pass 4: authenticated e2e, RLS proof, launch checklist
+4. Brand unify when D-001 decided
 
 ## Acceptance criteria
 
-Pass 1 ACCEPTED. Pass 2 Wave 1 ACCEPTED (see `ACCEPTANCE_CRITERIA.md`). Live schema remains owner-blocked.
+Pass 1–3 ACCEPTED in source (see `ACCEPTANCE_CRITERIA.md`). Live schema owner-blocked.
 
 ## Exact current status
 
-Pass 2 **COMPLETE** for Wave 1 Finance Debrief vertical slice in source. Ownership released. Next: Pass 3 queue 2.1 (studio/essay moderation). Live production schema application remains **OWNER-BLOCKED**.
+Pass 3 **COMPLETE** for Wave 2. Ownership released. Next: Pass 4 queue 3.1.
 
-## Next task (Pass 3)
+## Next task (Pass 4)
 
-**Admin moderation for studios/essays** (IMPLEMENTATION_QUEUE 2.1 / FM-PORTAL-003).
+**Authenticated Playwright journeys** (IMPLEMENTATION_QUEUE 3.1 / FM-BASE-004).

@@ -1,6 +1,24 @@
 # Data Model
 
-Pass 2 snapshot of production schema baseline (migrations 001–013).
+Pass 3 snapshot (migrations 001–014).
+
+## Pass 3 additions (014)
+
+### submission moderation
+`studio_submissions` / `essay_submissions`: `status` (pending|approved|rejected|archived), `moderated_at`, `moderated_by`, `moderation_note`.  
+Public SELECT: approved OR author OR admin. RPCs: `moderate_studio_submission`, `moderate_essay_submission`.
+
+### member_certificates
+`user_id`, `curriculum_key`, `title`, `verification_code`, `lesson_ids[]`, `issued_at`.  
+RPC: `issue_my_curriculum_certificate` (requires all listed lessons in `education_lesson_progress`).
+
+### chapter_leaders
+`(chapter_id, user_id)`, `role` (lead|co_lead|coordinator). RPCs: `appoint_chapter_leader`, `remove_chapter_leader`.
+
+### competitions
+`title`, `description`, `status` (draft|open|closed|archived), optional `chapter_id` / `opportunity_id`, dates, `registration_url`. Members read open/closed.
+
+---
 
 ## Roles
 

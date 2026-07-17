@@ -78,7 +78,7 @@ export const portalNav: PortalNavItem[] = [
     ],
   },
   {
-    label: "Pathways",
+    label: "Opportunities",
     path: portalRoutes.pathways,
     icon: Route,
     description: "Internships, studio projects, and essay challenges",
@@ -90,7 +90,7 @@ export const portalNav: PortalNavItem[] = [
     ],
   },
   {
-    label: "Events",
+    label: "Events & Chapters",
     path: portalRoutes.events,
     icon: CalendarDays,
     description: "Chapter meetups, workshops, and registration",
@@ -102,7 +102,7 @@ export const portalNav: PortalNavItem[] = [
     description: "Member profiles, connections, and introductions",
   },
   {
-    label: "Education",
+    label: "Learn",
     path: portalRoutes.education,
     icon: GraduationCap,
     description: "Catalyst curriculum, lessons, and glossary",
@@ -126,7 +126,7 @@ export const portalNav: PortalNavItem[] = [
     description: "Saves, applications, connections, and RSVPs",
   },
   {
-    label: "Settings",
+    label: "Profile",
     path: portalRoutes.settings,
     icon: Settings,
     description: "Profile, interests, and notification preferences",

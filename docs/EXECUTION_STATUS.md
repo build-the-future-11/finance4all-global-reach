@@ -1,40 +1,42 @@
 # Execution Status
 
-**Pass:** 2 of 4  
-**State:** COMPLETE (Wave 1 Debrief source slice; owner blockers remain for production)  
-**Updated:** 2026-07-17T14:10:00Z  
-**Checkpoint commit:** `3f3f43d`
+**Pass:** 3 of 4  
+**State:** COMPLETE (Wave 2 portal completeness in source; owner blockers remain)  
+**Updated:** 2026-07-17T14:00:00Z  
+**Checkpoint commit:** pending
 
 ## Completed this pass
 
-- [x] Claim ownership (`WORK_OWNERSHIP.md`)
-- [x] Migration `013_finance_debrief_editorial.sql` (sources, editorial columns, versions, AI logs, RPCs, publish trigger)
-- [x] Regenerated `FINAL_SETUP.sql` / updated `VERIFY_SETUP.sql`
-- [x] Types, mappers, sanitize, `debriefPublish` + `debriefAiAdapter`, unit tests
-- [x] Admin Debrief editorial UI (sources, draft editor, AI queue, publish/archive)
-- [x] Member Debrief disclaimer + source attribution
-- [x] Weekly digest filters `newsletter_include` + published/corrected
-- [x] Validation: typecheck, 88 unit, build, release:static, 7 e2e
-- [x] Memory docs + queue 1.1–1.7 marked; ownership released
+- [x] Claim ownership; Pass 3 context
+- [x] Migration `014_portal_completeness.sql` (moderation, certificates, leaders, competitions)
+- [x] FINAL_SETUP / VERIFY updated
+- [x] Admin Moderation + Competitions + chapter leaders UI
+- [x] Certificates issue flow on Learn hub
+- [x] Chapter country/city filters + map UX
+- [x] Nav alignment (Learn / Opportunities / Events & Chapters / Profile)
+- [x] `public/sitemap.xml` + robots Sitemap (brand unify remains D-001)
+- [x] Unit tests +92; typecheck; build; release:static; 7 e2e
+- [x] Memory/audit/queue updated; ownership released
 
 ## In progress
 
-- None (Pass 2 Wave 1 closed)
+- None (Pass 3 Wave 2 closed)
 
 ## Blocked on owner
 
-- OA-1…OA-8 (see OWNER_ACTIONS.md) — **OA-1 must re-run FINAL_SETUP** to activate migration 013 on live
-- FM-DATA-001, FM-AUTH-001, FM-SEC-001/002
+- OA-1…OA-8 — **OA-1 must re-run FINAL_SETUP** for migration 014
+- FM-PUBLIC-002 / D-001 brand unify
+- FM-PORTAL-004 labs-in-admin remains DEFERRED
 
 ## Next engineering task
 
-Pass 3 Wave 2.1 — Admin moderation for studios/essays (see IMPLEMENTATION_QUEUE.md).
+Pass 4 Wave 3.1 — Authenticated Playwright journeys.
 
 ## Metrics
 
 | Check | Result |
 | --- | --- |
-| Unit tests | 88 passed |
+| Unit tests | 92 passed |
 | E2E | 7 passed |
 | Typecheck | pass |
 | Build | pass |

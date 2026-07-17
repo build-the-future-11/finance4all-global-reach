@@ -122,12 +122,12 @@ Statuses: `UNRESOLVED` | `PARTIAL` | `RESOLVED` | `INVALIDATED` | `DEFERRED` | `
 
 ### FM-PORTAL-003 — Admin studio/essay moderation missing
 - **Severity:** Medium
-- **Files:** `Admin.tsx`, pathways pages
+- **Files:** `Admin.tsx`, pathways pages, `014_portal_completeness.sql`
 - **Impact:** Member submissions lack admin workflow
 - **Root cause:** Scope never built
-- **Fix:** Admin tabs + status fields (Pass 3)
-- **Validation:** Admin can list/moderate submissions
-- **Status:** UNRESOLVED
+- **Fix:** Status columns + moderate RPCs + Admin Moderation tab
+- **Validation:** Admin can list/moderate submissions; pending hidden from public feed
+- **Status:** RESOLVED (source); live pending OA-1
 
 ### FM-PORTAL-004 — Labs not in Admin console
 - **Severity:** Low
@@ -136,33 +136,33 @@ Statuses: `UNRESOLVED` | `PARTIAL` | `RESOLVED` | `INVALIDATED` | `DEFERRED` | `
 - **Root cause:** Intentional lead-researcher portal create
 - **Fix:** Optional admin overview (Pass 3)
 - **Validation:** Admin can list all projects
-- **Status:** DEFERRED
+- **Status:** DEFERRED (D-005)
 
 ### FM-PORTAL-005 — Certificates missing
 - **Severity:** Medium
-- **Files:** education completion UX
+- **Files:** education completion UX, `member_certificates`
 - **Impact:** Spec asks certificates; only local celebration
 - **Root cause:** Not implemented
-- **Fix:** Certificate records + downloadable/viewable achievement (Pass 3)
-- **Validation:** Complete curriculum → certificate row
-- **Status:** UNRESOLVED
+- **Fix:** `issue_my_curriculum_certificate` + Education hub issue UI
+- **Validation:** Complete curriculum → certificate row with verification code
+- **Status:** RESOLVED (source); live pending OA-1
 
 ### FM-PORTAL-006 — Competitions / chapter leadership thin
 - **Severity:** Medium
-- **Files:** events, chapters schema
+- **Files:** events, chapters schema, Admin competitions/leaders
 - **Impact:** Spec modules incomplete
 - **Root cause:** Folded into chapters/events without leadership roles
-- **Fix:** Spec-driven schema + UI (Pass 3)
-- **Validation:** Acceptance criteria for chapters/competitions
-- **Status:** UNRESOLVED
+- **Fix:** `chapter_leaders` + `competitions` tables + Admin/member UI
+- **Validation:** Appoint leader; open competition visible on Events
+- **Status:** RESOLVED (source); live pending OA-1
 
 ### FM-PORTAL-007 — Global map experience thin
 - **Severity:** Low
-- **Files:** events/chapters UI
+- **Files:** `ChapterMap.tsx`, `EventsChapters.tsx`
 - **Impact:** Lat/long exist; map visualization weak/absent
-- **Fix:** Map view of chapters (Pass 3)
-- **Validation:** Chapters render on map
-- **Status:** UNRESOLVED
+- **Fix:** Country/city filters, legend, selected chapter panel, a11y labels
+- **Validation:** Chapters render on map with filters
+- **Status:** RESOLVED
 
 ---
 

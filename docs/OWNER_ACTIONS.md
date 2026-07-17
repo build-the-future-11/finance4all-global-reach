@@ -7,13 +7,13 @@ Only credential, dashboard, legal, or live-environment tasks. Engineering work i
 **Project:** `xwlrzgfuhfbckgvcmyoq` (or whichever is canonical)  
 **Steps:**
 
-1. SQL Editor → paste `supabase/FINAL_SETUP.sql` → Run (now includes migration **013** Debrief editorial)  
+1. SQL Editor → paste `supabase/FINAL_SETUP.sql` → Run (includes migrations **013** Debrief + **014** portal completeness)  
 2. Paste `supabase/VERIFY_SETUP.sql` → Run  
-3. Confirm every row `ok = true` (including `approved_sources`, version/AI log tables, publish RPCs)
+3. Confirm every row `ok = true` (including moderation columns, certificates, leaders, competitions, new RPCs)
 
-**Unblocks:** FM-DATA-001, FM-AUTH-002, portal runtime, live Finance Debrief publish guards
+**Unblocks:** FM-DATA-001, FM-AUTH-002, portal runtime, live Debrief publish guards, live moderation/certificates/competitions
 
-**Note:** If a prior FINAL_SETUP was already applied without 013, either re-run the full script (idempotent where designed) or run `supabase/migrations/013_finance_debrief_editorial.sql` alone, then VERIFY.
+**Note:** If a prior FINAL_SETUP was applied without 013/014, re-run full script or apply `013_*.sql` then `014_*.sql`, then VERIFY.
 
 ## OA-2 — Auth URL configuration
 

@@ -1,6 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { mapProfile } from "@/lib/mappers";
+import {
+  mapChapterLeader,
+  mapCompetition,
+  mapEssaySubmission,
+  mapProfile,
+  mapStudioSubmission,
+} from "@/lib/mappers";
 import type { EventStatus, NewsCategory, OpportunityType, UserRole } from "@/types/domain";
 import {
   sanitizeChapterInput,
@@ -722,5 +728,188 @@ export function useCmsHealth() {
       return { initialized: (count ?? 0) > 0 };
     },
     staleTime: 60_000,
+  });
+}
+
+export function useAdminStudioSubmissions() {
+  return useQuery({
+    queryKey: ["admin-studio-submissions"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("studio_submissions")
+        .select("*")
+        .order("submitted_at", { ascending: false });
+      if (error) throwSanitizedDbError(error);
+      return data.map(mapStudioSubmission);
+    },
+  });
+}
+
+export function useAdminEssaySubmissions() {
+  return useQuery({
+    queryKey: ["admin-essay-submissions"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("essay_submissions_with_counts")
+        .select("*")
+        .order("submitted_at", { ascending: false });
+      if (error) throwSanitizedDbError(error);
+      return data.map(mapEssaySubmission);
+    },
+  });
+}
+
+export function useModerateStudioSubmission() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: {
+      id: string;
+      status: "pending" | "approved" | "rejected" | "archived";
+      note?: string;
+    }) => {
+      const { error } = await supabase.rpc("moderate_studio_submission", {
+        p_id: input.id,
+        p_status: input.status,
+        p_note: input.note ?? null,
+      });
+      if (error) throwSanitizedDbError(error);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-studio-submissions"] });
+      qc.invalidateQueries({ queryKey: ["studio-submissions"] });
+    },
+  });
+}
+
+export function useModerateEssaySubmission() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: {
+      id: string;
+      status: "pending" | "approved" | "rejected" | "archived";
+      note?: string;
+      editorialPick?: boolean;
+    }) => {
+      const { error } = await supabase.rpc("moderate_essay_submission", {
+        p_id: input.id,
+        p_status: input.status,
+        p_note: input.note ?? null,
+        p_editorial_pick: input.editorialPick ?? null,
+      });
+      if (error) throwSanitizedDbError(error);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-essay-submissions"] });
+      qc.invalidateQueries({ queryKey: ["essays"] });
+    },
+  });
+}
+
+export function useChapterLeaders() {
+  return useQuery({
+    queryKey: ["chapter-leaders"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("chapter_leaders").select("*");
+      if (error) throwSanitizedDbError(error);
+      return data.map(mapChapterLeader);
+    },
+  });
+}
+
+export function useAppointChapterLeader() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: {
+      chapterId: string;
+      userId: string;
+      role?: "lead" | "co_lead" | "coordinator";
+    }) => {
+      const { error } = await supabase.rpc("appoint_chapter_leader", {
+        p_chapter_id: input.chapterId,
+        p_user_id: input.userId,
+        p_role: input.role ?? "lead",
+      });
+      if (error) throwSanitizedDbError(error);
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["chapter-leaders"] }),
+  });
+}
+
+export function useRemoveChapterLeader() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { chapterId: string; userId: string }) => {
+      const { error } = await supabase.rpc("remove_chapter_leader", {
+        p_chapter_id: input.chapterId,
+        p_user_id: input.userId,
+      });
+      if (error) throwSanitizedDbError(error);
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["chapter-leaders"] }),
+  });
+}
+
+export function useAdminCompetitions() {
+  return useQuery({
+    queryKey: ["admin-competitions"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("competitions")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throwSanitizedDbError(error);
+      return data.map(mapCompetition);
+    },
+  });
+}
+
+export function useUpsertCompetition() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: {
+      id?: string;
+      title: string;
+      description: string;
+      status: "draft" | "open" | "closed" | "archived";
+      chapterId?: string;
+      startsAt?: string;
+      endsAt?: string;
+      registrationUrl?: string;
+    }) => {
+      const payload = {
+        title: input.title,
+        description: input.description,
+        status: input.status,
+        chapter_id: input.chapterId ?? null,
+        starts_at: input.startsAt ?? null,
+        ends_at: input.endsAt ?? null,
+        registration_url: input.registrationUrl ?? null,
+      };
+      if (input.id) {
+        const { error } = await supabase.from("competitions").update(payload).eq("id", input.id);
+        if (error) throwSanitizedDbError(error);
+      } else {
+        const { error } = await supabase.from("competitions").insert(payload);
+        if (error) throwSanitizedDbError(error);
+      }
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-competitions"] });
+      qc.invalidateQueries({ queryKey: ["competitions"] });
+    },
+  });
+}
+
+export function useDeleteCompetition() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("competitions").delete().eq("id", id);
+      if (error) throwSanitizedDbError(error);
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-competitions"] });
+      qc.invalidateQueries({ queryKey: ["competitions"] });
+    },
   });
 }

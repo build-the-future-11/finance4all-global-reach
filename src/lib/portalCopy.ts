@@ -199,17 +199,18 @@ export const portalCopy = {
   },
   education: {
     eyebrow: "Catalyst",
-    title: "Education",
+    title: "Learn",
     description:
-      "Structured curriculum for outreach and self-study: budgeting, markets, research writing, and glossary terms linked to Debriefed explainers. Progress saves on this device.",
+      "Structured curriculum for outreach and self-study: budgeting, markets, research writing, and glossary terms linked to Debriefed explainers. Progress saves to your account when signed in.",
     certificate:
-      "All Catalyst lessons complete on this device. Consider applying to a lab project or submitting an essay on Pathways.",
+      "All Catalyst lessons complete. Issue a verified certificate, then apply to a lab or submit a Pathways essay.",
     lessonNotFound: "This lesson could not be found. Return to the education hub to browse modules.",
     exerciseTitle: "Exercise",
     markComplete: "Mark lesson complete",
     markUndo: "Completed — click to undo",
     relatedExplainers: "Related explainers",
-    progressNote: "Progress saves locally on this device. Completing every lesson marks the Catalyst track complete on this device.",
+    progressNote:
+      "Signed-in progress syncs to your account. Guests keep progress on this device until they sign in.",
   },
   resources: {
     eyebrow: "Member library",

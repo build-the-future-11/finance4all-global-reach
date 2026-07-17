@@ -31,8 +31,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { portalCopy } from "@/lib/portalCopy";
 import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
+import { moderationLabel } from "@/lib/submissionModeration";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function PathwaysEssays() {
+  const { user } = useAuth();
   const { data: essays, isLoading, error, refetch } = useEssays();
   const { data: upvotes } = useMyEssayUpvotes();
   const toggleUpvote = useToggleEssayUpvote();
@@ -48,7 +51,7 @@ export default function PathwaysEssays() {
     if (!title.trim() || !body.trim()) return;
     try {
       await submitEssay.mutateAsync({ title: title.trim(), body: body.trim() });
-      toast.success("Essay published");
+      toast.success("Essay submitted — pending admin review");
       setOpen(false);
       setTitle("");
       setBody("");
@@ -119,6 +122,11 @@ export default function PathwaysEssays() {
                     <div className="flex flex-wrap items-center gap-2">
                       {essay.isEditorialPick && (
                         <Badge className="bg-amber-400/15 text-amber-300">Editorial pick</Badge>
+                      )}
+                      {essay.status !== "approved" && essay.authorId === user?.id && (
+                        <Badge variant="outline" className="border-amber-400/40 text-amber-200">
+                          {moderationLabel(essay.status)}
+                        </Badge>
                       )}
                     </div>
                     <h3 className="mt-2 text-lg font-semibold text-white">{essay.title}</h3>

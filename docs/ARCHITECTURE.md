@@ -56,16 +56,16 @@ See `src/components/AppRouter.tsx` and `src/routes/portal.ts`.
 | Identity | `profiles`, `digest_preferences` |
 | Debrief | `approved_sources`, `news_articles`, `news_article_versions`, `debrief_ai_generation_logs`, `explainer_cards`, `news_bookmarks` |
 | Labs | `research_projects`, `lab_applications`, `project_bookmarks` |
-| Pathways | `opportunities`, `opportunity_interests`, `studio_submissions`, `essay_submissions`, `essay_upvotes` |
-| Chapters/events | `chapters`, `events`, `event_registrations` |
+| Pathways | `opportunities`, `opportunity_interests`, `studio_submissions`, `essay_submissions`, `essay_upvotes`, `competitions` |
+| Chapters/events | `chapters`, `chapter_leaders`, `events`, `event_registrations` |
 | Network | `member_directory` view, `connection_requests`, `introduction_posts` |
-| Learning | `education_modules`, `education_lessons`, `education_lesson_progress` |
+| Learning | `education_modules`, `education_lessons`, `education_lesson_progress`, `member_certificates` |
 | Resources | `resource_items`, `resource_guides`, `webinars`, `testimonials` |
 | Ops | `contact_submissions`, `notifications`, `rate_limit_events`, `product_analytics_events`, `client_error_events`, `digest_send_log`, `weekly_goal_baselines` |
 
 ## Migrations
 
-Ordered `001`…`013`. Consolidated: `supabase/FINAL_SETUP.sql`. Verify: `supabase/VERIFY_SETUP.sql`.
+Ordered `001`…`014`. Consolidated: `supabase/FINAL_SETUP.sql`. Verify: `supabase/VERIFY_SETUP.sql`.
 
 ## Edge Functions
 

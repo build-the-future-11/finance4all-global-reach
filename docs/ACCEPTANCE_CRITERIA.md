@@ -32,6 +32,21 @@
 
 **Pass 2 result:** ACCEPTED (Wave 1 source). Live schema application remains owner-blocked (OA-1) and does not fail Pass 2 acceptance. Broader Pass 2 product brief items outside Wave 1 remain deferred to Pass 3 per D-002 / IMPLEMENTATION_QUEUE.
 
+## Pass 3 — Portal depth & credibility
+
+| # | Criterion | Met? |
+| --- | --- | --- |
+| P3-1 | Studio/essay moderation status + Admin UI | YES (014) |
+| P3-2 | Curriculum certificates issueable with verification code | YES |
+| P3-3 | Chapter leaders appointable; competitions CRUD + member list | YES |
+| P3-4 | Chapter map with country/city filters + selected detail | YES |
+| P3-5 | Primary nav labels aligned to PRODUCT_SPEC | YES |
+| P3-6 | Public sitemap + robots Sitemap directive | YES |
+| P3-7 | Types + unit tests for moderation helpers; baseline green | YES (92 unit / 7 e2e) |
+| P3-8 | Memory docs updated; Wave 2 queue marked; remaining gaps listed | YES |
+
+**Pass 3 result:** ACCEPTED (Wave 2 source). Brand legal unify (P3 brand / FM-PUBLIC-002) remains owner-blocked (D-001). Live schema remains OA-1. Labs-in-admin stays DEFERRED (D-005).
+
 ## Global launch acceptance (later)
 
 Critical journeys work end-to-end on production URL with real Supabase: signup/onboarding/login/OAuth/reset; read/publish Debrief; apply to lab; RSVP; bookmark; admin role change; VERIFY_SETUP all ok; security matrix sampled.

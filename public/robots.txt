@@ -12,3 +12,5 @@ Allow: /
 
 User-agent: *
 Allow: /
+
+Sitemap: https://finance4all-global-reach.vercel.app/sitemap.xml
