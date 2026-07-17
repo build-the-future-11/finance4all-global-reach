@@ -46,6 +46,10 @@ import {
   useAdminResearchProjects,
   useNewsArticleVersions,
 } from "@/hooks/portal/useAdmin";
+import {
+  useAdminContentReports,
+  useResolveContentReport,
+} from "@/hooks/portal/useSafety";
 import { prepareDebriefAiQueue } from "@/lib/debriefAiAdapter";
 import { canTransitionToStatus, DEBRIEF_DISCLAIMER } from "@/lib/debriefPublish";
 import {
@@ -281,6 +285,7 @@ export default function Admin() {
           <PortalTabsTrigger value="moderation">Moderation</PortalTabsTrigger>
           <PortalTabsTrigger value="competitions">Competitions</PortalTabsTrigger>
           <PortalTabsTrigger value="labs">Labs</PortalTabsTrigger>
+          <PortalTabsTrigger value="reports">Reports</PortalTabsTrigger>
           <PortalTabsTrigger value="inbox">Inbox</PortalTabsTrigger>
           <PortalTabsTrigger value="members">Members</PortalTabsTrigger>
           <PortalTabsTrigger value="system">System</PortalTabsTrigger>
@@ -1097,6 +1102,7 @@ export default function Admin() {
         <AdminModerationTab />
         <AdminCompetitionsTab />
         <AdminLabsTab />
+        <AdminReportsTab />
         <AdminInboxTab />
         <AdminMembersTab />
         <AdminSystemTab />
@@ -1164,6 +1170,73 @@ function AdminLabsTab() {
                 {project.status}
               </Badge>
             </PortalDataRow>
+          ))}
+        </div>
+      </QueryStatus>
+    </PortalTabsContent>
+  );
+}
+
+function AdminReportsTab() {
+  const { data, isLoading, error, refetch } = useAdminContentReports();
+  const resolve = useResolveContentReport();
+  return (
+    <PortalTabsContent value="reports" className="space-y-4">
+      <p className="text-sm text-white/50">
+        Member safety and spam reports. Resolve after review; youth-protection concerns should be
+        prioritized.
+      </p>
+      <QueryStatus
+        isLoading={isLoading}
+        error={error}
+        onRetry={() => refetch()}
+        isEmpty={!data?.length}
+        emptyMessage="No content reports yet."
+      >
+        <div className="space-y-3">
+          {data?.map((report) => (
+            <PortalCard key={report.id} className="space-y-3 p-4">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="font-medium text-white">
+                    {report.target_type}
+                    {report.target_id ? ` · ${report.target_id.slice(0, 8)}…` : ""}
+                  </p>
+                  <p className="mt-1 text-sm text-white/70">{report.reason}</p>
+                  {report.details && (
+                    <p className="mt-1 text-sm text-white/50">{report.details}</p>
+                  )}
+                  <p className="mt-2 text-xs text-white/40">
+                    {new Date(report.created_at).toLocaleString()} · {report.status}
+                  </p>
+                </div>
+                <Select
+                  value={report.status === "open" ? "reviewing" : report.status}
+                  onValueChange={async (status) => {
+                    try {
+                      await resolve.mutateAsync({
+                        id: report.id,
+                        status: status as "open" | "reviewing" | "resolved" | "dismissed",
+                      });
+                      toast.success("Report updated");
+                    } catch (e) {
+                      toast.error(e instanceof Error ? e.message : "Failed");
+                    }
+                  }}
+                >
+                  <SelectTrigger className="w-36 border-white/20 bg-white/5 text-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <PortalSelectContent>
+                    {(["reviewing", "resolved", "dismissed"] as const).map((s) => (
+                      <PortalSelectItem key={s} value={s}>
+                        {s}
+                      </PortalSelectItem>
+                    ))}
+                  </PortalSelectContent>
+                </Select>
+              </div>
+            </PortalCard>
           ))}
         </div>
       </QueryStatus>

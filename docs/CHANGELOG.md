@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-07-17 — Finisher (source completion package)
+
+- Migration `015_content_reports_chapter_tools.sql`: content reports + `my_chapter_leader_snapshot`
+- Debriefed: newsletter archive + topic/region filters
+- Report buttons; Admin Reports tab; chapter leadership panel
+- `docs/VALIDATION_REPORT.md`; README refresh; `dist-packages/finance4all-finished-source.tgz`
+- Validation: typecheck, 94 unit, build, release:static, 11 e2e / 2 skipped
+
 ## 2026-07-17 — Pass 4 (Harden / prove)
 
 ### QA / security docs

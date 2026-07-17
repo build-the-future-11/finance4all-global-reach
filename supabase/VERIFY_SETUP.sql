@@ -41,7 +41,8 @@ WITH expected_tables(name) AS (
     ('debrief_ai_generation_logs'),
     ('member_certificates'),
     ('chapter_leaders'),
-    ('competitions')
+    ('competitions'),
+    ('content_reports')
 ),
 table_checks AS (
   SELECT
@@ -83,7 +84,9 @@ expected_columns(table_name, column_name) AS (
     ('essay_submissions', 'status'),
     ('member_certificates', 'verification_code'),
     ('chapter_leaders', 'role'),
-    ('competitions', 'status')
+    ('competitions', 'status'),
+    ('content_reports', 'status'),
+    ('content_reports', 'target_type')
 ),
 column_checks AS (
   SELECT
@@ -130,7 +133,8 @@ expected_policy_tables(name) AS (
     ('essay_submissions'),
     ('member_certificates'),
     ('chapter_leaders'),
-    ('competitions')
+    ('competitions'),
+    ('content_reports')
 ),
 policy_table_checks AS (
   SELECT
@@ -226,7 +230,10 @@ expected_functions(name) AS (
     ('moderate_essay_submission'),
     ('issue_my_curriculum_certificate'),
     ('appoint_chapter_leader'),
-    ('remove_chapter_leader')
+    ('remove_chapter_leader'),
+    ('submit_content_report'),
+    ('resolve_content_report'),
+    ('my_chapter_leader_snapshot')
 ),
 function_checks AS (
   SELECT
@@ -256,7 +263,10 @@ expected_function_grants(name) AS (
     ('moderate_essay_submission'),
     ('issue_my_curriculum_certificate'),
     ('appoint_chapter_leader'),
-    ('remove_chapter_leader')
+    ('remove_chapter_leader'),
+    ('submit_content_report'),
+    ('resolve_content_report'),
+    ('my_chapter_leader_snapshot')
 ),
 function_grant_checks AS (
   SELECT

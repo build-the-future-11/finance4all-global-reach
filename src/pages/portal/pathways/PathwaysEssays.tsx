@@ -33,6 +33,7 @@ import { portalCopy } from "@/lib/portalCopy";
 import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
 import { moderationLabel } from "@/lib/submissionModeration";
 import { useAuth } from "@/contexts/AuthContext";
+import ReportContentButton from "@/components/portal/ReportContentButton";
 
 export default function PathwaysEssays() {
   const { user } = useAuth();
@@ -132,6 +133,9 @@ export default function PathwaysEssays() {
                     <h3 className="mt-2 text-lg font-semibold text-white">{essay.title}</h3>
                     <p className="mt-1 text-sm text-white/50">by {author?.displayName ?? "Member"}</p>
                     <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-white/70">{essay.body}</p>
+                    <div className="mt-3">
+                      <ReportContentButton targetType="essay" targetId={essay.id} />
+                    </div>
                   </div>
                   <Button
                     size="sm"

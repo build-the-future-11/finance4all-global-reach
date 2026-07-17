@@ -53,6 +53,9 @@ export default function DebriefedHub() {
   useDocumentTitle("Debriefed");
   const [searchParams, setSearchParams] = useSearchParams();
   const [category, setCategory] = useState<NewsCategory | "all">("all");
+  const [topicFilter, setTopicFilter] = useState<string>("all");
+  const [regionFilter, setRegionFilter] = useState<string>("all");
+  const [collection, setCollection] = useState<"all" | "newsletter">("all");
   const [selectedArticle, setSelectedArticle] = useState<NewsArticle | null>(null);
   const { data: articles, isLoading, error, refetch } = useNewsArticles(category);
   const { data: prefs } = useDigestPreferences();
@@ -92,6 +95,27 @@ export default function DebriefedHub() {
     articles?.forEach((a) => a.tags.forEach((t) => counts.set(t, (counts.get(t) ?? 0) + 1)));
     return [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8).map(([tag]) => tag);
   }, [articles]);
+
+  const topics = useMemo(() => {
+    const set = new Set<string>();
+    articles?.forEach((a) => a.topics?.forEach((t) => set.add(t)));
+    return [...set].sort();
+  }, [articles]);
+
+  const regions = useMemo(() => {
+    const set = new Set<string>();
+    articles?.forEach((a) => a.regions?.forEach((r) => set.add(r)));
+    return [...set].sort();
+  }, [articles]);
+
+  const displayArticles = useMemo(() => {
+    return (articles ?? []).filter((a) => {
+      if (collection === "newsletter" && !a.newsletterInclude) return false;
+      if (topicFilter !== "all" && !(a.topics ?? []).includes(topicFilter)) return false;
+      if (regionFilter !== "all" && !(a.regions ?? []).includes(regionFilter)) return false;
+      return true;
+    });
+  }, [articles, collection, topicFilter, regionFilter]);
 
   const handleDigestToggle = async (
     value: boolean,
@@ -207,6 +231,44 @@ export default function DebriefedHub() {
         </PortalTabsList>
       </Tabs>
 
+      <div className="mb-4 flex flex-wrap gap-2">
+        <select
+          aria-label="Collection"
+          className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white"
+          value={collection}
+          onChange={(e) => setCollection(e.target.value as "all" | "newsletter")}
+        >
+          <option value="all">All published</option>
+          <option value="newsletter">Newsletter archive</option>
+        </select>
+        <select
+          aria-label="Filter by topic"
+          className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white"
+          value={topicFilter}
+          onChange={(e) => setTopicFilter(e.target.value)}
+        >
+          <option value="all">All topics</option>
+          {topics.map((t) => (
+            <option key={t} value={t}>
+              {t}
+            </option>
+          ))}
+        </select>
+        <select
+          aria-label="Filter by region"
+          className="rounded-lg border border-white/15 bg-white/5 px-3 py-2 text-sm text-white"
+          value={regionFilter}
+          onChange={(e) => setRegionFilter(e.target.value)}
+        >
+          <option value="all">All regions</option>
+          {regions.map((r) => (
+            <option key={r} value={r}>
+              {r}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {trendingTags.length > 0 && (
         <div className="mb-6 flex flex-wrap items-center gap-2">
           <span className="text-xs font-medium uppercase tracking-wider text-white/40">Trending</span>
@@ -224,17 +286,26 @@ export default function DebriefedHub() {
       <QueryStatus
         isLoading={isLoading}
         error={error}
-        isEmpty={!articles?.length}
-        emptyMessage={portalCopy.debriefed.emptyArticles}
+        isEmpty={!displayArticles.length}
+        emptyMessage={
+          collection === "newsletter"
+            ? "No newsletter editions yet. When editors mark articles for the digest, they appear here."
+            : portalCopy.debriefed.emptyArticles
+        }
         onRetry={() => refetch()}
       >
         <div className="space-y-4">
-          {articles?.map((article) => (
+          {displayArticles.map((article) => (
             <PortalCard key={article.id} hover className="p-5">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <CategoryBadge>{article.category}</CategoryBadge>
+                    {article.newsletterInclude && (
+                      <Badge variant="outline" className="border-emerald-400/30 text-emerald-200">
+                        Newsletter
+                      </Badge>
+                    )}
                     {article.tags.map((tag) => (
                       <span key={tag} className="text-xs text-white/35">
                         #{tag}
@@ -251,6 +322,12 @@ export default function DebriefedHub() {
                   <p className="mt-2 text-sm leading-relaxed text-white/55">{article.summary}</p>
                   <p className="mt-2 text-xs text-white/35">
                     {new Date(article.publishedAt).toLocaleDateString()}
+                    {(article.topics?.length || article.regions?.length) ? (
+                      <>
+                        {" · "}
+                        {[...(article.topics ?? []), ...(article.regions ?? [])].slice(0, 4).join(", ")}
+                      </>
+                    ) : null}
                   </p>
                 </div>
                 <div className="flex shrink-0 flex-col gap-2">

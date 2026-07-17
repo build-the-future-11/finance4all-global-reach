@@ -218,6 +218,31 @@ export interface Database {
         };
         Update: Partial<Database["public"]["Tables"]["competitions"]["Insert"]>;
       };
+      content_reports: {
+        Row: {
+          id: string;
+          reporter_id: string;
+          target_type: "studio" | "essay" | "introduction" | "news" | "profile" | "other";
+          target_id: string | null;
+          reason: string;
+          details: string | null;
+          status: "open" | "reviewing" | "resolved" | "dismissed";
+          created_at: string;
+          resolved_at: string | null;
+          resolved_by: string | null;
+          resolution_note: string | null;
+        };
+        Insert: Omit<Database["public"]["Tables"]["content_reports"]["Row"], "id" | "created_at" | "status" | "resolved_at" | "resolved_by" | "resolution_note"> & {
+          id?: string;
+          created_at?: string;
+          status?: "open" | "reviewing" | "resolved" | "dismissed";
+        };
+        Update: Partial<Database["public"]["Tables"]["content_reports"]["Insert"]> & {
+          resolved_at?: string | null;
+          resolved_by?: string | null;
+          resolution_note?: string | null;
+        };
+      };
       explainer_cards: {
         Row: {
           id: string;
@@ -764,6 +789,36 @@ export interface Database {
       remove_chapter_leader: {
         Args: { p_chapter_id: string; p_user_id: string };
         Returns: undefined;
+      };
+      submit_content_report: {
+        Args: {
+          p_target_type: Database["public"]["Tables"]["content_reports"]["Row"]["target_type"];
+          p_reason: string;
+          p_target_id?: string | null;
+          p_details?: string | null;
+        };
+        Returns: string;
+      };
+      resolve_content_report: {
+        Args: {
+          p_id: string;
+          p_status: Database["public"]["Tables"]["content_reports"]["Row"]["status"];
+          p_note?: string | null;
+        };
+        Returns: Database["public"]["Tables"]["content_reports"]["Row"];
+      };
+      my_chapter_leader_snapshot: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          chapter_id: string;
+          chapter_name: string;
+          city: string;
+          country: string;
+          member_count: number;
+          leader_role: Database["public"]["Tables"]["chapter_leaders"]["Row"]["role"];
+          upcoming_events: number;
+          open_competitions: number;
+        }[];
       };
     };
     Enums: Record<string, never>;

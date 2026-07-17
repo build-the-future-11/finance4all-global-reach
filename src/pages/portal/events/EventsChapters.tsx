@@ -9,6 +9,7 @@ import {
 } from "@/hooks/portal/useEvents";
 import { useChapterLeaders } from "@/hooks/portal/useAdmin";
 import { useCompetitions } from "@/hooks/portal/useCertificates";
+import { useMyChapterLeaderSnapshot } from "@/hooks/portal/useSafety";
 import ChapterMap from "@/components/portal/ChapterMap";
 import {
   PortalCard,
@@ -56,6 +57,7 @@ export default function EventsChapters() {
   } = useChapters();
   const { data: competitions } = useCompetitions();
   const { data: leaders } = useChapterLeaders();
+  const { data: leaderSnapshot } = useMyChapterLeaderSnapshot();
   const {
     data: events,
     isLoading: eventsLoading,
@@ -131,6 +133,33 @@ export default function EventsChapters() {
           description={portalCopy.events.description}
         />
       </PortalAnimatedSection>
+
+      {leaderSnapshot && leaderSnapshot.length > 0 && (
+        <section className="mb-8 space-y-3">
+          <h2 className="text-lg font-semibold text-white">Your chapter leadership</h2>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {leaderSnapshot.map((row) => (
+              <PortalCard key={row.chapter_id} className="p-5">
+                <p className="font-semibold text-white">{row.chapter_name}</p>
+                <p className="text-sm capitalize text-white/50">
+                  {row.leader_role.replace("_", " ")} · {row.city}, {row.country}
+                </p>
+                <p className="mt-3 text-sm text-white/70">
+                  {row.member_count} members · {row.upcoming_events} upcoming events ·{" "}
+                  {row.open_competitions} open competitions
+                </p>
+                <Button
+                  type="button"
+                  className={`mt-3 ${portalButtonOutline}`}
+                  onClick={() => setSelectedChapter(row.chapter_id)}
+                >
+                  Focus this chapter
+                </Button>
+              </PortalCard>
+            ))}
+          </div>
+        </section>
+      )}
 
       <QueryStatus
         isLoading={chaptersLoading}

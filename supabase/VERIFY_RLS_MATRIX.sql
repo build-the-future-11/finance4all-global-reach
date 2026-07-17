@@ -19,7 +19,10 @@ WITH expected_policies(tablename, policyname) AS (
     ('approved_sources', 'Approved sources readable by authenticated'),
     ('news_articles', 'Published news viewable'),
     ('news_article_versions', 'Admin read article versions'),
-    ('education_lesson_progress', 'Users manage own education progress')
+    ('education_lesson_progress', 'Users manage own education progress'),
+    ('content_reports', 'Users insert own content reports'),
+    ('content_reports', 'Users read own content reports'),
+    ('content_reports', 'Admin update content reports')
 ),
 policy_checks AS (
   SELECT
@@ -49,7 +52,8 @@ rls_enabled AS (
       'competitions',
       'approved_sources',
       'news_articles',
-      'education_lesson_progress'
+      'education_lesson_progress',
+      'content_reports'
     )
 )
 SELECT * FROM policy_checks

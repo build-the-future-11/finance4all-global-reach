@@ -1,64 +1,62 @@
 # Finance4All
 
-Finance4All is a public financial-literacy site and authenticated member portal for learning, Finance Debrief publishing, research applications, opportunities, chapters, events, saved content, notifications, and administration.
+Public financial-literacy site and authenticated member portal: learning, Finance Debrief, research labs, opportunities, chapters/events, network, resources, and administration.
 
-## Production Readiness
+**Canonical status:** [docs/PROJECT_MEMORY.md](docs/PROJECT_MEMORY.md)  
+**Owner-only launch steps:** [docs/OWNER_ACTIONS.md](docs/OWNER_ACTIONS.md)  
+**Validation snapshot:** [docs/VALIDATION_REPORT.md](docs/VALIDATION_REPORT.md)  
+**Launch checklist:** [docs/LAUNCH_CHECKLIST.md](docs/LAUNCH_CHECKLIST.md)
 
-The frontend, portal workflows, Supabase schema, Edge Function contracts, and operator documentation are designed for production deployment. Production launch still requires the external steps in [docs/LAUNCH_CHECKLIST.md](docs/LAUNCH_CHECKLIST.md): real Supabase credentials, migrations, Edge Function deployment, mail sender approval, OAuth URLs, legal review, content review, monitoring, and dependency audit from an approved security environment.
-
-## Main Areas
-
-| Route | Purpose |
-| --- | --- |
-| `/` | Public landing page |
-| `/login`, `/signup`, `/reset-password` | Authentication |
-| `/portal` | Personalized member dashboard |
-| `/portal/debriefed` | Finance Debrief articles, explainers, saved reading, digest preferences |
-| `/portal/labs` | Research projects and applications |
-| `/portal/pathways` | Opportunities, studios, and essays |
-| `/portal/education` | Courses and lesson progress |
-| `/portal/events` | Chapters and event registration |
-| `/portal/network` | Member directory, introductions, and connection requests |
-| `/portal/settings` | Profile, communications, export, password, account deletion |
-| `/portal/admin` | Publishing, inbox, member roles, and operational system view |
-
-## Deployment
-
-Use [DEPLOYMENT.md](DEPLOYMENT.md) for the complete production deployment path and [supabase/SUPABASE_SETUP.md](supabase/SUPABASE_SETUP.md) for Supabase-specific setup.
-
-Additional docs:
-
-- [docs/PROJECT_MEMORY.md](docs/PROJECT_MEMORY.md) — **canonical continuity context**
-- [docs/IMPLEMENTATION_QUEUE.md](docs/IMPLEMENTATION_QUEUE.md) — frozen pass queue
-- [docs/OWNER_ACTIONS.md](docs/OWNER_ACTIONS.md) — credential/dashboard-only steps
-- [DATABASE.md](DATABASE.md) — migrations, seeds, RLS verification
-- [SECURITY.md](SECURITY.md) — env vars, authz, edge function secrets
-- [TESTING.md](TESTING.md) — test commands and manual journeys
-- [PROJECT_STATUS.md](PROJECT_STATUS.md) — what's done vs credential blockers
-
-## Local Development
+## Quick start
 
 ```bash
 npm install
 cp .env.example .env
+# Fill VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, VITE_APP_URL
 npm run dev
 ```
 
-Local development needs the same browser-safe client variables documented in `.env.example`.
-
-## Verification
+## Verify
 
 ```bash
+npm run typecheck
 npm test
 npm run lint
-npx tsc --noEmit
-VITE_APP_URL=<canonical-production-url> npm run build
+VITE_SUPABASE_URL=https://ci-placeholder.supabase.co \
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpLXBsYWNlaG9sZGVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDAwMDAwMDAsImV4cCI6MjAwMDAwMDAwMH0.ci-placeholder-signature-for-build-only \
+VITE_APP_URL=https://ci-placeholder.vercel.app \
+npm run build
 npm run release:static
-npm run test:e2e
+CI=true npm run test:e2e
 ```
 
-Run `npm audit --omit=dev --audit-level=high` from an approved security environment before public launch.
+## Database
+
+1. Supabase SQL Editor → paste `supabase/FINAL_SETUP.sql` (migrations **001–015**)  
+2. Run `supabase/VERIFY_SETUP.sql` then `supabase/VERIFY_RLS_MATRIX.sql`  
+3. Confirm every row `ok = true`
+
+Details: [DATABASE.md](DATABASE.md), [DEPLOYMENT.md](DEPLOYMENT.md), [supabase/SUPABASE_SETUP.md](supabase/SUPABASE_SETUP.md)
+
+## Product map
+
+| Area | Path |
+| --- | --- |
+| Landing | `/` |
+| Auth | `/login`, `/signup`, `/forgot-password`, `/reset-password` |
+| Dashboard | `/portal` |
+| Debriefed | `/portal/debriefed` (collections, newsletter archive, explainers) |
+| Meta Labs | `/portal/labs` |
+| Opportunities | `/portal/pathways` |
+| Learn | `/portal/education` (certificates) |
+| Events & Chapters | `/portal/events` (map, leaders, competitions) |
+| Network | `/portal/network` |
+| Admin | `/portal/admin` (Debrief, moderation, reports, labs overview, …) |
+
+## Packaged source
+
+After a finisher build: `dist-packages/finance4all-finished-source.tgz` (excludes `node_modules`, `dist`, `.git`).
 
 ## Stack
 
-React, Vite, TypeScript, Tailwind, shadcn/ui, Supabase, TanStack Query, and Playwright.
+React, Vite, TypeScript, Tailwind, shadcn/ui, Supabase, TanStack Query, Playwright.

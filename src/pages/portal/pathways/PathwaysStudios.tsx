@@ -27,6 +27,7 @@ import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
 import { Badge } from "@/components/ui/badge";
 import { moderationLabel } from "@/lib/submissionModeration";
 import { useAuth } from "@/contexts/AuthContext";
+import ReportContentButton from "@/components/portal/ReportContentButton";
 
 export default function PathwaysStudios() {
   const { user } = useAuth();
@@ -148,6 +149,7 @@ export default function PathwaysStudios() {
                       Demo <ExternalLink className="h-3.5 w-3.5" />
                     </a>
                   )}
+                  <ReportContentButton targetType="studio" targetId={sub.id} />
                 </div>
               </PortalCard>
             );
