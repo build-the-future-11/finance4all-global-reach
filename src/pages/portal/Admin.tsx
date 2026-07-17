@@ -27,7 +27,15 @@ import {
   useUpdateMemberRole,
   useSeedCmsContent,
   useCmsHealth,
+  usePublishNewsArticle,
+  useTransitionNewsStatus,
+  useApprovedSources,
+  useUpsertApprovedSource,
+  useQueueDebriefAiGeneration,
+  useDebriefAiLogs,
 } from "@/hooks/portal/useAdmin";
+import { prepareDebriefAiQueue } from "@/lib/debriefAiAdapter";
+import { canTransitionToStatus, DEBRIEF_DISCLAIMER } from "@/lib/debriefPublish";
 import {
   PortalCard,
   PortalDataRow,
@@ -93,6 +101,12 @@ export default function Admin() {
   const createChapter = useCreateChapter();
   const deleteNews = useDeleteNewsArticle();
   const updateNews = useUpdateNewsArticle();
+  const publishNews = usePublishNewsArticle();
+  const transitionNews = useTransitionNewsStatus();
+  const { data: approvedSources } = useApprovedSources();
+  const upsertSource = useUpsertApprovedSource();
+  const queueAi = useQueueDebriefAiGeneration();
+  const { data: aiLogs } = useDebriefAiLogs();
   const deleteOpp = useDeleteOpportunity();
   const updateOpp = useUpdateOpportunity();
   const deleteEvent = useDeleteEvent();
@@ -105,15 +119,42 @@ export default function Admin() {
   const [editingOppId, setEditingOppId] = useState<string | null>(null);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
   const [editingExplainerId, setEditingExplainerId] = useState<string | null>(null);
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [sourceForm, setSourceForm] = useState({
+    name: "",
+    homepageUrl: "https://",
+    allowedDomains: "",
+    notes: "",
+  });
 
   const [newsForm, setNewsForm] = useState({
     title: "",
     summary: "",
+    body: "",
     category: "macro" as NewsCategory,
     tags: "",
     sourceUrl: "",
-    isPublished: true,
+    sourceId: "",
+    topics: "",
+    regions: "",
+    importance: 3,
+    newsletterInclude: false,
+    aiAssisted: false,
   });
+  const emptyNewsForm = {
+    title: "",
+    summary: "",
+    body: "",
+    category: "macro" as NewsCategory,
+    tags: "",
+    sourceUrl: "",
+    sourceId: "",
+    topics: "",
+    regions: "",
+    importance: 3,
+    newsletterInclude: false,
+    aiAssisted: false,
+  };
   const [oppForm, setOppForm] = useState({
     title: "",
     organization: "",
@@ -224,7 +265,68 @@ export default function Admin() {
 
         <PortalTabsContent value="news" className="space-y-6">
           <PortalCard className="p-6">
-            <h3 className="font-semibold text-white">{editingNewsId ? "Edit article" : "Publish article"}</h3>
+            <h3 className="font-semibold text-white">Approved sources</h3>
+            <p className="mt-1 text-sm text-white/50">
+              Finance Debrief articles can only be scheduled or published when bound to an active approved source.
+            </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <Input
+                value={sourceForm.name}
+                onChange={(e) => setSourceForm({ ...sourceForm, name: e.target.value })}
+                placeholder="Source name"
+                className={portalInputClass}
+              />
+              <Input
+                value={sourceForm.homepageUrl}
+                onChange={(e) => setSourceForm({ ...sourceForm, homepageUrl: e.target.value })}
+                placeholder="https://example.com"
+                className={portalInputClass}
+              />
+              <Input
+                value={sourceForm.allowedDomains}
+                onChange={(e) => setSourceForm({ ...sourceForm, allowedDomains: e.target.value })}
+                placeholder="Domains (comma-separated)"
+                className={portalInputClass}
+              />
+              <Input
+                value={sourceForm.notes}
+                onChange={(e) => setSourceForm({ ...sourceForm, notes: e.target.value })}
+                placeholder="Editorial notes"
+                className={portalInputClass}
+              />
+            </div>
+            <Button
+              className={cn("mt-3", portalButtonPrimary)}
+              disabled={upsertSource.isPending || !sourceForm.name.trim() || !sourceForm.homepageUrl.startsWith("https://")}
+              onClick={async () => {
+                try {
+                  await upsertSource.mutateAsync({
+                    name: sourceForm.name,
+                    homepageUrl: sourceForm.homepageUrl,
+                    allowedDomains: sourceForm.allowedDomains.split(",").map((d) => d.trim()).filter(Boolean),
+                    notes: sourceForm.notes,
+                  });
+                  toast.success("Approved source saved");
+                  setSourceForm({ name: "", homepageUrl: "https://", allowedDomains: "", notes: "" });
+                } catch (e) {
+                  toast.error(e instanceof Error ? e.message : "Failed to save source");
+                }
+              }}
+            >
+              Add approved source
+            </Button>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {(approvedSources ?? []).map((s) => (
+                <Badge key={s.id} variant="outline" className={s.is_active ? "border-emerald-400/40 text-emerald-200" : "border-white/20 text-white/40"}>
+                  {s.name}
+                </Badge>
+              ))}
+            </div>
+          </PortalCard>
+
+          <PortalCard className="p-6">
+            <h3 className="font-semibold text-white">{editingNewsId ? "Edit Debrief draft" : "New Debrief draft"}</h3>
+            <p className="mt-1 text-xs text-white/45">{DEBRIEF_DISCLAIMER}</p>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
                 <Label className="text-white/70">Title</Label>
@@ -233,6 +335,10 @@ export default function Admin() {
               <div className="sm:col-span-2">
                 <Label className="text-white/70">Summary</Label>
                 <Textarea value={newsForm.summary} onChange={(e) => setNewsForm({ ...newsForm, summary: e.target.value })} rows={2} className={portalInputClass} />
+              </div>
+              <div className="sm:col-span-2">
+                <Label className="text-white/70">Body</Label>
+                <Textarea value={newsForm.body} onChange={(e) => setNewsForm({ ...newsForm, body: e.target.value })} rows={5} className={portalInputClass} />
               </div>
               <div>
                 <Label className="text-white/70">Category</Label>
@@ -246,109 +352,261 @@ export default function Admin() {
                 </Select>
               </div>
               <div>
-                <Label className="text-white/70">Tags (comma-separated)</Label>
+                <Label className="text-white/70">Approved source</Label>
+                <Select value={newsForm.sourceId || "none"} onValueChange={(v) => setNewsForm({ ...newsForm, sourceId: v === "none" ? "" : v })}>
+                  <SelectTrigger className={portalInputClass}><SelectValue placeholder="Select source" /></SelectTrigger>
+                  <PortalSelectContent>
+                    <PortalSelectItem value="none">None (draft only)</PortalSelectItem>
+                    {(approvedSources ?? []).filter((s) => s.is_active).map((s) => (
+                      <PortalSelectItem key={s.id} value={s.id}>{s.name}</PortalSelectItem>
+                    ))}
+                  </PortalSelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-white/70">Tags</Label>
                 <Input value={newsForm.tags} onChange={(e) => setNewsForm({ ...newsForm, tags: e.target.value })} className={portalInputClass} />
               </div>
+              <div>
+                <Label className="text-white/70">Importance (1–5)</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={5}
+                  value={newsForm.importance}
+                  onChange={(e) => setNewsForm({ ...newsForm, importance: Number(e.target.value) || 3 })}
+                  className={portalInputClass}
+                />
+              </div>
+              <div>
+                <Label className="text-white/70">Topics</Label>
+                <Input value={newsForm.topics} onChange={(e) => setNewsForm({ ...newsForm, topics: e.target.value })} className={portalInputClass} />
+              </div>
+              <div>
+                <Label className="text-white/70">Regions</Label>
+                <Input value={newsForm.regions} onChange={(e) => setNewsForm({ ...newsForm, regions: e.target.value })} className={portalInputClass} />
+              </div>
               <div className="sm:col-span-2">
-                <Label className="text-white/70">Source URL (optional)</Label>
+                <Label className="text-white/70">Canonical source URL</Label>
                 <Input value={newsForm.sourceUrl} onChange={(e) => setNewsForm({ ...newsForm, sourceUrl: e.target.value })} className={portalInputClass} />
               </div>
-              <div className="sm:col-span-2 flex items-center justify-between gap-4 rounded-lg border border-white/10 px-3 py-2">
-                <div>
-                  <Label htmlFor="news-published" className="text-white/80">Visible to members</Label>
-                  <p className="mt-1 text-xs text-white/45">Turn this off to save a draft only administrators can view.</p>
-                </div>
-                <Switch id="news-published" checked={newsForm.isPublished} onCheckedChange={(isPublished) => setNewsForm({ ...newsForm, isPublished })} />
+              <div className="flex items-center justify-between gap-4 rounded-lg border border-white/10 px-3 py-2">
+                <Label htmlFor="news-newsletter" className="text-white/80">Include in newsletter</Label>
+                <Switch id="news-newsletter" checked={newsForm.newsletterInclude} onCheckedChange={(newsletterInclude) => setNewsForm({ ...newsForm, newsletterInclude })} />
+              </div>
+              <div className="flex items-center justify-between gap-4 rounded-lg border border-white/10 px-3 py-2">
+                <Label htmlFor="news-ai" className="text-white/80">AI-assisted draft</Label>
+                <Switch id="news-ai" checked={newsForm.aiAssisted} onCheckedChange={(aiAssisted) => setNewsForm({ ...newsForm, aiAssisted })} />
               </div>
             </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Button
+                className={cn(portalButtonPrimary)}
+                disabled={createNews.isPending || updateNews.isPending || !newsForm.title.trim() || !newsForm.summary.trim()}
+                onClick={async () => {
+                  try {
+                    const payload = {
+                      title: newsForm.title,
+                      summary: newsForm.summary,
+                      body: newsForm.body,
+                      category: newsForm.category,
+                      tags: parseTags(newsForm.tags),
+                      sourceUrl: sanitizeOptionalUrl(newsForm.sourceUrl),
+                      sourceId: newsForm.sourceId || undefined,
+                      topics: parseTags(newsForm.topics),
+                      regions: parseTags(newsForm.regions),
+                      importance: newsForm.importance,
+                      newsletterInclude: newsForm.newsletterInclude,
+                      aiAssisted: newsForm.aiAssisted,
+                    };
+                    if (editingNewsId) {
+                      await updateNews.mutateAsync({ id: editingNewsId, ...payload });
+                      toast.success("Draft saved");
+                    } else {
+                      await createNews.mutateAsync(payload);
+                      toast.success("Draft created — publish only via Publish action");
+                    }
+                    setEditingNewsId(null);
+                    setNewsForm(emptyNewsForm);
+                  } catch (e) {
+                    toast.error(e instanceof Error ? e.message : "Failed");
+                  }
+                }}
+              >
+                {editingNewsId ? "Save draft" : "Create draft"}
+              </Button>
+              {editingNewsId && (
+                <Button
+                  variant="outline"
+                  className={portalButtonOutline}
+                  onClick={() => {
+                    setEditingNewsId(null);
+                    setNewsForm(emptyNewsForm);
+                  }}
+                >
+                  Cancel edit
+                </Button>
+              )}
+            </div>
+          </PortalCard>
+
+          <PortalCard className="p-6">
+            <h3 className="font-semibold text-white">Source-bound AI queue</h3>
+            <p className="mt-1 text-sm text-white/50">
+              Live model completion is owner-configured. Queuing always requires approved source ids; unsourced AI cannot publish.
+            </p>
+            <Textarea
+              className={cn("mt-3", portalInputClass)}
+              rows={3}
+              value={aiPrompt}
+              onChange={(e) => setAiPrompt(e.target.value)}
+              placeholder="Prompt for a source-bound summary…"
+            />
             <Button
-              className={cn("mt-4", portalButtonPrimary)}
-              disabled={createNews.isPending || updateNews.isPending || !newsForm.title.trim() || !newsForm.summary.trim()}
+              className={cn("mt-3", portalButtonOutline)}
+              variant="outline"
+              disabled={queueAi.isPending || !aiPrompt.trim() || !newsForm.sourceId}
               onClick={async () => {
                 try {
-                  const payload = {
-                    title: sanitizeTextInput(newsForm.title, 200),
-                    summary: sanitizeTextInput(newsForm.summary, 500),
-                    category: newsForm.category,
-                    tags: parseTags(newsForm.tags),
-                    sourceUrl: sanitizeOptionalUrl(newsForm.sourceUrl),
-                    isPublished: newsForm.isPublished,
-                  };
-                  if (editingNewsId) {
-                    await updateNews.mutateAsync({ id: editingNewsId, ...payload });
-                    toast.success("Article updated");
-                    setEditingNewsId(null);
-                  } else {
-                    await createNews.mutateAsync(payload);
-                    toast.success("Article published");
-                  }
-                  setNewsForm({ title: "", summary: "", category: "macro", tags: "", sourceUrl: "", isPublished: true });
+                  const prepared = prepareDebriefAiQueue({
+                    prompt: aiPrompt,
+                    sourceIds: [newsForm.sourceId],
+                    articleId: editingNewsId ?? undefined,
+                  });
+                  const logId = await queueAi.mutateAsync({
+                    promptHash: prepared.promptHash,
+                    sourceIds: [newsForm.sourceId],
+                    articleId: editingNewsId ?? undefined,
+                  });
+                  toast.success(`${prepared.message} Log: ${logId.slice(0, 8)}…`);
+                  setNewsForm({ ...newsForm, aiAssisted: true });
                 } catch (e) {
-                  toast.error(e instanceof Error ? e.message : "Failed");
+                  toast.error(e instanceof Error ? e.message : "Queue failed");
                 }
               }}
             >
-              {editingNewsId ? "Save changes" : "Publish"}
+              Queue AI generation
             </Button>
-            {editingNewsId && (
-              <Button
-                variant="outline"
-                className={cn("ml-2 mt-4", portalButtonOutline)}
-                onClick={() => {
-                  setEditingNewsId(null);
-                  setNewsForm({ title: "", summary: "", category: "macro", tags: "", sourceUrl: "", isPublished: true });
-                }}
-              >
-                Cancel edit
-              </Button>
-            )}
+            <div className="mt-4 space-y-2">
+              {(aiLogs ?? []).slice(0, 5).map((log) => (
+                <p key={log.id} className="text-xs text-white/45">
+                  {log.status} · {log.model} · {log.prompt_hash} · {new Date(log.created_at).toLocaleString()}
+                </p>
+              ))}
+            </div>
           </PortalCard>
+
           {!news?.length ? (
             <EmptyState message={portalCopy.admin.emptyNews} />
           ) : (
-          <div className="space-y-2">
-            {news.map((a) => (
-              <PortalDataRow key={a.id}>
-                <div>
-                  <p className="font-medium text-white">{a.title}</p>
-                  <CategoryBadge>{a.category}</CategoryBadge>
-                </div>
-                <div className="flex gap-1">
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="text-white/60 hover:text-white"
-                    aria-label={`Edit ${a.title}`}
-                    onClick={() => {
-                      setEditingNewsId(a.id);
-                      setNewsForm({
-                        title: a.title,
-                        summary: a.summary,
-                        category: a.category,
-                        tags: a.tags.join(", "),
-                        sourceUrl: a.sourceUrl ?? "",
-                        isPublished: a.isPublished,
-                      });
-                    }}
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <AdminConfirmDelete
-                    label={a.title}
-                    onConfirm={async () => {
-                      try {
-                        await deleteNews.mutateAsync(a.id);
-                        toast.success("Deleted");
-                        if (editingNewsId === a.id) setEditingNewsId(null);
-                      } catch (e) {
-                        toast.error(e instanceof Error ? e.message : "Failed");
-                      }
-                    }}
-                  />
-                </div>
-              </PortalDataRow>
-            ))}
-          </div>
+            <div className="space-y-2">
+              {news.map((a) => (
+                <PortalDataRow key={a.id}>
+                  <div className="min-w-0">
+                    <p className="font-medium text-white">{a.title}</p>
+                    <div className="mt-1 flex flex-wrap gap-2">
+                      <CategoryBadge>{a.category}</CategoryBadge>
+                      <Badge variant="outline" className="border-white/20 text-white/60">{a.status}</Badge>
+                      {a.newsletterInclude && <Badge variant="outline" className="border-emerald-400/30 text-emerald-200">newsletter</Badge>}
+                      {a.aiAssisted && <Badge variant="outline" className="border-amber-400/30 text-amber-200">AI-assisted</Badge>}
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="text-white/60 hover:text-white"
+                      aria-label={`Edit ${a.title}`}
+                      onClick={() => {
+                        setEditingNewsId(a.id);
+                        setNewsForm({
+                          title: a.title,
+                          summary: a.summary,
+                          body: a.body ?? "",
+                          category: a.category,
+                          tags: a.tags.join(", "),
+                          sourceUrl: a.sourceUrl ?? "",
+                          sourceId: a.sourceId ?? "",
+                          topics: a.topics?.join(", ") ?? "",
+                          regions: a.regions?.join(", ") ?? "",
+                          importance: a.importance ?? 3,
+                          newsletterInclude: a.newsletterInclude ?? false,
+                          aiAssisted: a.aiAssisted ?? false,
+                        });
+                      }}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    {a.status !== "published" && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className={portalButtonOutline}
+                        disabled={publishNews.isPending}
+                        onClick={async () => {
+                          const guard = canTransitionToStatus({
+                            status: "published",
+                            sourceId: a.sourceId,
+                            sourceIsActive: Boolean(approvedSources?.find((s) => s.id === a.sourceId)?.is_active),
+                            aiAssisted: a.aiAssisted,
+                            aiLogId: a.aiAssisted
+                              ? aiLogs?.find((l) => l.article_id === a.id || !l.used_in_publish)?.id
+                              : null,
+                            aiLogUsedInPublish: true,
+                          });
+                          if (!guard.ok) {
+                            toast.error(guard.errors[0]);
+                            return;
+                          }
+                          try {
+                            await publishNews.mutateAsync({
+                              id: a.id,
+                              aiLogId: a.aiAssisted
+                                ? aiLogs?.find((l) => l.article_id === a.id || l.status === "queued" || l.status === "completed")?.id
+                                : undefined,
+                            });
+                            toast.success("Published to members");
+                          } catch (e) {
+                            toast.error(e instanceof Error ? e.message : "Publish failed");
+                          }
+                        }}
+                      >
+                        Publish
+                      </Button>
+                    )}
+                    {a.status === "published" && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className={portalButtonOutline}
+                        onClick={async () => {
+                          try {
+                            await transitionNews.mutateAsync({ id: a.id, status: "archived", changeNote: "Archived from admin" });
+                            toast.success("Archived");
+                          } catch (e) {
+                            toast.error(e instanceof Error ? e.message : "Archive failed");
+                          }
+                        }}
+                      >
+                        Archive
+                      </Button>
+                    )}
+                    <AdminConfirmDelete
+                      label={a.title}
+                      onConfirm={async () => {
+                        try {
+                          await deleteNews.mutateAsync(a.id);
+                          toast.success("Deleted");
+                          if (editingNewsId === a.id) setEditingNewsId(null);
+                        } catch (e) {
+                          toast.error(e instanceof Error ? e.message : "Failed");
+                        }
+                      }}
+                    />
+                  </div>
+                </PortalDataRow>
+              ))}
+            </div>
           )}
         </PortalTabsContent>
 

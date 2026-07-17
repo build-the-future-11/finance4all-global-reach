@@ -54,7 +54,7 @@ See `src/components/AppRouter.tsx` and `src/routes/portal.ts`.
 | Domain | Primary tables |
 | --- | --- |
 | Identity | `profiles`, `digest_preferences` |
-| Debrief | `news_articles`, `explainer_cards`, `news_bookmarks` |
+| Debrief | `approved_sources`, `news_articles`, `news_article_versions`, `debrief_ai_generation_logs`, `explainer_cards`, `news_bookmarks` |
 | Labs | `research_projects`, `lab_applications`, `project_bookmarks` |
 | Pathways | `opportunities`, `opportunity_interests`, `studio_submissions`, `essay_submissions`, `essay_upvotes` |
 | Chapters/events | `chapters`, `events`, `event_registrations` |
@@ -65,7 +65,7 @@ See `src/components/AppRouter.tsx` and `src/routes/portal.ts`.
 
 ## Migrations
 
-Ordered `001`…`012`. Consolidated: `supabase/FINAL_SETUP.sql`. Verify: `supabase/VERIFY_SETUP.sql`.
+Ordered `001`…`013`. Consolidated: `supabase/FINAL_SETUP.sql`. Verify: `supabase/VERIFY_SETUP.sql`.
 
 ## Edge Functions
 
@@ -84,11 +84,7 @@ Ordered `001`…`012`. Consolidated: `supabase/FINAL_SETUP.sql`. Verify: `supaba
 - `src/data/` — static CMS fallbacks
 - `src/types/database.ts` — typed schema
 
-## Finance Debrief target architecture (Pass 2+)
-
-Current: admin publishes `news_articles` with optional `source_url` + `is_published`.
-
-Target:
+## Finance Debrief architecture (Pass 2 Wave 1 — source)
 
 ```
 approved_sources ──┐
@@ -98,7 +94,7 @@ debrief_ai_logs ───┘         │
                              └── newsletter inclusion flags
 ```
 
-Publish path must require: approved source binding + human confirmation + educational disclaimer. No automatic publish from AI output.
+Publish path: `publish_news_article` / `transition_news_article_status` + trigger `enforce_news_article_publish_rules`. Requires approved source; AI-assisted requires generation log. Client adapter queues only — never auto-publishes. Member UI shows educational disclaimer + source attribution. Live DB activation: OA-1.
 
 ## Production dependencies (non-code)
 

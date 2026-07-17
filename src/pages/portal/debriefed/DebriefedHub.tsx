@@ -39,6 +39,7 @@ import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
 import PersonalizedForYou from "@/components/portal/PersonalizedForYou";
 import { portalCopy } from "@/lib/portalCopy";
 import { sanitizeUrl } from "@/lib/security";
+import { DEBRIEF_DISCLAIMER } from "@/lib/debriefPublish";
 
 const CATEGORIES: { value: NewsCategory | "all"; label: string }[] = [
   { value: "all", label: portalCopy.debriefed.categories.all },
@@ -109,7 +110,7 @@ export default function DebriefedHub() {
         <PortalPageHeader
           eyebrow={portalCopy.debriefed.eyebrow}
           title={portalCopy.debriefed.title}
-          description={portalCopy.debriefed.description}
+          description={`${portalCopy.debriefed.description} ${DEBRIEF_DISCLAIMER}`}
           action={
             <Link to={portalRoutes.debriefedExplainers}>
               <Button variant="outline" className={portalButtonOutline}>
@@ -286,9 +287,16 @@ export default function DebriefedHub() {
                 <CategoryBadge>{selectedArticle.category}</CategoryBadge>
                 <DialogTitle className="mt-2 text-left text-white">{selectedArticle.title}</DialogTitle>
               </DialogHeader>
+              <p className="rounded-lg border border-amber-400/20 bg-amber-400/5 px-3 py-2 text-xs leading-relaxed text-amber-100/80">
+                {DEBRIEF_DISCLAIMER}
+              </p>
               <p className="text-sm leading-relaxed text-white/65">{selectedArticle.summary}</p>
+              {selectedArticle.body ? (
+                <p className="whitespace-pre-wrap text-sm leading-relaxed text-white/70">{selectedArticle.body}</p>
+              ) : null}
               <p className="text-xs text-white/35">
                 {new Date(selectedArticle.publishedAt).toLocaleString()}
+                {selectedArticle.aiAssisted ? " · AI-assisted (editor-reviewed)" : ""}
               </p>
               {selectedArticle.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2">
@@ -299,12 +307,14 @@ export default function DebriefedHub() {
                   ))}
                 </div>
               )}
-              {sanitizeUrl(selectedArticle.sourceUrl ?? "") && (
+              {sanitizeUrl(selectedArticle.sourceUrl ?? "") ? (
                 <a href={sanitizeUrl(selectedArticle.sourceUrl ?? "")!} target="_blank" rel="noopener noreferrer">
                   <Button size="sm" variant="outline" className={portalButtonOutline}>
-                    Read source <ExternalLink className="h-3.5 w-3.5" />
+                    Read original source <ExternalLink className="h-3.5 w-3.5" />
                   </Button>
                 </a>
+              ) : (
+                <p className="text-xs text-white/40">Source attribution is managed through the approved-source registry.</p>
               )}
             </>
           )}

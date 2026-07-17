@@ -85,14 +85,38 @@ export function mapNewsArticle(row: Tables<"news_articles">): NewsArticle {
       id: row.id,
       title: row.title,
       summary: row.summary,
+      body: row.body ?? "",
       category: row.category,
       sourceUrl: row.source_url ?? undefined,
+      sourceId: row.source_id ?? undefined,
+      sourcePublishedAt: row.source_published_at ?? undefined,
+      topics: row.topics ?? [],
+      regions: row.regions ?? [],
+      importance: row.importance ?? 3,
+      status: row.status ?? (row.is_published ? "published" : "draft"),
       publishedAt: row.published_at,
       isPublished: row.is_published,
+      newsletterInclude: row.newsletter_include ?? false,
+      aiAssisted: row.ai_assisted ?? false,
+      disclaimerVersion: row.disclaimer_version ?? "edu-not-advice-v1",
       tags: row.tags,
+      authorId: row.author_id ?? undefined,
+      editorId: row.editor_id ?? undefined,
+      scheduledFor: row.scheduled_for ?? undefined,
     },
     "news article",
   );
+}
+
+export function mapApprovedSource(row: Tables<"approved_sources">) {
+  return {
+    id: row.id,
+    name: row.name,
+    homepageUrl: row.homepage_url,
+    allowedDomains: row.allowed_domains ?? [],
+    notes: row.notes ?? "",
+    isActive: row.is_active,
+  };
 }
 
 export function mapExplainer(row: Tables<"explainer_cards">): ExplainerCard {

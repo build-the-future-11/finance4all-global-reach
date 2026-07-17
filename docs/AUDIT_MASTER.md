@@ -170,52 +170,52 @@ Statuses: `UNRESOLVED` | `PARTIAL` | `RESOLVED` | `INVALIDATED` | `DEFERRED` | `
 
 ### FM-DEBRIEF-001 — No approved-source registry
 - **Severity:** High
-- **Files:** schema, admin
+- **Files:** `013_finance_debrief_editorial.sql`, Admin sources UI
 - **Impact:** Cannot enforce source-bound publishing
-- **Root cause:** `news_articles` only has optional `source_url`
-- **Fix:** `approved_sources` table + FK/check (Pass 2)
-- **Validation:** Cannot publish without approved source
-- **Status:** UNRESOLVED
+- **Root cause:** `news_articles` only had optional `source_url`
+- **Fix:** `approved_sources` table + publish trigger/RPC require `source_id`
+- **Validation:** Unit tests + VERIFY_SETUP; live after OA-1
+- **Status:** RESOLVED (source); live pending OA-1
 
 ### FM-DEBRIEF-002 — No editorial workflow states
 - **Severity:** High
-- **Files:** `news_articles`, Admin news tab
+- **Files:** `news_articles`, Admin news tab, `transition_news_article_status`
 - **Impact:** Only `is_published` boolean — no draft/review/schedule/correct
-- **Fix:** Status enum + assignment fields (Pass 2)
-- **Validation:** Draft cannot appear in member feed
-- **Status:** UNRESOLVED
+- **Fix:** Status enum + admin transitions; create/update stay draft
+- **Validation:** Drafts excluded from member feed queries
+- **Status:** RESOLVED (source); live pending OA-1
 
 ### FM-DEBRIEF-003 — No AI generation logs / auto-publish block
 - **Severity:** High
-- **Files:** missing
+- **Files:** `debrief_ai_generation_logs`, publish RPC/trigger, `debriefAiAdapter.ts`
 - **Impact:** Spec forbids unsourced AI auto-publish
-- **Fix:** `debrief_ai_generation_logs` + publish guard RPC (Pass 2)
-- **Validation:** Unit/RLS tests; no path publishes without human confirm + source
-- **Status:** UNRESOLVED
+- **Fix:** Queue/log + trigger requires log when `ai_assisted`; no auto-publish path
+- **Validation:** `debriefPublish.test.ts`; adapter marks unconfigured without credentials
+- **Status:** RESOLVED (source); live AI provider still unconfigured (owner)
 
 ### FM-DEBRIEF-004 — No version history / corrections
 - **Severity:** Medium
-- **Files:** missing
+- **Files:** `news_article_versions`, `record_news_article_version`
 - **Impact:** Cannot correct published articles with audit trail
-- **Fix:** `news_article_versions` + correction notes (Pass 2)
-- **Validation:** Edit published → version row
-- **Status:** UNRESOLVED
+- **Fix:** Version table + RPC on post-publish edits / correct transitions
+- **Validation:** VERIFY_SETUP; admin correct/archive flows
+- **Status:** RESOLVED (source); live pending OA-1
 
 ### FM-DEBRIEF-005 — Metadata gaps (topic/region/importance/schedule)
 - **Severity:** Medium
-- **Files:** `news_articles`
+- **Files:** `news_articles`, Admin form, weekly-digest
 - **Impact:** Weak editorial ops and newsletter selection
-- **Fix:** Columns + admin form (Pass 2)
-- **Validation:** Filter/sort by importance/region
-- **Status:** UNRESOLVED
+- **Fix:** Columns + admin form; digest uses `newsletter_include`
+- **Validation:** Admin form fields; digest query filter
+- **Status:** RESOLVED (source); live pending OA-1
 
 ### FM-DEBRIEF-006 — Educational disclaimer not structured
 - **Severity:** Low
-- **Files:** Debriefed UI copy
+- **Files:** `DebriefedHub.tsx`
 - **Impact:** Framing inconsistent
-- **Fix:** Shared disclaimer component on article views (Pass 2)
-- **Validation:** Visible on article detail
-- **Status:** PARTIAL (portal copy exists; not enforced template)
+- **Fix:** Structured disclaimer + source attribution on member Debrief views
+- **Validation:** Visible on Debrief hub article presentation
+- **Status:** RESOLVED
 
 ---
 

@@ -23,7 +23,7 @@ Pass 1 source-level review. Live RLS proof remains owner/staging work.
 | --- | --- | --- |
 | FM-SEC-001 | Live RLS unproven on current Supabase project | BLOCKED |
 | FM-SEC-002 | Edge secrets/deploy may be incomplete | BLOCKED |
-| FM-DEBRIEF-003 | No server publish guard for AI content yet | UNRESOLVED |
+| FM-DEBRIEF-003 | Server publish guard + AI log requirement (013) | RESOLVED (source); live OA-1 |
 | FM-DATA-001 | Incomplete live schema increases misconfig risk | BLOCKED |
 | FM-PUBLIC-003 | Relative OG image | UNRESOLVED |
 

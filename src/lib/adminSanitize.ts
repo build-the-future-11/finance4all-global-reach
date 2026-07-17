@@ -13,14 +13,30 @@ export function sanitizeNewsInput(input: {
   tags: string[];
   sourceUrl?: string;
   isPublished?: boolean;
+  body?: string;
+  sourceId?: string;
+  topics?: string[];
+  regions?: string[];
+  importance?: number;
+  newsletterInclude?: boolean;
+  aiAssisted?: boolean;
+  status?: "draft" | "in_review" | "scheduled" | "published" | "corrected" | "archived";
 }) {
   return {
     title: sanitizeTextInput(input.title, 200),
     summary: sanitizeTextInput(input.summary, 500),
+    body: sanitizeTextInput(input.body ?? "", 20000),
     category: input.category,
     tags: sanitizeTags(input.tags.join(",")),
     sourceUrl: sanitizeOptionalUrl(input.sourceUrl),
-    isPublished: input.isPublished ?? true,
+    sourceId: input.sourceId?.trim() || undefined,
+    topics: (input.topics ?? []).map((t) => sanitizeTextInput(t, 40)).filter(Boolean).slice(0, 12),
+    regions: (input.regions ?? []).map((t) => sanitizeTextInput(t, 40)).filter(Boolean).slice(0, 12),
+    importance: Math.min(5, Math.max(1, input.importance ?? 3)),
+    newsletterInclude: input.newsletterInclude ?? false,
+    aiAssisted: input.aiAssisted ?? false,
+    status: input.status ?? (input.isPublished === false ? "draft" : "draft"),
+    isPublished: false,
   };
 }
 

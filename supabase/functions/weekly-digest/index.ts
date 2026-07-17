@@ -67,6 +67,8 @@ Deno.serve(async (request) => {
           .from("news_articles")
           .select("title, summary, category, published_at")
           .eq("is_published", true)
+          .eq("newsletter_include", true)
+          .in("status", ["published", "corrected"])
           .gte("published_at", publishedSince)
           .order("published_at", { ascending: false })
           .limit(20),

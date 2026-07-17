@@ -67,18 +67,104 @@ export interface Database {
           id: string;
           title: string;
           summary: string;
+          body: string;
           category: NewsCategory;
           source_url: string | null;
+          source_id: string | null;
+          source_published_at: string | null;
+          topics: string[];
+          regions: string[];
+          importance: number;
+          status: "draft" | "in_review" | "scheduled" | "published" | "corrected" | "archived";
           published_at: string;
           is_published: boolean;
+          newsletter_include: boolean;
+          ai_assisted: boolean;
+          disclaimer_version: string;
           tags: string[];
+          author_id: string | null;
+          editor_id: string | null;
+          scheduled_for: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["news_articles"]["Row"], "id" | "created_at" | "updated_at"> & {
+          id?: string;
+          created_at?: string;
+          updated_at?: string;
+          body?: string;
+          status?: Database["public"]["Tables"]["news_articles"]["Row"]["status"];
+          topics?: string[];
+          regions?: string[];
+          importance?: number;
+          newsletter_include?: boolean;
+          ai_assisted?: boolean;
+          disclaimer_version?: string;
+          is_published?: boolean;
+        };
+        Update: Partial<Database["public"]["Tables"]["news_articles"]["Insert"]>;
+      };
+      approved_sources: {
+        Row: {
+          id: string;
+          name: string;
+          homepage_url: string;
+          allowed_domains: string[];
+          notes: string;
+          is_active: boolean;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Omit<Database["public"]["Tables"]["approved_sources"]["Row"], "id" | "created_at" | "updated_at"> & {
+          id?: string;
+          created_at?: string;
+          updated_at?: string;
+          allowed_domains?: string[];
+          notes?: string;
+          is_active?: boolean;
+        };
+        Update: Partial<Database["public"]["Tables"]["approved_sources"]["Insert"]>;
+      };
+      news_article_versions: {
+        Row: {
+          id: string;
+          article_id: string;
+          version: number;
+          snapshot: Json;
+          changed_by: string | null;
+          change_note: string;
           created_at: string;
         };
-        Insert: Omit<Database["public"]["Tables"]["news_articles"]["Row"], "id" | "created_at"> & {
+        Insert: Omit<Database["public"]["Tables"]["news_article_versions"]["Row"], "id" | "created_at"> & {
           id?: string;
           created_at?: string;
         };
-        Update: Partial<Database["public"]["Tables"]["news_articles"]["Insert"]>;
+        Update: never;
+      };
+      debrief_ai_generation_logs: {
+        Row: {
+          id: string;
+          article_id: string | null;
+          model: string;
+          prompt_hash: string;
+          source_ids: string[];
+          output_excerpt: string;
+          structured_output: Json;
+          status: "queued" | "completed" | "failed" | "rejected" | "applied";
+          error_message: string | null;
+          created_by: string | null;
+          created_at: string;
+          used_in_publish: boolean;
+        };
+        Insert: Omit<Database["public"]["Tables"]["debrief_ai_generation_logs"]["Row"], "id" | "created_at"> & {
+          id?: string;
+          created_at?: string;
+          used_in_publish?: boolean;
+          structured_output?: Json;
+          output_excerpt?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["debrief_ai_generation_logs"]["Insert"]>;
       };
       explainer_cards: {
         Row: {
@@ -551,6 +637,32 @@ export interface Database {
       report_client_error: {
         Args: { p_error_name: string; p_message: string; p_tags?: Json };
         Returns: string;
+      };
+      publish_news_article: {
+        Args: { p_article_id: string; p_change_note?: string; p_ai_log_id?: string };
+        Returns: Database["public"]["Tables"]["news_articles"]["Row"];
+      };
+      transition_news_article_status: {
+        Args: {
+          p_article_id: string;
+          p_new_status: Database["public"]["Tables"]["news_articles"]["Row"]["status"];
+          p_change_note?: string;
+          p_ai_log_id?: string;
+        };
+        Returns: Database["public"]["Tables"]["news_articles"]["Row"];
+      };
+      queue_debrief_ai_generation: {
+        Args: {
+          p_prompt_hash: string;
+          p_source_ids?: string[];
+          p_article_id?: string;
+          p_model?: string;
+        };
+        Returns: string;
+      };
+      record_news_article_version: {
+        Args: { p_article_id: string; p_change_note?: string };
+        Returns: number;
       };
     };
     Enums: Record<string, never>;

@@ -1,48 +1,23 @@
 # Current Pass Context
 
-**Pass:** 1 of 4 — Audit, permanent memory, and light reworks  
-**Agent:** Cursor (primary implementation owner)  
-**Started:** 2026-07-17T13:10:00Z  
-**Re-validated:** 2026-07-17T13:13:00Z (prompt re-issued; acceptance still MET)  
-**Branch:** `cursor/membership-security-supabase-fix` @ `ca56cab` (+ Pass 1 working tree)  
-**Base:** `main` @ `fbdd503`
+**Pass:** 2 of 4 — Heavy additions / Finance Debrief core  
+**Agent:** Cursor  
+**Started:** 2026-07-17T13:20:00Z  
+**Closed:** 2026-07-17T14:10:00Z  
+**Branch:** `cursor/membership-security-supabase-fix`  
+**Prior:** Pass 1 ACCEPTED  
+**Result:** ACCEPTED (source Wave 1 complete; live schema remains OA-1)
 
-## Baseline command results (this pass)
+## Scope completed (frozen queue Wave 1)
 
-| Command | Result |
-| --- | --- |
-| `npm run lint` | Pass — 0 errors, 11 Fast Refresh warnings |
-| `npm run typecheck` | Pass |
-| `npm test` | Pass — 19 files, 78 tests |
-| `npm run build` (placeholder VITE_*) | Pass |
-| `npm run release:static` | Pass |
-| `CI=true npm run test:e2e` | Pass — 7/7 |
+1.1–1.7: `approved_sources`, editorial status/metadata on `news_articles`, versions, AI generation logs, publish/transition RPCs + triggers, types/mappers/tests, admin editorial UI + sources, member disclaimer/source attribution, digest `newsletter_include` filter.
 
-## Absorbed uncommitted work (pre-pass)
+Broader Pass 2 prompt items (chapters leadership, competitions, certificates, etc.) remain **Wave 2 / Pass 3** per IMPLEMENTATION_QUEUE.
 
-- Landing page sections wired + JSON-LD (`Index.tsx`)
-- `database.ts` CMS/ops table types (migration 008+)
-- Admin System tab CMS seed UI
-- SetupBanner checks `education_modules`
-- ProtectedRoute tests include `profile` mock
-- Root docs: `DATABASE.md`, `SECURITY.md`, `TESTING.md`, `PROJECT_STATUS.md`, README links
+## Acceptance
 
-## This pass focus
+P2-1…P2-8 met in source. Live activation requires owner re-apply `FINAL_SETUP.sql` (now includes migration 013).
 
-1. Create full permanent memory document set
-2. Stable audit IDs with statuses
-3. Frozen dependency-ordered implementation queue
-4. Owner-only blockers explicit
-5. Low-risk fixes only (no broad rewrites)
-6. Define Finance Debrief trustworthy editorial model for later passes
+## Next engineering task
 
-## Explicit next Pass 2 task
-
-See end of `docs/IMPLEMENTATION_QUEUE.md` and `docs/PROJECT_MEMORY.md` § Next task.
-
-## Pass 1 closeout
-
-- Acceptance criteria P1-1…P1-10: **MET**
-- Ownership claim: **RELEASED**
-- Remaining production blockers: **owner-only** (OA-1…OA-8)
-- Re-entry of Prompt 1: no new gaps; do not redo Pass 1 — proceed to Pass 2 or commit checkpoint
+Pass 3 Wave 2.1 — Admin moderation for studios/essays (see IMPLEMENTATION_QUEUE.md).

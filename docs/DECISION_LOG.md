@@ -8,3 +8,5 @@
 | D-004 | 2026-07-17 | Hybrid CMS (DB + static fallback) retained until seeded | Resilience when 008 empty | Admin seed UI enabled |
 | D-005 | 2026-07-17 | Labs creation remains lead-researcher portal for now | Working path exists; admin overview deferred | FM-PORTAL-004 DEFERRED |
 | D-006 | 2026-07-17 | Pass 1 accepts owner-blocked live schema without failing pass | Pass 1 is audit/memory, not live DB ownership | ACCEPTANCE_CRITERIA P1 |
+| D-007 | 2026-07-17 | Pass 2 implements Wave 1 Debrief only; rest of Pass 2 prompt → Pass 3 | Frozen queue; coherent vertical slice before portal expansion | IMPLEMENTATION_QUEUE Wave 1 DONE |
+| D-008 | 2026-07-17 | AI Debrief adapter ships unconfigured; queue/logs/admin without live provider keys | Credentials are owner-only; never auto-publish | FM-DEBRIEF-003 |

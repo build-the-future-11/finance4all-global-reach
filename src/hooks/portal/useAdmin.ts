@@ -20,16 +20,33 @@ export function useCreateNewsArticle() {
       category: NewsCategory;
       tags: string[];
       sourceUrl?: string;
-      isPublished?: boolean;
+      body?: string;
+      sourceId?: string;
+      topics?: string[];
+      regions?: string[];
+      importance?: number;
+      newsletterInclude?: boolean;
+      aiAssisted?: boolean;
     }) => {
       const safe = sanitizeNewsInput(input);
+      if (safe.aiAssisted && !safe.sourceId) {
+        throw new Error("AI-assisted drafts still require an approved source before work begins");
+      }
       const { error } = await supabase.from("news_articles").insert({
         title: safe.title,
         summary: safe.summary,
+        body: safe.body,
         category: safe.category,
         tags: safe.tags,
         source_url: safe.sourceUrl ?? null,
-        is_published: safe.isPublished,
+        source_id: safe.sourceId ?? null,
+        topics: safe.topics,
+        regions: safe.regions,
+        importance: safe.importance,
+        newsletter_include: safe.newsletterInclude,
+        ai_assisted: safe.aiAssisted,
+        status: "draft",
+        is_published: false,
       });
       if (error) throwSanitizedDbError(error);
     },
@@ -145,7 +162,13 @@ export function useUpdateNewsArticle() {
       category: NewsCategory;
       tags: string[];
       sourceUrl?: string;
-      isPublished?: boolean;
+      body?: string;
+      sourceId?: string;
+      topics?: string[];
+      regions?: string[];
+      importance?: number;
+      newsletterInclude?: boolean;
+      aiAssisted?: boolean;
     }) => {
       const safe = sanitizeNewsInput(input);
       const { error } = await supabase
@@ -153,15 +176,140 @@ export function useUpdateNewsArticle() {
         .update({
           title: safe.title,
           summary: safe.summary,
+          body: safe.body,
           category: safe.category,
           tags: safe.tags,
           source_url: safe.sourceUrl ?? null,
-          is_published: safe.isPublished,
+          source_id: safe.sourceId ?? null,
+          topics: safe.topics,
+          regions: safe.regions,
+          importance: safe.importance,
+          newsletter_include: safe.newsletterInclude,
+          ai_assisted: safe.aiAssisted,
+          updated_at: new Date().toISOString(),
         })
         .eq("id", id);
       if (error) throwSanitizedDbError(error);
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["news"] }),
+  });
+}
+
+export function usePublishNewsArticle() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { id: string; changeNote?: string; aiLogId?: string }) => {
+      const { data, error } = await supabase.rpc("publish_news_article", {
+        p_article_id: input.id,
+        p_change_note: input.changeNote ?? "Published",
+        p_ai_log_id: input.aiLogId,
+      });
+      if (error) throwSanitizedDbError(error);
+      return data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["news"] });
+      qc.invalidateQueries({ queryKey: ["debrief-ai-logs"] });
+    },
+  });
+}
+
+export function useTransitionNewsStatus() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: {
+      id: string;
+      status: "draft" | "in_review" | "scheduled" | "published" | "corrected" | "archived";
+      changeNote?: string;
+      aiLogId?: string;
+    }) => {
+      const { data, error } = await supabase.rpc("transition_news_article_status", {
+        p_article_id: input.id,
+        p_new_status: input.status,
+        p_change_note: input.changeNote ?? "",
+        p_ai_log_id: input.aiLogId,
+      });
+      if (error) throwSanitizedDbError(error);
+      return data;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["news"] }),
+  });
+}
+
+export function useApprovedSources() {
+  return useQuery({
+    queryKey: ["approved-sources"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("approved_sources")
+        .select("*")
+        .order("name");
+      if (error) throwSanitizedDbError(error);
+      return data;
+    },
+  });
+}
+
+export function useUpsertApprovedSource() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: {
+      id?: string;
+      name: string;
+      homepageUrl: string;
+      allowedDomains: string[];
+      notes?: string;
+      isActive?: boolean;
+    }) => {
+      const payload = {
+        name: input.name.trim(),
+        homepage_url: input.homepageUrl.trim(),
+        allowed_domains: input.allowedDomains.map((d) => d.trim().toLowerCase()).filter(Boolean),
+        notes: input.notes?.trim() ?? "",
+        is_active: input.isActive ?? true,
+        updated_at: new Date().toISOString(),
+      };
+      if (input.id) {
+        const { error } = await supabase.from("approved_sources").update(payload).eq("id", input.id);
+        if (error) throwSanitizedDbError(error);
+        return;
+      }
+      const { error } = await supabase.from("approved_sources").insert(payload);
+      if (error) throwSanitizedDbError(error);
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["approved-sources"] }),
+  });
+}
+
+export function useQueueDebriefAiGeneration() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { promptHash: string; sourceIds: string[]; articleId?: string; model?: string }) => {
+      const { data, error } = await supabase.rpc("queue_debrief_ai_generation", {
+        p_prompt_hash: input.promptHash,
+        p_source_ids: input.sourceIds,
+        p_article_id: input.articleId,
+        p_model: input.model ?? "unconfigured",
+      });
+      if (error) throwSanitizedDbError(error);
+      return data as string;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["debrief-ai-logs"] }),
+  });
+}
+
+export function useDebriefAiLogs() {
+  return useQuery({
+    queryKey: ["debrief-ai-logs"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("debrief_ai_generation_logs")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(50);
+      if (error) throwSanitizedDbError(error);
+      return data;
+    },
   });
 }
 

@@ -13,6 +13,7 @@ describe("adminSanitize", () => {
     expect(result.title).toBe("Fed rates");
     expect(result.tags).toEqual(["macro", "rates"]);
     expect(result.sourceUrl).toBeUndefined();
+    expect(result.isPublished).toBe(false);
   });
 
   it("keeps valid https source URLs", () => {
@@ -24,5 +25,6 @@ describe("adminSanitize", () => {
       sourceUrl: "https://example.com/article",
     });
     expect(result.sourceUrl).toBe("https://example.com/article");
+    expect(result.status).toBe("draft");
   });
 });

@@ -35,7 +35,10 @@ WITH expected_tables(name) AS (
     ('contact_submissions'),
     ('rate_limit_events'),
     ('product_analytics_events'),
-    ('client_error_events')
+    ('client_error_events'),
+    ('approved_sources'),
+    ('news_article_versions'),
+    ('debrief_ai_generation_logs')
 ),
 table_checks AS (
   SELECT
@@ -200,7 +203,12 @@ expected_functions(name) AS (
     ('portal_search'),
     ('track_product_event'),
     ('report_client_error'),
-    ('purge_operational_events')
+    ('purge_operational_events'),
+    ('publish_news_article'),
+    ('transition_news_article_status'),
+    ('record_news_article_version'),
+    ('queue_debrief_ai_generation'),
+    ('enforce_news_article_publish_rules')
 ),
 function_checks AS (
   SELECT
@@ -222,7 +230,10 @@ expected_function_grants(name) AS (
     ('submit_contact_submission'),
     ('portal_search'),
     ('track_product_event'),
-    ('report_client_error')
+    ('report_client_error'),
+    ('publish_news_article'),
+    ('transition_news_article_status'),
+    ('queue_debrief_ai_generation')
 ),
 function_grant_checks AS (
   SELECT

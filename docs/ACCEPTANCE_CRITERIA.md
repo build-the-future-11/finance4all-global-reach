@@ -17,18 +17,20 @@
 
 **Pass 1 result:** ACCEPTED (documentation + baseline). Live schema remains owner-blocked and does not fail Pass 1 acceptance.
 
-## Pass 2 — Finance Debrief trustworthy foundation (preview)
+## Pass 2 — Finance Debrief trustworthy foundation
 
-| # | Criterion |
-| --- | --- |
-| P2-1 | `approved_sources` migrated + RLS |
-| P2-2 | Article editorial status machine + metadata columns |
-| P2-3 | AI generation log table; publish path cannot skip human+source |
-| P2-4 | Version history on post-publish edits |
-| P2-5 | Admin UI for draft/review/publish/correct |
-| P2-6 | Types + unit tests for publish guards |
-| P2-7 | Educational disclaimer on published views |
-| P2-8 | Memory docs updated; queue items marked |
+| # | Criterion | Met? |
+| --- | --- | --- |
+| P2-1 | `approved_sources` migrated + RLS | YES (013; live OA-1) |
+| P2-2 | Article editorial status machine + metadata columns | YES |
+| P2-3 | AI generation log table; publish path cannot skip human+source | YES |
+| P2-4 | Version history on post-publish edits | YES |
+| P2-5 | Admin UI for draft/review/publish/correct | YES |
+| P2-6 | Types + unit tests for publish guards | YES (+10 tests; 88 total) |
+| P2-7 | Educational disclaimer on published views | YES |
+| P2-8 | Memory docs updated; queue items marked | YES |
+
+**Pass 2 result:** ACCEPTED (Wave 1 source). Live schema application remains owner-blocked (OA-1) and does not fail Pass 2 acceptance. Broader Pass 2 product brief items outside Wave 1 remain deferred to Pass 3 per D-002 / IMPLEMENTATION_QUEUE.
 
 ## Global launch acceptance (later)
 

@@ -7,11 +7,13 @@ Only credential, dashboard, legal, or live-environment tasks. Engineering work i
 **Project:** `xwlrzgfuhfbckgvcmyoq` (or whichever is canonical)  
 **Steps:**
 
-1. SQL Editor → paste `supabase/FINAL_SETUP.sql` → Run  
+1. SQL Editor → paste `supabase/FINAL_SETUP.sql` → Run (now includes migration **013** Debrief editorial)  
 2. Paste `supabase/VERIFY_SETUP.sql` → Run  
-3. Confirm every row `ok = true`
+3. Confirm every row `ok = true` (including `approved_sources`, version/AI log tables, publish RPCs)
 
-**Unblocks:** FM-DATA-001, FM-AUTH-002, portal runtime
+**Unblocks:** FM-DATA-001, FM-AUTH-002, portal runtime, live Finance Debrief publish guards
+
+**Note:** If a prior FINAL_SETUP was already applied without 013, either re-run the full script (idempotent where designed) or run `supabase/migrations/013_finance_debrief_editorial.sql` alone, then VERIFY.
 
 ## OA-2 — Auth URL configuration
 

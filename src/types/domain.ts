@@ -30,15 +30,48 @@ export type MemberDirectoryProfile = z.infer<typeof MemberDirectoryProfileSchema
 export const NewsCategorySchema = z.enum(["macro", "markets", "ipo", "company"]);
 export type NewsCategory = z.infer<typeof NewsCategorySchema>;
 
+export const NewsEditorialStatusSchema = z.enum([
+  "draft",
+  "in_review",
+  "scheduled",
+  "published",
+  "corrected",
+  "archived",
+]);
+export type NewsEditorialStatus = z.infer<typeof NewsEditorialStatusSchema>;
+
+export const ApprovedSourceSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string(),
+  homepageUrl: z.string().url(),
+  allowedDomains: z.array(z.string()).default([]),
+  notes: z.string().default(""),
+  isActive: z.boolean().default(true),
+});
+export type ApprovedSource = z.infer<typeof ApprovedSourceSchema>;
+
 export const NewsArticleSchema = z.object({
   id: z.string().uuid(),
   title: z.string(),
   summary: z.string(),
+  body: z.string().default(""),
   category: NewsCategorySchema,
   sourceUrl: z.string().url().optional(),
-  publishedAt: z.string().datetime(),
+  sourceId: z.string().uuid().optional(),
+  sourcePublishedAt: z.string().optional(),
+  topics: z.array(z.string()).default([]),
+  regions: z.array(z.string()).default([]),
+  importance: z.number().int().min(1).max(5).default(3),
+  status: NewsEditorialStatusSchema.default("draft"),
+  publishedAt: z.string(),
   isPublished: z.boolean().default(true),
+  newsletterInclude: z.boolean().default(false),
+  aiAssisted: z.boolean().default(false),
+  disclaimerVersion: z.string().default("edu-not-advice-v1"),
   tags: z.array(z.string()).default([]),
+  authorId: z.string().uuid().optional(),
+  editorId: z.string().uuid().optional(),
+  scheduledFor: z.string().optional(),
 });
 export type NewsArticle = z.infer<typeof NewsArticleSchema>;
 
