@@ -1,10 +1,5 @@
 # Work Ownership
 
-| Agent | Status |
-| --- | --- |
-| Active claims | none |
-
-| Released | Notes |
-| --- | --- |
-| Cursor (Finisher) | Migration 015 + finish packaging |
-| Passes 1–4 | See CHANGELOG / git log |
+| Agent | Claimed | Status |
+| --- | --- | --- |
+| Cursor (Finisher harden) | security packaging, 016 RLS, sanitizeUrl, Dashboard search, reports UI, docs | COMPLETE |

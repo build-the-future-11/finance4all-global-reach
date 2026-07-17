@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-07-17 — Phase 4 release governor
+
+- `DEMO_GUIDE.md`, `KNOWN_LIMITATIONS.md`, synced release checklists
+- Playwright CI `webServer.env` coerces non-https local `VITE_APP_URL` so e2e build succeeds
+- Resource library external hrefs sanitized; `openPortalSearch` unit test
+- Continuity: `.cursor/project_state.json`, `.cursor/execution_ledger.md`
+
+## 2026-07-17 — Finisher harden (security packaging)
+
+- Migration `016_content_reports_rpc_only.sql` + 015: no direct INSERT on `content_reports`
+- `scripts/package-source.mjs` — secret-free source archive (`npm run package:source`)
+- `sanitizeUrl` on Events/Opportunities/Studios render hrefs; Dashboard Search via `openPortalSearch`
+- Report buttons on news, introductions, profiles; Admin report status honesty
+- Docs + FINAL_SETUP synced to **001–016**
+
 ## 2026-07-17 — Finisher (source completion package)
 
 - Migration `015_content_reports_chapter_tools.sql`: content reports + `my_chapter_leader_snapshot`

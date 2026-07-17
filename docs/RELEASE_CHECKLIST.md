@@ -1,54 +1,54 @@
 # Release Checklist
 
-Status: final release checklist. Only external/manual tasks remain.
+Engineering source gates vs owner live gates. Keep claims honest: only mark checked items that were actually verified.
 
-## Repository Verification
+## Repository Verification (engineering)
 
-- [x] Unit tests passed.
-- [x] E2E smoke tests passed.
-- [x] TypeScript passed.
-- [x] ESLint passed with existing Fast Refresh warnings and no errors.
-- [x] Production build passed with `VITE_APP_URL` set.
-- [x] Production dependency audit passed with zero high vulnerabilities.
-- [x] Browser smoke test passed on desktop and mobile.
-- [x] Diff whitespace check passed.
+- [x] Unit tests (`npm test`)
+- [x] E2E smoke + auth-surface (`CI=true npm run test:e2e`; auth journeys skip without `E2E_*`)
+- [x] TypeScript (`npm run typecheck`)
+- [x] ESLint 0 errors (Fast Refresh warnings on shadcn/Auth acceptable per D-011)
+- [x] Production build with CI placeholder `VITE_*` (`https` `VITE_APP_URL` required)
+- [x] `npm run release:static`
+- [x] `npm run package:source` (no `.env` / `.vercel` / `.cursor`)
+- [x] Migrations **001–016** present; `FINAL_SETUP.sql` synced
+- [x] `VERIFY_SETUP.sql` + `VERIFY_RLS_MATRIX.sql` (includes absent direct INSERT on `content_reports`)
 
-## Production Supabase
+## Production Supabase (owner)
 
-- [ ] Create or confirm the production Supabase project.
-- [ ] Apply migrations `001` through `012` in order.
-- [ ] Run `supabase/VERIFY_SETUP.sql` and confirm every row returns `ok = true`.
-- [ ] Confirm RLS is enabled and policies match the release audit.
-- [ ] Configure storage bucket and avatar policies.
-- [ ] Promote two real administrators through a controlled database operation.
-- [ ] Remove demo content and seed-only records.
+- [ ] Create or confirm the production Supabase project
+- [ ] Apply `supabase/FINAL_SETUP.sql` (migrations **001–016**)
+- [ ] Run `VERIFY_SETUP.sql` — every row `ok = true`
+- [ ] Run `VERIFY_RLS_MATRIX.sql` — every row `ok = true`
+- [ ] Confirm storage `avatars` policies
+- [ ] Promote administrators through controlled SQL
+- [ ] Remove demo/seed-only records before public launch
 
-## Auth And Email
+## Auth And Email (owner)
 
-- [ ] Set production Site URL and redirect URLs.
-- [ ] Configure Google OAuth if used.
-- [ ] Verify password recovery and OAuth callback on the production domain.
-- [ ] Configure sender domain and email templates.
-- [ ] Deploy `weekly-digest` and configure cron with `DIGEST_CRON_SECRET`.
-- [ ] Deploy `delete-account` with JWT verification.
+- [ ] Production Site URL and redirect URLs
+- [ ] Google OAuth if used
+- [ ] Password recovery + OAuth callback on production domain
+- [ ] Sender domain and email templates
+- [ ] Deploy `weekly-digest` + cron (`DIGEST_CRON_SECRET`)
+- [ ] Deploy `delete-account` with JWT verification
 
-## Hosting
+## Hosting (owner)
 
-- [ ] Set `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, and `VITE_APP_URL`.
-- [ ] Point canonical domain to hosting.
-- [ ] Validate security headers and CSP in production.
-- [ ] Validate metadata, robots, sitemap, and social preview image.
+- [ ] `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_APP_URL`
+- [ ] Canonical domain
+- [ ] Security headers / CSP in production
+- [ ] Metadata, robots, sitemap, social preview
 
-## Content, Legal, And Operations
+## Content, Legal, And Operations (owner)
 
-- [ ] Approve privacy and terms pages.
-- [ ] Assign support mailbox owner and response process.
-- [ ] Publish only reviewed Debrief, learning, opportunities, chapter, event,
-      and research content.
-- [ ] Configure monitoring for hosting, Supabase functions, auth anomalies, and
-      database backups.
-- [ ] Run live smoke tests for visitor, member, research lead if enabled, and
-      administrator.
+- [ ] Approve privacy and terms; brand decision D-001
+- [ ] Support mailbox owner
+- [ ] Publish only reviewed Debrief / learning / opportunities / events content
+- [ ] Monitoring and backups
+- [ ] Live smoke: visitor, member, admin
 
-Release verdict: do not mark public launch complete until every unchecked item
-above is completed with production evidence.
+## Verdict
+
+**Source:** release-candidate ready after local verification.  
+**Public launch:** not complete until every unchecked owner item has production evidence.

@@ -139,13 +139,13 @@ export default function PathwaysStudios() {
                 <p className="mt-1 text-sm text-white/50">by {author?.displayName ?? "Member"}</p>
                 <p className="mt-3 text-sm leading-relaxed text-white/70">{sub.writeup}</p>
                 <div className="mt-4 flex flex-wrap gap-3">
-                  {sub.repoUrl && (
-                    <a href={sub.repoUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm text-emerald-300 hover:underline">
+                  {sanitizeUrl(sub.repoUrl ?? "") && (
+                    <a href={sanitizeUrl(sub.repoUrl)!} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm text-emerald-300 hover:underline">
                       Repository <ExternalLink className="h-3.5 w-3.5" />
                     </a>
                   )}
-                  {sub.demoUrl && (
-                    <a href={sub.demoUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm text-emerald-300 hover:underline">
+                  {sanitizeUrl(sub.demoUrl ?? "") && (
+                    <a href={sanitizeUrl(sub.demoUrl)!} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-sm text-emerald-300 hover:underline">
                       Demo <ExternalLink className="h-3.5 w-3.5" />
                     </a>
                   )}

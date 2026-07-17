@@ -1211,7 +1211,7 @@ function AdminReportsTab() {
                   </p>
                 </div>
                 <Select
-                  value={report.status === "open" ? "reviewing" : report.status}
+                  value={report.status}
                   onValueChange={async (status) => {
                     try {
                       await resolve.mutateAsync({
@@ -1228,7 +1228,7 @@ function AdminReportsTab() {
                     <SelectValue />
                   </SelectTrigger>
                   <PortalSelectContent>
-                    {(["reviewing", "resolved", "dismissed"] as const).map((s) => (
+                    {(["open", "reviewing", "resolved", "dismissed"] as const).map((s) => (
                       <PortalSelectItem key={s} value={s}>
                         {s}
                       </PortalSelectItem>

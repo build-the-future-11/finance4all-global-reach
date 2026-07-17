@@ -1,5 +1,5 @@
 -- FinanceMeta / Finance4All production setup verification.
--- Run after supabase/FINAL_SETUP.sql or after applying migrations 001-014.
+-- Run after supabase/FINAL_SETUP.sql or after applying migrations 001-016.
 -- Expected result: every row has ok = true.
 
 WITH expected_tables(name) AS (

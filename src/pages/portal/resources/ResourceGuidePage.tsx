@@ -8,6 +8,7 @@ import { portalRoutes } from "@/routes/portal";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { portalCopy } from "@/lib/portalCopy";
 import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
+import { sanitizeUrl } from "@/lib/security";
 
 export default function ResourceGuidePage() {
   const { id } = useParams();
@@ -65,10 +66,15 @@ export default function ResourceGuidePage() {
         <MarkdownContent content={guide.body} />
       </PortalCard>
 
-      {meta?.external && (
+      {meta?.external && sanitizeUrl(meta.href) && (
         <p className="mt-6 text-sm text-white/50">
           External link:{" "}
-          <a href={meta.href} target="_blank" rel="noopener noreferrer" className="text-emerald-300 hover:underline">
+          <a
+            href={sanitizeUrl(meta.href)!}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-emerald-300 hover:underline"
+          >
             {meta.href}
           </a>
         </p>

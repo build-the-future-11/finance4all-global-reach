@@ -1,5 +1,5 @@
 {
-  "name": "vite_react_shadcn_ts",
+  "name": "finance4all-global-reach",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -15,6 +15,7 @@
     "typecheck": "tsc --noEmit",
     "release:static": "node scripts/final-readiness.mjs",
     "release:check": "node scripts/release-check.mjs",
+    "package:source": "node scripts/package-source.mjs",
     "audit:ci": "npm audit --omit=dev --audit-level=high"
   },
   "dependencies": {

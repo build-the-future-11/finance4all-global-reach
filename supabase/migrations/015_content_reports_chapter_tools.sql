@@ -45,10 +45,8 @@ CREATE INDEX IF NOT EXISTS content_reports_reporter
 
 ALTER TABLE content_reports ENABLE ROW LEVEL SECURITY;
 
+-- Inserts only via submit_content_report (rate-limited SECURITY DEFINER)
 DROP POLICY IF EXISTS "Users insert own content reports" ON content_reports;
-CREATE POLICY "Users insert own content reports"
-  ON content_reports FOR INSERT TO authenticated
-  WITH CHECK (reporter_id = (SELECT auth.uid()));
 
 DROP POLICY IF EXISTS "Users read own content reports" ON content_reports;
 CREATE POLICY "Users read own content reports"

@@ -7,14 +7,14 @@ Only credential, dashboard, legal, or live-environment tasks. Engineering work i
 **Project:** `xwlrzgfuhfbckgvcmyoq` (or whichever is canonical)  
 **Steps:**
 
-1. SQL Editor → paste `supabase/FINAL_SETUP.sql` → Run (migrations **001–015**)  
+1. SQL Editor → paste `supabase/FINAL_SETUP.sql` → Run (migrations **001–016**)  
 2. Paste `supabase/VERIFY_SETUP.sql` → Run  
 3. Confirm every row `ok = true` (including content_reports, moderation, certificates, leaders, competitions)  
 4. Paste `supabase/VERIFY_RLS_MATRIX.sql` → Run; confirm every row `ok = true`
 
 **Unblocks:** FM-DATA-001, FM-AUTH-002, FM-SEC-001 (policy presence), portal runtime, Debrief, moderation, certificates, competitions, content reports
 
-**Note:** If a prior FINAL_SETUP was applied without 013–015, re-run full script or apply `013`/`014`/`015` in order, then VERIFY.
+**Note:** If a prior FINAL_SETUP was applied without 013–016, re-run full script or apply `013`…`016` in order, then VERIFY. Migration **016** drops direct `content_reports` INSERT so rate limits cannot be bypassed.
 
 ## OA-2 — Auth URL configuration
 

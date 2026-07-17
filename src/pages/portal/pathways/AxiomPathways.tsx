@@ -26,6 +26,7 @@ import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { portalCopy } from "@/lib/portalCopy";
 import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
 import InterestPillBar from "@/components/portal/InterestPillBar";
+import { sanitizeUrl } from "@/lib/security";
 
 const TYPES: { value: OpportunityType | "all"; label: string }[] = [
   { value: "all", label: "All" },
@@ -140,8 +141,8 @@ export default function AxiomPathways() {
                       <Star className={`h-3.5 w-3.5 ${saved ? "fill-current" : ""}`} />
                       {saved ? "Saved" : "Save"}
                     </Button>
-                    {opp.applicationUrl && (
-                      <a href={opp.applicationUrl} target="_blank" rel="noopener noreferrer">
+                    {sanitizeUrl(opp.applicationUrl ?? "") && (
+                      <a href={sanitizeUrl(opp.applicationUrl)!} target="_blank" rel="noopener noreferrer">
                         <Button size="sm" variant="outline" className={`w-full ${portalButtonOutline}`}>
                           Apply <ExternalLink className="h-3.5 w-3.5" />
                         </Button>

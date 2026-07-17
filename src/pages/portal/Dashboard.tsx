@@ -47,6 +47,7 @@ import EngagementSummary from "@/components/portal/EngagementSummary";
 import SuggestedMembersRail from "@/components/portal/SuggestedMembersRail";
 import WeeklyGoalsCard from "@/components/portal/WeeklyGoalsCard";
 import LabApplicationsPanel from "@/components/portal/LabApplicationsPanel";
+import { openPortalSearch } from "@/lib/portalSearch";
 import { computeMemberBadges } from "@/lib/badges";
 import { timeGreeting } from "@/lib/personalization";
 import { portalCopy } from "@/lib/portalCopy";
@@ -154,9 +155,7 @@ export default function Dashboard() {
           variant="outline"
           size="sm"
           className={portalButtonOutline}
-          onClick={() =>
-            document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }))
-          }
+          onClick={() => openPortalSearch()}
         >
           <Search className="mr-2 h-3.5 w-3.5" />
           Search ⌘K

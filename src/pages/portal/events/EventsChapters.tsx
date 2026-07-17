@@ -29,6 +29,7 @@ import { portalCopy } from "@/lib/portalCopy";
 import { downloadIcal } from "@/lib/downloadIcal";
 import { getEventRegistrationState } from "@/lib/eventRegistration";
 import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
+import { sanitizeUrl } from "@/lib/security";
 
 function groupEventsByMonth(events: { id: string; title: string; startsAt: string }[]) {
   const groups = new Map<string, typeof events>();
@@ -286,9 +287,9 @@ export default function EventsChapters() {
                     {comp.status}
                   </Badge>
                 </div>
-                {comp.registrationUrl && (
+                {sanitizeUrl(comp.registrationUrl ?? "") && (
                   <a
-                    href={comp.registrationUrl}
+                    href={sanitizeUrl(comp.registrationUrl)!}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="mt-3 inline-flex items-center gap-1 text-sm text-emerald-300 hover:underline"
@@ -447,17 +448,21 @@ export default function EventsChapters() {
                       </p>
                       {event.programLinks.length > 0 && (
                         <div className="mt-3 flex flex-wrap gap-3">
-                          {event.programLinks.map((link) => (
-                            <a
-                              key={link.url}
-                              href={link.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 text-sm text-emerald-300 hover:underline"
-                            >
-                              {link.label} <ExternalLink className="h-3 w-3" />
-                            </a>
-                          ))}
+                          {event.programLinks.map((link) => {
+                            const safe = sanitizeUrl(link.url);
+                            if (!safe) return null;
+                            return (
+                              <a
+                                key={link.url}
+                                href={safe}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 text-sm text-emerald-300 hover:underline"
+                              >
+                                {link.label} <ExternalLink className="h-3 w-3" />
+                              </a>
+                            );
+                          })}
                         </div>
                       )}
                     </div>
@@ -489,8 +494,8 @@ export default function EventsChapters() {
                         <CalendarPlus className="mr-1.5 h-3.5 w-3.5" />
                         {portalCopy.calendar.addToCalendar}
                       </Button>
-                      {event.registrationUrl && (
-                        <a href={event.registrationUrl} target="_blank" rel="noopener noreferrer">
+                      {sanitizeUrl(event.registrationUrl ?? "") && (
+                        <a href={sanitizeUrl(event.registrationUrl)!} target="_blank" rel="noopener noreferrer">
                           <Button size="sm" variant="outline" className="w-full border-white/20 text-white">
                             External signup <ExternalLink className="h-3.5 w-3.5" />
                           </Button>

@@ -16,7 +16,7 @@ Do not expose `service_role` or secret keys to the frontend.
 
 ## Database
 
-Run migrations `001` through `012` in order, or run `supabase/FINAL_SETUP.sql`
+Run migrations `001` through `016` in order, or run `supabase/FINAL_SETUP.sql`
 once in a new project. Then run `supabase/VERIFY_SETUP.sql` in the SQL Editor.
 Every row must return `ok = true`.
 

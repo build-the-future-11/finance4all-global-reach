@@ -50,6 +50,7 @@ import CommunityPulse from "@/components/portal/CommunityPulse";
 import SuggestedMembersRail from "@/components/portal/SuggestedMembersRail";
 import InterestPillBar from "@/components/portal/InterestPillBar";
 import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
+import ReportContentButton from "@/components/portal/ReportContentButton";
 import { portalCopy } from "@/lib/portalCopy";
 import { sharedInterests } from "@/lib/personalization";
 import { toast } from "sonner";
@@ -326,17 +327,20 @@ export default function Networking() {
                     </div>
                   )}
                 </div>
-                {post.authorId === profile?.id && (
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="shrink-0 text-red-400/60 hover:text-red-400"
-                    onClick={() => handleDeleteIntro(post.id)}
-                    aria-label="Delete introduction"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                )}
+                <div className="flex shrink-0 flex-col items-end gap-2">
+                  <ReportContentButton targetType="introduction" targetId={post.id} />
+                  {post.authorId === profile?.id && (
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="shrink-0 text-red-400/60 hover:text-red-400"
+                      onClick={() => handleDeleteIntro(post.id)}
+                      aria-label="Delete introduction"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
               </div>
             </PortalCard>
           ))}

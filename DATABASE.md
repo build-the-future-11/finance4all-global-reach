@@ -32,6 +32,10 @@ supabase db push
 | 010 | `010_directory_privacy.sql` | `member_directory` view, profile privacy |
 | 011 | `011_profile_write_boundary.sql` | `update_my_profile`, `set_my_avatar` RPCs |
 | 012 | `012_operational_integrity.sql` | Analytics, client errors, digest log, write boundaries |
+| 013 | `013_finance_debrief_editorial.sql` | Approved sources, editorial fields, publish RPCs |
+| 014 | `014_portal_completeness.sql` | Moderation, certificates, chapter leaders, competitions |
+| 015 | `015_content_reports_chapter_tools.sql` | Content reports + chapter leader snapshot (RPC insert only) |
+| 016 | `016_content_reports_rpc_only.sql` | Drop any leftover direct INSERT policy on reports |
 
 ## Seeds
 

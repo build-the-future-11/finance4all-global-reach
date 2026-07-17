@@ -11,8 +11,9 @@ Engineering source gates vs owner live gates. Pass 4 closeout reference.
 - [ ] `npm run release:static`
 - [ ] `CI=true npm run test:e2e` (public + auth-surface tests; authenticated tests skip without secrets)
 - [ ] Optional: `E2E_EMAIL` + `E2E_PASSWORD` against staging → authenticated journeys pass
-- [ ] Migrations 001–014 present; `FINAL_SETUP.sql` synced
-- [ ] `VERIFY_SETUP.sql` and `VERIFY_RLS_MATRIX.sql` available
+- [ ] Migrations 001–016 present; `FINAL_SETUP.sql` synced
+- [ ] `VERIFY_SETUP.sql` and `VERIFY_RLS_MATRIX.sql` available (includes absent direct INSERT on `content_reports`)
+- [ ] `npm run package:source` produces archive without `.env`
 
 ## Owner live environment (OA-*)
 

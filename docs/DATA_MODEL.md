@@ -1,6 +1,6 @@
 # Data Model
 
-Pass 3 snapshot (migrations 001–014).
+Snapshot through migrations **001–016**.
 
 ## Pass 3 additions (014)
 
@@ -17,6 +17,15 @@ RPC: `issue_my_curriculum_certificate` (requires all listed lessons in `educatio
 
 ### competitions
 `title`, `description`, `status` (draft|open|closed|archived), optional `chapter_id` / `opportunity_id`, dates, `registration_url`. Members read open/closed.
+
+## Safety / chapter tools (015–016)
+
+### content_reports
+`reporter_id`, `target_type`, `target_id`, `reason`, `details`, `status`.  
+**Inserts only via** `submit_content_report` (rate-limited SECURITY DEFINER). No authenticated INSERT policy (016). Resolve via `resolve_content_report` (admin).
+
+### my_chapter_leader_snapshot
+RPC returning chapter membership/registration snapshot for appointed leaders.
 
 ---
 

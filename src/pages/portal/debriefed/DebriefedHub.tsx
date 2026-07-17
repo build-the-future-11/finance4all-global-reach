@@ -37,6 +37,7 @@ import {
 import InterestPillBar from "@/components/portal/InterestPillBar";
 import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
 import PersonalizedForYou from "@/components/portal/PersonalizedForYou";
+import ReportContentButton from "@/components/portal/ReportContentButton";
 import { portalCopy } from "@/lib/portalCopy";
 import { sanitizeUrl } from "@/lib/security";
 import { DEBRIEF_DISCLAIMER } from "@/lib/debriefPublish";
@@ -349,6 +350,7 @@ export default function DebriefedHub() {
                       </Button>
                     </a>
                   )}
+                  <ReportContentButton targetType="news" targetId={article.id} />
                 </div>
               </div>
             </PortalCard>
@@ -393,6 +395,7 @@ export default function DebriefedHub() {
               ) : (
                 <p className="text-xs text-white/40">Source attribution is managed through the approved-source registry.</p>
               )}
+              <ReportContentButton targetType="news" targetId={selectedArticle.id} />
             </>
           )}
         </PortalDialogContent>

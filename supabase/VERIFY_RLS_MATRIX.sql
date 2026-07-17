@@ -20,7 +20,6 @@ WITH expected_policies(tablename, policyname) AS (
     ('news_articles', 'Published news viewable'),
     ('news_article_versions', 'Admin read article versions'),
     ('education_lesson_progress', 'Users manage own education progress'),
-    ('content_reports', 'Users insert own content reports'),
     ('content_reports', 'Users read own content reports'),
     ('content_reports', 'Admin update content reports')
 ),
@@ -35,6 +34,17 @@ policy_checks AS (
         AND policyname = expected_policies.policyname
     ) AS ok
   FROM expected_policies
+),
+no_direct_insert AS (
+  SELECT
+    'policy-absent:content_reports:Users insert own content reports' AS check_name,
+    NOT EXISTS (
+      SELECT 1
+      FROM pg_policies
+      WHERE schemaname = 'public'
+        AND tablename = 'content_reports'
+        AND policyname = 'Users insert own content reports'
+    ) AS ok
 ),
 rls_enabled AS (
   SELECT
@@ -57,6 +67,8 @@ rls_enabled AS (
     )
 )
 SELECT * FROM policy_checks
+UNION ALL
+SELECT * FROM no_direct_insert
 UNION ALL
 SELECT * FROM rls_enabled
 ORDER BY check_name;

@@ -65,7 +65,7 @@ See `src/components/AppRouter.tsx` and `src/routes/portal.ts`.
 
 ## Migrations
 
-Ordered `001`…`014`. Consolidated: `supabase/FINAL_SETUP.sql`. Verify: `supabase/VERIFY_SETUP.sql`.
+Ordered `001`…`016`. Consolidated: `supabase/FINAL_SETUP.sql`. Verify: `supabase/VERIFY_SETUP.sql` + `supabase/VERIFY_RLS_MATRIX.sql`.
 
 ## Edge Functions
 
@@ -99,3 +99,11 @@ Publish path: `publish_news_article` / `transition_news_article_status` + trigge
 ## Production dependencies (non-code)
 
 Supabase migrations, Auth URLs, Vercel `VITE_*`, Edge secrets, email sender, real content, legal approval, monitoring.
+
+## Release / continuity docs
+
+- `DEMO_GUIDE.md` — local/staging walkthrough
+- `KNOWN_LIMITATIONS.md` — verified vs blocked vs not completed
+- `docs/RELEASE_CHECKLIST.md` — engineering vs owner gates
+- `.cursor/project_state.json` + `.cursor/execution_ledger.md` — autonomous run continuity
+

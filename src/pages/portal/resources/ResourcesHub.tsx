@@ -13,6 +13,7 @@ import { portalCopy } from "@/lib/portalCopy";
 import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
 import InterestPillBar from "@/components/portal/InterestPillBar";
 import PersonalizedForYou from "@/components/portal/PersonalizedForYou";
+import { sanitizeUrl } from "@/lib/security";
 
 export default function ResourcesHub() {
   useDocumentTitle("Resources");
@@ -155,18 +156,22 @@ export default function ResourcesHub() {
       {filteredExternal.length > 0 && (
         <PortalSection title="External">
           <div className="grid gap-2 sm:grid-cols-2">
-            {filteredExternal.map((item) => (
-              <a
-                key={item.id}
-                href={item.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="portal-glass portal-focus-ring portal-interactive flex items-center justify-between rounded-xl px-4 py-3 text-sm transition hover:border-white/20"
-              >
-                <span className="text-white/80">{item.title}</span>
-                <ExternalLink className="h-4 w-4 text-white/35" />
-              </a>
-            ))}
+            {filteredExternal.map((item) => {
+              const safe = sanitizeUrl(item.href);
+              if (!safe) return null;
+              return (
+                <a
+                  key={item.id}
+                  href={safe}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="portal-glass portal-focus-ring portal-interactive flex items-center justify-between rounded-xl px-4 py-3 text-sm transition hover:border-white/20"
+                >
+                  <span className="text-white/80">{item.title}</span>
+                  <ExternalLink className="h-4 w-4 text-white/35" />
+                </a>
+              );
+            })}
           </div>
         </PortalSection>
       )}

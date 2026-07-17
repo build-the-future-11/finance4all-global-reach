@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { usePortalSearch, type SearchResult } from "@/hooks/portal/usePortalSearch";
 import { portalCopy } from "@/lib/portalCopy";
+import { PORTAL_SEARCH_OPEN_EVENT } from "@/lib/portalSearch";
 import { sanitizeSearchQuery } from "@/lib/security";
 import { PortalCommandDialog } from "@/components/portal/PortalUI";
 import {
@@ -113,8 +114,13 @@ export default function PortalSearch() {
         setOpen((v) => !v);
       }
     };
+    const onOpen = () => setOpen(true);
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener(PORTAL_SEARCH_OPEN_EVENT, onOpen);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener(PORTAL_SEARCH_OPEN_EVENT, onOpen);
+    };
   }, []);
 
   const grouped = groupResults(results ?? []);

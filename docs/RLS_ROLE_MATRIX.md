@@ -34,6 +34,7 @@ Source-level expectation for Finance4All / FinanceMeta. **Live proof** requires 
 | `education_lesson_progress` | — | own | own | own (no cross-user) |
 | `contact_submissions` | insert RPC | — | — | R/W status |
 | `notifications` | — | own | own | own |
+| `content_reports` | — | insert via RPC only; read own | same | read all + resolve RPC |
 | Storage `avatars` | — | own path | own path | own path |
 
 ## Hard rules
@@ -42,6 +43,7 @@ Source-level expectation for Finance4All / FinanceMeta. **Live proof** requires 
 2. AI-assisted Debrief cannot publish without generation log + approved source (trigger + RPC).
 3. Pending studio/essay rows are not listed to other members.
 4. Service role key never appears in `VITE_*` or browser bundles.
+5. `content_reports` has no direct INSERT policy — rate limit lives in `submit_content_report`.
 
 ## Validation
 

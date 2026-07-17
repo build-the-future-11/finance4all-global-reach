@@ -23,6 +23,7 @@ import MemberBadges from "@/components/portal/MemberBadges";
 import InterestPillBar from "@/components/portal/InterestPillBar";
 import ProfileShareButton from "@/components/portal/ProfileShareButton";
 import MemberActivityPreview from "@/components/portal/MemberActivityPreview";
+import ReportContentButton from "@/components/portal/ReportContentButton";
 import { computeMemberBadges } from "@/lib/badges";
 
 export default function MemberProfile() {
@@ -140,7 +141,7 @@ export default function MemberProfile() {
                 </div>
 
                 {!isOwnProfile && (
-                  <div className="mt-6">
+                  <div className="mt-6 flex flex-wrap items-center gap-3">
                     {existing ? (
                       <div className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-4 py-2.5">
                         {existing.status === "accepted" ? (
@@ -167,6 +168,7 @@ export default function MemberProfile() {
                         </Button>
                       </div>
                     )}
+                    <ReportContentButton targetType="profile" targetId={id} />
                   </div>
                 )}
                 {isOwnProfile && (

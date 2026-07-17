@@ -35,10 +35,7 @@ export function useAdminContentReports() {
         .select("*")
         .order("created_at", { ascending: false })
         .limit(100);
-      if (error) {
-        if (error.code === "42P01") return [];
-        throwSanitizedDbError(error);
-      }
+      if (error) throwSanitizedDbError(error);
       return data;
     },
   });
