@@ -2,6 +2,7 @@
 
 **Recorded:** 2026-07-17 (Finisher)  
 **Branch:** `cursor/membership-security-supabase-fix`  
+**Git:** `5f9176f` — Finish source delivery: safety reports, chapter tools, and package.  
 **Artifact:** `dist-packages/finance4all-finished-source.tgz`
 
 ## Validation
