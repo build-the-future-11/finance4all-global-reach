@@ -22,6 +22,9 @@ import { PopoverContent } from "@/components/ui/popover";
 import { portalCopy } from "@/lib/portalCopy";
 import { sanitizeUserFacingError } from "@/lib/authErrors";
 
+/* Shared tokens colocated for DX; Fast Refresh trade-off documented in DECISION_LOG D-011. */
+/* eslint-disable react-refresh/only-export-components */
+
 export const ACTIVITY_ICONS = {
   news: Newspaper,
   lab_application: FlaskConical,

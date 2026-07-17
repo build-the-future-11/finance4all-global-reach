@@ -12,3 +12,5 @@
 | D-008 | 2026-07-17 | AI Debrief adapter ships unconfigured; queue/logs/admin without live provider keys | Credentials are owner-only; never auto-publish | FM-DEBRIEF-003 |
 | D-009 | 2026-07-17 | Pass 3 ships sitemap/nav/moderation/certs/leaders/competitions; brand unify waits on D-001 | Owner legal naming is not engineering | FM-PUBLIC-002 BLOCKED; 2.6 partial |
 | D-010 | 2026-07-17 | Certificates = verification code + DB row (no PDF binary in Pass 3) | Trusted record first; printable PDF can follow | FM-PORTAL-005 |
+| D-011 | 2026-07-17 | PortalUI keeps shared class tokens; eslint-disable for react-refresh; shadcn/Auth unchanged | Avoid mass import churn; portal custom hooks extracted | FM-BASE-001 PARTIAL |
+| D-012 | 2026-07-17 | Admin Labs tab is read-only overview; create/review stay lead-researcher | Preserves working Meta Labs path (extends D-005) | FM-PORTAL-004 |

@@ -43,6 +43,8 @@ import {
   useAdminCompetitions,
   useUpsertCompetition,
   useDeleteCompetition,
+  useAdminResearchProjects,
+  useNewsArticleVersions,
 } from "@/hooks/portal/useAdmin";
 import { prepareDebriefAiQueue } from "@/lib/debriefAiAdapter";
 import { canTransitionToStatus, DEBRIEF_DISCLAIMER } from "@/lib/debriefPublish";
@@ -278,6 +280,7 @@ export default function Admin() {
           <PortalTabsTrigger value="chapters">Chapters ({chapters?.length ?? 0})</PortalTabsTrigger>
           <PortalTabsTrigger value="moderation">Moderation</PortalTabsTrigger>
           <PortalTabsTrigger value="competitions">Competitions</PortalTabsTrigger>
+          <PortalTabsTrigger value="labs">Labs</PortalTabsTrigger>
           <PortalTabsTrigger value="inbox">Inbox</PortalTabsTrigger>
           <PortalTabsTrigger value="members">Members</PortalTabsTrigger>
           <PortalTabsTrigger value="system">System</PortalTabsTrigger>
@@ -468,6 +471,7 @@ export default function Admin() {
                 </Button>
               )}
             </div>
+            {editingNewsId && <AdminNewsVersionHistory articleId={editingNewsId} />}
           </PortalCard>
 
           <PortalCard className="p-6">
@@ -1092,11 +1096,78 @@ export default function Admin() {
 
         <AdminModerationTab />
         <AdminCompetitionsTab />
+        <AdminLabsTab />
         <AdminInboxTab />
         <AdminMembersTab />
         <AdminSystemTab />
       </Tabs>
     </div>
+  );
+}
+
+function AdminNewsVersionHistory({ articleId }: { articleId: string }) {
+  const { data, isLoading, error, refetch } = useNewsArticleVersions(articleId);
+  return (
+    <div className="mt-4 border-t border-white/10 pt-4">
+      <h4 className="text-sm font-medium text-white/80">Version history</h4>
+      <QueryStatus
+        isLoading={isLoading}
+        error={error}
+        onRetry={() => refetch()}
+        isEmpty={!data?.length}
+        emptyMessage="No versions recorded yet. Versions appear after publish and post-publish edits."
+      >
+        <ul className="mt-2 space-y-2">
+          {data?.map((v) => (
+            <li key={v.id} className="rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-sm">
+              <p className="text-white">
+                v{v.version}
+                {v.change_note ? ` — ${v.change_note}` : ""}
+              </p>
+              <p className="text-xs text-white/45">{new Date(v.created_at).toLocaleString()}</p>
+            </li>
+          ))}
+        </ul>
+      </QueryStatus>
+    </div>
+  );
+}
+
+function AdminLabsTab() {
+  const { data, isLoading, error, refetch } = useAdminResearchProjects();
+  return (
+    <PortalTabsContent value="labs" className="space-y-4">
+      <p className="text-sm text-white/50">
+        Read-only overview of Meta Labs projects. Create and review applications remain in the lead
+        researcher portal.
+      </p>
+      <QueryStatus
+        isLoading={isLoading}
+        error={error}
+        onRetry={() => refetch()}
+        isEmpty={!data?.length}
+        emptyMessage="No research projects yet."
+      >
+        <div className="space-y-2">
+          {data?.map((project) => (
+            <PortalDataRow key={project.id}>
+              <div>
+                <p className="font-medium text-white">{project.title}</p>
+                <p className="text-sm capitalize text-white/50">
+                  {project.status}
+                  {project.applicationDeadline
+                    ? ` · deadline ${new Date(project.applicationDeadline).toLocaleDateString()}`
+                    : ""}
+                </p>
+              </div>
+              <Badge variant="outline" className="border-white/20 text-white/60">
+                {project.status}
+              </Badge>
+            </PortalDataRow>
+          ))}
+        </div>
+      </QueryStatus>
+    </PortalTabsContent>
   );
 }
 

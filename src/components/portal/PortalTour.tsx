@@ -10,13 +10,7 @@ import {
   portalButtonPrimary,
 } from "@/components/portal/PortalUI";
 import { portalCopy } from "@/lib/portalCopy";
-
-export const PORTAL_TOUR_STORAGE_KEY = "f4a-portal-tour-v1";
-
-export function replayPortalTour() {
-  localStorage.removeItem(PORTAL_TOUR_STORAGE_KEY);
-  window.location.reload();
-}
+import { PORTAL_TOUR_STORAGE_KEY } from "@/lib/portalTour";
 
 const { tour } = portalCopy;
 

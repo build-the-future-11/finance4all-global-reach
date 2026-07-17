@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-07-17 — Pass 4 (Harden / prove)
+
+### QA / security docs
+- `e2e/authenticated.spec.ts` — auth-surface tests + env-gated login journeys
+- `docs/RLS_ROLE_MATRIX.md`, `supabase/VERIFY_RLS_MATRIX.sql`
+- `docs/LAUNCH_CHECKLIST.md`
+- Portal tour/setup-health Fast Refresh cleanup; PortalUI D-011
+
+### App depth
+- Admin Labs overview tab; Debrief version history when editing
+- Certificate print/save view from Learn hub
+
+### Validation
+- typecheck, 94 unit, lint 0 errors / 8 warnings, release:static, 11 e2e passed / 2 skipped
+
 ## 2026-07-17 — Pass 3 (Portal depth & credibility)
 
 ### Schema

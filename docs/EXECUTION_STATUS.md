@@ -1,43 +1,37 @@
 # Execution Status
 
-**Pass:** 3 of 4  
-**State:** COMPLETE (Wave 2 portal completeness in source; owner blockers remain)  
-**Updated:** 2026-07-17T14:00:00Z  
-**Checkpoint commit:** `14a20ed`
+**Pass:** 4 of 4  
+**State:** COMPLETE (engineering harden/prove; owner live blockers remain)  
+**Updated:** 2026-07-17T14:35:00Z  
+**Checkpoint commit:** pending
 
 ## Completed this pass
 
-- [x] Claim ownership; Pass 3 context
-- [x] Migration `014_portal_completeness.sql` (moderation, certificates, leaders, competitions)
-- [x] FINAL_SETUP / VERIFY updated
-- [x] Admin Moderation + Competitions + chapter leaders UI
-- [x] Certificates issue flow on Learn hub
-- [x] Chapter country/city filters + map UX
-- [x] Nav alignment (Learn / Opportunities / Events & Chapters / Profile)
-- [x] `public/sitemap.xml` + robots Sitemap (brand unify remains D-001)
-- [x] Unit tests +92; typecheck; build; release:static; 7 e2e
+- [x] Authenticated e2e scaffolding (`E2E_*` gated) + auth-surface tests
+- [x] `docs/RLS_ROLE_MATRIX.md` + `supabase/VERIFY_RLS_MATRIX.sql`
+- [x] Portal Fast Refresh cleanup (tour/setup); PortalUI D-011
+- [x] Launch checklist
+- [x] Admin Labs overview; Debrief version history UI; certificate print
+- [x] Validation: typecheck, 94 unit, lint 0 errors, release:static, 11 e2e + 2 skipped
 - [x] Memory/audit/queue updated; ownership released
-
-## In progress
-
-- None (Pass 3 Wave 2 closed)
 
 ## Blocked on owner
 
-- OA-1…OA-8 — **OA-1 must re-run FINAL_SETUP** for migration 014
-- FM-PUBLIC-002 / D-001 brand unify
-- FM-PORTAL-004 labs-in-admin remains DEFERRED
+- OA-1…OA-8
+- Live RLS role sampling (FM-SEC-001 remainder)
+- Live authenticated e2e credentials
+- D-001 brand unify
 
-## Next engineering task
+## Next
 
-Pass 4 Wave 3.1 — Authenticated Playwright journeys.
+Owner apply FINAL_SETUP + VERIFY (+ VERIFY_RLS_MATRIX); configure Auth/Vercel/Edge; optional staging `E2E_*`.
 
 ## Metrics
 
 | Check | Result |
 | --- | --- |
-| Unit tests | 92 passed |
-| E2E | 7 passed |
+| Unit tests | 94 passed |
+| E2E | 11 passed / 2 skipped (no E2E_*) |
 | Typecheck | pass |
-| Build | pass |
-| Release static | pass |
+| Lint | 0 errors / 8 warnings (shadcn/Auth) |
+| Build / release:static | pass |

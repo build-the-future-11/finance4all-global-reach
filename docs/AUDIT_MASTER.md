@@ -3,7 +3,7 @@
 Stable issue register for FinanceMeta / Finance4All.  
 Statuses: `UNRESOLVED` | `PARTIAL` | `RESOLVED` | `INVALIDATED` | `DEFERRED` | `BLOCKED`
 
-**Last updated:** 2026-07-17 (Pass 1)
+**Last updated:** 2026-07-17 (Pass 4)
 
 ---
 
@@ -14,9 +14,9 @@ Statuses: `UNRESOLVED` | `PARTIAL` | `RESOLVED` | `INVALIDATED` | `DEFERRED` | `
 - **Files:** `src/contexts/AuthContext.tsx`, `src/components/ui/*`, portal shared exports
 - **Impact:** Noise in CI lint; does not fail build
 - **Root cause:** Files export hooks/constants alongside components
-- **Fix:** Split exports or suppress intentionally for shadcn patterns
-- **Validation:** `npm run lint` → 0 errors (warnings OK)
-- **Status:** DEFERRED
+- **Fix:** Portal tour + setup health extracted; PortalUI eslint exception (D-011); shadcn/Auth remain convention
+- **Validation:** `npm run lint` → 0 errors; portal-custom warnings cleared (8 shadcn/Auth remain)
+- **Status:** PARTIAL
 
 ### FM-BASE-002 — ProtectedRoute tests missing profile
 - **Severity:** Medium
@@ -38,12 +38,12 @@ Statuses: `UNRESOLVED` | `PARTIAL` | `RESOLVED` | `INVALIDATED` | `DEFERRED` | `
 
 ### FM-BASE-004 — Authenticated E2E coverage missing
 - **Severity:** Medium
-- **Files:** `e2e/*`
+- **Files:** `e2e/authenticated.spec.ts`, `e2e/authCredentials.ts`
 - **Impact:** Regressions in auth/portal CRUD uncaught in CI
 - **Root cause:** Suite limited to smoke/security
-- **Fix:** Staging credentials + Playwright auth fixtures (Pass 4)
-- **Validation:** New e2e green in CI with secrets
-- **Status:** DEFERRED
+- **Fix:** Env-gated Playwright auth journeys + auth-surface tests (Pass 4)
+- **Validation:** 11 passed / 2 skipped without secrets; green with `E2E_*` on staging
+- **Status:** PARTIAL (scaffolding done; live credentials owner/staging)
 
 ---
 
@@ -134,16 +134,16 @@ Statuses: `UNRESOLVED` | `PARTIAL` | `RESOLVED` | `INVALIDATED` | `DEFERRED` | `
 - **Files:** `MetaLabs.tsx`, `Admin.tsx`
 - **Impact:** Split ownership UX
 - **Root cause:** Intentional lead-researcher portal create
-- **Fix:** Optional admin overview (Pass 3)
+- **Fix:** Admin Labs overview tab (read-only); create/review stay in lead portal (D-005/D-012)
 - **Validation:** Admin can list all projects
-- **Status:** DEFERRED (D-005)
+- **Status:** RESOLVED (overview); create path remains lead-researcher
 
 ### FM-PORTAL-005 — Certificates missing
 - **Severity:** Medium
 - **Files:** education completion UX, `member_certificates`
 - **Impact:** Spec asks certificates; only local celebration
 - **Root cause:** Not implemented
-- **Fix:** `issue_my_curriculum_certificate` + Education hub issue UI
+- **Fix:** `issue_my_curriculum_certificate` + Education hub issue/print UI
 - **Validation:** Complete curriculum → certificate row with verification code
 - **Status:** RESOLVED (source); live pending OA-1
 
@@ -195,10 +195,10 @@ Statuses: `UNRESOLVED` | `PARTIAL` | `RESOLVED` | `INVALIDATED` | `DEFERRED` | `
 
 ### FM-DEBRIEF-004 — No version history / corrections
 - **Severity:** Medium
-- **Files:** `news_article_versions`, `record_news_article_version`
+- **Files:** `news_article_versions`, `record_news_article_version`, Admin version panel
 - **Impact:** Cannot correct published articles with audit trail
-- **Fix:** Version table + RPC on post-publish edits / correct transitions
-- **Validation:** VERIFY_SETUP; admin correct/archive flows
+- **Fix:** Version table + RPC + Admin version history UI when editing
+- **Validation:** VERIFY_SETUP; admin correct/archive flows; version list on edit
 - **Status:** RESOLVED (source); live pending OA-1
 
 ### FM-DEBRIEF-005 — Metadata gaps (topic/region/importance/schedule)
@@ -244,11 +244,11 @@ Statuses: `UNRESOLVED` | `PARTIAL` | `RESOLVED` | `INVALIDATED` | `DEFERRED` | `
 
 ### FM-SEC-001 — Live RLS proof outstanding
 - **Severity:** High
-- **Files:** live policies
+- **Files:** live policies; `docs/RLS_ROLE_MATRIX.md`; `supabase/VERIFY_RLS_MATRIX.sql`
 - **Impact:** Source RLS unproven against deployed DB
-- **Fix:** Role matrix tests on staging (Pass 4 + owner)
-- **Validation:** Anon/member/lead/admin matrix
-- **Status:** BLOCKED
+- **Fix:** Role matrix docs + policy-presence script (Pass 4); live sampling needs OA-1
+- **Validation:** VERIFY_RLS_MATRIX all ok after FINAL_SETUP; manual role sampling on staging
+- **Status:** PARTIAL (docs/script done; live sampling BLOCKED on OA-1)
 
 ### FM-SEC-002 — Edge function secrets
 - **Severity:** High

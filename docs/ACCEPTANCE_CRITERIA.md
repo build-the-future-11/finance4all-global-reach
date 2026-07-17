@@ -45,7 +45,21 @@
 | P3-7 | Types + unit tests for moderation helpers; baseline green | YES (92 unit / 7 e2e) |
 | P3-8 | Memory docs updated; Wave 2 queue marked; remaining gaps listed | YES |
 
-**Pass 3 result:** ACCEPTED (Wave 2 source). Brand legal unify (P3 brand / FM-PUBLIC-002) remains owner-blocked (D-001). Live schema remains OA-1. Labs-in-admin stays DEFERRED (D-005).
+**Pass 3 result:** ACCEPTED (Wave 2 source). Brand legal unify (P3 brand / FM-PUBLIC-002) remains owner-blocked (D-001). Live schema remains OA-1. Labs admin overview delivered in Pass 4 (D-012).
+
+## Pass 4 — Harden / prove
+
+| # | Criterion | Met? |
+| --- | --- | --- |
+| P4-1 | Authenticated e2e scaffolding; auth-surface tests always run | YES |
+| P4-2 | Authenticated login journeys env-gated (`E2E_*`); CI skips cleanly | YES |
+| P4-3 | RLS role matrix documented + VERIFY_RLS_MATRIX.sql | YES |
+| P4-4 | Portal Fast Refresh custom warnings reduced; launch checklist present | YES |
+| P4-5 | Admin labs overview + Debrief version UI + certificate print | YES |
+| P4-6 | Memory/audit updated; remaining gaps truthful | YES |
+| P4-7 | Baseline typecheck/unit/e2e/release:static green | YES (94 unit; 11/2 e2e) |
+
+**Pass 4 result:** ACCEPTED (engineering). Live RLS sampling, live `E2E_*`, schema apply, and brand unify remain owner/staging blockers.
 
 ## Global launch acceptance (later)
 

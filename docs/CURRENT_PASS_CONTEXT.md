@@ -1,26 +1,21 @@
 # Current Pass Context
 
-**Pass:** 3 of 4 — Heavy improvements / portal depth  
+**Pass:** 4 of 4 — Harden / prove  
 **Agent:** Cursor  
-**Started:** 2026-07-17T13:45:00Z  
-**Closed:** 2026-07-17T14:00:00Z  
+**Started:** 2026-07-17T14:00:00Z  
+**Closed:** 2026-07-17T14:35:00Z  
 **Branch:** `cursor/membership-security-supabase-fix`  
-**Prior:** Pass 2 ACCEPTED  
-**Result:** ACCEPTED (Wave 2 source; live OA-1; brand D-001 blocked)
+**Prior:** Pass 3 ACCEPTED  
+**Result:** ACCEPTED (engineering Wave 3; owner live gates remain)
 
-## Scope completed (frozen queue Wave 2)
+## Scope completed
 
-2.1 Moderation status + Admin Moderation tab  
-2.2 `member_certificates` + issue on curriculum complete  
-2.3 `chapter_leaders` + `competitions` + Admin/member UI  
-2.4 Country/city filters + map legend/detail/a11y  
-2.5 Nav labels: Learn, Opportunities, Events & Chapters, Profile  
-2.6 Brand unify deferred (D-001); shipped `sitemap.xml` + robots Sitemap
+3.1 Auth e2e scaffolding + auth-surface tests (live login env-gated)  
+3.2 RLS role matrix docs + `VERIFY_RLS_MATRIX.sql`  
+3.3 Portal Fast Refresh cleanup (tour/setup health); PortalUI exception D-011  
+3.4 `docs/LAUNCH_CHECKLIST.md`  
+Plus: Admin Labs overview, Debrief version history UI, certificate print view
 
-## Acceptance
+## Next
 
-P3-1…P3-8 met in source. Live activation requires FINAL_SETUP including 014.
-
-## Next engineering task
-
-Pass 4 Wave 3.1 — Authenticated Playwright journeys (see IMPLEMENTATION_QUEUE.md).
+Owner OA-1…OA-8; optional `E2E_*` against staging; brand D-001.

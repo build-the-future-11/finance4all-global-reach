@@ -11,7 +11,7 @@ import {
 } from "@/hooks/portal/useCertificates";
 import GlossarySearch from "@/components/portal/GlossarySearch";
 import ModuleProgressRing from "@/components/portal/ModuleProgressRing";
-import { PortalCard, PortalPageHeader, portalButtonPrimary } from "@/components/portal/PortalUI";
+import { PortalCard, PortalPageHeader, portalButtonOutline, portalButtonPrimary } from "@/components/portal/PortalUI";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { portalRoutes } from "@/routes/portal";
@@ -126,6 +126,35 @@ export default function EducationHub() {
                 onClick={handleIssueCertificate}
               >
                 Issue verified certificate
+              </Button>
+            )}
+            {existingCert && (
+              <Button
+                type="button"
+                className={portalButtonOutline}
+                onClick={() => {
+                  const win = window.open("", "_blank", "noopener,noreferrer,width=720,height=900");
+                  if (!win) {
+                    toast.error("Allow pop-ups to print your certificate.");
+                    return;
+                  }
+                  win.document.write(`<!doctype html><html><head><title>${existingCert.title}</title>
+<style>
+  body{font-family:Georgia,serif;padding:48px;color:#0f172a;background:#f8fafc}
+  .frame{border:2px solid #059669;padding:40px;text-align:center;border-radius:12px;background:#fff}
+  h1{font-size:28px;margin:0 0 8px} .meta{color:#64748b;font-size:14px;margin-top:24px}
+  .code{font-family:ui-monospace,monospace;letter-spacing:0.08em;font-size:18px;margin-top:12px}
+</style></head><body><div class="frame">
+  <p>Finance4All · Catalyst</p>
+  <h1>${existingCert.title}</h1>
+  <p>This certifies curriculum completion for the signed-in member account.</p>
+  <p class="code">Verification ${existingCert.verificationCode}</p>
+  <p class="meta">Issued ${new Date(existingCert.issuedAt).toLocaleDateString()} · Not investment advice</p>
+</div><script>window.onload=()=>window.print()</script></body></html>`);
+                  win.document.close();
+                }}
+              >
+                Print / save certificate
               </Button>
             )}
           </PortalCard>

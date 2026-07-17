@@ -5,6 +5,7 @@ import {
   mapCompetition,
   mapEssaySubmission,
   mapProfile,
+  mapResearchProject,
   mapStudioSubmission,
 } from "@/lib/mappers";
 import type { EventStatus, NewsCategory, OpportunityType, UserRole } from "@/types/domain";
@@ -910,6 +911,36 @@ export function useDeleteCompetition() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-competitions"] });
       qc.invalidateQueries({ queryKey: ["competitions"] });
+    },
+  });
+}
+
+export function useAdminResearchProjects() {
+  return useQuery({
+    queryKey: ["admin-research-projects"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("research_projects")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throwSanitizedDbError(error);
+      return data.map(mapResearchProject);
+    },
+  });
+}
+
+export function useNewsArticleVersions(articleId?: string | null) {
+  return useQuery({
+    queryKey: ["news-article-versions", articleId],
+    enabled: Boolean(articleId),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("news_article_versions")
+        .select("*")
+        .eq("article_id", articleId!)
+        .order("version", { ascending: false });
+      if (error) throwSanitizedDbError(error);
+      return data;
     },
   });
 }

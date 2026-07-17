@@ -11,7 +11,7 @@ import { computeMemberBadges } from "@/lib/badges";
 import { portalRoutes } from "@/routes/portal";
 import MembershipCard from "@/components/portal/MembershipCard";
 import MemberBadges from "@/components/portal/MemberBadges";
-import { replayPortalTour } from "@/components/portal/PortalTour";
+import { replayPortalTour } from "@/lib/portalTour";
 import {
   PortalCard,
   PortalPageHeader,

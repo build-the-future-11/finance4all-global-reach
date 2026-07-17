@@ -12,7 +12,8 @@ Coordination file for parallel agents. Claim before editing; release after commi
 
 | Agent | Paths | Released at | Notes |
 | --- | --- | --- | --- |
-| Cursor (Pass 3) | Wave 2 portal completeness (`014_*`, Admin moderation/competitions/leaders, certificates, ChapterMap, nav, sitemap, docs) | 2026-07-17T14:00:00Z | Checkpoint `14a20ed` |
+| Cursor (Pass 4) | e2e auth, RLS matrix, lint extract, Admin labs/versions, cert print, docs | 2026-07-17T14:35:00Z | Awaiting checkpoint |
+| Cursor (Pass 3) | Wave 2 portal completeness | 2026-07-17T14:00:00Z | Checkpoint `14a20ed` |
 | Cursor (Pass 2) | Debrief Wave 1 slice | 2026-07-17T14:10:00Z | Checkpoint `3f3f43d` |
 | Cursor (Pass 1) | Pass 1 memory + light fixes | 2026-07-17T13:45:00Z | Checkpoint `40bc348` |
 
@@ -27,6 +28,5 @@ Coordination file for parallel agents. Claim before editing; release after commi
 
 | From | To | Summary | Timestamp |
 | --- | --- | --- | --- |
-| Pass 1 | Pass 2 | Queue 1.1 Debrief schema + publish guards | 2026-07-17T13:45:00Z |
-| Pass 2 | Pass 3 | Wave 1 Debrief done; next 2.1 studio/essay moderation | 2026-07-17T14:10:00Z |
-| Pass 3 | Pass 4 | Wave 2 portal depth done; next 3.1 authenticated e2e | 2026-07-17T14:00:00Z |
+| Pass 3 | Pass 4 | Wave 2 done; start 3.1 authenticated e2e | 2026-07-17T14:00:00Z |
+| Pass 4 | Owner / maintenance | Engineering Wave 3 done; live OA-* remain | 2026-07-17T14:35:00Z |

@@ -9,9 +9,10 @@ Only credential, dashboard, legal, or live-environment tasks. Engineering work i
 
 1. SQL Editor → paste `supabase/FINAL_SETUP.sql` → Run (includes migrations **013** Debrief + **014** portal completeness)  
 2. Paste `supabase/VERIFY_SETUP.sql` → Run  
-3. Confirm every row `ok = true` (including moderation columns, certificates, leaders, competitions, new RPCs)
+3. Confirm every row `ok = true` (including moderation columns, certificates, leaders, competitions, new RPCs)  
+4. Paste `supabase/VERIFY_RLS_MATRIX.sql` → Run; confirm every row `ok = true`
 
-**Unblocks:** FM-DATA-001, FM-AUTH-002, portal runtime, live Debrief publish guards, live moderation/certificates/competitions
+**Unblocks:** FM-DATA-001, FM-AUTH-002, FM-SEC-001 (policy presence), portal runtime, live Debrief publish guards, live moderation/certificates/competitions
 
 **Note:** If a prior FINAL_SETUP was applied without 013/014, re-run full script or apply `013_*.sql` then `014_*.sql`, then VERIFY.
 
@@ -71,3 +72,16 @@ Then Admin → System → Seed CMS (after 008 present).
 ## OA-8 — Security environment audit
 
 `npm audit --omit=dev --audit-level=high` from approved security environment before launch.
+
+## OA-9 — Staging E2E credentials (optional)
+
+Create a non-production member account on the live/staging project after OA-1. Set CI or local:
+
+```
+E2E_EMAIL=…
+E2E_PASSWORD=…
+```
+
+Run `CI=true npm run test:e2e` to execute authenticated portal journeys (otherwise those tests skip).
+
+**Unblocks:** FM-BASE-004 live portion

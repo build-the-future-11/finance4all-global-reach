@@ -36,17 +36,17 @@ Dependency order. Do not reorder without DECISION_LOG entry.
 | 2.5 | Nav alignment to PRODUCT_SPEC | — | DONE |
 | 2.6 | Brand unify post D-001 (OG already absolute) | FM-PUBLIC-002 | BLOCKED (sitemap shipped) |
 
-## Wave 3 — Pass 4 (NEXT — harden / prove)
+## Wave 3 — Pass 4 (DONE 2026-07-17)
 
-| Order | Item | Audit IDs |
-| --- | --- | --- |
-| 3.1 | Authenticated Playwright journeys | FM-BASE-004 |
-| 3.2 | Live RLS role matrix documentation + scripts | FM-SEC-001 |
-| 3.3 | Fast Refresh lint cleanup (optional) | FM-BASE-001 |
-| 3.4 | Launch checklist closeout | OWNER |
+| Order | Item | Audit IDs | Status |
+| --- | --- | --- | --- |
+| 3.1 | Authenticated Playwright journeys | FM-BASE-004 | DONE (PARTIAL live) |
+| 3.2 | Live RLS role matrix documentation + scripts | FM-SEC-001 | DONE (PARTIAL live) |
+| 3.3 | Fast Refresh lint cleanup (optional) | FM-BASE-001 | DONE (PARTIAL shadcn) |
+| 3.4 | Launch checklist closeout | OWNER | DONE (docs); owner OA-* open |
 
 ---
 
-## Exact next Pass 4 task
+## Exact next task
 
-**Start at queue 3.1:** Authenticated Playwright journeys (signup/onboarding smoke against staging or documented fixtures). Live Debrief/portal depth depends on OA-1 applying FINAL_SETUP including 013–014.
+**Owner:** OA-1 apply FINAL_SETUP + VERIFY_SETUP + VERIFY_RLS_MATRIX; configure Auth/Vercel/Edge; optional staging `E2E_EMAIL`/`E2E_PASSWORD`. Engineering queue Waves 1–3 complete in source.

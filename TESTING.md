@@ -45,12 +45,17 @@ Current coverage:
 - Landing loads without page errors
 - Login reachable; poisoned redirect resisted
 - Contact form visible
-- Unauthenticated `/portal` and `/portal/network` redirect to login
-- Signup honeypot hidden
+- Unauthenticated `/portal`, `/portal/network`, `/onboarding`, `/portal/admin` redirect to login
+- Signup honeypot hidden; forgot-password form visible
+- **Authenticated journeys** (optional): set `E2E_EMAIL` and `E2E_PASSWORD` against staging/live with OA-1 applied
 
 Run: `npm run test:e2e` (starts against `npm run preview` in CI)
 
-**Not yet covered in E2E:** authenticated flows, OAuth, admin CRUD, Supabase integration. Verify those manually or against staging with real credentials.
+```bash
+E2E_EMAIL=member@example.com E2E_PASSWORD='…' CI=true npm run test:e2e
+```
+
+Without credentials, authenticated tests **skip** (CI stays green).
 
 ## CI
 
