@@ -3,7 +3,7 @@
 **Pass:** 2 of 4  
 **State:** COMPLETE (Wave 1 Debrief source slice; owner blockers remain for production)  
 **Updated:** 2026-07-17T14:10:00Z  
-**Checkpoint commit:** pending (Pass 2 batch)
+**Checkpoint commit:** `3f3f43d`
 
 ## Completed this pass
 

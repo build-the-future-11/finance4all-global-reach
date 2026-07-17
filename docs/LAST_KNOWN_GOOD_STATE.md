@@ -3,7 +3,7 @@
 **Recorded:** 2026-07-17 (Pass 2 Wave 1 close)  
 **Git branch:** `cursor/membership-security-supabase-fix`  
 **Prior Pass 1 commit:** `40bc348`  
-**Pass 2 checkpoint:** see latest commit after this file update
+**Pass 2 checkpoint:** `3f3f43d` — Implement Pass 2 Finance Debrief trustworthy editorial CMS.
 
 ## Validation snapshot
 

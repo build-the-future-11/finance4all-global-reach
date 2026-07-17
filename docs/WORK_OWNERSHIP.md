@@ -12,7 +12,7 @@ Coordination file for parallel agents. Claim before editing; release after commi
 
 | Agent | Paths | Released at | Notes |
 | --- | --- | --- | --- |
-| Cursor (Pass 2) | Debrief Wave 1 slice (`013_*`, FINAL_SETUP/VERIFY, debrief libs, Admin/Debriefed, weekly-digest, types/mappers, docs) | 2026-07-17T14:10:00Z | Pass 2 Wave 1 complete; awaiting checkpoint commit |
+| Cursor (Pass 2) | Debrief Wave 1 slice (`013_*`, FINAL_SETUP/VERIFY, debrief libs, Admin/Debriefed, weekly-digest, types/mappers, docs) | 2026-07-17T14:10:00Z | Checkpoint `3f3f43d` |
 | Cursor (Pass 1) | Pass 1 memory + light fixes | 2026-07-17T13:45:00Z | Checkpoint `40bc348` |
 
 ## Rules
