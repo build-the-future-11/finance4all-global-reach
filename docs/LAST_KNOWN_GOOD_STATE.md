@@ -3,7 +3,7 @@
 **Recorded:** 2026-07-17 (Pass 4 close)  
 **Git branch:** `cursor/membership-security-supabase-fix`  
 **Prior Pass 3:** `14a20ed` / `27cfba2`  
-**Pass 4 checkpoint:** see latest commit after this file update
+**Pass 4 checkpoint:** `ebc0d75` — Complete Pass 4 harden: auth e2e, RLS matrix, and depth polish.
 
 ## Validation snapshot
 

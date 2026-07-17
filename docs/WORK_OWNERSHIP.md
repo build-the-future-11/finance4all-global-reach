@@ -12,7 +12,7 @@ Coordination file for parallel agents. Claim before editing; release after commi
 
 | Agent | Paths | Released at | Notes |
 | --- | --- | --- | --- |
-| Cursor (Pass 4) | e2e auth, RLS matrix, lint extract, Admin labs/versions, cert print, docs | 2026-07-17T14:35:00Z | Awaiting checkpoint |
+| Cursor (Pass 4) | e2e auth, RLS matrix, lint extract, Admin labs/versions, cert print, docs | 2026-07-17T14:35:00Z | Checkpoint `ebc0d75` |
 | Cursor (Pass 3) | Wave 2 portal completeness | 2026-07-17T14:00:00Z | Checkpoint `14a20ed` |
 | Cursor (Pass 2) | Debrief Wave 1 slice | 2026-07-17T14:10:00Z | Checkpoint `3f3f43d` |
 | Cursor (Pass 1) | Pass 1 memory + light fixes | 2026-07-17T13:45:00Z | Checkpoint `40bc348` |

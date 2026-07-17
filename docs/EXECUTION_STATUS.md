@@ -3,7 +3,7 @@
 **Pass:** 4 of 4  
 **State:** COMPLETE (engineering harden/prove; owner live blockers remain)  
 **Updated:** 2026-07-17T14:35:00Z  
-**Checkpoint commit:** pending
+**Checkpoint commit:** `ebc0d75`
 
 ## Completed this pass
 
