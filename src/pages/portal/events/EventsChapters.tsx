@@ -30,7 +30,7 @@ import { downloadIcal } from "@/lib/downloadIcal";
 import { getEventRegistrationState } from "@/lib/eventRegistration";
 import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
 import { sanitizeUrl } from "@/lib/security";
-import { isSampleContent, programKindLabels, stripSamplePrefix } from "@/lib/programLabels";
+import { isSampleContent, isPublicListingTitle, programKindLabels, stripSamplePrefix } from "@/lib/programLabels";
 
 function groupEventsByMonth(events: { id: string; title: string; startsAt: string }[]) {
   const groups = new Map<string, typeof events>();
@@ -115,10 +115,11 @@ export default function EventsChapters() {
 
   const displayEvents = useMemo(() => {
     if (!events) return [];
+    const visible = events.filter((e) => isPublicListingTitle(e.title));
     if (eventFilter === "mine") {
-      return events.filter((e) => registrations?.has(e.id));
+      return visible.filter((e) => registrations?.has(e.id));
     }
-    return events;
+    return visible;
   }, [events, eventFilter, registrations]);
 
   const eventsByMonth = useMemo(
@@ -455,7 +456,7 @@ export default function EventsChapters() {
                             </Badge>
                           ),
                         )}
-                        {isSampleContent(event.title) && (
+                        {isSampleContent(event.title) && !import.meta.env.PROD && (
                           <Badge variant="outline" className="border-amber-400/40 text-amber-200">
                             Sample
                           </Badge>

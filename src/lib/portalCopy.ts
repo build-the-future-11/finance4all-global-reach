@@ -146,7 +146,7 @@ export const portalCopy = {
     emptyEvents:
       "No events scheduled for this chapter yet. Select another chapter on the map, or register for events elsewhere.",
     emptyChapters:
-      "Chapters are being added to the directory. Check back soon, or ask your chapter lead about registration.",
+      "No chapters are listed yet. Ask your chapter lead about registration, or check back after chapters are published.",
   },
   network: {
     eyebrow: "Member network",
@@ -251,11 +251,11 @@ export const portalCopy = {
     title: "Settings",
     description:
       "Your interests are used to order suggestions across Debriefed, Meta Labs, Pathways, and the member directory.",
-    digestNote: "Weekly digest delivery is rolling out chapter by chapter.",
+    digestNote: "When enabled, the weekly Debrief digest is sent to the email on your account.",
     securityAdmin:
-      "Admin: if saved items, notifications, contact inbox, or lesson progress fail, check the Admin System tab and production database status.",
+      "If saved items, notifications, contact inbox, or lesson progress fail, open Admin → System to review service health.",
     securityMember:
-      "If Saved items or notifications aren't working, contact your chapter lead — the workspace may need a one-time setup.",
+      "If Saved items or notifications aren't working, try again later or contact your chapter lead.",
     profileStrength: "Profile strength",
     profileCompleteness: "Profile completeness",
     saving: "Saving…",

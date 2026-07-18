@@ -41,7 +41,7 @@ import ReportContentButton from "@/components/portal/ReportContentButton";
 import { portalCopy } from "@/lib/portalCopy";
 import { sanitizeUrl } from "@/lib/security";
 import { DEBRIEF_DISCLAIMER } from "@/lib/debriefPublish";
-import { isSampleContent, stripSamplePrefix } from "@/lib/programLabels";
+import { isSampleContent, isPublicListingTitle, stripSamplePrefix } from "@/lib/programLabels";
 
 const CATEGORIES: { value: NewsCategory | "all"; label: string }[] = [
   { value: "all", label: portalCopy.debriefed.categories.all },
@@ -112,6 +112,7 @@ export default function DebriefedHub() {
 
   const displayArticles = useMemo(() => {
     return (articles ?? []).filter((a) => {
+      if (!isPublicListingTitle(a.title)) return false;
       if (collection === "newsletter" && !a.newsletterInclude) return false;
       if (topicFilter !== "all" && !(a.topics ?? []).includes(topicFilter)) return false;
       if (regionFilter !== "all" && !(a.regions ?? []).includes(regionFilter)) return false;
@@ -303,7 +304,7 @@ export default function DebriefedHub() {
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <CategoryBadge>{article.category}</CategoryBadge>
-                    {isSampleContent(article.title) && (
+                    {!import.meta.env.PROD && isSampleContent(article.title) && (
                       <Badge variant="outline" className="border-amber-400/40 text-amber-200">
                         Sample
                       </Badge>
@@ -371,7 +372,7 @@ export default function DebriefedHub() {
               <DialogHeader>
                 <div className="flex flex-wrap items-center gap-2">
                   <CategoryBadge>{selectedArticle.category}</CategoryBadge>
-                  {isSampleContent(selectedArticle.title) && (
+                  {isSampleContent(selectedArticle.title) && !import.meta.env.PROD && (
                     <Badge variant="outline" className="border-amber-400/40 text-amber-200">
                       Sample
                     </Badge>

@@ -2,6 +2,7 @@ import { sanitizeUserFacingError } from "@/lib/authErrors";
 import { useMutation } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { trackEvent } from "@/lib/analytics";
+import { PUBLIC_CONTACT_EMAIL } from "@/lib/publicContact";
 import {
   isValidEmail,
   sanitizeDisplayName,
@@ -54,7 +55,9 @@ export function useContactSubmission() {
           error.code === "42883" ||
           error.message?.includes("does not exist")
         ) {
-          throw new Error("Contact form is not available yet. Please email finance4alledu@gmail.com directly.");
+          throw new Error(
+            `Could not send your message right now. Please try again or email ${PUBLIC_CONTACT_EMAIL}.`,
+          );
         }
         throw new Error(sanitizeUserFacingError(error.message ?? "Submission failed."));
       }

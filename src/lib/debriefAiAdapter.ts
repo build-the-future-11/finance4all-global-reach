@@ -46,7 +46,7 @@ export function prepareDebriefAiQueue(input: QueueDebriefAiInput): QueueDebriefA
     promptHash: hashPrompt(input.prompt.trim()),
     message:
       status === "unconfigured"
-        ? "Queued locally for server processing. Configure the Debrief AI Edge adapter (owner action) before live generation runs."
+        ? "Queued for server processing. Live model completion runs when the Debrief AI service is configured."
         : "Queued for generation",
   };
 }

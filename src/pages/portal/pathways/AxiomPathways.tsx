@@ -27,7 +27,7 @@ import { portalCopy } from "@/lib/portalCopy";
 import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
 import InterestPillBar from "@/components/portal/InterestPillBar";
 import { sanitizeUrl } from "@/lib/security";
-import { isSampleContent, programKindLabels, stripSamplePrefix } from "@/lib/programLabels";
+import { isSampleContent, isPublicListingTitle, programKindLabels, stripSamplePrefix } from "@/lib/programLabels";
 import { portalRoutes } from "@/routes/portal";
 
 const TYPES: { value: OpportunityType | "all"; label: string }[] = [
@@ -49,6 +49,7 @@ export default function AxiomPathways() {
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return opportunities?.filter((opp) => {
+      if (!isPublicListingTitle(opp.title)) return false;
       if (typeFilter !== "all" && opp.type !== typeFilter) return false;
       if (!q) return true;
       return (
@@ -124,7 +125,7 @@ export default function AxiomPathways() {
                           {label}
                         </Badge>
                       ))}
-                      {isSampleContent(opp.title) && (
+                      {isSampleContent(opp.title) && !import.meta.env.PROD && (
                         <Badge variant="outline" className="border-amber-400/40 text-amber-200">
                           Sample
                         </Badge>

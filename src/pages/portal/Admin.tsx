@@ -307,7 +307,7 @@ export default function Admin() {
               <Input
                 value={sourceForm.homepageUrl}
                 onChange={(e) => setSourceForm({ ...sourceForm, homepageUrl: e.target.value })}
-                placeholder="https://example.com"
+                placeholder="https://"
                 className={portalInputClass}
               />
               <Input
@@ -482,7 +482,7 @@ export default function Admin() {
           <PortalCard className="p-6">
             <h3 className="font-semibold text-white">Source-bound AI queue</h3>
             <p className="mt-1 text-sm text-white/50">
-              Live model completion is owner-configured. Queuing always requires approved source ids; unsourced AI cannot publish.
+              Live model completion runs when the Debrief AI service is configured. Queuing always requires approved source ids; unsourced AI cannot publish.
             </p>
             <Textarea
               className={cn("mt-3", portalInputClass)}
@@ -1793,7 +1793,7 @@ function AdminSystemTab() {
               <p className="mt-1 text-sm text-white/55">
                 {cmsHealth.data?.initialized
                   ? "Education, resources, webinars, and testimonials are loaded in the database."
-                  : "Seed the default curriculum and resource library into Supabase (migration 008 required)."}
+                  : "Load the default curriculum and resource library into the database."}
               </p>
             </div>
             <Button
@@ -1803,14 +1803,14 @@ function AdminSystemTab() {
               onClick={async () => {
                 try {
                   await seedCms.mutateAsync();
-                  toast.success("CMS content seeded");
+                  toast.success("CMS content loaded");
                   void cmsHealth.refetch();
                 } catch (err) {
-                  toast.error(err instanceof Error ? err.message : "Could not seed CMS content");
+                  toast.error(err instanceof Error ? err.message : "Could not load CMS content");
                 }
               }}
             >
-              {seedCms.isPending ? "Seeding…" : cmsHealth.data?.initialized ? "Re-seed CMS" : "Seed CMS content"}
+              {seedCms.isPending ? "Loading…" : cmsHealth.data?.initialized ? "Reload CMS content" : "Load CMS content"}
             </Button>
           </div>
         </PortalCard>

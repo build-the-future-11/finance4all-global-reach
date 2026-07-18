@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { useContactSubmission } from "@/hooks/useContactSubmission";
 import { portalCopy } from "@/lib/portalCopy";
+import { PUBLIC_CONTACT_EMAIL, PUBLIC_CONTACT_MAILTO } from "@/lib/publicContact";
 import {
   PortalAlert,
   PortalInput,
@@ -118,14 +119,14 @@ export default function ContactSection() {
 
         <div className="mt-10">
           <a
-            href="mailto:finance4alledu@gmail.com"
+            href={PUBLIC_CONTACT_MAILTO}
             className="portal-focus-ring group mx-auto flex max-w-sm flex-col items-center gap-3 rounded-md border border-white/10 bg-white/[0.04] p-6 transition hover:border-emerald-400/30 hover:bg-white/[0.07]"
           >
             <div className="rounded-xl border border-white/10 bg-emerald-500/15 p-3 text-emerald-300">
               <Send className="h-5 w-5" aria-hidden />
             </div>
             <p className="font-semibold text-white">General inquiries</p>
-            <p className="text-sm text-white/45">finance4alledu@gmail.com</p>
+            <p className="text-sm text-white/45">{PUBLIC_CONTACT_EMAIL}</p>
           </a>
         </div>
       </div>

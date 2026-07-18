@@ -36,27 +36,27 @@ export default function SetupBanner() {
       <div className="min-w-0 flex-1">
         {isAdmin ? (
           <>
-            <p className="font-medium text-amber-200">Workspace setup incomplete</p>
+            <p className="font-medium text-amber-200">Some member services need attention</p>
             <p className="mt-1 text-amber-100/80">
-              Some member services are not responding with the expected production schema. Review
-              the deployment checklist and database health before inviting members.
+              Saved content, notifications, contact inbox, or learning progress may be unavailable.
+              Check the Admin System tab before inviting new members.
             </p>
+            <Link
+              to={portalRoutes.admin}
+              className="mt-2 inline-block text-xs font-medium text-amber-300 hover:underline"
+            >
+              Open Admin System →
+            </Link>
           </>
         ) : (
           <>
             <p className="font-medium text-amber-200">Some features are temporarily unavailable</p>
             <p className="mt-1 text-amber-100/80">
-              Saved content, notifications, or learning progress may be limited until service is
-              restored.
+              Saved content, notifications, or learning progress may be limited right now. Please
+              try again shortly.
             </p>
           </>
         )}
-        <Link
-          to={portalRoutes.settings}
-          className="mt-2 inline-block text-xs font-medium text-amber-300 hover:underline"
-        >
-          Learn more in Settings →
-        </Link>
       </div>
       <button
         type="button"

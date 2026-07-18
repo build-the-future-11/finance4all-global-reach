@@ -14,7 +14,7 @@ export async function checkServerRateLimit(
   });
   if (error) {
     if (error.code === "42883" || error.message?.includes("does not exist")) {
-      console.error("Rate limit RPC unavailable — apply migration 008_platform_cms.sql");
+      console.error("Rate limit service unavailable");
       return false;
     }
     console.error("Rate limit check failed:", error.message);

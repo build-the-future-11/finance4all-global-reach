@@ -1,6 +1,7 @@
 -- Seed data for Finance4All Portal (run after migration)
--- DEVELOPMENT SAMPLE DATA ONLY — do not treat as production content.
--- Titles prefixed with [Sample] so the UI can badge them. Safe to re-run: ON CONFLICT where applicable.
+-- DEVELOPMENT SAMPLE DATA ONLY — do not run against production.
+-- Titles prefixed with [Sample] are filtered from production UI listings.
+-- Safe to re-run in local/staging: ON CONFLICT where applicable.
 
 INSERT INTO chapters (id, name, city, country, latitude, longitude, member_count) VALUES
   ('70000000-0000-4000-8000-000000000001', 'Mumbai', 'Mumbai', 'India', 19.076, 72.8777, 42),

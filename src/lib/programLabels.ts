@@ -22,3 +22,9 @@ export function isSampleContent(title: string): boolean {
 export function stripSamplePrefix(title: string): string {
   return title.replace(/^\[sample\]\s*/i, "").trim();
 }
+
+/** Hide development seed rows from members in production builds. */
+export function isPublicListingTitle(title: string): boolean {
+  if (!import.meta.env.PROD) return true;
+  return !isSampleContent(title);
+}

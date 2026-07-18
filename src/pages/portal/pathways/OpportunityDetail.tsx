@@ -18,7 +18,7 @@ import { toast } from "sonner";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { portalRoutes } from "@/routes/portal";
 import { sanitizeUrl } from "@/lib/security";
-import { isSampleContent, programKindLabels, stripSamplePrefix } from "@/lib/programLabels";
+import { isSampleContent, isPublicListingTitle, programKindLabels, stripSamplePrefix } from "@/lib/programLabels";
 import PortalAnimatedSection from "@/components/portal/PortalAnimatedSection";
 
 export default function OpportunityDetail() {
@@ -27,7 +27,7 @@ export default function OpportunityDetail() {
   const { data: interests } = useOpportunityInterests();
   const toggle = useToggleOpportunityInterest();
 
-  const opp = opportunities?.find((o) => o.id === id);
+  const opp = opportunities?.find((o) => o.id === id && isPublicListingTitle(o.title));
   useDocumentTitle(opp ? stripSamplePrefix(opp.title) : "Opportunity");
 
   const handleToggle = async () => {
@@ -73,7 +73,7 @@ export default function OpportunityDetail() {
                   {label}
                 </Badge>
               ))}
-              {isSampleContent(opp.title) && (
+              {isSampleContent(opp.title) && !import.meta.env.PROD && (
                 <Badge variant="outline" className="border-amber-400/40 text-amber-200">
                   Sample data
                 </Badge>

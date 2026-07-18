@@ -3,20 +3,14 @@ import { useScrollReveal } from "@/hooks/useScrollReveal";
 import SectionHeader from "@/components/landing/SectionHeader";
 import GlassSurface from "@/components/landing/GlassSurface";
 import { portalCopy } from "@/lib/portalCopy";
-import { DEFAULT_TESTIMONIALS } from "@/lib/cmsDefaults";
 import { useTestimonials } from "@/hooks/portal/useTestimonials";
 
 export default function TestimonialsSection() {
   const ref = useScrollReveal();
   const { data: testimonials } = useTestimonials();
-  const items =
-    testimonials ??
-    DEFAULT_TESTIMONIALS.map((t, i) => ({
-      id: `default-${i}`,
-      quote: t.quote,
-      attribution: t.attribution,
-      roleLabel: t.roleLabel,
-    }));
+  const items = testimonials ?? [];
+
+  if (items.length === 0) return null;
 
   return (
     <section className="relative px-4 py-24 sm:py-32">
@@ -24,7 +18,7 @@ export default function TestimonialsSection() {
         <SectionHeader
           eyebrow={portalCopy.landing.testimonialsEyebrow}
           title={portalCopy.landing.testimonialsTitle}
-          description="Paraphrased from chapter officers and members — roles described, names withheld for privacy."
+          description="Quotes from chapter officers and members — roles described, names withheld for privacy."
         />
 
         <div className="mt-14 grid gap-6 md:grid-cols-3">

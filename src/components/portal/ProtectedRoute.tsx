@@ -36,8 +36,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
           <h1 className="text-lg font-semibold text-white">Profile unavailable</h1>
           <p className="text-sm text-white/55">
             Your account session is active, but we could not load your member profile. Retry or sign
-            out and try again. If this continues, ask an admin to confirm migrations 009–011 are
-            applied.
+            out and try again. If this continues, contact Finance4All support.
           </p>
           <div className="flex flex-col gap-2 sm:flex-row sm:justify-center">
             <Button type="button" className={cn(portalButtonPrimary)} onClick={() => void refreshProfile()}>

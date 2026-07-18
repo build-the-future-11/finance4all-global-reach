@@ -60,10 +60,9 @@ export default function Discover() {
           Find a program, then join the portal to apply, register, or save it
         </h1>
         <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/55">
-          Finance4All (FinanceMeta member platform) is for students who want structured finance
-          learning, research projects, opportunities, chapters, and competitions. Listings below
-          open in the authenticated portal after you create an account — there are no fabricated
-          placement rates or member counts on this page.
+          Finance4All helps students find structured finance learning, research projects,
+          opportunities, chapters, and competitions. Choose a track below to create an account and
+          continue in the member portal — this page does not invent placement rates or member counts.
         </p>
 
         <div className="mt-12 grid gap-4 sm:grid-cols-2">

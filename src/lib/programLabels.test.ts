@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { isSampleContent, programKindLabels, stripSamplePrefix } from "@/lib/programLabels";
+import {
+  isPublicListingTitle,
+  isSampleContent,
+  programKindLabels,
+  stripSamplePrefix,
+} from "@/lib/programLabels";
 
 describe("programLabels", () => {
   it("detects fellowship and competition from tags", () => {
@@ -22,5 +27,15 @@ describe("programLabels", () => {
   it("marks sample titles", () => {
     expect(isSampleContent("[Sample] Fed signals patience")).toBe(true);
     expect(stripSamplePrefix("[Sample] Fed signals patience")).toBe("Fed signals patience");
+  });
+
+  it("hides sample titles from production listings", () => {
+    const title = "[Sample] Fed signals patience";
+    if (import.meta.env.PROD) {
+      expect(isPublicListingTitle(title)).toBe(false);
+    } else {
+      expect(isPublicListingTitle(title)).toBe(true);
+    }
+    expect(isPublicListingTitle("Fed signals patience")).toBe(true);
   });
 });
