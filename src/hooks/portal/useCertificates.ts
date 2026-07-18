@@ -4,6 +4,7 @@ import { mapCompetition, mapMemberCertificate } from "@/lib/mappers";
 import { CATALYST_CURRICULUM_KEY } from "@/lib/submissionModeration";
 import { supabase } from "@/lib/supabase";
 import { throwSanitizedDbError } from "@/lib/adminSanitize";
+import { trackEvent } from "@/lib/analytics";
 
 export function useMyCertificates() {
   const { user } = useAuth();
@@ -37,7 +38,8 @@ export function useIssueCurriculumCertificate() {
       if (error) throwSanitizedDbError(error);
       return mapMemberCertificate(data);
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      trackEvent("education.certificate_issued", { lesson_count: data.lessonIds.length });
       qc.invalidateQueries({ queryKey: ["member-certificates"] });
     },
   });

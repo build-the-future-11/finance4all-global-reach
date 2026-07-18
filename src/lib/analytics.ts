@@ -9,8 +9,11 @@ export const PRODUCT_EVENT_NAMES = [
   "contact.submit",
   "content.saved",
   "education.lesson_complete",
+  "education.certificate_issued",
   "event.registered",
+  "opportunity.interest_saved",
   "research.application_submitted",
+  "research.application_decided",
 ] as const;
 
 export type ProductEventName = (typeof PRODUCT_EVENT_NAMES)[number];

@@ -162,7 +162,8 @@ export function useUpdateApplicationStatus() {
         .eq("id", applicationId);
       if (error) throw error;
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
+      trackEvent("research.application_decided", { decision: variables.status });
       qc.invalidateQueries({ queryKey: ["review-queue"] });
       qc.invalidateQueries({ queryKey: ["project-applications"] });
     },

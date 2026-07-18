@@ -48,6 +48,7 @@ import SuggestedMembersRail from "@/components/portal/SuggestedMembersRail";
 import WeeklyGoalsCard from "@/components/portal/WeeklyGoalsCard";
 import LabApplicationsPanel from "@/components/portal/LabApplicationsPanel";
 import ParticipationSummary from "@/components/portal/ParticipationSummary";
+import ContributionHistory from "@/components/portal/ContributionHistory";
 import { openPortalSearch } from "@/lib/portalSearch";
 import { computeMemberBadges } from "@/lib/badges";
 import { timeGreeting } from "@/lib/personalization";
@@ -227,6 +228,10 @@ export default function Dashboard() {
 
           <PortalAnimatedSection>
             <ParticipationSummary />
+          </PortalAnimatedSection>
+
+          <PortalAnimatedSection>
+            <ContributionHistory />
           </PortalAnimatedSection>
 
           <PortalAnimatedSection>

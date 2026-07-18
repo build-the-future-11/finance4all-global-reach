@@ -6,6 +6,7 @@ import {
   mapStudioSubmission,
 } from "@/lib/mappers";
 import { useAuth } from "@/contexts/AuthContext";
+import { trackEvent } from "@/lib/analytics";
 
 export function useOpportunities() {
   return useQuery({
@@ -58,7 +59,8 @@ export function useToggleOpportunityInterest() {
         if (error) throw error;
       }
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
+      if (variables.interested) trackEvent("opportunity.interest_saved");
       qc.invalidateQueries({ queryKey: ["opportunity-interests"] });
       qc.invalidateQueries({ queryKey: ["saved-opportunities"] });
     },
