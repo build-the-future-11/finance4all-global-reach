@@ -35,7 +35,7 @@ CI=true npm run test:e2e
 
 ## Database
 
-1. Supabase SQL Editor → paste `supabase/FINAL_SETUP.sql` (migrations **001–016**)  
+1. Supabase SQL Editor → paste `supabase/FINAL_SETUP.sql` (migrations **001–017**)  
 2. Run `supabase/VERIFY_SETUP.sql` then `supabase/VERIFY_RLS_MATRIX.sql`  
 3. Confirm every row `ok = true`
 

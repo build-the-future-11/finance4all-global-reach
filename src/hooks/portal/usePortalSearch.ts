@@ -109,7 +109,7 @@ export function usePortalSearch(query: string) {
         results.push({ id: r.id, type: "lab", title: r.title, subtitle: "Research project", href: `${portalRoutes.labs}/${r.id}` }),
       );
       opps.data?.forEach((r) =>
-        results.push({ id: r.id, type: "opportunity", title: r.title, subtitle: r.organization, href: portalRoutes.pathwaysOpportunities }),
+        results.push({ id: r.id, type: "opportunity", title: r.title, subtitle: r.organization, href: `${portalRoutes.pathwaysOpportunities}/${r.id}` }),
       );
       events.data?.forEach((r) =>
         results.push({ id: r.id, type: "event", title: r.title, subtitle: "Event", href: portalRoutes.events }),

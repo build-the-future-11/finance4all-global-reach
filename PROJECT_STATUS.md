@@ -1,21 +1,21 @@
 # Project Status
 
 **Product:** Finance4All / FinanceMeta  
-**Branch:** `cursor/membership-security-supabase-fix` (ahead of origin)  
-**Latest:** `f74c688` post-discovery depth  
-**Schema:** migrations **001–016**  
+**Branch:** `cursor/membership-security-supabase-fix`  
+**Schema:** migrations **001–017**  
+**Continuity:** `.cursor/project_state.json`
 
 ## Status taxonomy
 
 | Area | Status |
 | --- | --- |
-| Visitor → signup → portal discovery | **Verified complete** |
-| Opportunity detail + Saved deep links | **Verified complete** |
-| Public competitions overview | **Verified complete** (honest static; live list after signup) |
-| Dashboard participation + activity RSVPs/interests | **Verified complete** |
-| Sample seed marking (`[Sample]`) | **Verified complete** (source) |
-| Local CI (108 unit; 14 e2e / 2 skip) | **Verified complete** |
+| Visitor → Discover → signup → portal | **Verified complete** |
+| Mobile nav (Pathways/Events primary) | **Verified complete** |
+| Lab status notification deep-links | **Verified complete** (migration 017) |
+| Debrief Sample badges | **Verified complete** |
+| Opportunity detail + search deep links | **Verified complete** |
+| Local CI matrix | **Verified complete** |
 | Live Supabase / Auth / Vercel / Edge | **Externally blocked** (OA-*) |
-| Bu1LD / VertexED / ObscuredRecords | **Not completed** — not open in workspace |
+| Bu1LD / VertexED / ObscuredRecords | **Not completed** — not open |
 
-See `DEMO_GUIDE.md`, `KNOWN_LIMITATIONS.md`, `.cursor/project_state.json`.
+See `DEMO_GUIDE.md`, `KNOWN_LIMITATIONS.md`, `docs/OWNER_ACTIONS.md`.

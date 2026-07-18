@@ -3,20 +3,21 @@ import { Link } from "react-router-dom";
 import {
   Activity,
   Bookmark,
-  CalendarDays,
+  FlaskConical,
+  GraduationCap,
   LayoutGrid,
   MoreHorizontal,
-  Route,
   Settings,
+  Users,
 } from "lucide-react";
 import { portalRoutes } from "@/routes/portal";
 import { PortalSheetContent } from "@/components/portal/PortalUI";
-import { portalCopy } from "@/lib/portalCopy";
 import { Sheet, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 const moreItems = [
-  { to: portalRoutes.pathways, icon: Route, label: "Pathways" },
-  { to: portalRoutes.events, icon: CalendarDays, label: "Events" },
+  { to: portalRoutes.education, icon: GraduationCap, label: "Learn" },
+  { to: portalRoutes.labs, icon: FlaskConical, label: "Labs" },
+  { to: portalRoutes.network, icon: Users, label: "Network" },
   { to: portalRoutes.saved, icon: Bookmark, label: "Saved" },
   { to: portalRoutes.activity, icon: Activity, label: "Activity" },
   { to: portalRoutes.settings, icon: Settings, label: "Settings" },

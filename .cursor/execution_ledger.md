@@ -118,3 +118,27 @@ Owner OA-*; other product repos not open.
 
 ### Next executable action
 Owner OA-1 or authorize push.
+
+## [2026-07-18T03:10:00Z] Work Unit — FinanceMeta harden polish
+
+### Objective
+Mobile nav for apply/register journeys, lab notification deep-links, Debrief sample badges, Hero→Discover, search deep links, mobile e2e.
+
+### Files changed
+- MobileBottomNav, MobileMoreMenu, HeroSection, DebriefedHub, usePortalSearch
+- 017_lab_notification_deep_link.sql, FINAL_SETUP.sql
+- playwright.config.ts, e2e/mobile.spec.ts, e2e/smoke.spec.ts
+- index.html OG, Admin competitions empty, docs 001–017
+
+### Implementation
+Primary mobile tabs are Home/News/Pathways/Events. Lab status notifies link to /portal/labs/:id. Package and FINAL_SETUP regenerated through 017.
+
+### Verification
+- Command: typecheck; npm test (110); release:static; package:source; CI=true test:e2e
+- Result: all pass; e2e 16 pass / 2 skip
+
+### Remaining issue
+Owner OA-*; other product repos not open.
+
+### Next executable action
+Owner apply FINAL_SETUP 001–017; or authorize push.

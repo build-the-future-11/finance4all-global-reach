@@ -35,6 +35,12 @@ test.describe("public site smoke", () => {
     await expect(page.getByRole("link", { name: /browse research after signup/i })).toBeVisible();
   });
 
+  test("hero primary CTA opens Discover", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("link", { name: /discover programs/i }).click();
+    await expect(page).toHaveURL(/\/discover/);
+  });
+
   test("landing module CTA routes to signup with next", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("link", { name: /meta labs/i }).first().click();

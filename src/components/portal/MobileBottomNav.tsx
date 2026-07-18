@@ -1,23 +1,20 @@
 import { NavLink } from "react-router-dom";
 import {
-  FlaskConical,
-  GraduationCap,
+  CalendarDays,
   LayoutDashboard,
   Newspaper,
-  Users,
+  Route,
 } from "lucide-react";
 import { portalRoutes } from "@/routes/portal";
 import { cn } from "@/lib/utils";
 import { portalCopy } from "@/lib/portalCopy";
-
 import MobileMoreMenu from "@/components/portal/MobileMoreMenu";
 
 const items = [
   { to: portalRoutes.dashboard, icon: LayoutDashboard, label: portalCopy.nav.mobile.home },
   { to: portalRoutes.debriefed, icon: Newspaper, label: portalCopy.nav.mobile.news },
-  { to: portalRoutes.education, icon: GraduationCap, label: portalCopy.nav.mobile.learn },
-  { to: portalRoutes.labs, icon: FlaskConical, label: portalCopy.nav.mobile.labs },
-  { to: portalRoutes.network, icon: Users, label: portalCopy.nav.mobile.network },
+  { to: portalRoutes.pathways, icon: Route, label: portalCopy.nav.mobile.pathways },
+  { to: portalRoutes.events, icon: CalendarDays, label: portalCopy.nav.mobile.events },
 ];
 
 export default function MobileBottomNav() {

@@ -1,14 +1,13 @@
 {
   "current_phase": 4,
   "completed_phases": [1, 2, 3, 4],
-  "product_wave": "financemeta_post_discovery_depth",
+  "product_wave": "financemeta_harden_polish",
   "completed_work": [
-    "Visitor discovery journey",
-    "Public /competitions overview",
-    "Opportunity detail route + Saved deep links",
-    "Activity feed: own RSVPs + opportunity interests",
-    "Fellowship/workshop labels; [Sample] seed marking",
-    "Duplicate lab apply friendly 23505 error"
+    "Mobile nav promotes Pathways/Events",
+    "017 lab notification deep-link",
+    "Debrief Sample badges; Hero→Discover",
+    "Portal search opportunity :id; admin competitions empty copy",
+    "Mobile e2e project; package:source regen; FINAL_SETUP 001-017"
   ],
   "remaining_work": [],
   "blocked_work": [
@@ -19,16 +18,17 @@
   "commands_executed": [
     "npm run typecheck",
     "npm test",
+    "npm run release:static",
+    "npm run package:source",
     "CI=true npm run test:e2e"
   ],
   "tests_executed": [
-    "vitest 108 passed",
-    "playwright 14 passed / 2 skipped"
+    "vitest 110 passed",
+    "playwright e2e (see ledger)"
   ],
   "artifacts_created": [
-    "src/pages/Competitions.tsx",
-    "src/pages/portal/pathways/OpportunityDetail.tsx",
-    "src/lib/programLabels.ts"
+    "supabase/migrations/017_lab_notification_deep_link.sql",
+    "e2e/mobile.spec.ts"
   ],
-  "last_updated": "2026-07-17T17:05:00Z"
+  "last_updated": "2026-07-18T03:10:00Z"
 }

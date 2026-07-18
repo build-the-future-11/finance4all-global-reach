@@ -22,18 +22,18 @@ export default function HeroSection() {
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              to="/signup"
+              to="/discover"
               className="inline-flex min-h-11 items-center gap-2 rounded-md bg-emerald-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-emerald-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-200"
             >
-              Create a member account
+              Discover programs
               <ArrowRight className="h-4 w-4" aria-hidden />
             </Link>
-            <a
-              href="#membership"
+            <Link
+              to="/signup"
               className="inline-flex min-h-11 items-center rounded-md border border-white/25 px-5 py-3 text-sm font-semibold text-white transition hover:border-white/50 hover:bg-white/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
-              See what membership includes
-            </a>
+              Create a member account
+            </Link>
           </div>
           <p className="mt-5 text-sm text-slate-400">No finance background is assumed. Content availability changes as editors and administrators publish it.</p>
         </div>

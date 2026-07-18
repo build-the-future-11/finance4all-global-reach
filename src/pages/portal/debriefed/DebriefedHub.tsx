@@ -41,6 +41,7 @@ import ReportContentButton from "@/components/portal/ReportContentButton";
 import { portalCopy } from "@/lib/portalCopy";
 import { sanitizeUrl } from "@/lib/security";
 import { DEBRIEF_DISCLAIMER } from "@/lib/debriefPublish";
+import { isSampleContent, stripSamplePrefix } from "@/lib/programLabels";
 
 const CATEGORIES: { value: NewsCategory | "all"; label: string }[] = [
   { value: "all", label: portalCopy.debriefed.categories.all },
@@ -302,6 +303,11 @@ export default function DebriefedHub() {
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <CategoryBadge>{article.category}</CategoryBadge>
+                    {isSampleContent(article.title) && (
+                      <Badge variant="outline" className="border-amber-400/40 text-amber-200">
+                        Sample
+                      </Badge>
+                    )}
                     {article.newsletterInclude && (
                       <Badge variant="outline" className="border-emerald-400/30 text-emerald-200">
                         Newsletter
@@ -318,7 +324,7 @@ export default function DebriefedHub() {
                     onClick={() => openArticle(article)}
                     className="mt-2.5 text-left text-lg font-semibold leading-snug text-white hover:text-emerald-200"
                   >
-                    {article.title}
+                    {stripSamplePrefix(article.title)}
                   </button>
                   <p className="mt-2 text-sm leading-relaxed text-white/55">{article.summary}</p>
                   <p className="mt-2 text-xs text-white/35">
@@ -363,8 +369,17 @@ export default function DebriefedHub() {
           {selectedArticle && (
             <>
               <DialogHeader>
-                <CategoryBadge>{selectedArticle.category}</CategoryBadge>
-                <DialogTitle className="mt-2 text-left text-white">{selectedArticle.title}</DialogTitle>
+                <div className="flex flex-wrap items-center gap-2">
+                  <CategoryBadge>{selectedArticle.category}</CategoryBadge>
+                  {isSampleContent(selectedArticle.title) && (
+                    <Badge variant="outline" className="border-amber-400/40 text-amber-200">
+                      Sample
+                    </Badge>
+                  )}
+                </div>
+                <DialogTitle className="mt-2 text-left text-white">
+                  {stripSamplePrefix(selectedArticle.title)}
+                </DialogTitle>
               </DialogHeader>
               <p className="rounded-lg border border-amber-400/20 bg-amber-400/5 px-3 py-2 text-xs leading-relaxed text-amber-100/80">
                 {DEBRIEF_DISCLAIMER}

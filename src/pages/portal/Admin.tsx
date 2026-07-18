@@ -1589,7 +1589,7 @@ function AdminCompetitionsTab() {
         error={error}
         onRetry={() => refetch()}
         isEmpty={!data?.length}
-        emptyMessage="No competitions yet."
+        emptyMessage="No competitions yet. Create one above — open status listings appear for members under Events & Chapters."
       >
         <div className="space-y-2">
           {data?.map((comp) => (

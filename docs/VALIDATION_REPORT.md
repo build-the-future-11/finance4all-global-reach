@@ -3,7 +3,7 @@
 **Project:** Finance4All / FinanceMeta  
 **Branch:** `cursor/membership-security-supabase-fix`  
 **Recorded:** 2026-07-17 (Phase 4 release governor)  
-**Migrations:** 001–016
+**Migrations:** 001–017
 
 ## Commands run in this environment
 

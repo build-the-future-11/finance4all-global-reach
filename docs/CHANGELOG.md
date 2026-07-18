@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-07-18 — Harden polish (mobile + notifications)
+
+- Mobile bottom nav: Pathways + Events primary; Learn/Labs/Network under More
+- Migration `017_lab_notification_deep_link.sql`; FINAL_SETUP 001–017
+- Debrief Sample badges; Hero primary → `/discover`
+- Portal search opportunity `:id` links; admin competitions empty guidance
+- Mobile Playwright project; package:source regenerated
+
 ## 2026-07-17 — Phase 4 release governor
 
 - `DEMO_GUIDE.md`, `KNOWN_LIMITATIONS.md`, synced release checklists

@@ -663,6 +663,8 @@ export const portalCopy = {
     mobile: {
       home: "Home",
       news: "News",
+      pathways: "Pathways",
+      events: "Events",
       learn: "Learn",
       labs: "Labs",
       network: "Network",
