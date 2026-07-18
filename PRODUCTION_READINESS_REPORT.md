@@ -185,7 +185,7 @@ Full detail: `docs/OWNER_ACTIONS.md`, `DEPLOYMENT.md`, `DATABASE.md`.
 
 | Project | Verdict |
 | --- | --- |
-| **FinanceMeta / Finance4All** | **READY AFTER CONFIGURATION** — build/tests/security/SEO/mobile all pass locally; only owner-side live config (OA-1…OA-9) remains. Zero known P0/P1 *engineering* blockers. |
+| **FinanceMeta / Finance4All** | **READY AFTER CONFIGURATION** — build/tests/security/SEO/mobile all pass locally; public UI scrubbed of sample/dev/setup jargon; only owner-side live config (OA-1…OA-9) remains. Zero known P0/P1 *engineering* blockers. |
 | VertexEDU | **NOT VERIFIED FROM THIS WORKSPACE** — open in its own workspace to run its finisher pass. |
 | the-bu1ld-nexus-main | **NOT VERIFIED FROM THIS WORKSPACE** — same. |
 | ObscuredRecordsAgent | **NOT VERIFIED FROM THIS WORKSPACE** — Python env + assets required; open separately. |
