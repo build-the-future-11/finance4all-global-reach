@@ -19,10 +19,12 @@
     "npm run typecheck",
     "npm test",
     "npm run release:static",
-    "npm run package:source"
+    "npm run package:source",
+    "CI=true npm run test:e2e"
   ],
   "tests_executed": [
-    "vitest 119 passed"
+    "vitest 119 passed",
+    "playwright e2e 16 passed / 2 skipped"
   ],
   "artifacts_created": [
     "supabase/migrations/020_notification_ownership_moderation.sql"
