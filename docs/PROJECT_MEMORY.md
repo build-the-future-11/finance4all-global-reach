@@ -12,7 +12,7 @@ Global financial-literacy nonprofit platform: public site + member portal (learn
 
 ## Exact current status
 
-Engineering finish line: schemas 001–016, portal workflows, Debrief trust model, moderation, certificates, competitions, chapter tools, content reports (RPC-only insert), newsletter archive filters, sanitized outbound URLs, secure source packaging, e2e smoke/auth surfaces, RLS matrix docs.
+Engineering finish line: schemas 001–019, portal workflows, Debrief trust model, moderation, certificates, competitions, chapter tools, content reports (RPC-only insert), ownership force-assign, SECURITY DEFINER search_path pins, newsletter archive filters, sanitized outbound URLs, secure source packaging, e2e smoke/auth surfaces, RLS matrix docs.
 
 ## Next task
 
@@ -30,7 +30,7 @@ Schema apply, Auth URLs, Vercel env, Edge secrets, brand D-001, live RLS samplin
 
 | Item | Notes |
 | --- | --- |
-| Live Supabase | Must run FINAL_SETUP 001–016 |
+| Live Supabase | Must run FINAL_SETUP 001–019 |
 | Event push reminders | Not built (RSVP + calendar export exist) |
 | Debrief AI live provider | Adapter unconfigured by design |
 | Certificate PDF binary | HTML print view only |

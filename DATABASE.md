@@ -37,6 +37,8 @@ supabase db push
 | 015 | `015_content_reports_chapter_tools.sql` | Content reports + chapter leader snapshot (RPC insert only) |
 | 016 | `016_content_reports_rpc_only.sql` | Drop any leftover direct INSERT policy on reports |
 | 017 | `017_lab_notification_deep_link.sql` | Lab status notifications link to `/portal/labs/:id` |
+| 018 | `018_security_definer_search_path.sql` | Pin all public SECURITY DEFINER functions to `search_path = public, pg_temp` |
+| 019 | `019_ownership_force_assign.sql` | Force-assign owners from `auth.uid()`, ownership indexes, lab review deep-link |
 
 ## Seeds
 

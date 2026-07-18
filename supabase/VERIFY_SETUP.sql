@@ -1,5 +1,5 @@
 -- FinanceMeta / Finance4All production setup verification.
--- Run after supabase/FINAL_SETUP.sql or after applying migrations 001-016.
+-- Run after supabase/FINAL_SETUP.sql or after applying migrations 001-019.
 -- Expected result: every row has ok = true.
 
 WITH expected_tables(name) AS (
@@ -164,7 +164,13 @@ expected_indexes(name) AS (
     ('product_analytics_events_name_time'),
     ('product_analytics_events_user_time'),
     ('client_error_events_time'),
-    ('client_error_events_user_time')
+    ('client_error_events_user_time'),
+    ('opportunity_interests_user'),
+    ('news_bookmarks_user'),
+    ('project_bookmarks_user'),
+    ('event_registrations_user'),
+    ('lab_applications_applicant'),
+    ('essay_upvotes_user')
 ),
 index_checks AS (
   SELECT
@@ -190,7 +196,12 @@ expected_triggers(name) AS (
     ('validate_connection_request_write'),
     ('validate_studio_submission_write'),
     ('validate_essay_submission_write'),
-    ('validate_introduction_post_write')
+    ('validate_introduction_post_write'),
+    ('force_news_bookmark_owner'),
+    ('force_project_bookmark_owner'),
+    ('force_opportunity_interest_owner'),
+    ('force_essay_upvote_owner'),
+    ('force_education_progress_owner')
 ),
 trigger_checks AS (
   SELECT
@@ -281,6 +292,21 @@ function_grant_checks AS (
     ) AS ok
   FROM expected_function_grants
 ),
+security_definer_search_path_check AS (
+  SELECT
+    'security:all SECURITY DEFINER functions pin search_path' AS check_name,
+    NOT EXISTS (
+      SELECT 1
+      FROM pg_proc p
+      JOIN pg_namespace n ON n.oid = p.pronamespace
+      WHERE n.nspname = 'public'
+        AND p.prosecdef
+        AND NOT (
+          COALESCE(p.proconfig, ARRAY[]::TEXT[])
+          @> ARRAY['search_path=public, pg_temp']::TEXT[]
+        )
+    ) AS ok
+),
 view_checks AS (
   SELECT
     'view:member_directory' AS check_name,
@@ -351,6 +377,7 @@ UNION ALL SELECT * FROM index_checks
 UNION ALL SELECT * FROM trigger_checks
 UNION ALL SELECT * FROM function_checks
 UNION ALL SELECT * FROM function_grant_checks
+UNION ALL SELECT * FROM security_definer_search_path_check
 UNION ALL SELECT * FROM view_checks
 UNION ALL SELECT * FROM storage_checks
 UNION ALL SELECT * FROM storage_policy_checks

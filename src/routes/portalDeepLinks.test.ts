@@ -12,5 +12,8 @@ describe("portal deep links", () => {
   it("builds lab project paths for notifications", () => {
     const id = "22222222-2222-4222-8222-222222222222";
     expect(`${portalRoutes.labs}/${id}`).toBe(`/portal/labs/${id}`);
+    expect(`${portalRoutes.labs}/review?project=${id}`).toBe(
+      `/portal/labs/review?project=${id}`,
+    );
   });
 });

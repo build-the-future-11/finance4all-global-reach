@@ -7,14 +7,14 @@ Only credential, dashboard, legal, or live-environment tasks. Engineering work i
 **Project:** `xwlrzgfuhfbckgvcmyoq` (or whichever is canonical)  
 **Steps:**
 
-1. SQL Editor → paste `supabase/FINAL_SETUP.sql` → Run (migrations **001–017**)  
+1. SQL Editor → paste `supabase/FINAL_SETUP.sql` → Run (migrations **001–019**)  
 2. Paste `supabase/VERIFY_SETUP.sql` → Run  
-3. Confirm every row `ok = true` (including content_reports, moderation, certificates, leaders, competitions)  
+3. Confirm every row `ok = true` (including content_reports, moderation, certificates, leaders, competitions, ownership triggers, SECURITY DEFINER search_path)  
 4. Paste `supabase/VERIFY_RLS_MATRIX.sql` → Run; confirm every row `ok = true`
 
 **Unblocks:** FM-DATA-001, FM-AUTH-002, FM-SEC-001 (policy presence), portal runtime, Debrief, moderation, certificates, competitions, content reports
 
-**Note:** If a prior FINAL_SETUP was applied without 013–017, re-run full script or apply `013`…`017` in order, then VERIFY. Migration **016** drops direct `content_reports` INSERT; **017** deep-links lab status notifications to `/portal/labs/:id`.
+**Note:** If a prior FINAL_SETUP was applied without 013–019, re-run full script or apply `013`…`019` in order, then VERIFY. Migration **016** drops direct `content_reports` INSERT; **017** deep-links lab status notifications to `/portal/labs/:id`; **018** pins SECURITY DEFINER `search_path`; **019** force-assigns ownership from `auth.uid()` and deep-links lab received notices to `/portal/labs/review?project=`.
 
 ## OA-2 — Auth URL configuration
 

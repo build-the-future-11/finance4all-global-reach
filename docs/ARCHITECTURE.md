@@ -65,7 +65,7 @@ See `src/components/AppRouter.tsx` and `src/routes/portal.ts`.
 
 ## Migrations
 
-Ordered `001`…`016`. Consolidated: `supabase/FINAL_SETUP.sql`. Verify: `supabase/VERIFY_SETUP.sql` + `supabase/VERIFY_RLS_MATRIX.sql`.
+Ordered `001`…`019`. Consolidated: `supabase/FINAL_SETUP.sql`. Verify: `supabase/VERIFY_SETUP.sql` + `supabase/VERIFY_RLS_MATRIX.sql`.
 
 ## Edge Functions
 

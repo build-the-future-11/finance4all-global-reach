@@ -18,4 +18,4 @@
 
 ## Schema
 
-Migrations **001–016** in FINAL_SETUP. Content reports: RPC insert only.
+Migrations **001–019** in FINAL_SETUP. Content reports: RPC insert only. Ownership force-assigned from `auth.uid()`.

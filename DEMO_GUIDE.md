@@ -8,7 +8,7 @@ Local walkthrough of Finance4All / FinanceMeta after `npm install` and a configu
    - `VITE_SUPABASE_URL`
    - `VITE_SUPABASE_ANON_KEY`
    - `VITE_APP_URL` (e.g. `http://localhost:8080` for local; production builds require `https://…`)
-2. Apply `supabase/FINAL_SETUP.sql` (migrations **001–016**) on your Supabase project, then `VERIFY_SETUP.sql` and `VERIFY_RLS_MATRIX.sql` (all `ok`).
+2. Apply `supabase/FINAL_SETUP.sql` (migrations **001–019**) on your Supabase project, then `VERIFY_SETUP.sql` and `VERIFY_RLS_MATRIX.sql` (all `ok`).
 3. `npm install` then `npm run dev` (default Vite port from project config).
 
 Without a live schema, public pages still load; authenticated portal data will fail or appear empty.

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-07-18 — Ownership + DEFINER harden (018–019)
+
+- Migration `018_security_definer_search_path.sql` pins all public SECURITY DEFINER `search_path`
+- Migration `019_ownership_force_assign.sql` force-assigns owners from `auth.uid()`, indexes dashboard queries, deep-links lab received → `/portal/labs/review?project=`
+- Lab review UI honors `?project=` filter; VERIFY_SETUP + FINAL_SETUP synced to **001–019**
+
 ## 2026-07-18 — Harden polish (mobile + notifications)
 
 - Mobile bottom nav: Pathways + Events primary; Learn/Labs/Network under More

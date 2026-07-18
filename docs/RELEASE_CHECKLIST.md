@@ -11,13 +11,13 @@ Engineering source gates vs owner live gates. Keep claims honest: only mark chec
 - [x] Production build with CI placeholder `VITE_*` (`https` `VITE_APP_URL` required)
 - [x] `npm run release:static`
 - [x] `npm run package:source` (no `.env` / `.vercel` / `.cursor`)
-- [x] Migrations **001–017** present; `FINAL_SETUP.sql` synced
+- [x] Migrations **001–019** present; `FINAL_SETUP.sql` synced
 - [x] `VERIFY_SETUP.sql` + `VERIFY_RLS_MATRIX.sql` (includes absent direct INSERT on `content_reports`)
 
 ## Production Supabase (owner)
 
 - [ ] Create or confirm the production Supabase project
-- [ ] Apply `supabase/FINAL_SETUP.sql` (migrations **001–017**)
+- [ ] Apply `supabase/FINAL_SETUP.sql` (migrations **001–019**)
 - [ ] Run `VERIFY_SETUP.sql` — every row `ok = true`
 - [ ] Run `VERIFY_RLS_MATRIX.sql` — every row `ok = true`
 - [ ] Confirm storage `avatars` policies

@@ -142,3 +142,29 @@ Owner OA-*; other product repos not open.
 
 ### Next executable action
 Owner apply FINAL_SETUP 001–017; or authorize push.
+
+## [2026-07-18T03:45:00Z] Work Unit — Ownership + DEFINER harden
+
+### Objective
+Pin SECURITY DEFINER search_path; force-assign ownership from auth.uid(); deep-link lab received notifications; sync FINAL_SETUP 001–019.
+
+### Files changed
+- supabase/migrations/018_security_definer_search_path.sql
+- supabase/migrations/019_ownership_force_assign.sql
+- supabase/VERIFY_SETUP.sql, supabase/FINAL_SETUP.sql
+- src/pages/portal/labs/LabReview.tsx
+- src/lib/ownershipForceAssign.test.ts, portalDeepLinks.test.ts
+- Docs/status/continuity to 001–019; package:source archive
+
+### Implementation
+018 alters every public SECURITY DEFINER function to `search_path = public, pg_temp`. 019 overwrites applicant/user/author/from_user on insert, adds ownership indexes, points lab-received notices to `/portal/labs/review?project=`. LabReview filters on that query param.
+
+### Verification
+- Command: typecheck; npm test (116); release:static; package:source (396 entries); CI=true test:e2e
+- Result: all pass; e2e 16 pass / 2 skip
+
+### Remaining issue
+Owner OA-*; other product repos not open.
+
+### Next executable action
+Owner apply FINAL_SETUP 001–019 + VERIFY; or authorize push.

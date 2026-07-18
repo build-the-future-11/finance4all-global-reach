@@ -2,24 +2,25 @@
 
 **Project:** Finance4All / FinanceMeta  
 **Branch:** `cursor/membership-security-supabase-fix`  
-**Recorded:** 2026-07-17 (Phase 4 release governor)  
-**Migrations:** 001–017
+**Recorded:** 2026-07-18 (ownership + DEFINER harden)  
+**Migrations:** 001–019
 
 ## Commands run in this environment
 
 | Check | Result |
 | --- | --- |
 | `npm run typecheck` | PASSED |
-| `npm test` | PASSED (98) |
-| `npm run lint` | PASSED (0 errors; 8 Fast Refresh warnings) |
-| `npm run build` (CI `VITE_*`) | PASSED |
+| `npm test` | PASSED (116) |
 | `npm run release:static` | PASSED |
-| `npm run package:source` | PASSED (380 entries; no `.env`) |
-| `CI=true npm run test:e2e` | PASSED (11) / SKIPPED (2) — after Playwright https coerce |
+| `npm run package:source` | PASSED (396 entries; no `.env`) |
+| `CI=true npm run test:e2e` | PASSED (16) / SKIPPED (2) — authenticated journeys need `E2E_*` |
 
-## Failure repaired this run
+## This run
 
-Local `.env` had non-https `VITE_APP_URL` (`http://localhost…`). Playwright `webServer.env` used `??` which kept that value; Vite production validate rejected it. Fixed by coercing to `https://ci-placeholder.vercel.app` when value does not start with `https://`.
+- Migration **018** pins SECURITY DEFINER `search_path`
+- Migration **019** force-assigns ownership from `auth.uid()`, indexes ownership queries, deep-links lab received notifications
+- Lab review honors `?project=` filter
+- `ownershipForceAssign.test.ts` regression coverage
 
 ## Not runnable here
 

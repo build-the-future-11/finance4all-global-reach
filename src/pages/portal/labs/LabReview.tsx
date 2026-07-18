@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   useProfilesByIds,
@@ -24,10 +26,18 @@ import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 export default function LabReview() {
   useDocumentTitle("Lab review");
   const { profile } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const projectFilter = searchParams.get("project")?.trim() || null;
   const { data: queue, isLoading, error, refetch } = useReviewQueue();
   const updateStatus = useUpdateApplicationStatus();
 
-  const applicantIds = queue?.map((a) => a.applicantId) ?? [];
+  const filteredQueue = useMemo(() => {
+    if (!queue) return queue;
+    if (!projectFilter) return queue;
+    return queue.filter((app) => app.projectId === projectFilter);
+  }, [queue, projectFilter]);
+
+  const applicantIds = filteredQueue?.map((a) => a.applicantId) ?? [];
   const { data: applicants } = useProfilesByIds(applicantIds);
 
   const handleReview = async (applicationId: string, status: LabApplicationStatus) => {
@@ -65,9 +75,30 @@ export default function LabReview() {
       {!isLoading && !error && queue && queue.length === 0 && (
         <EmptyState message={portalCopy.labs.reviewEmpty ?? "No pending applications."} />
       )}
+      {!isLoading && !error && queue && queue.length > 0 && filteredQueue && filteredQueue.length === 0 && (
+        <EmptyState message="No pending applications match this project filter." />
+      )}
+      {projectFilter && (
+        <div className="mb-4 flex flex-wrap items-center gap-3 text-sm text-white/60">
+          <span>Filtered to one project from your notification.</span>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className={portalButtonOutline}
+            onClick={() => {
+              const next = new URLSearchParams(searchParams);
+              next.delete("project");
+              setSearchParams(next, { replace: true });
+            }}
+          >
+            Show all
+          </Button>
+        </div>
+      )}
 
       <div className="space-y-4">
-        {queue?.map((app) => {
+        {filteredQueue?.map((app) => {
           const applicant = applicants?.[app.applicantId];
           return (
             <PortalCard key={app.id} className="p-5">
