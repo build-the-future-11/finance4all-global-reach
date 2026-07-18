@@ -1,13 +1,13 @@
 {
   "current_phase": 4,
   "completed_phases": [1, 2, 3, 4],
-  "product_wave": "financemeta_ownership_definer_harden",
+  "product_wave": "financemeta_notification_moderation_harden",
   "completed_work": [
     "018 SECURITY DEFINER search_path pin",
     "019 ownership force-assign + indexes + lab review deep-link",
-    "LabReview ?project= filter",
-    "VERIFY_SETUP + FINAL_SETUP 001-019",
-    "ownershipForceAssign unit tests; package:source regen"
+    "020 notification content freeze, research/competition ownership, moderation notifies",
+    "Admin chapter-leader member picker",
+    "VERIFY_SETUP + FINAL_SETUP 001-020"
   ],
   "remaining_work": [],
   "blocked_work": [
@@ -19,17 +19,13 @@
     "npm run typecheck",
     "npm test",
     "npm run release:static",
-    "npm run package:source",
-    "CI=true npm run test:e2e"
+    "npm run package:source"
   ],
   "tests_executed": [
-    "vitest 116 passed",
-    "playwright e2e 16 passed / 2 skipped"
+    "vitest 119 passed"
   ],
   "artifacts_created": [
-    "supabase/migrations/018_security_definer_search_path.sql",
-    "supabase/migrations/019_ownership_force_assign.sql",
-    "src/lib/ownershipForceAssign.test.ts"
+    "supabase/migrations/020_notification_ownership_moderation.sql"
   ],
-  "last_updated": "2026-07-18T03:45:00Z"
+  "last_updated": "2026-07-18T03:50:00Z"
 }

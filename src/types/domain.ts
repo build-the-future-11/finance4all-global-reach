@@ -291,6 +291,8 @@ export const NotificationTypeSchema = z.enum([
   "connection_accepted",
   "lab_application_status",
   "lab_application_received",
+  "studio_submission_status",
+  "essay_submission_status",
 ]);
 export type NotificationType = z.infer<typeof NotificationTypeSchema>;
 

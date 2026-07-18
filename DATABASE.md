@@ -39,6 +39,7 @@ supabase db push
 | 017 | `017_lab_notification_deep_link.sql` | Lab status notifications link to `/portal/labs/:id` |
 | 018 | `018_security_definer_search_path.sql` | Pin all public SECURITY DEFINER functions to `search_path = public, pg_temp` |
 | 019 | `019_ownership_force_assign.sql` | Force-assign owners from `auth.uid()`, ownership indexes, lab review deep-link |
+| 020 | `020_notification_ownership_moderation.sql` | Notification read-only updates, research/competition ownership, moderation notifies |
 
 ## Seeds
 

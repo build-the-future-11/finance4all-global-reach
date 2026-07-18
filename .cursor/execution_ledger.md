@@ -168,3 +168,27 @@ Owner OA-*; other product repos not open.
 
 ### Next executable action
 Owner apply FINAL_SETUP 001–019 + VERIFY; or authorize push.
+
+## [2026-07-18T03:50:00Z] Work Unit — Close audit gaps (020)
+
+### Objective
+Address remaining locally solvable gaps from release audit: notification UPDATE freeze, research/competition ownership, moderation notifies, connection indexes, admin appoint UX.
+
+### Files changed
+- supabase/migrations/020_notification_ownership_moderation.sql
+- VERIFY_SETUP, FINAL_SETUP, database/domain types
+- Admin.tsx chapter leaders picker; NotificationsCenter copy
+- Docs/status/continuity to 001–020
+
+### Implementation
+Members can only flip notification `read`. Research leads and competition `created_by` come from `auth.uid()`. Studio/essay moderation emits author notifications. Connection inbox indexes added. Admin appoint uses member select.
+
+### Verification
+- Command: typecheck; npm test (119); release:static; package:source (397)
+- Result: all pass
+
+### Remaining issue
+Owner OA-*; chapter leaders still cannot draft events without further product scope.
+
+### Next executable action
+Owner apply FINAL_SETUP 001–020 + VERIFY; or authorize push.

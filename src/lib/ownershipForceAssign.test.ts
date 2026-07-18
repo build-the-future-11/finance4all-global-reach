@@ -47,8 +47,32 @@ describe("ownership force-assign", () => {
   });
 });
 
+describe("notification ownership and moderation", () => {
+  const migration020 = readFileSync(
+    join(migrationsDir, "020_notification_ownership_moderation.sql"),
+    "utf8",
+  );
+
+  it("freezes notification content updates to the read flag", () => {
+    expect(migration020).toContain("protect_notification_content");
+    expect(migration020).toContain("Only the read flag can be updated on notifications");
+  });
+
+  it("force-assigns research lead and competition created_by", () => {
+    expect(migration020).toContain("NEW.lead_researcher_id := (SELECT auth.uid())");
+    expect(migration020).toContain("NEW.created_by := (SELECT auth.uid())");
+  });
+
+  it("notifies authors on studio and essay moderation", () => {
+    expect(migration020).toContain("studio_submission_status");
+    expect(migration020).toContain("essay_submission_status");
+    expect(migration020).toContain("'/portal/pathways/studios'");
+    expect(migration020).toContain("'/portal/pathways/essays'");
+  });
+});
+
 describe("FINAL_SETUP synchronization", () => {
-  it("includes migrations 018 and 019", () => {
+  it("includes migrations 018 through 020", () => {
     const finalSetup = readFileSync(join(root, "supabase/FINAL_SETUP.sql"), "utf8");
     const migrationFiles = readdirSync(migrationsDir)
       .filter((name) => /^\d{3}_.+\.sql$/.test(name))
@@ -56,9 +80,12 @@ describe("FINAL_SETUP synchronization", () => {
 
     expect(migrationFiles).toContain("018_security_definer_search_path.sql");
     expect(migrationFiles).toContain("019_ownership_force_assign.sql");
+    expect(migrationFiles).toContain("020_notification_ownership_moderation.sql");
     expect(finalSetup).toContain("-- 018_security_definer_search_path.sql");
     expect(finalSetup).toContain("-- 019_ownership_force_assign.sql");
+    expect(finalSetup).toContain("-- 020_notification_ownership_moderation.sql");
     expect(finalSetup).toContain("SET search_path = public, pg_temp");
     expect(finalSetup).toContain("force_news_bookmark_owner");
+    expect(finalSetup).toContain("protect_notification_content_write");
   });
 });

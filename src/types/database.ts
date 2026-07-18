@@ -12,7 +12,9 @@ export type NotificationType =
   | "connection_request"
   | "connection_accepted"
   | "lab_application_status"
-  | "lab_application_received";
+  | "lab_application_received"
+  | "studio_submission_status"
+  | "essay_submission_status";
 
 export interface Database {
   public: {
@@ -821,7 +823,20 @@ export interface Database {
         }[];
       };
     };
-    Enums: Record<string, never>;
+    Enums: {
+      user_role: UserRole;
+      news_category: NewsCategory;
+      research_project_status: ResearchProjectStatus;
+      lab_application_status: LabApplicationStatus;
+      opportunity_type: OpportunityType;
+      event_status: EventStatus;
+      connection_status: ConnectionStatus;
+      explainer_difficulty: ExplainerDifficulty;
+      notification_type: NotificationType;
+      submission_moderation_status: "pending" | "approved" | "rejected" | "archived";
+      chapter_leader_role: "lead" | "co_lead" | "coordinator";
+      competition_status: "draft" | "open" | "closed" | "archived";
+    };
   };
 }
 

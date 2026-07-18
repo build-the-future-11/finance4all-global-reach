@@ -1,5 +1,5 @@
 -- FinanceMeta / Finance4All production setup verification.
--- Run after supabase/FINAL_SETUP.sql or after applying migrations 001-019.
+-- Run after supabase/FINAL_SETUP.sql or after applying migrations 001-020.
 -- Expected result: every row has ok = true.
 
 WITH expected_tables(name) AS (
@@ -170,7 +170,9 @@ expected_indexes(name) AS (
     ('project_bookmarks_user'),
     ('event_registrations_user'),
     ('lab_applications_applicant'),
-    ('essay_upvotes_user')
+    ('essay_upvotes_user'),
+    ('connection_requests_to_user'),
+    ('connection_requests_from_user')
 ),
 index_checks AS (
   SELECT
@@ -201,7 +203,10 @@ expected_triggers(name) AS (
     ('force_project_bookmark_owner'),
     ('force_opportunity_interest_owner'),
     ('force_essay_upvote_owner'),
-    ('force_education_progress_owner')
+    ('force_education_progress_owner'),
+    ('protect_notification_content_write'),
+    ('research_projects_validate_ownership'),
+    ('competitions_validate_audit')
 ),
 trigger_checks AS (
   SELECT

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-07-18 — Notification ownership + moderation (020)
+
+- Migration `020_notification_ownership_moderation.sql`: freeze notification content (read-only updates), research/competition ownership, connection indexes, studio/essay moderation notifications
+- Admin chapter-leader appoint uses member picker; notification empty-state copy corrected
+- Types/enums + FINAL_SETUP synced to **001–020**
+
 ## 2026-07-18 — Ownership + DEFINER harden (018–019)
 
 - Migration `018_security_definer_search_path.sql` pins all public SECURITY DEFINER `search_path`

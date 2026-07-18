@@ -7,14 +7,14 @@ Only credential, dashboard, legal, or live-environment tasks. Engineering work i
 **Project:** `xwlrzgfuhfbckgvcmyoq` (or whichever is canonical)  
 **Steps:**
 
-1. SQL Editor → paste `supabase/FINAL_SETUP.sql` → Run (migrations **001–019**)  
+1. SQL Editor → paste `supabase/FINAL_SETUP.sql` → Run (migrations **001–020**)  
 2. Paste `supabase/VERIFY_SETUP.sql` → Run  
-3. Confirm every row `ok = true` (including content_reports, moderation, certificates, leaders, competitions, ownership triggers, SECURITY DEFINER search_path)  
+3. Confirm every row `ok = true` (including content_reports, moderation, certificates, leaders, competitions, ownership triggers, SECURITY DEFINER search_path, notification content freeze)  
 4. Paste `supabase/VERIFY_RLS_MATRIX.sql` → Run; confirm every row `ok = true`
 
 **Unblocks:** FM-DATA-001, FM-AUTH-002, FM-SEC-001 (policy presence), portal runtime, Debrief, moderation, certificates, competitions, content reports
 
-**Note:** If a prior FINAL_SETUP was applied without 013–019, re-run full script or apply `013`…`019` in order, then VERIFY. Migration **016** drops direct `content_reports` INSERT; **017** deep-links lab status notifications to `/portal/labs/:id`; **018** pins SECURITY DEFINER `search_path`; **019** force-assigns ownership from `auth.uid()` and deep-links lab received notices to `/portal/labs/review?project=`.
+**Note:** If a prior FINAL_SETUP was applied without 013–020, re-run full script or apply `013`…`020` in order, then VERIFY. **018** pins SECURITY DEFINER `search_path`; **019** force-assigns ownership from `auth.uid()`; **020** freezes notification content updates, sets research/competition ownership, and notifies authors on studio/essay moderation.
 
 ## OA-2 — Auth URL configuration
 

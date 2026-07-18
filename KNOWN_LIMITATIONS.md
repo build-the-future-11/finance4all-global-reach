@@ -5,7 +5,7 @@ Honest inventory. Items marked **Externally blocked** cannot be completed in thi
 ## Verified complete (source)
 
 - Public site + member portal modules through Pass 4 / finisher harden
-- Migrations **001–019** in repo + `FINAL_SETUP.sql`
+- Migrations **001–020** in repo + `FINAL_SETUP.sql`
 - Content reports RPC-only insert; outbound URL sanitization on portal external links
 - Secret-free `npm run package:source`
 - Local: typecheck, unit tests, lint (0 errors), production build with CI `VITE_*`, release:static, Playwright smoke/security/auth-surface
@@ -23,7 +23,7 @@ Honest inventory. Items marked **Externally blocked** cannot be completed in thi
 
 | ID | Blocker |
 | --- | --- |
-| OA-1 | Apply FINAL_SETUP 001–019 + VERIFY on live Supabase |
+| OA-1 | Apply FINAL_SETUP 001–020 + VERIFY on live Supabase |
 | OA-2 | Auth Site URL + redirect allowlist |
 | OA-3 | Vercel `VITE_*` matching live project |
 | OA-4 | Google OAuth (optional) |

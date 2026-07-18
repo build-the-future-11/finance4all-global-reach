@@ -104,7 +104,9 @@ export default function NotificationsCenter() {
               <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-white/[0.04]">
                 <Inbox className="h-5 w-5 text-white/30" />
               </div>
-              <p className="text-sm text-white/40">No notifications yet — activity from labs, connections, and events will appear here.</p>
+              <p className="text-sm text-white/40">
+                No notifications yet — lab applications, connection requests, and studio or essay moderation updates will appear here.
+              </p>
               <Link
                 to={portalRoutes.debriefed}
                 onClick={() => setOpen(false)}

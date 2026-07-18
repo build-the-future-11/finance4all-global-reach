@@ -1250,16 +1250,22 @@ function AdminChapterLeadersPanel({
   chapters: { id: string; name: string; city: string; country: string }[];
 }) {
   const { data: leaders, isLoading, error, refetch } = useChapterLeaders();
+  const { data: members } = useAdminMembers();
   const appoint = useAppointChapterLeader();
   const remove = useRemoveChapterLeader();
   const [chapterId, setChapterId] = useState("");
   const [userId, setUserId] = useState("");
+  const memberLabel = (id: string) => {
+    const member = members?.find((m) => m.id === id);
+    if (!member) return id;
+    return `${member.displayName} (${member.email})`;
+  };
 
   return (
     <PortalCard className="mt-6 space-y-4 p-4">
       <h3 className="font-medium text-white">Chapter leaders</h3>
       <p className="text-sm text-white/50">
-        Appoint verified chapter leads by member profile ID (from Members tab).
+        Appoint a verified chapter lead by selecting a member profile.
       </p>
       <div className="grid gap-3 sm:grid-cols-3">
         <Select value={chapterId} onValueChange={setChapterId}>
@@ -1274,12 +1280,18 @@ function AdminChapterLeadersPanel({
             ))}
           </PortalSelectContent>
         </Select>
-        <Input
-          value={userId}
-          onChange={(e) => setUserId(e.target.value)}
-          placeholder="Member profile UUID"
-          className={portalInputClass}
-        />
+        <Select value={userId} onValueChange={setUserId}>
+          <SelectTrigger className="border-white/20 bg-white/5 text-white">
+            <SelectValue placeholder="Member" />
+          </SelectTrigger>
+          <PortalSelectContent>
+            {(members ?? []).map((member) => (
+              <PortalSelectItem key={member.id} value={member.id}>
+                {member.displayName} · {member.email}
+              </PortalSelectItem>
+            ))}
+          </PortalSelectContent>
+        </Select>
         <Button
           className={portalButtonPrimary}
           disabled={!chapterId || !userId.trim() || appoint.isPending}
@@ -1311,7 +1323,7 @@ function AdminChapterLeadersPanel({
                 <div>
                   <p className="font-medium text-white">{chapter?.name ?? leader.chapterId}</p>
                   <p className="text-sm text-white/50">
-                    {leader.role} · {leader.userId}
+                    {leader.role} · {memberLabel(leader.userId)}
                   </p>
                 </div>
                 <Button
