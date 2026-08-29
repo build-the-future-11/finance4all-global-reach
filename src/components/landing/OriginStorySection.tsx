@@ -16,7 +16,7 @@ const TIMELINE = [
   },
   {
     year: "2025",
-    title: "Finance4All portal launch",
+    title: "FinanceMeta portal launch",
     body: "Finance Debrief, research applications, opportunities, saved content, course progress, and chapter activity moved into one member dashboard.",
   },
 ];
