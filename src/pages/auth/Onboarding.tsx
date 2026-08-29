@@ -105,7 +105,7 @@ export default function Onboarding() {
             value={bio}
             onChange={(e) => setBio(e.target.value)}
             rows={3}
-            placeholder="e.g. macro research, chapter outreach, applying to grad school"
+            placeholder="e.g. macro research, chapter outreach, fintech, investing"
           />
         </div>
         <div>
@@ -139,7 +139,10 @@ export default function Onboarding() {
             </Select>
           </div>
         )}
-        <PortalToggleRow title="Open to collaborate" description="Shown to other signed-in members in the portal">
+        <PortalToggleRow
+          title="Open to collaborate"
+          description="Make your profile discoverable to other signed-in FinanceMeta members and signal that you are open to collaboration."
+        >
           <Switch checked={openToCollaborate} onCheckedChange={setOpenToCollaborate} />
         </PortalToggleRow>
         {error && <PortalAlert variant="error">{error}</PortalAlert>}
