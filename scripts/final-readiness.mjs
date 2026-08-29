@@ -40,6 +40,7 @@ const requiredFiles = [
   "supabase/FINAL_SETUP.sql",
   "supabase/FINAL_SETUP_PATCH.sql",
   "supabase/VERIFY_SETUP.sql",
+  "supabase/VERIFY_RELEASE_PATCH.sql",
 ];
 
 for (const file of requiredFiles) {
@@ -121,9 +122,24 @@ for (const requiredSnippet of [
   }
 }
 
+const verifyReleasePatch = read("supabase/VERIFY_RELEASE_PATCH.sql");
+for (const requiredSnippet of [
+  "member_directory filters collaboration visibility",
+  "member_directory excludes email",
+  "member_directory anon select revoked",
+  "member_directory authenticated select granted",
+]) {
+  if (!verifyReleasePatch.includes(requiredSnippet)) {
+    fail(`supabase/VERIFY_RELEASE_PATCH.sql is missing check: ${requiredSnippet}`);
+  }
+}
+
 const deployment = read("DEPLOYMENT.md");
 if (!deployment.includes("supabase db push")) {
   fail("DEPLOYMENT.md must document the canonical migration-based production path");
+}
+if (!deployment.includes("VERIFY_RELEASE_PATCH.sql")) {
+  fail("DEPLOYMENT.md must require the supplemental post-021 release verification");
 }
 for (const file of patchMigrationFiles) {
   if (!deployment.includes(file) && !deployment.includes("FINAL_SETUP_PATCH.sql")) {
@@ -154,6 +170,7 @@ const productFiles = [...walk("src"), ...walk("public")].filter(
   (file) => !/\.(test|spec)\.(ts|tsx)$/.test(file),
 );
 const bannedProductClaims = [
+  /Finance4All/,
   /25,000/,
   /500\+/,
   /Jane Street/i,
