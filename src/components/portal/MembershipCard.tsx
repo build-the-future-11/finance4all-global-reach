@@ -63,7 +63,7 @@ export default function MembershipCard({
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.25em] text-white/50">
             <Sparkles className="h-3 w-3 text-emerald-300" />
-            Finance4All
+            FinanceMeta
           </div>
           {profile.role !== "member" && (
             <Badge className="border-0 bg-white/15 text-[10px] text-white backdrop-blur-sm">
