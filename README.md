@@ -1,54 +1,88 @@
-# Finance4All
+# FinanceMeta
 
-Finance4All is a student-facing finance learning and participation platform.
+FinanceMeta is a student-facing financial education, research, opportunity, and community platform with a Supabase-backed member portal.
 
-Visitors can discover programs, research, opportunities, competitions, and chapters. Members can create an account, complete a profile, apply to research projects, register for events, save opportunities, follow Finance Debrief, and track participation from a personal dashboard.
+Visitors can discover programs, research, opportunities, competitions, and chapters. Members can create an account, complete a profile, learn through Catalyst, follow Finance Debrief, apply to Meta Labs, register for events, save opportunities, opt into the member directory, connect with other members, and track participation from a personal dashboard.
 
-**Live site:** [https://finance4all-global-reach.vercel.app](https://finance4all-global-reach.vercel.app)
+**Current hosted origin:** [https://finance4all-global-reach.vercel.app](https://finance4all-global-reach.vercel.app)
+
+The hosted project slug is legacy infrastructure; the product identity is **FinanceMeta**.
 
 ## What members can do
 
 | Area | After signup |
 | --- | --- |
-| Dashboard | Track applications, registrations, and saved items |
-| Finance Debrief | Read educational market summaries with source attribution |
-| Meta Labs | Apply to scoped research projects |
-| Pathways | Browse and save opportunities, submit studios and essays |
-| Education | Complete Catalyst lessons and earn certificates |
-| Events & Chapters | Find chapters, RSVP, and view competitions |
-| Network | Connect with members and post introductions |
+| Dashboard | Track activity, progress, applications, registrations, and saved items |
+| Finance Debrief | Read educational market summaries and explainers with source attribution |
+| Meta Labs | Browse and apply to scoped research projects |
+| Pathways | Browse/save opportunities and submit studio projects or essays |
+| Learn | Complete Catalyst lessons and earn certificates |
+| Events & Chapters | Find chapters, RSVP to events, and view competitions |
+| Network | Opt into directory visibility, connect with members, and post introductions |
+| Resources | Use guides, standards, and facilitator materials |
+| Settings | Manage profile, directory visibility, password, communications, export, and deletion |
 
-## Quick start (developers)
+## Requirements
+
+- Node.js **22 or newer**
+- npm
+- Supabase project for authenticated/database-backed flows
+
+## Quick start
 
 ```bash
-npm install
+npm ci
 cp .env.example .env
 # Fill VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, VITE_APP_URL
 npm run dev
 ```
 
-## Verify
+## Repository verification
 
 ```bash
+npm run audit:ci
+npm run lint
 npm run typecheck
 npm test
-npm run lint
-VITE_SUPABASE_URL=https://ci-placeholder.supabase.co \
-VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpLXBsYWNlaG9sZGVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDAwMDAwMDAsImV4cCI6MjAwMDAwMDAwMH0.ci-placeholder-signature-for-build-only \
-VITE_APP_URL=https://ci-placeholder.vercel.app \
 npm run build
 npm run release:static
-CI=true npm run test:e2e
+npm run test:e2e
 ```
+
+CI supplies build-only placeholder public variables. Final authenticated production acceptance additionally requires dedicated `E2E_EMAIL` and `E2E_PASSWORD` test credentials.
 
 ## Database setup
 
-1. Supabase SQL Editor → paste `supabase/FINAL_SETUP.sql` (migrations **001–020**)
-2. Run `supabase/VERIFY_SETUP.sql` then `supabase/VERIFY_RLS_MATRIX.sql`
-3. Confirm every row `ok = true`
-4. Do **not** run `supabase/seed.sql` on production — it inserts development sample content
+Preferred production path:
 
-Operator docs: [DATABASE.md](DATABASE.md) · [DEPLOYMENT.md](DEPLOYMENT.md) · [docs/OWNER_ACTIONS.md](docs/OWNER_ACTIONS.md)
+```bash
+supabase link --project-ref <project-ref>
+supabase db push
+```
+
+The release currently contains migrations through `022_directory_visibility.sql`.
+
+For a fresh project using the SQL Editor:
+
+1. Run `supabase/FINAL_SETUP.sql`.
+2. Run `supabase/FINAL_SETUP_PATCH.sql`.
+3. Run `supabase/VERIFY_SETUP.sql`.
+4. Run `supabase/VERIFY_RELEASE_PATCH.sql`.
+5. Resolve every row where `ok = false`.
+
+Do **not** run `supabase/seed.sql` on production; it contains development sample content.
+
+## Membership privacy
+
+Account email is not included in the member directory. Ordinary members can discover another member profile only when that profile has opted in through **Open to collaborate**. The database view enforces this rule; it is not only a client-side filter. Administrators retain directory access for moderation/support.
+
+## Deployment
+
+Do not deploy the stale default branch before the hardened release branch is merged. The release runbook and owner-only production actions are maintained in:
+
+- [DEPLOYMENT.md](DEPLOYMENT.md)
+- [REMAINING_EXTERNAL_ACTIONS.md](REMAINING_EXTERNAL_ACTIONS.md)
+- [DATABASE.md](DATABASE.md)
 
 ## Stack
 
