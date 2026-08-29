@@ -334,7 +334,7 @@ export default function Settings() {
             )}
             <PortalToggleRow
               title="Open to collaborate"
-              description="Adds an open-to-collaborate signal to your member profile. Directory visibility is handled separately by FinanceMeta's membership policy."
+              description="Controls whether other members can discover your profile in the directory and signals that you are open to collaboration."
             >
               <Switch checked={openToCollaborate} onCheckedChange={setOpenToCollaborate} />
             </PortalToggleRow>
