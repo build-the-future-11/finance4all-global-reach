@@ -18,7 +18,7 @@ export default function Navbar() {
     <header className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-[#071412]/95 backdrop-blur">
       <nav className="mx-auto flex min-h-16 max-w-6xl items-center justify-between px-4" aria-label="Primary navigation">
         <a href="/" className="rounded-sm text-lg font-semibold text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-300">
-          Finance4All
+          FinanceMeta
         </a>
         <div className="hidden items-center gap-6 md:flex">
           {links.map((link) => (
