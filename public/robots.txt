@@ -12,5 +12,11 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /portal
+Disallow: /login
+Disallow: /signup
+Disallow: /onboarding
+Disallow: /forgot-password
+Disallow: /reset-password
 
 Sitemap: https://finance4all-global-reach.vercel.app/sitemap.xml
