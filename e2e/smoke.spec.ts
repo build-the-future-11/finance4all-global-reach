@@ -6,7 +6,7 @@ test.describe("public site smoke", () => {
     page.on("pageerror", (err) => errors.push(err.message));
 
     await page.goto("/");
-    await expect(page).toHaveTitle(/Finance4All/i);
+    await expect(page).toHaveTitle(/FinanceMeta/i);
     await expect(page.locator("body")).toBeVisible();
 
     const critical = errors.filter((e) => !e.includes("ResizeObserver"));
