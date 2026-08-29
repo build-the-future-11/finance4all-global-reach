@@ -1,6 +1,6 @@
 import { portalCopy } from "@/lib/portalCopy";
 
-/** Programs and initiatives inside Finance4All — not unaffiliated institution logos. */
+/** Programs and initiatives inside FinanceMeta — not unaffiliated institution logos. */
 const PROGRAMS = [
   "Catalyst Education",
   "Research Projects",
