@@ -38,6 +38,7 @@ const requiredFiles = [
   "TEST_REPORT.md",
   "REMAINING_EXTERNAL_ACTIONS.md",
   "supabase/FINAL_SETUP.sql",
+  "supabase/FINAL_SETUP_PATCH.sql",
   "supabase/VERIFY_SETUP.sql",
 ];
 
@@ -60,6 +61,13 @@ const migrationFiles = fs
   .filter((file) => file.endsWith(".sql"))
   .sort();
 
+// FINAL_SETUP.sql is a frozen consolidated artifact through migration 021.
+// Newer migrations are intentionally carried in FINAL_SETUP_PATCH.sql so a
+// security hotfix does not require rewriting the large historical bundle.
+const consolidatedThrough = "021_analytics_journey_events.sql";
+const consolidatedMigrationFiles = migrationFiles.filter((file) => file <= consolidatedThrough);
+const patchMigrationFiles = migrationFiles.filter((file) => file > consolidatedThrough);
+
 const expectedSetup = [
   "-- FinanceMeta / Finance4All final consolidated Supabase setup.",
   "-- Generated from supabase/migrations/*.sql in filename order.",
@@ -67,7 +75,7 @@ const expectedSetup = [
   "",
 ];
 
-for (const file of migrationFiles) {
+for (const file of consolidatedMigrationFiles) {
   expectedSetup.push("-- ============================================================");
   expectedSetup.push(`-- ${file}`);
   expectedSetup.push("-- ============================================================");
@@ -77,7 +85,26 @@ for (const file of migrationFiles) {
 
 const finalSetup = read("supabase/FINAL_SETUP.sql");
 if (finalSetup !== expectedSetup.join("\n")) {
-  fail("supabase/FINAL_SETUP.sql is not synchronized with supabase/migrations/*.sql");
+  fail(`supabase/FINAL_SETUP.sql is not synchronized through ${consolidatedThrough}`);
+}
+
+const expectedPatch = [
+  "-- FinanceMeta release patch for migrations newer than the consolidated FINAL_SETUP.sql.",
+  "-- Apply immediately after supabase/FINAL_SETUP.sql when using the SQL Editor path.",
+  "-- Preferred production path remains `supabase db push`, which applies every migration in order.",
+  "",
+];
+for (const file of patchMigrationFiles) {
+  expectedPatch.push("-- ============================================================");
+  expectedPatch.push(`-- ${file}`);
+  expectedPatch.push("-- ============================================================");
+  expectedPatch.push(read(`supabase/migrations/${file}`).trim());
+  expectedPatch.push("");
+}
+
+const finalPatch = read("supabase/FINAL_SETUP_PATCH.sql");
+if (finalPatch !== expectedPatch.join("\n")) {
+  fail("supabase/FINAL_SETUP_PATCH.sql is not synchronized with post-021 migrations");
 }
 
 const verifySetup = read("supabase/VERIFY_SETUP.sql");
@@ -94,6 +121,16 @@ for (const requiredSnippet of [
   }
 }
 
+const deployment = read("DEPLOYMENT.md");
+if (!deployment.includes("supabase db push")) {
+  fail("DEPLOYMENT.md must document the canonical migration-based production path");
+}
+for (const file of patchMigrationFiles) {
+  if (!deployment.includes(file) && !deployment.includes("FINAL_SETUP_PATCH.sql")) {
+    fail(`DEPLOYMENT.md does not account for release migration ${file}`);
+  }
+}
+
 const releaseDocs = [
   "README.md",
   "DEPLOYMENT.md",
@@ -103,7 +140,7 @@ const releaseDocs = [
   "FINAL_COMPLETION_REPORT.md",
   "REMAINING_EXTERNAL_ACTIONS.md",
   ...walk("docs"),
-  ...walk("supabase").filter((file) => file !== "supabase/FINAL_SETUP.sql"),
+  ...walk("supabase").filter((file) => !["supabase/FINAL_SETUP.sql", "supabase/FINAL_SETUP_PATCH.sql"].includes(file)),
 ];
 
 for (const file of releaseDocs) {
@@ -144,5 +181,6 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Final readiness checks passed.");
-
+console.log(
+  `Final readiness checks passed. Consolidated setup through ${consolidatedThrough}; ${patchMigrationFiles.length} release patch migration(s) checked.`,
+);
