@@ -1,76 +1,59 @@
-# Remaining External Actions
+# FinanceMeta — Remaining External Actions
 
-Only credential, dashboard, legal, production-content, or live-environment tasks
-remain.
+Repository-side launch blockers are handled in code and CI. The items below require production credentials, dashboards, live data, or owner approval and therefore must be completed against the real deployment.
 
-## 1. Configure Supabase Project
-
-Command or dashboard:
+## 1. Link the production Supabase project
 
 ```bash
 supabase link --project-ref <project-ref>
 ```
 
-Expected result: local CLI is linked to the production Supabase project.
+## 2. Apply every database migration
 
-## 2. Apply Database
-
-SQL Editor option:
-
-1. Paste `supabase/FINAL_SETUP.sql`.
-2. Run it once.
-3. Paste `supabase/VERIFY_SETUP.sql`.
-4. Confirm every row returns `ok = true`.
-
-CLI option:
+Preferred path:
 
 ```bash
 supabase db push
 ```
 
-Expected result: all tables, functions, policies, views, and storage bucket
-exist in production.
+This must apply all migrations through `022_directory_visibility.sql`.
 
-## 3. Set Hosting Variables
+If using the SQL Editor on a fresh project instead:
+
+1. Run `supabase/FINAL_SETUP.sql`.
+2. Run `supabase/FINAL_SETUP_PATCH.sql`.
+3. Run `supabase/VERIFY_SETUP.sql`.
+4. Run `supabase/VERIFY_RELEASE_PATCH.sql`.
+5. Resolve every row where `ok = false`.
+
+Then test directory privacy with two ordinary member accounts: a member with `open_to_collaborate = false` must not be discoverable by the other account; enabling it must make the profile discoverable. Email must never be returned by the member directory.
+
+## 3. Set production hosting variables
 
 Set these in Vercel or the chosen host:
 
 ```env
-VITE_SUPABASE_URL
-VITE_SUPABASE_ANON_KEY
-VITE_APP_URL
+VITE_SUPABASE_URL=<production project URL>
+VITE_SUPABASE_ANON_KEY=<production anon key>
+VITE_APP_URL=<canonical https production URL>
 ```
 
-Expected result: production build connects to Supabase and OAuth redirects use
-the canonical site URL.
+Do not put the Supabase service-role key or other backend secrets in `VITE_*` variables.
 
 ## 4. Configure Supabase Auth
 
-Dashboard: Authentication -> URL Configuration.
-
-Set Site URL:
+In **Authentication → URL Configuration** set the canonical Site URL and allow:
 
 ```text
-https://your-production-domain
+https://<production-domain>/auth/callback
+https://<production-domain>/reset-password
 ```
 
-Add redirects:
+Keep local-development redirects only where needed.
 
-```text
-https://your-production-domain/auth/callback
-https://your-production-domain/reset-password
-http://localhost:5173/auth/callback
-http://localhost:5173/reset-password
-```
+## 5. Configure Google OAuth if enabled
 
-Expected result: email/OAuth sign-in and password reset return to the app.
-
-## 5. Configure Google OAuth If Used
-
-Dashboard: Authentication -> Providers -> Google.
-
-Expected result: Google sign-in opens Google, returns to `/auth/callback`, and
-creates exactly one profile.
+Configure the production Supabase callback in Google Cloud and test a fresh Google account through signup, callback, onboarding, sign-out, and re-login.
 
 ## 6. Deploy Edge Functions
 
@@ -79,7 +62,7 @@ supabase functions deploy weekly-digest --no-verify-jwt
 supabase functions deploy delete-account
 ```
 
-Set secrets:
+Set the required function secrets:
 
 ```bash
 supabase secrets set SUPABASE_URL=<url>
@@ -88,46 +71,46 @@ supabase secrets set SUPABASE_SERVICE_ROLE_KEY=<service-role-key>
 supabase secrets set SITE_URL=<production-domain>
 supabase secrets set DIGEST_CRON_SECRET=<long-random-secret>
 supabase secrets set RESEND_API_KEY=<resend-key>
-supabase secrets set DIGEST_FROM_EMAIL=<sender>
+supabase secrets set DIGEST_FROM_EMAIL=<verified-sender>
 ```
 
-Expected result: account deletion works for a non-admin test account and weekly
-digest dry-run/cron requests are authorized correctly.
+If email infrastructure is not ready, keep weekly digest delivery disabled for launch rather than exposing a broken flow.
 
-## 7. Promote Administrators
+## 7. Establish administrator coverage
 
-After trusted admins create accounts:
+Create at least two trusted administrator accounts. Verify ordinary members remain `member` and cannot self-promote or write admin-managed data through direct API calls.
 
-```sql
-UPDATE public.profiles
-SET role = 'admin'
-WHERE email IN ('admin@your-domain', 'backup-admin@your-domain');
-```
+## 8. Review production content and legal text
 
-Expected result: both admins can access `/portal/admin`; no other member has an
-elevated role.
+Before opening registration:
 
-## 8. Approve Legal And Content
+- approve FinanceMeta Privacy and Terms;
+- remove seed/demo/unverified production records;
+- publish only verified Finance Debrief articles, opportunities, research projects, events, competitions, chapters, lessons, guides, and testimonials;
+- approve the final canonical domain and social-preview metadata;
+- confirm public claims match current evidence.
 
-Required owner actions:
+## 9. Run authenticated production acceptance
 
-- Approve privacy and terms text.
-- Remove seed/demo content from production.
-- Publish only verified Finance Debrief articles, opportunities, research
-  projects, events, chapters, and lessons.
+Use dedicated test accounts and verify:
 
-Expected result: public launch contains no fabricated claims or demo records.
+- email signup and confirmation;
+- Google OAuth if enabled;
+- onboarding and directory visibility consent;
+- dashboard and all portal modules;
+- saved content and learning progress persistence;
+- event registration limits and duplicate prevention;
+- lab application eligibility and review transitions;
+- connection requests and member-directory privacy;
+- password reset/change;
+- account export;
+- account deletion and sole-admin deletion protection;
+- admin publishing, moderation, analytics, content reports, competitions, research, and chapter-leader tools;
+- non-admin denial of privileged operations;
+- mobile navigation and critical journeys.
 
-## 9. Live Smoke Test
+Provide `E2E_EMAIL` and `E2E_PASSWORD` for the authenticated Playwright acceptance suite. Repository CI may skip those credentialed journeys, but production launch acceptance may not.
 
-Run with real production test accounts:
+## 10. Merge and deploy
 
-- Visitor can read public pages.
-- New member signs up, completes onboarding, signs out, and signs back in.
-- Member saves Debrief content and lesson progress persists.
-- Member applies/registers where eligible and duplicate submission is rejected.
-- Admin publishes/edits content and sees operational logs.
-- Non-admin cannot access admin routes or write admin data.
-
-Expected result: all journeys pass before public launch.
-
+Merge `cursor/membership-security-supabase-fix` into `main` only after required GitHub checks are green. Deploy the merged `main`, keep the previous Vercel deployment available for rollback, and open registration only after the live acceptance checks above pass.
