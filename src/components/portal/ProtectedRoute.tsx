@@ -14,7 +14,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
       <PortalFullPageShell>
         <div className="portal-glass flex flex-col items-center gap-4 rounded-2xl px-10 py-12">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 text-sm font-bold text-white">
-            F4
+            FM
           </div>
           <Loader2 className="h-6 w-6 animate-spin text-emerald-400" aria-hidden />
           <p className="text-sm text-white/50" role="status">
@@ -36,7 +36,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
           <h1 className="text-lg font-semibold text-white">Profile unavailable</h1>
           <p className="text-sm text-white/55">
             Your account session is active, but we could not load your member profile. Retry or sign
-            out and try again. If this continues, contact Finance4All support.
+            out and try again. If this continues, contact FinanceMeta support.
           </p>
           <div className="flex flex-col gap-2 sm:flex-row sm:justify-center">
             <Button type="button" className={cn(portalButtonPrimary)} onClick={() => void refreshProfile()}>
