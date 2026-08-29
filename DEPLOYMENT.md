@@ -1,61 +1,78 @@
-# Production Deployment
+# FinanceMeta Production Deployment
 
-Finance4All is a Vite application with Supabase Auth, Database, Storage, and Edge Functions. Production deployment is complete only when the frontend, database migrations, Edge Functions, scheduled digest, email sender, auth redirects, and content review are all configured.
+FinanceMeta is a Vite application backed by Supabase Auth, Database, Storage, and Edge Functions. Production deployment is complete only when the frontend, all database migrations, Edge Functions, auth redirects, runtime secrets, content review, and live smoke tests are complete.
 
-For a new Supabase project, the fastest setup path is:
+## 1. Canonical release branch
 
-1. Run `supabase/FINAL_SETUP.sql` in the Supabase SQL Editor.
-2. Run `supabase/VERIFY_SETUP.sql`.
-3. Resolve any row where `ok = false`.
-4. Deploy the frontend with the environment variables below.
+Deploy only code that has passed review and CI from the hardened release branch and has been merged into `main`.
 
-## 1. Hosting Environment
+Current release source:
 
-Set these client variables in the hosting provider before deploying:
+```text
+cursor/membership-security-supabase-fix
+```
+
+Do not deploy the older `main` state before the hardened branch is merged.
+
+## 2. Hosting environment
+
+Set these browser-safe variables in the hosting provider before building:
 
 | Name | Required | Notes |
 | --- | --- | --- |
-| `VITE_SUPABASE_URL` | Yes | Supabase project URL |
+| `VITE_SUPABASE_URL` | Yes | Production Supabase project URL |
 | `VITE_SUPABASE_ANON_KEY` | Yes | Browser-safe anon JWT |
-| `VITE_APP_URL` | Yes | Canonical public URL, including `https://` |
+| `VITE_APP_URL` | Yes | Canonical public production URL including `https://` |
 
-Do not expose `SUPABASE_SERVICE_ROLE_KEY`, `sb_secret_...`, provider API keys, cron secrets, or mail credentials in frontend variables.
+Never expose `SUPABASE_SERVICE_ROLE_KEY`, `sb_secret_...`, provider API keys, cron secrets, or mail credentials in `VITE_*` variables.
 
 After changing any `VITE_*` value, rebuild and redeploy. Vite reads these values at build time.
 
-## 2. Supabase Database
+## 3. Database: preferred production path
 
-Apply migrations in order:
+The canonical production database path is migration-based:
 
-1. `supabase/migrations/001_initial_schema.sql`
-2. `supabase/migrations/002_google_oauth.sql`
-3. `supabase/migrations/003_bookmarks_notifications.sql`
-4. `supabase/migrations/004_avatar_storage.sql`
-5. `supabase/migrations/005_security_hardening.sql`
-6. `supabase/migrations/006_education_progress.sql`
-7. `supabase/migrations/007_contact_submissions.sql`
-8. `supabase/migrations/008_platform_cms.sql`
-9. `supabase/migrations/009_membership_integrity.sql`
-10. `supabase/migrations/010_directory_privacy.sql`
-11. `supabase/migrations/011_profile_write_boundary.sql`
-12. `supabase/migrations/012_operational_integrity.sql`
+```bash
+supabase link --project-ref <project-ref>
+supabase db push
+```
 
-Then run `supabase/VERIFY_SETUP.sql`. Do not open registration until every row
-returns `ok = true`.
+This applies every migration in `supabase/migrations/` in order, including the current release migrations through:
 
-Seed data is for internal review only. Remove or replace unverified seed records before public launch.
+```text
+022_directory_visibility.sql
+```
 
-## 3. Supabase Auth
+Do not manually stop at migration 012 or 021.
 
-In Supabase Authentication URL settings:
+After applying migrations, run `supabase/VERIFY_SETUP.sql` in the SQL Editor and resolve every failing row before opening registration.
+
+### SQL Editor path for a fresh project
+
+If the Supabase CLI is unavailable, use both release SQL artifacts in this order:
+
+1. Run `supabase/FINAL_SETUP.sql`.
+2. Run `supabase/FINAL_SETUP_PATCH.sql`.
+3. Run `supabase/VERIFY_SETUP.sql`.
+4. Confirm all verification rows return `ok = true`.
+5. Explicitly verify member-directory privacy: a normal authenticated member must not be able to resolve another member whose `open_to_collaborate` value is `false`.
+
+`FINAL_SETUP.sql` is frozen through migration `021_analytics_journey_events.sql`. `FINAL_SETUP_PATCH.sql` contains the later release migration(s), currently `022_directory_visibility.sql`. CI checks both artifacts against their corresponding migration ranges.
+
+Seed data is for internal review only. Remove or replace unverified seed/demo records before public launch.
+
+## 4. Supabase Auth
+
+In **Authentication → URL Configuration**:
 
 - Site URL: the canonical production URL.
-- Redirect URLs: production and preview URLs for `/auth/callback` and `/reset-password`, plus local development URLs if needed.
-- Google OAuth callback, if enabled: the Supabase project callback URL in Google Cloud Console.
+- Redirect URLs: production `/auth/callback` and `/reset-password` URLs.
+- Add local development URLs only where needed.
+- If Google OAuth is enabled, configure the Supabase project callback URL in Google Cloud Console.
 
-Email confirmation settings should match the production membership policy before invitations are sent.
+Email confirmation settings should match the actual membership policy before invitations are sent.
 
-## 4. Edge Functions
+## 5. Edge Functions
 
 Deploy:
 
@@ -64,11 +81,11 @@ supabase functions deploy weekly-digest --no-verify-jwt
 supabase functions deploy delete-account
 ```
 
-`weekly-digest` uses a cron secret and must be called only by the scheduler. `delete-account` keeps JWT verification enabled and validates the member inside the function.
+`weekly-digest` uses a cron secret and must be called only by the scheduler. `delete-account` keeps JWT verification enabled and validates the signed-in member before deletion.
 
-Set these function secrets:
+Set function secrets:
 
-| Secret | Used By |
+| Secret | Used by |
 | --- | --- |
 | `SUPABASE_URL` | Both |
 | `SUPABASE_ANON_KEY` | `delete-account` |
@@ -78,30 +95,78 @@ Set these function secrets:
 | `RESEND_API_KEY` | `weekly-digest` |
 | `DIGEST_FROM_EMAIL` | `weekly-digest` |
 
-Schedule the weekly digest as a `POST` with:
+Schedule the weekly digest as a `POST` containing:
 
 ```text
-Authorization: Bearer DIGEST_CRON_SECRET
+Authorization: Bearer <DIGEST_CRON_SECRET>
 ```
 
-## 5. Production Verification
+If email infrastructure is not ready at initial launch, keep the weekly digest disabled rather than shipping a broken preference.
 
-Run these checks against the production deployment:
+## 6. Required release verification
 
-1. Public landing page loads on desktop and mobile without console errors or horizontal overflow.
-2. Sign up with email, complete onboarding once, sign out, and sign back in.
-3. Google sign-in returns to `/portal` if OAuth is enabled.
-4. Member dashboard, Finance Debrief, saved content, courses, chapters, opportunities, research applications, notifications, and settings load from production data.
-5. Draft Finance Debrief articles are visible only to admins; published articles are visible to members.
-6. Event registration respects status, open/close windows, capacity, duplicate prevention, and preserved state after sign-in.
-7. A member can export account data and delete a non-admin test account.
-8. Sole-admin account deletion is blocked.
-9. Avatar uploads reject unsupported files and store only in the member-owned path.
-10. Admin Inbox, Members, content editors, and System tab load and enforce role permissions.
-11. Weekly digest sends only published current-week articles and writes one delivery log row per member/week.
-12. Privacy, terms, support contact, canonical URL, metadata, and social previews are approved.
-13. `npm audit --omit=dev --audit-level=high` passes from an approved security environment.
+Before merge/deploy, require all of these to pass from the repository root:
 
-## 6. Rollback
+```bash
+npm ci
+npm run audit:ci
+npm run lint
+npm run typecheck
+npm test
+npm run build
+npm run release:static
+npm run test:e2e
+```
 
-Keep the previous hosting deployment available until production verification passes. If a migration or Edge Function deploy fails, stop inviting users, restore the previous frontend deployment, and resolve the Supabase issue before retrying.
+For authenticated E2E coverage, provide dedicated non-production test credentials through `E2E_EMAIL` and `E2E_PASSWORD`. A CI run that skips authenticated portal journeys is not sufficient as the final production acceptance test.
+
+## 7. Production smoke tests
+
+Run these checks against the actual production deployment:
+
+1. Public landing, Discover, Competitions, Privacy, and Terms load on desktop and mobile without console errors or horizontal overflow.
+2. Email signup succeeds, confirmation behavior is correct, onboarding completes once, sign-out works, and sign-in restores the account.
+3. Google sign-in returns to `/portal` when OAuth is enabled.
+4. Dashboard, Finance Debrief, Saved, Learn, Resources, Events & Chapters, Opportunities, Meta Labs, Network, Activity, and Settings load from production data.
+5. A member with `open_to_collaborate = false` is not discoverable by another normal member; enabling it makes the profile discoverable.
+6. Account email never appears in the member directory.
+7. Draft Finance Debrief articles are visible only to administrators; published articles are visible to members.
+8. Event registration respects status, registration windows, capacity, duplicate prevention, and persists across sign-in.
+9. Lab applications enforce project status, deadlines, ownership, duplicate rules, and authorized review transitions.
+10. A member can export account data and delete a non-admin test account.
+11. Deleting the sole administrator is blocked.
+12. Avatar uploads reject unsupported files and store only in the member-owned path.
+13. Admin Inbox, Members, content editors, moderation, competitions, research projects, chapter leadership, analytics, and System surfaces enforce role permissions.
+14. Non-admin users cannot write administrative data even by direct API calls.
+15. Weekly digest sends only published eligible content and writes one delivery-log row per member/week when enabled.
+16. Privacy, terms, support contact, canonical URL, metadata, social preview, and public program copy are approved.
+17. No seed/demo/unverified content or unsupported scale claims remain in production.
+
+## 8. Administrator coverage
+
+Before launch, create at least two trusted administrator accounts. Confirm ordinary members remain `member` unless deliberately promoted through an administrative workflow.
+
+Never expose a browser-facing workflow that allows a member to promote their own role.
+
+## 9. Rollback
+
+Keep the previous hosting deployment available until production verification passes. If a migration, Edge Function, auth configuration, or portal journey fails:
+
+1. Stop inviting or onboarding users.
+2. Restore the previous frontend deployment where appropriate.
+3. Do not roll back irreversible database changes blindly; fix forward or restore from an approved backup.
+4. Re-run database verification and production smoke tests before reopening access.
+
+## 10. Launch gate
+
+FinanceMeta is **GO** only when:
+
+- the hardened branch is merged to `main`;
+- GitHub Actions is green;
+- all production migrations through `022` are applied;
+- Supabase verification passes;
+- authenticated golden-journey smoke tests pass against the live environment;
+- directory privacy behavior is verified;
+- legal/content review is complete;
+- at least two administrators are available;
+- the final production URL is configured consistently in Vercel and Supabase.
