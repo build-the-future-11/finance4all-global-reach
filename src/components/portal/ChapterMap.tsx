@@ -34,7 +34,7 @@ export default function ChapterMap({
       <div
         className="relative aspect-[2/1] w-full overflow-hidden rounded-2xl border border-white/10 bg-landing-map-bg"
         role="img"
-        aria-label={`Map of ${visible.length} Finance4All chapters`}
+        aria-label={`Map of ${visible.length} FinanceMeta chapters`}
       >
         <div
           className="absolute inset-0 opacity-20"
