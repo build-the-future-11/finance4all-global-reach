@@ -1,5 +1,5 @@
 /**
- * Centralized copy for Finance4All — portal, auth, and landing.
+ * Centralized copy for FinanceMeta — portal, auth, and landing.
  * Tone: specific, member-first, editorial. Lead with what people do, not adjectives.
  */
 
@@ -54,7 +54,7 @@ export const portalCopy = {
     eyebrow: "Finance Debriefed",
     title: "News & market pulse",
     description:
-      "Macro, markets, IPO, and company coverage from Finance4All editors and chapter contributors. Save articles to your library and set digest preferences below.",
+      "Macro, markets, IPO, and company coverage from FinanceMeta editors and chapter contributors. Save articles to your library and set digest preferences below.",
     digestNote:
       "Save your weekly digest preference here. Email delivery is available only when it is configured for this portal.",
     liveSection:
@@ -152,7 +152,7 @@ export const portalCopy = {
     eyebrow: "Member network",
     title: "Network",
     description:
-      "Browse members by chapter and interest. Send connection requests and post introductions when you are looking for collaborators or co-authors.",
+      "Browse members who have opted into directory visibility by chapter and interest. Send connection requests and post introductions when you are looking for collaborators or co-authors.",
     emptyMembers:
       "No members match your filters. Clear the chapter filter or search with a broader interest tag.",
     introFeed: "Introductions feed",
@@ -164,8 +164,8 @@ export const portalCopy = {
     introLookingFor: "What are you looking for?",
     membersSection: "Members",
     searchPlaceholder: "Search by name or interest…",
-    profileVisibility: "Your profile visibility",
-    openToCollaborateHint: "Let others know you're open to collaborate",
+    profileVisibility: "Directory visibility",
+    openToCollaborateHint: "Make your profile discoverable and signal that you're open to collaborate",
     pendingRequests: "Pending requests",
     accept: "Accept",
     decline: "Decline",
@@ -184,7 +184,7 @@ export const portalCopy = {
     },
   },
   memberProfile: {
-    notFound: "This member profile could not be found or may have been removed.",
+    notFound: "This member profile could not be found, is not visible in the directory, or may have been removed.",
     noBio: "No bio added yet.",
     sharedInterestsTitle: "Shared interests",
     sharedInterestsHint:
@@ -261,7 +261,7 @@ export const portalCopy = {
     saving: "Saving…",
     saveChanges: "Save changes",
     openToCollaborate: "Open to collaborate",
-    openToCollaborateHint: "Shown on your public profile",
+    openToCollaborateHint: "Controls member-directory visibility and shows that you are open to collaboration",
     communications: "Communications",
     weeklyDigest: "Weekly Debriefed digest",
     substackSubscriber: "Substack subscriber",
@@ -302,8 +302,8 @@ export const portalCopy = {
   },
   auth: {
     loginTitle: "Welcome back",
-    loginSubtitle: "Sign in to your Finance4All member account.",
-    signupTitle: "Join Finance4All",
+    loginSubtitle: "Sign in to your FinanceMeta member account.",
+    signupTitle: "Join FinanceMeta",
     signupSubtitle:
       "Create a free member account. One login for news, curriculum, labs, pathways, events, and the member network.",
     emailConfirmTitle: "Check your email",
@@ -314,12 +314,12 @@ export const portalCopy = {
       "A few details help the portal order relevant articles, opportunities, and member suggestions. You can update them later in Settings.",
     onboardingFooter: "You can update your profile anytime in Settings.",
     onboardingGoogleNote: "Your photo will appear on your profile",
-    securityFooter: "Finance4All never asks for your password by email. Use a unique password for this account.",
+    securityFooter: "FinanceMeta never asks for your password by email. Use a unique password for this account.",
     forgotPasswordTitle: "Reset password",
     forgotPasswordSubtitle: "We'll email you a link to set a new password.",
     forgotPasswordSent: "If an account exists for that email, check your inbox for a reset link.",
     resetPasswordTitle: "Set new password",
-    resetPasswordSubtitle: "Choose a strong password for your Finance4All account.",
+    resetPasswordSubtitle: "Choose a strong password for your FinanceMeta account.",
     resetPasswordSuccess: "Password updated. Sign in with your new password.",
     resetPasswordVerifying: "Verifying reset link…",
     backToSite: "← Back to site",
@@ -384,7 +384,7 @@ export const portalCopy = {
   },
   security: {
     sessionWarning:
-      "For your security, sign out on shared devices. Finance4All never asks for your password by email.",
+      "For your security, sign out on shared devices. FinanceMeta never asks for your password by email.",
     passwordHints:
       "Use at least 8 characters with letters and numbers. Avoid reusing passwords from other sites.",
     twoFactorNote:
@@ -447,7 +447,7 @@ export const portalCopy = {
     progress: "Still on the list for this week.",
   },
   footer: {
-    tagline: "Finance learning and member portal.",
+    tagline: "Financial education, research, opportunities, and community.",
     settings: "Settings",
     saved: "Saved items",
     activity: "Activity feed",
@@ -456,11 +456,11 @@ export const portalCopy = {
   },
   landing: {
     heroBadge: "Free membership",
-    heroBadgeModules: "Portal · Labs · Chapters · Journal",
+    heroBadgeModules: "Portal · Labs · Chapters · Debrief",
     heroTitle: "A global network for",
     heroTitleAccent: "finance education and research.",
     heroSubtext:
-      "Finance4All brings learning content, a member portal, research applications, writing submissions, and chapter activity into one place.",
+      "FinanceMeta brings learning content, a member portal, research applications, opportunities, writing submissions, and chapter activity into one place.",
     heroCtaPrimary: "Create free account",
     heroCtaSecondary: "Sign in to portal",
     heroScrollHint: "What we build",
@@ -502,13 +502,13 @@ export const portalCopy = {
     contactSuccessDetail: "Your message is now available to portal administrators.",
     contactError: "Could not send your message. Try again or email us directly.",
     founderEyebrow: "Leadership",
-    founderTitle: "The team behind Finance4All",
+    founderTitle: "The team behind FinanceMeta",
     founderSubtext:
-      "Students and recent graduates who run outreach, build curriculum, and review research — not a distant advisory board.",
-    footerTagline: "Finance learning and member portal.",
+      "FinanceMeta is built and operated by its student leadership and contributors across education, research, chapters, and platform development.",
+    footerTagline: "Financial education, research, opportunities, and community.",
     footerMission: "Learning content and member tools in one place.",
-    socialProofLabel: "Programs inside Finance4All",
-    documentTitle: "Finance learning and member portal",
+    socialProofLabel: "Programs inside FinanceMeta",
+    documentTitle: "Financial education, research and opportunities",
     skipToContent: "Skip to content",
     contactSending: "Sending…",
     contactSendAnother: "Send another message",
@@ -537,7 +537,7 @@ export const portalCopy = {
     },
     network: {
       title: "Open Network",
-      description: "Find members in your chapter or post an introduction.",
+      description: "Find members who opted into the directory or post an introduction.",
     },
     events: {
       title: "Chapter events",
@@ -571,11 +571,11 @@ export const portalCopy = {
   },
   tour: {
     step1Title: "Your member dashboard",
-    step1Body: "The dashboard surfaces articles, lab openings, events, and members based on your interests and chapter.",
+    step1Body: "The dashboard surfaces articles, lab openings, events, and visible members based on your interests and chapter.",
     step2Title: "Search the portal",
     step2Body: "Press ⌘K (Ctrl+K on Windows) to search articles, labs, opportunities, events, and members from any page.",
     step3Title: "Complete your profile",
-    step3Body: "Bio, interests, and chapter drive what appears in your feed and in member search results.",
+    step3Body: "Bio, interests, and chapter drive your feed. Enabling Open to collaborate also makes your profile discoverable in the member directory.",
     step3Cta: "Go to Settings",
     step4Title: "Choose a starting point",
     step4Body: "Debriefed for news, Meta Labs for research roles, Network for chapter members — pick what fits your week.",
