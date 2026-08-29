@@ -17,15 +17,15 @@ import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 const structuredData = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "Finance4All",
+  name: "FinanceMeta",
   description:
-    "Student finance learning and member portal for courses, Finance Debrief, research applications, opportunities, chapters, and saved content.",
+    "Student financial education, research, opportunities, chapters, and member portal.",
   url: "https://finance4all-global-reach.vercel.app",
   sameAs: [],
 };
 
 export default function Index() {
-  useDocumentTitle("Finance learning and member portal");
+  useDocumentTitle("Financial education, research and opportunities");
 
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-[#071412] text-white">
