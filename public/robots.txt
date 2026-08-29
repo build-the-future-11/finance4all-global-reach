@@ -18,5 +18,6 @@ Disallow: /signup
 Disallow: /onboarding
 Disallow: /forgot-password
 Disallow: /reset-password
+Disallow: /auth/
 
 Sitemap: https://finance4all-global-reach.vercel.app/sitemap.xml
