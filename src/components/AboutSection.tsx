@@ -46,7 +46,7 @@ export default function AboutSection() {
               <span className="text-emerald-300/95">actually run</span>
             </>
           }
-          description="Finance4All brings school outreach, a member portal, and chapter activity into one system. The through-line is practical: learn the basics, save useful reading, apply to real projects, and follow what your chapter publishes."
+          description="FinanceMeta brings financial education, a member portal, research workflows, opportunities, and chapter activity into one system. The through-line is practical: learn the basics, save useful reading, apply to real projects, and follow what your chapter publishes."
         />
         <p className="mx-auto mt-4 max-w-3xl text-center text-sm leading-relaxed text-white/45">
           {portalCopy.landing.aboutSubtext}
