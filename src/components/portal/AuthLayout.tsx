@@ -31,7 +31,7 @@ export default function AuthLayout({
             {portalCopy.auth.backToSite}
           </Link>
           <h2 className="mt-8 text-4xl font-bold leading-tight text-white">
-            Finance4All
+            FinanceMeta
             <span className="mt-1 block bg-gradient-to-r from-emerald-300 to-cyan-200 bg-clip-text text-transparent">
               {portalCopy.auth.portalLabel}
             </span>
@@ -72,7 +72,7 @@ export default function AuthLayout({
                   <p className="font-medium text-amber-200">Account service unavailable</p>
                   <p className="mt-1 text-amber-100/70">
                     Sign-in is temporarily unavailable. Please try again later or contact the
-                    Finance4All team if this continues.
+                    FinanceMeta team if this continues.
                   </p>
                 </div>
               )}
