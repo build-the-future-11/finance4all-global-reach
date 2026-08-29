@@ -24,6 +24,7 @@ import {
   PortalSelectContent,
   PortalSelectItem,
   PortalSectionHeading,
+  portalButtonDanger,
   portalButtonOutline,
   portalButtonPrimary,
   portalInputClass,
@@ -240,7 +241,7 @@ export default function Settings() {
             to={profile ? `${portalRoutes.networkProfile}/${profile.id}` : portalRoutes.network}
             className={cn(portalLinkClass, "mt-4 inline-block text-sm")}
           >
-            View public profile →
+            View member profile →
           </Link>
         </PortalCard>
       </div>
@@ -333,7 +334,7 @@ export default function Settings() {
             )}
             <PortalToggleRow
               title="Open to collaborate"
-              description="Shown on your public profile"
+              description="Adds an open-to-collaborate signal to your member profile. Directory visibility is handled separately by FinanceMeta's membership policy."
             >
               <Switch checked={openToCollaborate} onCheckedChange={setOpenToCollaborate} />
             </PortalToggleRow>
@@ -485,7 +486,7 @@ export default function Settings() {
               </AlertDialogTrigger>
               <AlertDialogContent className="border-white/15 bg-slate-950 text-white">
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Delete your Finance4All account?</AlertDialogTitle>
+                  <AlertDialogTitle>Delete your FinanceMeta account?</AlertDialogTitle>
                   <AlertDialogDescription className="text-white/60">
                     Download your data first if you need a record. To confirm permanent deletion, type <strong className="break-all text-white">{requiredDeleteConfirmation}</strong>.
                   </AlertDialogDescription>
