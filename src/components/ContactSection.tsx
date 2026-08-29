@@ -40,7 +40,7 @@ export default function ContactSection() {
       <div ref={ref} className="mx-auto max-w-3xl text-center">
         <p className={cn(landingEyebrowClass, "mb-3")}>Contact</p>
         <h2 className="mb-4 text-balance text-3xl font-bold tracking-tight text-white sm:text-4xl">
-          Questions about Finance4All
+          Questions about FinanceMeta
         </h2>
         <p className="mx-auto mb-10 max-w-xl text-pretty text-white/55">Use the form for an account, chapter, content, or general inquiry. Do not include passwords or sensitive financial information.</p>
 
