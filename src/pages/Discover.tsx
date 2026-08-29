@@ -25,14 +25,14 @@ const TRACKS = [
     next: portalRoutes.pathwaysOpportunities,
     cta: "Open opportunity board after signup",
   },
-    {
-      title: "Competitions",
-      body: "Open competitions appear under Events & Chapters with status and external registration links when provided. See the public overview first.",
-      next: portalRoutes.events,
-      cta: "View competitions after signup",
-      publicHref: "/competitions",
-      publicCta: "Read competitions overview",
-    },
+  {
+    title: "Competitions",
+    body: "Open competitions appear under Events & Chapters with status and external registration links when provided. See the public overview first.",
+    next: portalRoutes.events,
+    cta: "View competitions after signup",
+    publicHref: "/competitions",
+    publicCta: "Read competitions overview",
+  },
   {
     title: "Chapters & workshops",
     body: "Find chapters on the map, RSVP to events, and export calendar invites. Workshops are published as chapter events.",
@@ -60,9 +60,9 @@ export default function Discover() {
           Find a program, then join the portal to apply, register, or save it
         </h1>
         <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/55">
-          Finance4All helps students find structured finance learning, research projects,
+          FinanceMeta helps students find structured finance learning, research projects,
           opportunities, chapters, and competitions. Choose a track below to create an account and
-          continue in the member portal — this page does not invent placement rates or member counts.
+          continue in the member portal. Availability is based on what administrators have actually published.
         </p>
 
         <div className="mt-12 grid gap-4 sm:grid-cols-2">
