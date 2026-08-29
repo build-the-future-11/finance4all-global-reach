@@ -15,7 +15,6 @@ import PortalBreadcrumbs from "@/components/portal/PortalBreadcrumbs";
 import PageTransition from "@/components/portal/PageTransition";
 import PortalFooter from "@/components/portal/PortalFooter";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
-import { portalCopy } from "@/lib/portalCopy";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -70,10 +69,10 @@ export default function PortalLayout() {
             </button>
             <Link to="/portal" className="portal-focus-ring group flex items-center gap-2.5 rounded-lg">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 text-xs font-bold text-white shadow-[0_2px_8px_rgba(52,211,153,0.25)] transition group-hover:shadow-[0_4px_16px_rgba(52,211,153,0.35)]">
-                F4
+                FM
               </div>
               <div className="hidden sm:block">
-                <p className="text-sm font-semibold leading-none text-white">Finance4All</p>
+                <p className="text-sm font-semibold leading-none text-white">FinanceMeta</p>
                 <p className="text-[11px] text-white/45">Member Portal</p>
               </div>
             </Link>
