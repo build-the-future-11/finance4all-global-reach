@@ -27,7 +27,7 @@ export function buildIcalEvent(event: IcalEventInput): string {
   return [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//Finance4All//Member Portal//EN",
+    "PRODID:-//FinanceMeta//Member Portal//EN",
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
     "BEGIN:VEVENT",

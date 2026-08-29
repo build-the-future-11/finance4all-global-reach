@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { portalCopy } from "@/lib/portalCopy";
 
-const BASE = "Finance4All";
+const BASE = "FinanceMeta";
 const DEFAULT_SUFFIX = portalCopy.landing.documentTitle;
 
 export function useDocumentTitle(title?: string) {

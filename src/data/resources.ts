@@ -100,7 +100,7 @@ export const UPCOMING_WEBINARS = [
   {
     id: "lab-info",
     title: "Lab application workshop",
-    host: "Finance4All research",
+    host: "FinanceMeta research",
     date: "Bi-weekly",
     description: "How to write a motivation statement, pick a project, and what leads look for in applications.",
     href: "/portal/labs",

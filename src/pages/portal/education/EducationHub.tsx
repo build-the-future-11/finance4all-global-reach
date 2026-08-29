@@ -145,7 +145,7 @@ export default function EducationHub() {
   h1{font-size:28px;margin:0 0 8px} .meta{color:#64748b;font-size:14px;margin-top:24px}
   .code{font-family:ui-monospace,monospace;letter-spacing:0.08em;font-size:18px;margin-top:12px}
 </style></head><body><div class="frame">
-  <p>Finance4All · Catalyst</p>
+  <p>FinanceMeta · Catalyst</p>
   <h1>${existingCert.title}</h1>
   <p>This certifies curriculum completion for the signed-in member account.</p>
   <p class="code">Verification ${existingCert.verificationCode}</p>

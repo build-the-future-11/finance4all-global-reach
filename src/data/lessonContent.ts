@@ -1,4 +1,4 @@
-/** Full lesson bodies — written for Finance4All learning and Debrief content. */
+/** Full lesson bodies — written for FinanceMeta learning and Debrief content. */
 
 export interface LessonContent {
   body: string;
@@ -166,7 +166,7 @@ How will you separate correlation from causation? Natural experiments, differenc
 
 One message per chart. Label axes, cite sources in the caption, avoid 3D effects. A good chart should be understandable without reading the full paper.
 
-## Peer review at Finance4All
+## Peer review at FinanceMeta
 
 Submissions on Pathways → Essays receive community upvotes; editorial picks are selected for clarity, originality, and evidence. Respond to feedback — revision is part of publication.
 

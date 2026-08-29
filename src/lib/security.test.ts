@@ -44,7 +44,7 @@ describe("security", () => {
   it("assesses password strength", () => {
     const weak = assessPassword("abc");
     expect(weak.strength).toBe("weak");
-    const strong = assessPassword("Finance4All2026!");
+    const strong = assessPassword("FinanceMeta2026!");
     expect(strong.strength).toBe("strong");
   });
 

@@ -22,7 +22,7 @@ export function formatAuthError(message: string): string {
     return "Could not reach the account service. Check your connection and try again.";
   }
   if (m.includes("signup is disabled")) {
-    return "New signups are temporarily disabled. Contact the Finance4All team.";
+    return "New signups are temporarily disabled. Contact the FinanceMeta team.";
   }
 
   return sanitizeUserFacingError(message);

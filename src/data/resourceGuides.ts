@@ -11,7 +11,7 @@ export interface ResourceGuide {
 export const RESOURCE_GUIDES: Record<string, ResourceGuide> = {
   "club-toolkit": {
     id: "club-toolkit",
-    title: "Start a Finance4All school chapter",
+    title: "Start a FinanceMeta school chapter",
     summary: "Faculty-backed club playbook — from interest meeting to first Catalyst workshop to portal onboarding.",
     checklist: [
       "Find a faculty advisor willing to sponsor meetings",

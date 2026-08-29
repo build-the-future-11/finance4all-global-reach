@@ -18,7 +18,7 @@ export function getAppOrigin(): string {
       browserOrigin === "null"
     ) {
       console.error(
-        "[Finance4All] Production build on localhost — set VITE_APP_URL to your Vercel URL.",
+        "[FinanceMeta] Production build on localhost — set VITE_APP_URL to your Vercel URL.",
       );
     }
   }

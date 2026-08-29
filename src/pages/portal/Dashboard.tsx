@@ -92,7 +92,7 @@ export default function Dashboard() {
           subtitle={
             chapterName
               ? `${chapterName} chapter · ${openLabs} open lab ${openLabs === 1 ? "role" : "roles"} across the network`
-              : `Your Finance4All dashboard · ${openLabs} open lab ${openLabs === 1 ? "role" : "roles"}`
+              : `Your FinanceMeta dashboard · ${openLabs} open lab ${openLabs === 1 ? "role" : "roles"}`
           }
           badges={
             <>

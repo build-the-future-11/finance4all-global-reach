@@ -26,7 +26,7 @@ export function computeMemberBadges(
     {
       id: "founding",
       label: "Member",
-      description: "Finance4All account created",
+      description: "FinanceMeta account created",
       earned: Boolean(profile.displayName),
     },
     {

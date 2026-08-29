@@ -10,9 +10,9 @@ function resolveSupabaseUrl(): string {
     return fromEnv.replace(/\/$/, "");
   }
   if (import.meta.env.DEV) {
-    console.warn("[Finance4All] Account service URL is not configured for this local environment.");
+    console.warn("[FinanceMeta] Account service URL is not configured for this local environment.");
   } else {
-    console.error("[Finance4All] Account service URL is required in production.");
+    console.error("[FinanceMeta] Account service URL is required in production.");
   }
   return "";
 }
@@ -23,12 +23,12 @@ function resolveSupabaseKey(): string {
     return anon;
   }
   if (anon && !isClientSafeSupabaseKey(anon)) {
-    console.error("[Finance4All] Account service key is not a valid browser-safe anon key.");
+    console.error("[FinanceMeta] Account service key is not a valid browser-safe anon key.");
   }
   if (import.meta.env.DEV) {
-    console.warn("[Finance4All] Account service key is not configured for this local environment.");
+    console.warn("[FinanceMeta] Account service key is not configured for this local environment.");
   } else {
-    console.error("[Finance4All] Account service key is required in production.");
+    console.error("[FinanceMeta] Account service key is required in production.");
   }
   return "";
 }
@@ -38,7 +38,7 @@ const supabaseKey = resolveSupabaseKey();
 
 if (import.meta.env.PROD && (!supabaseUrl || !supabaseKey)) {
   throw new Error(
-    "[Finance4All] Account service configuration is required in production.",
+    "[FinanceMeta] Account service configuration is required in production.",
   );
 }
 
