@@ -5,7 +5,9 @@ test.describe("auth surfaces (unauthenticated)", () => {
   test("signup page is reachable with honeypot still present", async ({ page }) => {
     await page.goto("/signup");
     await expect(page.getByRole("button", { name: /create account/i })).toBeVisible();
-    await expect(page.locator('input[name="company_website"]')).toBeHidden();
+    await expect(page.locator('input[name="company"]')).toBeHidden();
+    await expect(page.locator('input[name="company"]')).toHaveAttribute("aria-hidden", "true");
+    await expect(page.locator('input[name="company"]')).toHaveAttribute("tabindex", "-1");
   });
 
   test("forgot-password page accepts email field", async ({ page }) => {
