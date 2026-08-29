@@ -30,7 +30,7 @@ describe("member directory privacy", () => {
     });
   });
 
-  it("uses a fixed-column view and no longer grants members direct directory reads", () => {
+  it("keeps account email out of the fixed-column member view", () => {
     const migration = readFileSync(
       resolve(process.cwd(), "supabase/migrations/010_directory_privacy.sql"),
       "utf8",
@@ -41,6 +41,21 @@ describe("member directory privacy", () => {
     expect(migration).toContain("USING (auth.uid() = id)");
     expect(viewDefinition).not.toMatch(/\bemail\b/i);
     expect(viewDefinition).toContain("onboarding_completed_at IS NOT NULL");
+    expect(migration).toContain("GRANT SELECT ON TABLE member_directory TO authenticated");
+  });
+
+  it("enforces directory visibility in migration 022 rather than relying on a client filter", () => {
+    const migration = readFileSync(
+      resolve(process.cwd(), "supabase/migrations/022_directory_visibility.sql"),
+      "utf8",
+    );
+    const viewDefinition = migration.split("CREATE OR REPLACE VIEW member_directory")[1].split("REVOKE ALL")[0];
+
+    expect(viewDefinition).toContain("open_to_collaborate = true");
+    expect(viewDefinition).toContain("id = (SELECT auth.uid())");
+    expect(viewDefinition).toContain("COALESCE((SELECT is_admin()), false)");
+    expect(viewDefinition).not.toMatch(/\bemail\b/i);
+    expect(migration).toContain("REVOKE ALL ON TABLE member_directory FROM PUBLIC, anon");
     expect(migration).toContain("GRANT SELECT ON TABLE member_directory TO authenticated");
   });
 });
