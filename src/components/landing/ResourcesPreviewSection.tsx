@@ -28,7 +28,7 @@ const PREVIEW = [
   {
     icon: BookOpen,
     title: "Club toolkit",
-    desc: "Month-by-month playbook for launching a Finance4All chapter at your school.",
+    desc: "Month-by-month playbook for launching a FinanceMeta chapter at your school.",
     href: signupWithNext("/portal/resources"),
   },
 ];
