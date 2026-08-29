@@ -1,10 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
-  <title id="title">Finance4All</title>
-  <desc id="desc">Finance learning and member portal</desc>
+  <title id="title">FinanceMeta</title>
+  <desc id="desc">Financial education, research, opportunities, and community</desc>
   <rect width="1200" height="630" fill="#071412"/>
   <rect x="72" y="70" width="1056" height="490" fill="#0d211d" stroke="#75e8b4" stroke-opacity=".38"/>
-  <text x="132" y="194" fill="#9af0c6" font-family="Arial, sans-serif" font-size="28" font-weight="700" letter-spacing="4">FINANCE4ALL</text>
-  <text x="132" y="300" fill="#ffffff" font-family="Arial, sans-serif" font-size="64" font-weight="700">Finance learning and</text>
-  <text x="132" y="378" fill="#ffffff" font-family="Arial, sans-serif" font-size="64" font-weight="700">member portal</text>
-  <text x="132" y="455" fill="#cbd5d1" font-family="Arial, sans-serif" font-size="28">Courses · Finance Debrief · Opportunities · Chapters</text>
+  <text x="132" y="194" fill="#9af0c6" font-family="Arial, sans-serif" font-size="28" font-weight="700" letter-spacing="4">FINANCEMETA</text>
+  <text x="132" y="300" fill="#ffffff" font-family="Arial, sans-serif" font-size="64" font-weight="700">Learn finance. Build research.</text>
+  <text x="132" y="378" fill="#ffffff" font-family="Arial, sans-serif" font-size="64" font-weight="700">Find your next opportunity.</text>
+  <text x="132" y="455" fill="#cbd5d1" font-family="Arial, sans-serif" font-size="28">Debrief · Meta Labs · Pathways · Chapters · Member Portal</text>
 </svg>
