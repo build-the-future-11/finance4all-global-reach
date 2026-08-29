@@ -45,19 +45,25 @@ This applies every migration in `supabase/migrations/` in order, including the c
 
 Do not manually stop at migration 012 or 021.
 
-After applying migrations, run `supabase/VERIFY_SETUP.sql` in the SQL Editor and resolve every failing row before opening registration.
+After applying migrations, run both verification scripts in the SQL Editor:
+
+1. `supabase/VERIFY_SETUP.sql`
+2. `supabase/VERIFY_RELEASE_PATCH.sql`
+
+Resolve every row where `ok = false` before opening registration.
 
 ### SQL Editor path for a fresh project
 
-If the Supabase CLI is unavailable, use both release SQL artifacts in this order:
+If the Supabase CLI is unavailable, use the release SQL artifacts in this order:
 
 1. Run `supabase/FINAL_SETUP.sql`.
 2. Run `supabase/FINAL_SETUP_PATCH.sql`.
 3. Run `supabase/VERIFY_SETUP.sql`.
-4. Confirm all verification rows return `ok = true`.
-5. Explicitly verify member-directory privacy: a normal authenticated member must not be able to resolve another member whose `open_to_collaborate` value is `false`.
+4. Run `supabase/VERIFY_RELEASE_PATCH.sql`.
+5. Confirm all verification rows return `ok = true`.
+6. Explicitly test with two normal accounts that a member whose `open_to_collaborate` value is `false` cannot be resolved by another ordinary member, while setting it to `true` makes the profile discoverable.
 
-`FINAL_SETUP.sql` is frozen through migration `021_analytics_journey_events.sql`. `FINAL_SETUP_PATCH.sql` contains the later release migration(s), currently `022_directory_visibility.sql`. CI checks both artifacts against their corresponding migration ranges.
+`FINAL_SETUP.sql` is frozen through migration `021_analytics_journey_events.sql`. `FINAL_SETUP_PATCH.sql` contains later release migrations, currently `022_directory_visibility.sql`. CI checks both artifacts against their corresponding migration ranges.
 
 Seed data is for internal review only. Remove or replace unverified seed/demo records before public launch.
 
@@ -105,7 +111,7 @@ If email infrastructure is not ready at initial launch, keep the weekly digest d
 
 ## 6. Required release verification
 
-Before merge/deploy, require all of these to pass from the repository root:
+Use Node.js 22 or newer. Before merge/deploy, require all of these to pass from the repository root:
 
 ```bash
 npm ci
@@ -164,9 +170,9 @@ FinanceMeta is **GO** only when:
 - the hardened branch is merged to `main`;
 - GitHub Actions is green;
 - all production migrations through `022` are applied;
-- Supabase verification passes;
+- both Supabase verification scripts pass;
 - authenticated golden-journey smoke tests pass against the live environment;
-- directory privacy behavior is verified;
+- directory privacy behavior is verified with two ordinary accounts;
 - legal/content review is complete;
 - at least two administrators are available;
 - the final production URL is configured consistently in Vercel and Supabase.
