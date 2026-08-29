@@ -13,12 +13,12 @@ export default function HeroSection() {
     <section className="border-b border-emerald-100/10 bg-[#071412] px-4 pb-14 pt-32 sm:pb-20 sm:pt-40">
       <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[1.08fr_0.92fr] lg:gap-16">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-300">Finance4All</p>
+          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-300">FinanceMeta</p>
           <h1 className="mt-5 max-w-3xl text-4xl font-semibold leading-tight text-white sm:text-5xl">
-            Learn finance by reading, practicing, and taking part.
+            Learn finance by reading, practicing, researching, and taking part.
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">
-            Finance4All is a member portal for students who want a clearer way into finance and economics. Use it to study foundational concepts, follow Finance Debrief, explore opportunities, and stay connected to chapter activity.
+            FinanceMeta is a student financial education, research, and opportunity platform. Use the member portal to study foundational concepts, follow Finance Debrief, explore Meta Labs and pathways, join chapter activity, and keep track of your progress.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
@@ -35,14 +35,14 @@ export default function HeroSection() {
               Create a member account
             </Link>
           </div>
-          <p className="mt-5 text-sm text-slate-400">No finance background is assumed. Content availability changes as editors and administrators publish it.</p>
+          <p className="mt-5 text-sm text-slate-400">No finance background is assumed. Programs and opportunities appear only when they are actively published.</p>
         </div>
 
         <div className="border border-white/15 bg-[#0d211d] p-5 shadow-2xl shadow-black/20 sm:p-7">
           <div className="flex items-center justify-between border-b border-white/10 pb-4">
             <div>
-              <p className="text-sm font-semibold text-white">Inside the member portal</p>
-              <p className="mt-1 text-sm text-slate-400">A single place to return to your learning and activity.</p>
+              <p className="text-sm font-semibold text-white">Inside the FinanceMeta member portal</p>
+              <p className="mt-1 text-sm text-slate-400">A single place to return to your learning, research, and activity.</p>
             </div>
             <Bookmark className="h-5 w-5 text-emerald-300" aria-hidden />
           </div>
