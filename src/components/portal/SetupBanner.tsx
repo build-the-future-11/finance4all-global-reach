@@ -20,7 +20,7 @@ export default function SetupBanner() {
           <p className="font-medium text-red-200">Member services unavailable</p>
           <p className="mt-1 text-red-100/80">
             The portal cannot reach its account and data services right now. Please try again later
-            or contact the Finance4All team if the issue continues.
+            or contact the FinanceMeta team if the issue continues.
           </p>
         </div>
       </div>
