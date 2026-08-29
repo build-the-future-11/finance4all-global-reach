@@ -39,7 +39,7 @@ export default function InclusiveImpactSection() {
         <SectionHeader
           eyebrow="Inclusion first"
           title="Built for students without a finance class"
-          description="Finance4All keeps the bar practical: free access, plain language, chapter support where available, and member tools that make the next step visible."
+          description="FinanceMeta keeps the bar practical: free access, plain language, chapter support where available, and member tools that make the next step visible."
         />
 
         <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
