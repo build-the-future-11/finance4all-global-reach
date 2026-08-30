@@ -1,7 +1,8 @@
 -- FinanceMeta authorization and notification integrity hardening
 -- Apply after 001_initial_schema.sql, 002_google_oauth.sql and 003_bookmarks_notifications.sql.
 -- Prevent members from escalating profiles.role through direct PostgREST/client writes.
--- Make the authenticated essay aggregate view execute with caller permissions so underlying RLS applies.
+-- Make the authenticated essay aggregate view execute with caller permissions so underlying essay RLS applies.
+-- Preserve community upvote totals through a narrow SECURITY DEFINER count function that exposes counts, not voter rows.
 -- Prevent authenticated clients from fabricating notifications; notification inserts remain trigger-owned.
 -- Pin SECURITY DEFINER helper/trigger search paths and remove unnecessary public execution.
 
@@ -53,6 +54,32 @@ REVOKE ALL ON FUNCTION public.notify_lab_application_status() FROM PUBLIC;
 DROP POLICY IF EXISTS "System insert notifications" ON public.notifications;
 REVOKE INSERT ON TABLE public.notifications FROM anon, authenticated;
 
+-- A security-invoker view is required so callers cannot bypass essay_submissions RLS.
+-- The original aggregate subquery would also make essay_upvotes obey caller RLS,
+-- collapsing community counts to the caller's own upvote. Expose only the aggregate
+-- through a tightly scoped definer function instead of exposing other users' upvote rows.
+CREATE OR REPLACE FUNCTION public.get_essay_upvote_count(target_essay_id uuid)
+RETURNS bigint
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = ''
+AS $$
+  SELECT count(*)
+  FROM public.essay_upvotes
+  WHERE essay_id = target_essay_id;
+$$;
+
+REVOKE ALL ON FUNCTION public.get_essay_upvote_count(uuid) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.get_essay_upvote_count(uuid) TO authenticated;
+
+CREATE OR REPLACE VIEW public.essay_submissions_with_counts AS
+SELECT
+  e.*,
+  COALESCE(public.get_essay_upvote_count(e.id), 0)::int AS upvote_count
+FROM public.essay_submissions e;
+
 ALTER VIEW public.essay_submissions_with_counts SET (security_invoker = true);
+GRANT SELECT ON public.essay_submissions_with_counts TO authenticated;
 
 COMMIT;
