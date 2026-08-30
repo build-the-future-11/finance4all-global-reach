@@ -57,8 +57,17 @@ describe("FinanceMeta authorization boundary", () => {
     expect(migration).not.toContain("GRANT INSERT ON TABLE public.notifications TO authenticated");
   });
 
-  it("forces the authenticated aggregate view to respect caller RLS", () => {
+  it("keeps the aggregate view invoker-safe without collapsing community upvote counts", () => {
     expect(migration).toContain("ALTER VIEW public.essay_submissions_with_counts SET (security_invoker = true)");
+    expect(migration).toContain("CREATE OR REPLACE FUNCTION public.get_essay_upvote_count(target_essay_id uuid)");
+    expect(migration).toContain("SECURITY DEFINER");
+    expect(migration).toContain("SET search_path = ''");
+    expect(migration).toContain("FROM public.essay_upvotes");
+    expect(migration).toContain("WHERE essay_id = target_essay_id");
+    expect(migration).toContain("REVOKE ALL ON FUNCTION public.get_essay_upvote_count(uuid) FROM PUBLIC");
+    expect(migration).toContain("GRANT EXECUTE ON FUNCTION public.get_essay_upvote_count(uuid) TO authenticated");
+    expect(migration).toContain("COALESCE(public.get_essay_upvote_count(e.id), 0)::int AS upvote_count");
+    expect(migration).not.toContain("SELECT essay_id, COUNT(*) AS cnt FROM essay_upvotes GROUP BY essay_id");
   });
 
   it("keeps the current member profile UI within the safe-column grant", () => {
