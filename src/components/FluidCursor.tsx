@@ -112,7 +112,7 @@ export default function FluidCursor(props: Props) {
 
     const pointers: Pointer[] = [pointerPrototype()];
 
-    const config: any = {
+    const config = {
       SIM_RESOLUTION: merged.simResolution,
       DYE_RESOLUTION: merged.dyeResolution,
       CAPTURE_RESOLUTION: merged.captureResolution,
@@ -151,7 +151,7 @@ export default function FluidCursor(props: Props) {
 
       const isWebGL2 = "drawBuffers" in gl;
       let supportLinearFiltering = false;
-      let halfFloat: any = null;
+      let halfFloat: { HALF_FLOAT_OES: number } | null = null;
 
       if (isWebGL2) {
         (gl as WebGL2RenderingContext).getExtension("EXT_color_buffer_float");
@@ -234,7 +234,7 @@ export default function FluidCursor(props: Props) {
       };
     }
 
-    const { gl, ext } = getWebGLContext(canvas) as { gl: WebGL2RenderingContext | null; ext: any };
+    const { gl, ext } = getWebGLContext(canvas);
     if (!gl || !ext) return;
 
     if (!ext.supportLinearFiltering) {
@@ -1350,9 +1350,9 @@ export default function FluidCursor(props: Props) {
       window.removeEventListener("mousemove", onMouseMove);
       if (firstMouseMoveHandler) document.body.removeEventListener("mousemove", firstMouseMoveHandler);
       document.body.removeEventListener("touchstart", onTouchStartFirst);
-      window.removeEventListener("touchstart", onTouchStart as any);
-      window.removeEventListener("touchmove", onTouchMove as any);
-      window.removeEventListener("touchend", onTouchEnd as any);
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("touchend", onTouchEnd);
     };
   }, [props]);
 
