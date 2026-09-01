@@ -22,10 +22,11 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Repository lint gate
+        run: npm run lint
+      - name: TypeScript compilation gate
+        run: npm run typecheck
       - name: Full test suite
         run: npm test
       - name: Production build
         run: npm run build
-      - name: Repository lint baseline
-        continue-on-error: true
-        run: npm run lint
