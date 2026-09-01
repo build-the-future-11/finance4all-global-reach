@@ -48,6 +48,27 @@ jobs:
           name: production-dependency-audit
           path: npm-audit-prod.json
           retention-days: 14
+      - name: Generate candidate safe lockfile remediation
+        if: failure()
+        shell: bash
+        run: |
+          cp package-lock.json package-lock.before-remediation.json
+          npm audit fix --package-lock-only --omit=dev || true
+          npm audit --omit=dev --json > npm-audit-candidate.json || true
+          if cmp -s package-lock.before-remediation.json package-lock.json; then
+            echo "candidate_changed=false" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "candidate_changed=true" >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Upload candidate lockfile remediation evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-dependency-remediation-candidate
+          path: |
+            package-lock.json
+            npm-audit-candidate.json
+          retention-days: 7
       - name: TypeScript compilation gate
         run: npm run typecheck
       - name: Full test suite
