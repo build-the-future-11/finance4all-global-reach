@@ -2,6 +2,21 @@
 
 This is a **Vite** app. All client env vars must use the `VITE_` prefix so they are exposed at build time. Do **not** use `NEXT_PUBLIC_`.
 
+## Current release gate
+
+`main` now fails closed when the browser Supabase configuration is missing, malformed, or placeholder-valued. A green GitHub Actions build does **not** prove that the Vercel project has the same environment configuration, because CI supplies its own test values.
+
+Before treating a Vercel deployment as production-ready, verify all of the following on the exact deployed commit:
+
+- `VITE_SUPABASE_URL` is present and points at the canonical FinanceMeta Supabase project.
+- Either `VITE_SUPABASE_ANON_KEY` or `VITE_SUPABASE_PUBLISHABLE_KEY` is present and is a browser-safe public key.
+- The variables are enabled for **Production and Preview** (and Development if Vercel development environments are used).
+- The deployment was rebuilt after any environment-variable change.
+- Database migrations `001` through `004` have been applied in order and migration state was checked before applying anything manually.
+- Google OAuth redirect URLs match the deployed production and preview domains.
+
+If a Vercel deployment starts failing after the fail-closed configuration gate was introduced, check the build log for `validate-public-env` output first. Do not weaken or bypass the validator to make a deployment green.
+
 ## 1. Connect repo to Vercel
 
 1. Go to [vercel.com/new](https://vercel.com/new)
@@ -32,11 +47,20 @@ Then click **Redeploy** — Vite bakes env vars in at **build** time, so changin
 
 ```bash
 cp .env.example .env
-# Edit .env with your anon JWT, then:
+# Edit .env with your browser-safe Supabase public key, then:
 npm run dev
 ```
 
 Dev server runs at **http://localhost:8080** (see `vite.config.ts`).
+
+### Validate the same contract locally
+
+```bash
+npm run validate:env
+npm run build
+```
+
+The release path should stay fail-closed: invalid or placeholder Supabase configuration must fail before a deploy is accepted.
 
 ## 3. Supabase redirect URLs (REQUIRED for Google login)
 
@@ -68,12 +92,29 @@ https://pnemeegkwyaicsbnbnmg.supabase.co/auth/v1/callback
 
 ## 4. Database
 
-If not done yet, run in Supabase SQL Editor (in order):
+Before applying anything, inspect the canonical Supabase project's migration state. Do not re-run migrations blindly.
+
+Required migration order:
 
 1. `supabase/migrations/001_initial_schema.sql`
-2. `supabase/seed.sql`
+2. `supabase/seed.sql` (seed data only; apply intentionally)
 3. `supabase/migrations/002_google_oauth.sql` (Google login)
 4. `supabase/migrations/003_bookmarks_notifications.sql` (bookmarks + notifications)
+5. `supabase/migrations/004_authorization_hardening.sql` (role/ownership/notification/view authorization hardening)
+
+Migration `004_authorization_hardening.sql` is a production security requirement, not an optional enhancement.
+
+### Authorization certification after migration 004
+
+Using an ordinary member account against the canonical production database, verify that:
+
+- changing `profiles.role` through the client/PostgREST is rejected;
+- creating a profile cannot self-assign an elevated role;
+- ordinary profile fields that are explicitly allowed remain editable;
+- a member cannot fabricate notifications;
+- essay/community aggregate upvote counts remain visible while individual voter rows stay protected by RLS.
+
+Record the deployed commit and the date of this certification. Source CI alone is not production certification.
 
 ## 5. Deploy
 
@@ -85,17 +126,26 @@ npx vercel --prod
 
 ## Verify
 
-1. Open `https://YOUR-PROJECT.vercel.app/login`
-2. No `placeholder.supabase.co` or missing-env errors in console
-3. Google sign-in completes and lands on `/portal`
-4. Portal loads news/events data
-5. Promote your account to admin (Supabase SQL Editor):
+Run this against the exact production deployment before sharing the portal publicly:
+
+1. Open `https://YOUR-PROJECT.vercel.app/login`.
+2. Confirm there are no placeholder/missing-env errors.
+3. Complete visitor → signup → onboarding → portal.
+4. Complete Google sign-in and confirm it lands on `/portal`.
+5. Confirm Portal loads news/events data.
+6. Save or create one normal member activity and confirm it persists across logout/login.
+7. Confirm a signed-out user is rejected from a protected portal route.
+8. Confirm a normal member cannot reach or mutate admin-only functions.
+9. Confirm the authorization checks above still pass against production.
+10. Record the exact deployed commit SHA in the release evidence.
+
+To promote an administrator, use a trusted database-admin path rather than any browser/client flow. For example, from the Supabase SQL Editor under an appropriately privileged operator account:
 
 ```sql
 UPDATE profiles SET role = 'admin' WHERE email = 'your@email.com';
 ```
 
-Then open `/portal/admin` to publish content.
+Then open `/portal/admin` and verify the intended admin path. Never expose role promotion as a member-editable client operation.
 
 ### Quick API check (local or CI)
 
@@ -106,4 +156,18 @@ curl -s -o /dev/null -w "%{http_code}\n" \
   "https://pnemeegkwyaicsbnbnmg.supabase.co/rest/v1/"
 ```
 
-Expect `200` — confirms URL and anon key are valid.
+Expect `200` — confirms URL and public key are valid.
+
+## Release evidence to retain
+
+For each production release, retain a compact record containing:
+
+- Git commit SHA;
+- Vercel deployment URL and successful build result;
+- environment-contract validation result (never the secret/public-key value itself);
+- migration state through `004_authorization_hardening.sql`;
+- auth/onboarding/protected-route smoke-test result;
+- ordinary-member authorization test result;
+- known failures or exceptions and their owner.
+
+A release is complete only when the deployment and the production authorization behavior are both verified.
