@@ -75,6 +75,5 @@ jobs:
         run: npm test
       - name: Production build
         run: npm run build
-      - name: Repository lint baseline
-        continue-on-error: true
+      - name: Repository lint gate
         run: npm run lint
