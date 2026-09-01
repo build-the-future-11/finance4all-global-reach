@@ -22,6 +22,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: TypeScript compilation gate
+        run: npm run typecheck
       - name: Full test suite
         run: npm test
       - name: Production build
