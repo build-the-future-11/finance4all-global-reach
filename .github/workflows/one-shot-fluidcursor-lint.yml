@@ -1,0 +1,70 @@
+name: One-shot FluidCursor lint type repair
+
+on:
+  push:
+    branches:
+      - fix/fluidcursor-lint-types-20260901
+    paths:
+      - .github/workflows/one-shot-fluidcursor-lint.yml
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      VITE_SUPABASE_URL: https://ci.example.invalid
+      VITE_SUPABASE_ANON_KEY: ci-public-key-for-build-contract-only
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: fix/fluidcursor-lint-types-20260901
+          fetch-depth: 1
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - name: Apply exact no-any substitutions
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('src/components/FluidCursor.tsx')
+          text = path.read_text()
+          replacements = {
+              '    const config: any = {': '    const config = {',
+              '      let halfFloat: any = null;': '      let halfFloat: { HALF_FLOAT_OES: number } | null = null;',
+              '    const { gl, ext } = getWebGLContext(canvas) as { gl: WebGL2RenderingContext | null; ext: any };': '    const { gl, ext } = getWebGLContext(canvas);',
+              '      window.removeEventListener("touchstart", onTouchStart as any);': '      window.removeEventListener("touchstart", onTouchStart);',
+              '      window.removeEventListener("touchmove", onTouchMove as any);': '      window.removeEventListener("touchmove", onTouchMove);',
+              '      window.removeEventListener("touchend", onTouchEnd as any);': '      window.removeEventListener("touchend", onTouchEnd);',
+          }
+          for old, new in replacements.items():
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'expected exactly one occurrence of {old!r}, found {count}')
+              text = text.replace(old, new)
+          path.write_text(text)
+          PY
+          git diff -- src/components/FluidCursor.tsx
+      - run: npm ci
+      - name: Lint must have zero errors
+        run: npm run lint
+      - name: TypeScript must remain green
+        run: npm run typecheck
+      - name: Full tests
+        run: npm test
+      - name: Production build
+        run: npm run build
+      - name: Commit only FluidCursor
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add src/components/FluidCursor.tsx
+          git diff --cached --name-only | grep -qx 'src/components/FluidCursor.tsx'
+          git commit -m 'fix(lint): remove FluidCursor explicit any types'
+          git push origin HEAD:fix/fluidcursor-lint-types-20260901
