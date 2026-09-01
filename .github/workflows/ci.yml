@@ -12,6 +12,9 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      VITE_SUPABASE_URL: https://ci.example.invalid
+      VITE_SUPABASE_ANON_KEY: ci-public-key-for-build-contract-only
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -19,8 +22,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: Authorization contract
-        run: npm run test -- authorization-contract
+      - name: Full test suite
+        run: npm test
       - name: Production build
         run: npm run build
       - name: Repository lint baseline
