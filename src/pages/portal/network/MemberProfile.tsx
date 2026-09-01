@@ -12,10 +12,11 @@ import { toast } from "sonner";
 export default function MemberProfile() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
-  if (!id) return <EmptyState message="Profile not found." />;
   const { data: profile, isLoading } = useProfileById(id);
   const { data: connections } = useConnectionRequests();
   const sendRequest = useSendConnectionRequest();
+
+  if (!id) return <EmptyState message="Profile not found." />;
 
   const existing = connections?.find(
     (c) =>
