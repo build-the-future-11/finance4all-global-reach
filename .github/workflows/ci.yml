@@ -17,7 +17,7 @@ jobs:
       VITE_SUPABASE_ANON_KEY: ci-public-key-for-build-contract-only
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: npm
@@ -43,7 +43,7 @@ jobs:
           exit "$status"
       - name: Upload production dependency audit evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: production-dependency-audit
           path: npm-audit-prod.json
@@ -62,7 +62,7 @@ jobs:
           fi
       - name: Upload candidate lockfile remediation evidence
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: production-dependency-remediation-candidate
           path: |
