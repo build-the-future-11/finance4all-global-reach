@@ -23,7 +23,31 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Production dependency audit
-        run: npm run audit:prod
+        shell: bash
+        run: |
+          set +e
+          npm audit --omit=dev --audit-level=high --json > npm-audit-prod.json
+          status=$?
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const report = JSON.parse(fs.readFileSync('npm-audit-prod.json', 'utf8'));
+          const counts = report.metadata?.vulnerabilities ?? {};
+          const vulnerable = Object.entries(report.vulnerabilities ?? {})
+            .filter(([, value]) => ['high', 'critical'].includes(value.severity))
+            .map(([name, value]) => `${name}: ${value.severity} (${value.isDirect ? 'direct' : 'transitive'})`);
+          fs.appendFileSync(
+            process.env.GITHUB_STEP_SUMMARY,
+            `## Production dependency audit\n\nCounts: \`${JSON.stringify(counts)}\`\n\nHigh/critical packages:\n${vulnerable.length ? vulnerable.map((x) => `- ${x}`).join('\n') : '- none'}\n`,
+          );
+          NODE
+          exit "$status"
+      - name: Upload production dependency audit evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-dependency-audit
+          path: npm-audit-prod.json
+          retention-days: 14
       - name: TypeScript compilation gate
         run: npm run typecheck
       - name: Full test suite
