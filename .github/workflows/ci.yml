@@ -39,46 +39,100 @@ jobs:
           cache: npm
       - name: Install locked dependencies without duplicate advisory fetch
         run: npm ci --no-audit --fund=false
-      - name: Production dependency audit with bounded transport
+      - name: Production dependency audit with bounded transport retry
         shell: bash
         run: |
-          set +e
-          timeout 180s npm audit --omit=dev --audit-level=high --json --fetch-timeout=150000 --fetch-retries=1 > npm-audit-prod.json
-          status=$?
-          node - <<'NODE'
-          const fs = require('node:fs');
-          const text = fs.readFileSync('npm-audit-prod.json', 'utf8');
-          if (!text.trim()) throw new Error('npm audit produced an empty result');
-          const report = JSON.parse(text);
-          if (!report.metadata || typeof report.metadata.vulnerabilities !== 'object') {
-            throw new Error('npm audit result is missing metadata.vulnerabilities');
+          set -euo pipefail
+          mkdir -p ci-evidence
+          selected=""
+
+          for attempt in 1 2; do
+            log="ci-evidence/npm-audit-prod-attempt-${attempt}.json"
+            status_file="ci-evidence/npm-audit-prod-attempt-${attempt}.status"
+
+            set +e
+            timeout 180s npm audit \
+              --omit=dev \
+              --audit-level=high \
+              --json \
+              --fetch-timeout=150000 \
+              --fetch-retries=0 \
+              > "$log" 2>&1
+            status=$?
+            set -e
+            printf '%s\n' "$status" > "$status_file"
+
+            if [ "$status" -eq 124 ]; then
+              printf '%s\n' "npm audit timed out after 180 seconds on attempt ${attempt}" >> "$log"
+            fi
+            cat "$log" || true
+
+            set +e
+            node --input-type=module - "$log" <<'NODE'
+          import { readFileSync } from 'node:fs';
+
+          const auditPath = process.argv[2];
+          const text = readFileSync(auditPath, 'utf8');
+          if (!text.trim()) process.exit(2);
+
+          let report;
+          try {
+            report = JSON.parse(text);
+          } catch {
+            process.exit(2);
           }
-          const counts = report.metadata.vulnerabilities;
-          const high = Number(counts.high ?? 0);
-          const critical = Number(counts.critical ?? 0);
-          if (!Number.isFinite(high) || !Number.isFinite(critical)) {
-            throw new Error('npm audit vulnerability counts are not finite numbers');
+
+          const counts = report?.metadata?.vulnerabilities;
+          if (!counts || typeof counts !== 'object') process.exit(2);
+
+          for (const severity of ['high', 'critical']) {
+            const count = Number(counts[severity]);
+            if (!Number.isInteger(count) || count < 0) process.exit(2);
+            if (count !== 0) process.exit(1);
           }
-          const vulnerable = Object.entries(report.vulnerabilities ?? {})
-            .filter(([, value]) => ['high', 'critical'].includes(value.severity))
-            .map(([name, value]) => `${name}: ${value.severity} (${value.isDirect ? 'direct' : 'transitive'})`);
-          fs.appendFileSync(
-            process.env.GITHUB_STEP_SUMMARY,
-            `## Production dependency audit\n\nCounts: \`${JSON.stringify(counts)}\`\n\nHigh/critical packages:\n${vulnerable.length ? vulnerable.map((x) => `- ${x}`).join('\n') : '- none'}\n`,
-          );
-          if (high !== 0 || critical !== 0 || vulnerable.length !== 0) {
-            throw new Error('production dependency audit contains high/critical vulnerabilities');
-          }
+
+          const vulnerable = Object.values(report.vulnerabilities ?? {})
+            .filter((value) => ['high', 'critical'].includes(value?.severity));
+          if (vulnerable.length !== 0) process.exit(1);
           NODE
-          node_status=$?
-          if [ "$status" -ne 0 ] || [ "$node_status" -ne 0 ]; then
-            exit 1
-          fi
+            validation_status=$?
+            set -e
+
+            if [ "$validation_status" -eq 0 ] && [ "$status" -eq 0 ]; then
+              selected="$log"
+              printf 'CLEAN\n' > ci-evidence/audit-classification.txt
+              break
+            fi
+
+            if [ "$validation_status" -eq 1 ]; then
+              printf 'VULNERABLE\n' > ci-evidence/audit-classification.txt
+              echo "npm audit returned a valid report with high or critical production vulnerabilities" >&2
+              exit 1
+            fi
+
+            printf 'TRANSPORT_OR_SCHEMA_ERROR\n' > ci-evidence/audit-classification.txt
+            echo "npm audit attempt ${attempt} did not return a valid clean vulnerability report" >&2
+            if [ "$attempt" -ge 2 ]; then
+              if [ "$status" -eq 124 ]; then
+                exit 124
+              fi
+              if [ "$status" -ne 0 ]; then
+                exit "$status"
+              fi
+              exit 2
+            fi
+          done
+
+          test -n "$selected"
+          cp "$selected" ci-evidence/npm-audit-prod.json
+          test -s ci-evidence/npm-audit-prod.json
+          sha256sum ci-evidence/npm-audit-prod.json > ci-evidence/npm-audit-prod.sha256
       - name: Record CI provenance
         if: always()
         shell: bash
         run: |
           set -euo pipefail
+          mkdir -p ci-evidence
           {
             printf 'source_sha=%s\n' "$EXPECTED_SOURCE_SHA"
             printf 'workflow_sha=%s\n' "$GITHUB_SHA"
@@ -89,30 +143,44 @@ jobs:
             printf 'npm=%s\n' "$(npm --version)"
             printf 'package_lock_sha256='
             sha256sum package-lock.json | awk '{print $1}'
-            if [ -s npm-audit-prod.json ]; then
+            if [ -s ci-evidence/npm-audit-prod.json ]; then
               printf 'npm_audit_sha256='
-              sha256sum npm-audit-prod.json | awk '{print $1}'
+              sha256sum ci-evidence/npm-audit-prod.json | awk '{print $1}'
             else
               printf 'npm_audit_sha256=MISSING\n'
             fi
-          } > ci-provenance.txt
+          } > ci-evidence/provenance.txt
       - name: Upload production dependency audit evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: production-dependency-audit-${{ env.EXPECTED_SOURCE_SHA }}
-          path: |
-            npm-audit-prod.json
-            ci-provenance.txt
+          path: ci-evidence
           if-no-files-found: error
           retention-days: 14
-      - name: Generate candidate safe lockfile remediation
+      - name: Generate bounded candidate safe lockfile remediation
         if: failure()
         shell: bash
         run: |
+          set -euo pipefail
+          if ! grep -qx 'VULNERABLE' ci-evidence/audit-classification.txt 2>/dev/null; then
+            echo "candidate_skipped=non-vulnerability-audit-failure" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
           cp package-lock.json package-lock.before-remediation.json
-          npm audit fix --package-lock-only --omit=dev || true
-          npm audit --omit=dev --json > npm-audit-candidate.json || true
+          set +e
+          timeout 180s npm audit fix --package-lock-only --omit=dev --no-fund
+          fix_status=$?
+          timeout 180s npm audit \
+            --omit=dev \
+            --json \
+            --fetch-timeout=150000 \
+            --fetch-retries=0 \
+            > ci-evidence/npm-audit-candidate.json 2>&1
+          audit_status=$?
+          set -e
+          printf 'fix_status=%s\naudit_status=%s\n' "$fix_status" "$audit_status" > ci-evidence/remediation-status.txt
           if cmp -s package-lock.before-remediation.json package-lock.json; then
             echo "candidate_changed=false" >> "$GITHUB_STEP_SUMMARY"
           else
@@ -125,7 +193,7 @@ jobs:
           name: production-dependency-remediation-candidate-${{ env.EXPECTED_SOURCE_SHA }}
           path: |
             package-lock.json
-            npm-audit-candidate.json
+            ci-evidence
           if-no-files-found: error
           retention-days: 7
       - name: TypeScript compilation gate
