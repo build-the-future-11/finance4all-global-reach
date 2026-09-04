@@ -5,13 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/validate-public-env.mjs && vite build",
+    "build": "node scripts/validate-public-env.mjs && vite build && node scripts/release-revision.mjs write",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "audit:prod": "npm audit --omit=dev --audit-level=high",
     "preview": "vite preview",
-    "test": "vitest run",
+    "test": "vitest run && npm run test:release-revision",
+    "test:release-revision": "node --test scripts/release-revision.test.mjs",
     "test:watch": "vitest"
   },
   "dependencies": {
@@ -81,7 +82,7 @@
     "@vitejs/plugin-react-swc": "^3.11.0",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.32.0",
-    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-hooks": "^6.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^15.15.0",
     "jsdom": "^20.0.3",
