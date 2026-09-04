@@ -14,20 +14,31 @@ concurrency:
 
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
+      EXPECTED_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
       VITE_SUPABASE_URL: https://ci.example.invalid
       VITE_SUPABASE_ANON_KEY: ci-public-key-for-build-contract-only
     steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - name: Checkout exact source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
+          ref: ${{ env.EXPECTED_SOURCE_SHA }}
           persist-credentials: false
+      - name: Verify exact source binding
+        shell: bash
+        run: |
+          set -euo pipefail
+          actual="$(git rev-parse HEAD)"
+          test "$actual" = "$EXPECTED_SOURCE_SHA"
+          printf 'verified_source_sha=%s\n' "$actual" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 22
           cache: npm
-      - run: npm ci
+      - name: Install locked dependencies without duplicate advisory fetch
+        run: npm ci --no-audit --fund=false
       - name: Production dependency audit
         shell: bash
         run: |
@@ -36,8 +47,18 @@ jobs:
           status=$?
           node - <<'NODE'
           const fs = require('node:fs');
-          const report = JSON.parse(fs.readFileSync('npm-audit-prod.json', 'utf8'));
-          const counts = report.metadata?.vulnerabilities ?? {};
+          const text = fs.readFileSync('npm-audit-prod.json', 'utf8');
+          if (!text.trim()) throw new Error('npm audit produced an empty result');
+          const report = JSON.parse(text);
+          if (!report.metadata || typeof report.metadata.vulnerabilities !== 'object') {
+            throw new Error('npm audit result is missing metadata.vulnerabilities');
+          }
+          const counts = report.metadata.vulnerabilities;
+          const high = Number(counts.high ?? 0);
+          const critical = Number(counts.critical ?? 0);
+          if (!Number.isFinite(high) || !Number.isFinite(critical)) {
+            throw new Error('npm audit vulnerability counts are not finite numbers');
+          }
           const vulnerable = Object.entries(report.vulnerabilities ?? {})
             .filter(([, value]) => ['high', 'critical'].includes(value.severity))
             .map(([name, value]) => `${name}: ${value.severity} (${value.isDirect ? 'direct' : 'transitive'})`);
@@ -45,14 +66,45 @@ jobs:
             process.env.GITHUB_STEP_SUMMARY,
             `## Production dependency audit\n\nCounts: \`${JSON.stringify(counts)}\`\n\nHigh/critical packages:\n${vulnerable.length ? vulnerable.map((x) => `- ${x}`).join('\n') : '- none'}\n`,
           );
+          if (high !== 0 || critical !== 0 || vulnerable.length !== 0) {
+            throw new Error('production dependency audit contains high/critical vulnerabilities');
+          }
           NODE
-          exit "$status"
+          node_status=$?
+          if [ "$status" -ne 0 ] || [ "$node_status" -ne 0 ]; then
+            exit 1
+          fi
+      - name: Record CI provenance
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            printf 'source_sha=%s\n' "$EXPECTED_SOURCE_SHA"
+            printf 'workflow_sha=%s\n' "$GITHUB_SHA"
+            printf 'workflow_ref=%s\n' "$GITHUB_WORKFLOW_REF"
+            printf 'runner_os=%s\n' "$RUNNER_OS"
+            printf 'runner_arch=%s\n' "$RUNNER_ARCH"
+            printf 'node=%s\n' "$(node --version)"
+            printf 'npm=%s\n' "$(npm --version)"
+            printf 'package_lock_sha256='
+            sha256sum package-lock.json | awk '{print $1}'
+            if [ -s npm-audit-prod.json ]; then
+              printf 'npm_audit_sha256='
+              sha256sum npm-audit-prod.json | awk '{print $1}'
+            else
+              printf 'npm_audit_sha256=MISSING\n'
+            fi
+          } > ci-provenance.txt
       - name: Upload production dependency audit evidence
         if: always()
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: production-dependency-audit
-          path: npm-audit-prod.json
+          name: production-dependency-audit-${{ env.EXPECTED_SOURCE_SHA }}
+          path: |
+            npm-audit-prod.json
+            ci-provenance.txt
+          if-no-files-found: error
           retention-days: 14
       - name: Generate candidate safe lockfile remediation
         if: failure()
@@ -68,12 +120,13 @@ jobs:
           fi
       - name: Upload candidate lockfile remediation evidence
         if: failure()
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: production-dependency-remediation-candidate
+          name: production-dependency-remediation-candidate-${{ env.EXPECTED_SOURCE_SHA }}
           path: |
             package-lock.json
             npm-audit-candidate.json
+          if-no-files-found: error
           retention-days: 7
       - name: TypeScript compilation gate
         run: npm run typecheck
