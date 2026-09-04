@@ -39,11 +39,11 @@ jobs:
           cache: npm
       - name: Install locked dependencies without duplicate advisory fetch
         run: npm ci --no-audit --fund=false
-      - name: Production dependency audit
+      - name: Production dependency audit with bounded transport
         shell: bash
         run: |
           set +e
-          npm audit --omit=dev --audit-level=high --json > npm-audit-prod.json
+          timeout 180s npm audit --omit=dev --audit-level=high --json --fetch-timeout=150000 --fetch-retries=1 > npm-audit-prod.json
           status=$?
           node - <<'NODE'
           const fs = require('node:fs');
