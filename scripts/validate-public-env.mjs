@@ -22,7 +22,7 @@ if (!supabaseUrl) {
 } else {
   try {
     const url = new URL(supabaseUrl);
-    const isLocal = ["localhost", "127.0.0.1", "::1"].includes(url.hostname);
+    const isLocal = ["localhost", "127.0.0.1", "::1", "[::1]"].includes(url.hostname);
 
     if (isLocal && !allowLocal) {
       failures.push("VITE_SUPABASE_URL may target localhost only in development");
