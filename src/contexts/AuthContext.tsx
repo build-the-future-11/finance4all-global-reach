@@ -31,6 +31,7 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 const PROFILE_HYDRATION_TIMEOUT_MS = 15_000;
+const AUTH_SESSION_OPERATION_TIMEOUT_MS = 15_000;
 
 function googleDisplayName(user: User) {
   const meta = user.user_metadata ?? {};
@@ -214,10 +215,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // getSession() and onAuthStateChange(INITIAL_SESSION) may race. The first
     // listener event supersedes this initial probe so a late getSession result
-    // cannot overwrite a newer sign-in/sign-out transition.
+    // cannot overwrite a newer sign-in/sign-out transition. Bound the initial
+    // probe as well: a stalled auth client must not leave the app permanently
+    // behind the global loading gate before any listener event arrives.
     const initialToken = guard.begin();
-    void supabase.auth
-      .getSession()
+    void withDeadline(
+      () => supabase.auth.getSession(),
+      AUTH_SESSION_OPERATION_TIMEOUT_MS,
+      "Initial auth session fetch",
+    )
       .then(({ data }) => {
         void hydrateSession(data.session, initialToken);
       })
@@ -274,7 +280,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signOut();
+      // A stalled remote sign-out must not strand the product in loading=true
+      // forever. Timeout is fail-closed: local auth state stays intact unless
+      // Supabase actually reports a successful sign-out or a newer auth event
+      // has already superseded this request.
+      const { error } = await withDeadline(
+        () => supabase.auth.signOut(),
+        AUTH_SESSION_OPERATION_TIMEOUT_MS,
+        "Sign out",
+      );
       if (error) {
         console.error("Sign out failed:", error.message);
         if (guard.isCurrent(token)) setLoading(false);
