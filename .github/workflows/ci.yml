@@ -18,7 +18,10 @@ jobs:
     timeout-minutes: 15
     env:
       EXPECTED_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-      VITE_SUPABASE_URL: https://ci.example.invalid
+      # Build against the canonical FinanceMeta project host so CI exercises the
+      # same fail-closed project-isolation contract as production. The key is a
+      # non-secret synthetic public fixture and no auth request is made by build.
+      VITE_SUPABASE_URL: https://pnemeegkwyaicsbnbnmg.supabase.co
       VITE_SUPABASE_ANON_KEY: ci-public-key-for-build-contract-only
     steps:
       - name: Checkout exact source
