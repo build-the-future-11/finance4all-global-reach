@@ -8,6 +8,7 @@ const env = { ...fileEnv, ...process.env };
 
 const FINANCEMETA_SUPABASE_PROJECT_REF = "pnemeegkwyaicsbnbnmg";
 const FINANCEMETA_SUPABASE_HOST = `${FINANCEMETA_SUPABASE_PROJECT_REF}.supabase.co`;
+const allowLocal = mode === "development";
 
 const supabaseUrl = String(env.VITE_SUPABASE_URL || "").trim();
 const supabaseKey = String(
@@ -22,10 +23,14 @@ if (!supabaseUrl) {
   try {
     const url = new URL(supabaseUrl);
     const isLocal = ["localhost", "127.0.0.1", "::1"].includes(url.hostname);
-    if (url.protocol !== "https:" && !(isLocal && url.protocol === "http:")) {
+
+    if (isLocal && !allowLocal) {
+      failures.push("VITE_SUPABASE_URL may target localhost only in development");
+    }
+    if (url.protocol !== "https:" && !(isLocal && allowLocal && url.protocol === "http:")) {
       failures.push("VITE_SUPABASE_URL must use https (http is allowed only for local development)");
     }
-    if (url.hostname === "localhost" && url.port === "0") {
+    if (isLocal && url.port === "0") {
       failures.push("VITE_SUPABASE_URL must not use the old localhost:0 fallback");
     }
 
