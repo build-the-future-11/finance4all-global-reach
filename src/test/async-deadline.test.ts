@@ -1,5 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { DeadlineExceededError, withDeadline } from "@/lib/asyncDeadline";
+import {
+  DeadlineExceededError,
+  MAX_DEADLINE_TIMEOUT_MS,
+  withDeadline,
+} from "@/lib/asyncDeadline";
 
 afterEach(() => {
   vi.useRealTimers();
@@ -25,13 +29,21 @@ describe("withDeadline", () => {
     await expectation;
   });
 
-  it.each([0, -1, 1.5, Number.NaN, Number.POSITIVE_INFINITY])(
+  it.each([
+    0,
+    -1,
+    1.5,
+    Number.NaN,
+    Number.POSITIVE_INFINITY,
+    Number.MAX_SAFE_INTEGER + 1,
+    MAX_DEADLINE_TIMEOUT_MS + 1,
+  ])(
     "rejects invalid timeout %s before starting the operation",
     async (timeoutMs) => {
       const operation = vi.fn(async () => "should-not-run");
 
       await expect(withDeadline(operation, timeoutMs, "Profile hydration")).rejects.toThrow(
-        "timeoutMs must be a positive integer",
+        `timeoutMs must be a positive safe integer no greater than ${MAX_DEADLINE_TIMEOUT_MS}`,
       );
       expect(operation).not.toHaveBeenCalled();
     },
