@@ -8,6 +8,7 @@ const env = { ...fileEnv, ...process.env };
 
 const FINANCEMETA_SUPABASE_PROJECT_REF = "pnemeegkwyaicsbnbnmg";
 const FINANCEMETA_SUPABASE_HOST = `${FINANCEMETA_SUPABASE_PROJECT_REF}.supabase.co`;
+const PUBLISHABLE_KEY_PATTERN = /^sb_publishable_[A-Za-z0-9_-]+$/;
 const allowLocal = mode === "development";
 
 const supabaseUrl = String(env.VITE_SUPABASE_URL || "").trim();
@@ -78,8 +79,15 @@ if (!supabaseKey) {
   failures.push("VITE_SUPABASE_ANON_KEY or VITE_SUPABASE_PUBLISHABLE_KEY is required");
 } else if (supabaseKey === "missing-key") {
   failures.push("Supabase public key must not use the old missing-key fallback");
-} else if (/^sb_secret_/i.test(supabaseKey) || readJwtRole(supabaseKey) === "service_role") {
-  failures.push("Supabase public configuration must not contain a secret/service-role key");
+} else {
+  const jwtRole = readJwtRole(supabaseKey);
+  if (/^sb_secret_/i.test(supabaseKey) || jwtRole === "service_role") {
+    failures.push("Supabase public configuration must not contain a secret/service-role key");
+  } else if (!allowLocal && !PUBLISHABLE_KEY_PATTERN.test(supabaseKey) && jwtRole !== "anon") {
+    failures.push(
+      "Supabase public configuration must use an sb_publishable_ key or a legacy anon JWT in production",
+    );
+  }
 }
 
 if (failures.length > 0) {
