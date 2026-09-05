@@ -76,6 +76,23 @@ describe("FinanceMeta Supabase project contract", () => {
     ).not.toThrow();
   });
 
+  it("rejects production credentials, custom ports, paths, queries, and fragments", () => {
+    const host = FINANCEMETA_SUPABASE_HOST;
+    const cases = [
+      [`https://user:pass@${host}`, /credentials/i],
+      [`https://${host}:8443`, /default https port/i],
+      [`https://${host}/rest`, /canonical project origin/i],
+      [`https://${host}?tenant=other`, /canonical project origin/i],
+      [`https://${host}#fragment`, /canonical project origin/i],
+    ] as const;
+
+    for (const [url, expected] of cases) {
+      expect(() =>
+        assertFinanceMetaSupabaseProject(url, { allowLocal: false }),
+      ).toThrow(expected);
+    }
+  });
+
   it("allows loopback only for development and rejects the old port-0 fallback", () => {
     for (const url of [
       "http://localhost:54321",
@@ -107,7 +124,7 @@ describe("FinanceMeta Supabase project contract", () => {
     expect(result.stdout).toContain("Public Supabase configuration contract passed");
   });
 
-  it("build validator rejects foreign and production-local targets", () => {
+  it("build validator rejects foreign, production-local, and noncanonical origins", () => {
     const foreign = runValidator("https://foreign-project.supabase.co", "production");
     expect(foreign.status).toBe(1);
     expect(foreign.stderr).toContain("must target the FinanceMeta Supabase project");
@@ -115,6 +132,16 @@ describe("FinanceMeta Supabase project contract", () => {
     const local = runValidator("http://127.0.0.1:54321", "production");
     expect(local.status).toBe(1);
     expect(local.stderr).toContain("only in development");
+
+    for (const url of [
+      `https://${FINANCEMETA_SUPABASE_HOST}:8443`,
+      `https://${FINANCEMETA_SUPABASE_HOST}/rest`,
+      `https://${FINANCEMETA_SUPABASE_HOST}?tenant=other`,
+      `https://${FINANCEMETA_SUPABASE_HOST}#fragment`,
+      `https://user:pass@${FINANCEMETA_SUPABASE_HOST}`,
+    ]) {
+      expect(runValidator(url, "production").status).toBe(1);
+    }
   });
 
   it("build validator preserves localhost development support including IPv6", () => {
