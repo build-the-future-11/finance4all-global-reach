@@ -107,6 +107,11 @@ export function assertFinanceMetaSupabasePublicKey(
       "[Finance4All] Refusing to expose a Supabase secret/service-role key in the public client.",
     );
   }
+  if (jwtRole && jwtRole !== "anon") {
+    throw new Error(
+      `[Finance4All] Refusing to expose Supabase JWT role ${jwtRole} in the public client; only anon is permitted.`,
+    );
+  }
 
   if (allowLocal) return;
 
