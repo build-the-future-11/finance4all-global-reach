@@ -102,4 +102,11 @@ describe("FinanceMeta authorization boundary", () => {
     expect(loadingEnd).toBeGreaterThan(fetchStart);
     expect(listener).not.toContain("fetchProfile(nextSession.user);\n      } else");
   });
+
+  it("fails closed to onboarding for authenticated users without a hydrated profile", () => {
+    expect(authContext).toContain(
+      "const needsOnboarding = Boolean(session?.user && (!profile || !profile.displayName?.trim()));",
+    );
+    expect(authContext).not.toContain("const needsOnboarding = Boolean(profile &&");
+  });
 });
