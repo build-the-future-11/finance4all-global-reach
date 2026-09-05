@@ -31,4 +31,21 @@ describe("FinanceMeta profile update persistence contract", () => {
     expect(missingRowGuard).toBeGreaterThanOrEqual(0);
     expect(refresh).toBeGreaterThan(missingRowGuard);
   });
+
+  it("requires avatar sync to return the authenticated profile row before reflecting it locally", () => {
+    const fetchStart = authContext.indexOf("const fetchProfile = useCallback");
+    const refreshStart = authContext.indexOf("const refreshProfile = useCallback", fetchStart);
+    expect(fetchStart).toBeGreaterThanOrEqual(0);
+    expect(refreshStart).toBeGreaterThan(fetchStart);
+
+    const fetchSection = authContext.slice(fetchStart, refreshStart);
+    expect(fetchSection).toContain("const { data: avatarUpdatedRow, error: avatarError } = await supabase");
+    expect(fetchSection).toContain('.update({ avatar_url: avatarUrl })\n          .eq("id", user.id)\n          .select("id")\n          .maybeSingle();');
+    expect(fetchSection).toContain("else if (!avatarUpdatedRow || avatarUpdatedRow.id !== user.id)");
+
+    const persistedGuard = fetchSection.indexOf("else if (!avatarUpdatedRow || avatarUpdatedRow.id !== user.id)");
+    const localApply = fetchSection.indexOf("mapped.avatarUrl = avatarUrl;", persistedGuard);
+    expect(persistedGuard).toBeGreaterThanOrEqual(0);
+    expect(localApply).toBeGreaterThan(persistedGuard);
+  });
 });
