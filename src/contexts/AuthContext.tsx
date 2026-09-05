@@ -215,8 +215,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = useCallback(async () => {
-    await supabase.auth.signOut();
-    setProfile(null);
+    const guard = hydrationGuard.current;
+    const token = guard.begin();
+    setLoading(true);
+
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error("Sign out failed:", error.message);
+        if (guard.isCurrent(token)) setLoading(false);
+        return;
+      }
+
+      // onAuthStateChange(SIGNED_OUT) normally owns this transition. If it did
+      // not fire, clear local auth state only when no newer auth event has
+      // superseded this sign-out request.
+      if (guard.isCurrent(token)) {
+        activeUserIdRef.current = null;
+        setSession(null);
+        setProfile(null);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error("Sign out failed:", error);
+      if (guard.isCurrent(token)) setLoading(false);
+    }
   }, []);
 
   const updateProfile = useCallback(
