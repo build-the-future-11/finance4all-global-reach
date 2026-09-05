@@ -86,21 +86,28 @@ describe("FinanceMeta authorization boundary", () => {
     expect(updateProfileSection).not.toContain("payload.email");
   });
 
-  it("keeps auth routing blocked until the authenticated profile finishes hydrating", () => {
+  it("keeps authenticated routing blocked until the newest profile hydration finishes", () => {
+    expect(authContext).toContain("const hydrationGuard = useRef(createAuthHydrationGuard());");
+    expect(authContext).toContain("const initialToken = guard.begin();");
+    expect(authContext).toContain("void hydrateSession(data.session, initialToken);");
+    expect(authContext).toContain("if (disposed || !guard.isCurrent(token)) return;");
+    expect(authContext).toContain("setProfile(null);\n      setLoading(true);");
+
     const listenerStart = authContext.indexOf("supabase.auth.onAuthStateChange");
-    const listenerEnd = authContext.indexOf("return () => sub.subscription.unsubscribe()", listenerStart);
+    const listenerEnd = authContext.indexOf("return () =>", listenerStart);
     expect(listenerStart).toBeGreaterThanOrEqual(0);
     expect(listenerEnd).toBeGreaterThan(listenerStart);
 
     const listener = authContext.slice(listenerStart, listenerEnd);
-    const loadingStart = listener.indexOf("setLoading(true)");
-    const fetchStart = listener.indexOf("fetchProfile(nextSession.user)");
-    const loadingEnd = listener.indexOf(".finally(() => setLoading(false))", fetchStart);
+    expect(listener).toContain("const token = guard.begin();");
+    expect(listener).toContain("void hydrateSession(nextSession, token);");
+    expect(listener).not.toContain("setLoading(false)");
+  });
 
-    expect(loadingStart).toBeGreaterThanOrEqual(0);
-    expect(fetchStart).toBeGreaterThan(loadingStart);
-    expect(loadingEnd).toBeGreaterThan(fetchStart);
-    expect(listener).not.toContain("fetchProfile(nextSession.user);\n      } else");
+  it("invalidates in-flight auth hydration when the provider unmounts", () => {
+    expect(authContext).toContain("disposed = true;");
+    expect(authContext).toContain("guard.invalidate();");
+    expect(authContext).toContain("sub.subscription.unsubscribe();");
   });
 
   it("fails closed to onboarding for authenticated users without a hydrated profile", () => {
