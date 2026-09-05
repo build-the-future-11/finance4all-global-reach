@@ -18,7 +18,7 @@ function syntheticJwt(role: string) {
 function runValidator(
   url: string,
   nodeEnv: "production" | "development",
-  key = "test-public-key",
+  key = syntheticJwt("anon"),
 ) {
   return spawnSync(process.execPath, [validatorPath], {
     cwd: process.cwd(),
@@ -69,7 +69,10 @@ describe("FinanceMeta Supabase project contract", () => {
 
   it("requires a real public Supabase key outside development", () => {
     expect(() =>
-      assertFinanceMetaSupabasePublicKey("public-anon-key", { allowLocal: false }),
+      assertFinanceMetaSupabasePublicKey("sb_publishable_test_fixture", { allowLocal: false }),
+    ).not.toThrow();
+    expect(() =>
+      assertFinanceMetaSupabasePublicKey(syntheticJwt("anon"), { allowLocal: false }),
     ).not.toThrow();
     expect(() =>
       assertFinanceMetaSupabasePublicKey(undefined, { allowLocal: false }),
@@ -80,9 +83,18 @@ describe("FinanceMeta Supabase project contract", () => {
     expect(() =>
       assertFinanceMetaSupabasePublicKey("missing-key", { allowLocal: false }),
     ).toThrow(/missing-key fallback/i);
+    expect(() =>
+      assertFinanceMetaSupabasePublicKey("public-anon-key", { allowLocal: false }),
+    ).toThrow(/sb_publishable_ key or a legacy anon JWT/i);
+    expect(() =>
+      assertFinanceMetaSupabasePublicKey(syntheticJwt("authenticated"), { allowLocal: false }),
+    ).toThrow(/sb_publishable_ key or a legacy anon JWT/i);
 
     expect(() =>
       assertFinanceMetaSupabasePublicKey(undefined, { allowLocal: true }),
+    ).not.toThrow();
+    expect(() =>
+      assertFinanceMetaSupabasePublicKey("local-test-key", { allowLocal: true }),
     ).not.toThrow();
   });
 
@@ -93,10 +105,6 @@ describe("FinanceMeta Supabase project contract", () => {
         assertFinanceMetaSupabasePublicKey(key, { allowLocal: false }),
       ).toThrow(/secret\/service-role key/i);
     }
-
-    expect(() =>
-      assertFinanceMetaSupabasePublicKey(syntheticJwt("anon"), { allowLocal: false }),
-    ).not.toThrow();
   });
 
   it("rejects production credentials, custom ports, paths, queries, and fragments", () => {
@@ -167,18 +175,24 @@ describe("FinanceMeta Supabase project contract", () => {
     }
   });
 
-  it("build validator rejects secret/service-role public keys", () => {
+  it("build validator rejects secret/service-role and malformed public keys", () => {
     const url = `https://${FINANCEMETA_SUPABASE_HOST}`;
     for (const key of ["sb_secret_test_fixture", syntheticJwt("service_role")]) {
       const result = runValidator(url, "production", key);
       expect(result.status).toBe(1);
       expect(result.stderr).toContain("must not contain a secret/service-role key");
     }
+
+    for (const key of ["public-anon-key", syntheticJwt("authenticated"), "sb_publishable_"]) {
+      const result = runValidator(url, "production", key);
+      expect(result.status).toBe(1);
+      expect(result.stderr).toContain("must use an sb_publishable_ key or a legacy anon JWT");
+    }
   });
 
   it("build validator preserves localhost development support including IPv6", () => {
     for (const url of ["http://localhost:54321", "http://[::1]:54321"]) {
-      const result = runValidator(url, "development");
+      const result = runValidator(url, "development", "local-test-key");
       expect(result.status).toBe(0);
     }
   });
