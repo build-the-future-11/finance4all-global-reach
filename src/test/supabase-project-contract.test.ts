@@ -9,7 +9,17 @@ import {
 
 const validatorPath = path.resolve(process.cwd(), "scripts/validate-public-env.mjs");
 
-function runValidator(url: string, nodeEnv: "production" | "development") {
+function syntheticJwt(role: string) {
+  const encode = (value: unknown) =>
+    Buffer.from(JSON.stringify(value), "utf8").toString("base64url");
+  return `${encode({ alg: "HS256", typ: "JWT" })}.${encode({ role })}.synthetic-signature`;
+}
+
+function runValidator(
+  url: string,
+  nodeEnv: "production" | "development",
+  key = "test-public-key",
+) {
   return spawnSync(process.execPath, [validatorPath], {
     cwd: process.cwd(),
     encoding: "utf8",
@@ -17,7 +27,7 @@ function runValidator(url: string, nodeEnv: "production" | "development") {
       ...process.env,
       NODE_ENV: nodeEnv,
       VITE_SUPABASE_URL: url,
-      VITE_SUPABASE_ANON_KEY: "test-public-key",
+      VITE_SUPABASE_ANON_KEY: key,
       VITE_SUPABASE_PUBLISHABLE_KEY: "",
     },
   });
@@ -73,6 +83,19 @@ describe("FinanceMeta Supabase project contract", () => {
 
     expect(() =>
       assertFinanceMetaSupabasePublicKey(undefined, { allowLocal: true }),
+    ).not.toThrow();
+  });
+
+  it("rejects secret and service-role keys from the public client", () => {
+    const secretKeys = ["sb_secret_test_fixture", syntheticJwt("service_role")];
+    for (const key of secretKeys) {
+      expect(() =>
+        assertFinanceMetaSupabasePublicKey(key, { allowLocal: false }),
+      ).toThrow(/secret\/service-role key/i);
+    }
+
+    expect(() =>
+      assertFinanceMetaSupabasePublicKey(syntheticJwt("anon"), { allowLocal: false }),
     ).not.toThrow();
   });
 
@@ -141,6 +164,15 @@ describe("FinanceMeta Supabase project contract", () => {
       `https://user:pass@${FINANCEMETA_SUPABASE_HOST}`,
     ]) {
       expect(runValidator(url, "production").status).toBe(1);
+    }
+  });
+
+  it("build validator rejects secret/service-role public keys", () => {
+    const url = `https://${FINANCEMETA_SUPABASE_HOST}`;
+    for (const key of ["sb_secret_test_fixture", syntheticJwt("service_role")]) {
+      const result = runValidator(url, "production", key);
+      expect(result.status).toBe(1);
+      expect(result.stderr).toContain("must not contain a secret/service-role key");
     }
   });
 
