@@ -53,11 +53,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const activeUserIdRef = useRef<string | null>(null);
 
   const ensureProfile = useCallback(async (user: User) => {
-    const { data: existing } = await supabase
+    const { data: existing, error: existingError } = await supabase
       .from("profiles")
       .select("*")
       .eq("id", user.id)
       .maybeSingle();
+
+    if (existingError) {
+      console.error("Profile lookup failed:", existingError.message);
+      return null;
+    }
 
     if (existing) return mapProfile(existing);
 
@@ -100,11 +105,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const mapped = mapProfile(data);
 
-      // Sync Google avatar if profile is missing one.
+      // Sync Google avatar if profile is missing one, but only reflect the
+      // change locally after persistence succeeds so UI state never claims a
+      // value that the canonical profile row rejected.
       const avatarUrl = googleAvatarUrl(user);
       if (!mapped.avatarUrl && avatarUrl) {
-        await supabase.from("profiles").update({ avatar_url: avatarUrl }).eq("id", user.id);
-        mapped.avatarUrl = avatarUrl;
+        const { error: avatarError } = await supabase
+          .from("profiles")
+          .update({ avatar_url: avatarUrl })
+          .eq("id", user.id);
+        if (avatarError) {
+          console.error("Profile avatar sync failed:", avatarError.message);
+        } else {
+          mapped.avatarUrl = avatarUrl;
+        }
       }
 
       return mapped;
