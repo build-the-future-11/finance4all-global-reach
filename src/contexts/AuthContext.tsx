@@ -191,7 +191,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [session?.user, fetchProfile],
   );
 
-  const needsOnboarding = Boolean(profile && !profile.displayName?.trim());
+  const needsOnboarding = Boolean(session?.user && (!profile || !profile.displayName?.trim()));
 
   const value = useMemo(
     () => ({
