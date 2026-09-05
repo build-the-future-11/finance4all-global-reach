@@ -81,6 +81,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .single();
 
     if (error) {
+      // Two legitimate auth hydration paths can race on a brand-new account
+      // (for example getSession() and INITIAL_SESSION). If the other path won
+      // the insert, recover only from the database's unique-violation signal by
+      // re-reading the canonical row. All other insert failures remain fail-closed.
+      if (error.code === "23505") {
+        const { data: concurrentExisting, error: concurrentReadError } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", user.id)
+          .maybeSingle();
+
+        if (concurrentReadError) {
+          console.error("Profile race recovery failed:", concurrentReadError.message);
+          return null;
+        }
+        if (concurrentExisting) return mapProfile(concurrentExisting);
+      }
+
       console.error("Profile ensure failed:", error.message);
       return null;
     }
