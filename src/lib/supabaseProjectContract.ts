@@ -7,6 +7,20 @@ export interface FinanceMetaSupabaseProjectOptions {
   allowLocal: boolean;
 }
 
+function readJwtRole(key: string): string | null {
+  const parts = key.split(".");
+  if (parts.length !== 3 || !parts[1]) return null;
+
+  try {
+    const normalized = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+    const payload = JSON.parse(atob(padded)) as { role?: unknown };
+    return typeof payload.role === "string" ? payload.role : null;
+  } catch {
+    return null;
+  }
+}
+
 export function assertFinanceMetaSupabaseProject(
   urlValue: string | undefined,
   { allowLocal }: FinanceMetaSupabaseProjectOptions,
@@ -83,6 +97,11 @@ export function assertFinanceMetaSupabasePublicKey(
   if (key === "missing-key") {
     throw new Error(
       "[Finance4All] Supabase public key must not use the old missing-key fallback.",
+    );
+  }
+  if (/^sb_secret_/i.test(key) || readJwtRole(key) === "service_role") {
+    throw new Error(
+      "[Finance4All] Refusing to expose a Supabase secret/service-role key in the public client.",
     );
   }
 }
