@@ -85,4 +85,21 @@ describe("FinanceMeta authorization boundary", () => {
     expect(updateProfileSection).not.toContain("payload.role");
     expect(updateProfileSection).not.toContain("payload.email");
   });
+
+  it("keeps auth routing blocked until the authenticated profile finishes hydrating", () => {
+    const listenerStart = authContext.indexOf("supabase.auth.onAuthStateChange");
+    const listenerEnd = authContext.indexOf("return () => sub.subscription.unsubscribe()", listenerStart);
+    expect(listenerStart).toBeGreaterThanOrEqual(0);
+    expect(listenerEnd).toBeGreaterThan(listenerStart);
+
+    const listener = authContext.slice(listenerStart, listenerEnd);
+    const loadingStart = listener.indexOf("setLoading(true)");
+    const fetchStart = listener.indexOf("fetchProfile(nextSession.user)");
+    const loadingEnd = listener.indexOf(".finally(() => setLoading(false))", fetchStart);
+
+    expect(loadingStart).toBeGreaterThanOrEqual(0);
+    expect(fetchStart).toBeGreaterThan(loadingStart);
+    expect(loadingEnd).toBeGreaterThan(fetchStart);
+    expect(listener).not.toContain("fetchProfile(nextSession.user);\n      } else");
+  });
 });
