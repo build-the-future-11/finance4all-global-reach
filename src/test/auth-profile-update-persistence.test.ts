@@ -15,9 +15,16 @@ describe("FinanceMeta profile update persistence contract", () => {
     expect(updateEnd).toBeGreaterThan(updateStart);
 
     const updateSection = authContext.slice(updateStart, updateEnd);
-    expect(updateSection).toContain('.eq("id", user.id)\n        .select("id")\n        .maybeSingle();');
+    expect(updateSection).toContain("updateResult = await withDeadline(");
+    expect(updateSection).toContain('.eq("id", user.id)');
+    expect(updateSection).toContain('.select("id")');
+    expect(updateSection).toContain(".maybeSingle(),");
+    expect(updateSection).toContain("AUTH_SESSION_OPERATION_TIMEOUT_MS");
+    expect(updateSection).toContain('"Profile update"');
     expect(updateSection).toContain("if (!error && !updatedRow)");
-    expect(updateSection).toContain('const message = "Profile update did not persist to an authenticated profile row";');
+    expect(updateSection).toContain(
+      'const message = "Profile update did not persist to an authenticated profile row";',
+    );
     expect(updateSection).toContain("return { error: message };");
   });
 
@@ -27,9 +34,11 @@ describe("FinanceMeta profile update persistence contract", () => {
     const updateSection = authContext.slice(updateStart, updateEnd);
 
     const missingRowGuard = updateSection.indexOf("if (!error && !updatedRow)");
-    const refresh = updateSection.indexOf("const refreshed = await fetchProfile(user);");
+    const refresh = updateSection.indexOf("const refreshed = await withDeadline(");
     expect(missingRowGuard).toBeGreaterThanOrEqual(0);
     expect(refresh).toBeGreaterThan(missingRowGuard);
+    expect(updateSection.slice(refresh)).toContain("() => fetchProfile(user)");
+    expect(updateSection.slice(refresh)).toContain('"Profile refresh after update"');
   });
 
   it("requires avatar sync to return the authenticated profile row before reflecting it locally", () => {
@@ -39,11 +48,19 @@ describe("FinanceMeta profile update persistence contract", () => {
     expect(refreshStart).toBeGreaterThan(fetchStart);
 
     const fetchSection = authContext.slice(fetchStart, refreshStart);
-    expect(fetchSection).toContain("const { data: avatarUpdatedRow, error: avatarError } = await supabase");
-    expect(fetchSection).toContain('.update({ avatar_url: avatarUrl })\n          .eq("id", user.id)\n          .select("id")\n          .maybeSingle();');
-    expect(fetchSection).toContain("else if (!avatarUpdatedRow || avatarUpdatedRow.id !== user.id)");
+    expect(fetchSection).toContain(
+      "const { data: avatarUpdatedRow, error: avatarError } = await supabase",
+    );
+    expect(fetchSection).toContain(
+      '.update({ avatar_url: avatarUrl })\n          .eq("id", user.id)\n          .select("id")\n          .maybeSingle();',
+    );
+    expect(fetchSection).toContain(
+      "else if (!avatarUpdatedRow || avatarUpdatedRow.id !== user.id)",
+    );
 
-    const persistedGuard = fetchSection.indexOf("else if (!avatarUpdatedRow || avatarUpdatedRow.id !== user.id)");
+    const persistedGuard = fetchSection.indexOf(
+      "else if (!avatarUpdatedRow || avatarUpdatedRow.id !== user.id)",
+    );
     const localApply = fetchSection.indexOf("mapped.avatarUrl = avatarUrl;", persistedGuard);
     expect(persistedGuard).toBeGreaterThanOrEqual(0);
     expect(localApply).toBeGreaterThan(persistedGuard);
