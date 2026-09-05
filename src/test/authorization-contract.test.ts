@@ -117,6 +117,30 @@ describe("FinanceMeta authorization boundary", () => {
     expect(authContext).not.toContain("const needsOnboarding = Boolean(profile &&");
   });
 
+  it("fails closed on profile lookup errors and only reflects persisted avatar updates", () => {
+    expect(authContext).toContain("const { data: existing, error: existingError } = await supabase");
+    expect(authContext).toContain('console.error("Profile lookup failed:", existingError.message);');
+    expect(authContext).toContain("if (existingError) {");
+
+    const ensureStart = authContext.indexOf("const ensureProfile = useCallback");
+    const ensureEnd = authContext.indexOf("const fetchProfile = useCallback", ensureStart);
+    expect(ensureStart).toBeGreaterThanOrEqual(0);
+    expect(ensureEnd).toBeGreaterThan(ensureStart);
+    const ensureSection = authContext.slice(ensureStart, ensureEnd);
+    expect(ensureSection.indexOf("if (existingError) {")).toBeLessThan(
+      ensureSection.indexOf('.from("profiles")\n      .insert({'),
+    );
+
+    const fetchStart = authContext.indexOf("const fetchProfile = useCallback");
+    const fetchEnd = authContext.indexOf("const refreshProfile = useCallback", fetchStart);
+    expect(fetchStart).toBeGreaterThanOrEqual(0);
+    expect(fetchEnd).toBeGreaterThan(fetchStart);
+    const fetchSection = authContext.slice(fetchStart, fetchEnd);
+    expect(fetchSection).toContain("const { error: avatarError } = await supabase");
+    expect(fetchSection).toContain('console.error("Profile avatar sync failed:", avatarError.message);');
+    expect(fetchSection).toContain("} else {\n          mapped.avatarUrl = avatarUrl;");
+  });
+
   it("invalidates stale hydration before sign-out and only clears the matching auth generation", () => {
     const signOutStart = authContext.indexOf("const signOut = useCallback");
     const signOutEnd = authContext.indexOf("const updateProfile", signOutStart);
