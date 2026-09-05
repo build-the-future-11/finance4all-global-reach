@@ -254,28 +254,61 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [fetchProfile]);
 
   const signIn = useCallback(async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error: error?.message ?? null };
+    try {
+      const { error } = await withDeadline(
+        () => supabase.auth.signInWithPassword({ email, password }),
+        AUTH_SESSION_OPERATION_TIMEOUT_MS,
+        "Sign in",
+      );
+      return { error: error?.message ?? null };
+    } catch (error) {
+      return {
+        error: error instanceof Error ? error.message : "Sign in failed. Please try again.",
+      };
+    }
   }, []);
 
   const signUp = useCallback(async (email: string, password: string, displayName: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { display_name: displayName } },
-    });
-    return { error: error?.message ?? null };
+    try {
+      const { error } = await withDeadline(
+        () =>
+          supabase.auth.signUp({
+            email,
+            password,
+            options: { data: { display_name: displayName } },
+          }),
+        AUTH_SESSION_OPERATION_TIMEOUT_MS,
+        "Sign up",
+      );
+      return { error: error?.message ?? null };
+    } catch (error) {
+      return {
+        error: error instanceof Error ? error.message : "Sign up failed. Please try again.",
+      };
+    }
   }, []);
 
   const signInWithGoogle = useCallback(async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: getAuthRedirectUrl(),
-        queryParams: { prompt: "select_account" },
-      },
-    });
-    return { error: error?.message ?? null };
+    try {
+      const { error } = await withDeadline(
+        () =>
+          supabase.auth.signInWithOAuth({
+            provider: "google",
+            options: {
+              redirectTo: getAuthRedirectUrl(),
+              queryParams: { prompt: "select_account" },
+            },
+          }),
+        AUTH_SESSION_OPERATION_TIMEOUT_MS,
+        "Google sign in",
+      );
+      return { error: error?.message ?? null };
+    } catch (error) {
+      return {
+        error:
+          error instanceof Error ? error.message : "Google sign in failed. Please try again.",
+      };
+    }
   }, []);
 
   const signOut = useCallback(async () => {
