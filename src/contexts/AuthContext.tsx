@@ -4,11 +4,13 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { getAuthRedirectUrl, supabase } from "@/lib/supabase";
+import { createAuthHydrationGuard } from "@/lib/authHydrationGuard";
 import { mapProfile } from "@/lib/mappers";
 import type { UserProfile } from "@/types/domain";
 
@@ -47,6 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const hydrationGuard = useRef(createAuthHydrationGuard());
 
   const ensureProfile = useCallback(async (user: User) => {
     const { data: existing } = await supabase
@@ -80,7 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const fetchProfile = useCallback(
-    async (user: User) => {
+    async (user: User): Promise<UserProfile | null> => {
       const { data, error } = await supabase
         .from("profiles")
         .select("*")
@@ -89,56 +92,86 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (error) {
         console.error("Profile fetch failed:", error.message);
-        setProfile(null);
-        return;
+        return null;
       }
 
-      if (!data) {
-        const ensured = await ensureProfile(user);
-        setProfile(ensured);
-        return;
-      }
+      if (!data) return ensureProfile(user);
 
       const mapped = mapProfile(data);
 
-      // Sync Google avatar if profile is missing one
+      // Sync Google avatar if profile is missing one.
       const avatarUrl = googleAvatarUrl(user);
       if (!mapped.avatarUrl && avatarUrl) {
         await supabase.from("profiles").update({ avatar_url: avatarUrl }).eq("id", user.id);
         mapped.avatarUrl = avatarUrl;
       }
 
-      setProfile(mapped);
+      return mapped;
     },
     [ensureProfile],
   );
 
   const refreshProfile = useCallback(async () => {
-    if (session?.user) await fetchProfile(session.user);
+    const user = session?.user;
+    if (!user) return;
+
+    const token = hydrationGuard.current.snapshot();
+    const refreshed = await fetchProfile(user);
+    if (hydrationGuard.current.isCurrent(token)) setProfile(refreshed);
   }, [session?.user, fetchProfile]);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      if (data.session?.user) {
-        fetchProfile(data.session.user).finally(() => setLoading(false));
-      } else {
-        setLoading(false);
-      }
-    });
+    const guard = hydrationGuard.current;
+    let disposed = false;
 
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+    const hydrateSession = async (nextSession: Session | null, token: number) => {
+      if (disposed || !guard.isCurrent(token)) return;
+
       setSession(nextSession);
-      if (nextSession?.user) {
-        setLoading(true);
-        void fetchProfile(nextSession.user).finally(() => setLoading(false));
-      } else {
+      if (!nextSession?.user) {
         setProfile(null);
         setLoading(false);
+        return;
       }
+
+      // Never expose the previous user's profile while the next authenticated
+      // identity is still hydrating.
+      setProfile(null);
+      setLoading(true);
+      const nextProfile = await fetchProfile(nextSession.user);
+
+      if (disposed || !guard.isCurrent(token)) return;
+      setProfile(nextProfile);
+      setLoading(false);
+    };
+
+    // getSession() and onAuthStateChange(INITIAL_SESSION) may race. The first
+    // listener event supersedes this initial probe so a late getSession result
+    // cannot overwrite a newer sign-in/sign-out transition.
+    const initialToken = guard.begin();
+    void supabase.auth
+      .getSession()
+      .then(({ data }) => {
+        void hydrateSession(data.session, initialToken);
+      })
+      .catch((error: unknown) => {
+        if (disposed || !guard.isCurrent(initialToken)) return;
+        console.error("Initial auth session fetch failed:", error);
+        setSession(null);
+        setProfile(null);
+        setLoading(false);
+      });
+
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      const token = guard.begin();
+      void hydrateSession(nextSession, token);
     });
 
-    return () => sub.subscription.unsubscribe();
+    return () => {
+      disposed = true;
+      guard.invalidate();
+      sub.subscription.unsubscribe();
+    };
   }, [fetchProfile]);
 
   const signIn = useCallback(async (email: string, password: string) => {
@@ -185,7 +218,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (updates.chapterId !== undefined) payload.chapter_id = updates.chapterId ?? null;
 
       const { error } = await supabase.from("profiles").update(payload).eq("id", session.user.id);
-      if (!error) await fetchProfile(session.user);
+      if (!error) {
+        const token = hydrationGuard.current.snapshot();
+        const refreshed = await fetchProfile(session.user);
+        if (hydrationGuard.current.isCurrent(token)) setProfile(refreshed);
+      }
       return { error: error?.message ?? null };
     },
     [session?.user, fetchProfile],
