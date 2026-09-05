@@ -128,15 +128,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // Sync Google avatar if profile is missing one, but only reflect the
       // change locally after persistence succeeds so UI state never claims a
-      // value that the canonical profile row rejected.
+      // value that the canonical profile row rejected or silently failed to match.
       const avatarUrl = googleAvatarUrl(user);
       if (!mapped.avatarUrl && avatarUrl) {
-        const { error: avatarError } = await supabase
+        const { data: avatarUpdatedRow, error: avatarError } = await supabase
           .from("profiles")
           .update({ avatar_url: avatarUrl })
-          .eq("id", user.id);
+          .eq("id", user.id)
+          .select("id")
+          .maybeSingle();
         if (avatarError) {
           console.error("Profile avatar sync failed:", avatarError.message);
+        } else if (!avatarUpdatedRow || avatarUpdatedRow.id !== user.id) {
+          console.error("Profile avatar sync did not persist to the authenticated profile row");
         } else {
           mapped.avatarUrl = avatarUrl;
         }
