@@ -56,3 +56,21 @@ export function assertFinanceMetaSupabaseProject(
     );
   }
 }
+
+export function assertFinanceMetaSupabasePublicKey(
+  keyValue: string | undefined,
+  { allowLocal }: FinanceMetaSupabaseProjectOptions,
+) {
+  const key = String(keyValue || "").trim();
+  if (!key) {
+    if (allowLocal) return;
+    throw new Error(
+      "[Finance4All] A Supabase anon or publishable key is required outside development.",
+    );
+  }
+  if (key === "missing-key") {
+    throw new Error(
+      "[Finance4All] Supabase public key must not use the old missing-key fallback.",
+    );
+  }
+}
