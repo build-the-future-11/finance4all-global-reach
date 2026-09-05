@@ -17,6 +17,18 @@ const supabaseKey = String(
 
 const failures = [];
 
+function readJwtRole(key) {
+  const parts = key.split(".");
+  if (parts.length !== 3 || !parts[1]) return null;
+
+  try {
+    const payload = JSON.parse(Buffer.from(parts[1], "base64url").toString("utf8"));
+    return typeof payload.role === "string" ? payload.role : null;
+  } catch {
+    return null;
+  }
+}
+
 if (!supabaseUrl) {
   failures.push("VITE_SUPABASE_URL is required");
 } else {
@@ -66,6 +78,8 @@ if (!supabaseKey) {
   failures.push("VITE_SUPABASE_ANON_KEY or VITE_SUPABASE_PUBLISHABLE_KEY is required");
 } else if (supabaseKey === "missing-key") {
   failures.push("Supabase public key must not use the old missing-key fallback");
+} else if (/^sb_secret_/i.test(supabaseKey) || readJwtRole(supabaseKey) === "service_role") {
+  failures.push("Supabase public configuration must not contain a secret/service-role key");
 }
 
 if (failures.length > 0) {
