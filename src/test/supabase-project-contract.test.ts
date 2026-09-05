@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
   FINANCEMETA_SUPABASE_HOST,
   assertFinanceMetaSupabaseProject,
+  assertFinanceMetaSupabasePublicKey,
 } from "@/lib/supabaseProjectContract";
 
 const validatorPath = path.resolve(process.cwd(), "scripts/validate-public-env.mjs");
@@ -53,6 +54,25 @@ describe("FinanceMeta Supabase project contract", () => {
 
     expect(() =>
       assertFinanceMetaSupabaseProject(undefined, { allowLocal: true }),
+    ).not.toThrow();
+  });
+
+  it("requires a real public Supabase key outside development", () => {
+    expect(() =>
+      assertFinanceMetaSupabasePublicKey("public-anon-key", { allowLocal: false }),
+    ).not.toThrow();
+    expect(() =>
+      assertFinanceMetaSupabasePublicKey(undefined, { allowLocal: false }),
+    ).toThrow(/required outside development/i);
+    expect(() =>
+      assertFinanceMetaSupabasePublicKey("", { allowLocal: false }),
+    ).toThrow(/required outside development/i);
+    expect(() =>
+      assertFinanceMetaSupabasePublicKey("missing-key", { allowLocal: false }),
+    ).toThrow(/missing-key fallback/i);
+
+    expect(() =>
+      assertFinanceMetaSupabasePublicKey(undefined, { allowLocal: true }),
     ).not.toThrow();
   });
 
