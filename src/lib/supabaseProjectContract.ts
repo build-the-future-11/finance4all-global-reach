@@ -55,6 +55,18 @@ export function assertFinanceMetaSupabaseProject(
       `[Finance4All] Refusing to start against foreign Supabase project ${parsed.hostname}. Expected ${FINANCEMETA_SUPABASE_HOST}.`,
     );
   }
+
+  if (parsed.username || parsed.password) {
+    throw new Error("[Finance4All] Production Supabase URL must not contain credentials.");
+  }
+  if (parsed.port) {
+    throw new Error("[Finance4All] Production Supabase URL must use the default HTTPS port.");
+  }
+  if (parsed.pathname !== "/" || parsed.search || parsed.hash) {
+    throw new Error(
+      "[Finance4All] Production Supabase URL must be the canonical project origin without path, query, or fragment.",
+    );
+  }
 }
 
 export function assertFinanceMetaSupabasePublicKey(
