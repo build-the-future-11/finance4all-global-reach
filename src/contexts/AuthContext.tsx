@@ -50,6 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const hydrationGuard = useRef(createAuthHydrationGuard());
+  const activeUserIdRef = useRef<string | null>(null);
 
   const ensureProfile = useCallback(async (user: User) => {
     const { data: existing } = await supabase
@@ -117,7 +118,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const token = hydrationGuard.current.snapshot();
     const refreshed = await fetchProfile(user);
-    if (hydrationGuard.current.isCurrent(token)) setProfile(refreshed);
+    if (
+      hydrationGuard.current.isCurrent(token) &&
+      activeUserIdRef.current === user.id
+    ) {
+      setProfile(refreshed);
+    }
   }, [session?.user, fetchProfile]);
 
   useEffect(() => {
@@ -127,6 +133,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const hydrateSession = async (nextSession: Session | null, token: number) => {
       if (disposed || !guard.isCurrent(token)) return;
 
+      activeUserIdRef.current = nextSession?.user.id ?? null;
       setSession(nextSession);
       if (!nextSession?.user) {
         setProfile(null);
@@ -140,7 +147,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(true);
       const nextProfile = await fetchProfile(nextSession.user);
 
-      if (disposed || !guard.isCurrent(token)) return;
+      if (
+        disposed ||
+        !guard.isCurrent(token) ||
+        activeUserIdRef.current !== nextSession.user.id
+      ) {
+        return;
+      }
       setProfile(nextProfile);
       setLoading(false);
     };
@@ -157,6 +170,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .catch((error: unknown) => {
         if (disposed || !guard.isCurrent(initialToken)) return;
         console.error("Initial auth session fetch failed:", error);
+        activeUserIdRef.current = null;
         setSession(null);
         setProfile(null);
         setLoading(false);
@@ -169,6 +183,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => {
       disposed = true;
+      activeUserIdRef.current = null;
       guard.invalidate();
       sub.subscription.unsubscribe();
     };
@@ -210,6 +225,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     ) => {
       if (!session?.user) return { error: "Not authenticated" };
 
+      const user = session.user;
       const payload: Record<string, unknown> = {};
       if (updates.displayName !== undefined) payload.display_name = updates.displayName;
       if (updates.bio !== undefined) payload.bio = updates.bio;
@@ -217,11 +233,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (updates.openToCollaborate !== undefined) payload.open_to_collaborate = updates.openToCollaborate;
       if (updates.chapterId !== undefined) payload.chapter_id = updates.chapterId ?? null;
 
-      const { error } = await supabase.from("profiles").update(payload).eq("id", session.user.id);
+      const { error } = await supabase.from("profiles").update(payload).eq("id", user.id);
       if (!error) {
         const token = hydrationGuard.current.snapshot();
-        const refreshed = await fetchProfile(session.user);
-        if (hydrationGuard.current.isCurrent(token)) setProfile(refreshed);
+        const refreshed = await fetchProfile(user);
+        if (
+          hydrationGuard.current.isCurrent(token) &&
+          activeUserIdRef.current === user.id
+        ) {
+          setProfile(refreshed);
+        }
       }
       return { error: error?.message ?? null };
     },
