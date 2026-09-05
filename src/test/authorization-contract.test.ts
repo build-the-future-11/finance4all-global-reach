@@ -151,7 +151,9 @@ describe("FinanceMeta authorization boundary", () => {
     expect(signOutSection).toContain("const guard = hydrationGuard.current;");
     expect(signOutSection).toContain("const token = guard.begin();");
     expect(signOutSection).toContain("setLoading(true);");
-    expect(signOutSection).toContain("const { error } = await supabase.auth.signOut();");
+    expect(signOutSection).toContain("const { error } = await withDeadline(");
+    expect(signOutSection).toContain("() => supabase.auth.signOut(),");
+    expect(signOutSection).toContain("AUTH_SESSION_OPERATION_TIMEOUT_MS,");
     expect(signOutSection).toContain("if (guard.isCurrent(token)) setLoading(false);");
     expect(signOutSection).toContain("if (guard.isCurrent(token)) {");
     expect(signOutSection).toContain("activeUserIdRef.current = null;");
