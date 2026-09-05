@@ -116,4 +116,22 @@ describe("FinanceMeta authorization boundary", () => {
     );
     expect(authContext).not.toContain("const needsOnboarding = Boolean(profile &&");
   });
+
+  it("invalidates stale hydration before sign-out and only clears the matching auth generation", () => {
+    const signOutStart = authContext.indexOf("const signOut = useCallback");
+    const signOutEnd = authContext.indexOf("const updateProfile", signOutStart);
+    expect(signOutStart).toBeGreaterThanOrEqual(0);
+    expect(signOutEnd).toBeGreaterThan(signOutStart);
+
+    const signOutSection = authContext.slice(signOutStart, signOutEnd);
+    expect(signOutSection).toContain("const guard = hydrationGuard.current;");
+    expect(signOutSection).toContain("const token = guard.begin();");
+    expect(signOutSection).toContain("setLoading(true);");
+    expect(signOutSection).toContain("const { error } = await supabase.auth.signOut();");
+    expect(signOutSection).toContain("if (guard.isCurrent(token)) setLoading(false);");
+    expect(signOutSection).toContain("if (guard.isCurrent(token)) {");
+    expect(signOutSection).toContain("activeUserIdRef.current = null;");
+    expect(signOutSection).toContain("setSession(null);");
+    expect(signOutSection).toContain("setProfile(null);");
+  });
 });
