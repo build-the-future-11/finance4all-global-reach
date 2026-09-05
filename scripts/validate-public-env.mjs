@@ -83,6 +83,10 @@ if (!supabaseKey) {
   const jwtRole = readJwtRole(supabaseKey);
   if (/^sb_secret_/i.test(supabaseKey) || jwtRole === "service_role") {
     failures.push("Supabase public configuration must not contain a secret/service-role key");
+  } else if (jwtRole && jwtRole !== "anon") {
+    failures.push(
+      `Supabase public configuration must not expose JWT role ${jwtRole}; only anon is permitted`,
+    );
   } else if (!allowLocal && !PUBLISHABLE_KEY_PATTERN.test(supabaseKey) && jwtRole !== "anon") {
     failures.push(
       "Supabase public configuration must use an sb_publishable_ key or a legacy anon JWT in production",
