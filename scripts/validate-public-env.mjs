@@ -42,6 +42,21 @@ if (!supabaseUrl) {
         `VITE_SUPABASE_URL must target the FinanceMeta Supabase project (${FINANCEMETA_SUPABASE_HOST}); received ${url.hostname}`,
       );
     }
+
+    // Production must bind to the exact Supabase project origin. Credentials,
+    // custom ports, paths, queries, or fragments can silently alter endpoint
+    // construction even when the hostname itself looks correct.
+    if (!isLocal && (url.username || url.password)) {
+      failures.push("VITE_SUPABASE_URL must not contain credentials");
+    }
+    if (!isLocal && url.port) {
+      failures.push("VITE_SUPABASE_URL must use the default HTTPS port");
+    }
+    if (!isLocal && (url.pathname !== "/" || url.search || url.hash)) {
+      failures.push(
+        "VITE_SUPABASE_URL must be the canonical project origin without path, query, or fragment",
+      );
+    }
   } catch {
     failures.push("VITE_SUPABASE_URL must be a valid absolute URL");
   }
