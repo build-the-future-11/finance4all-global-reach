@@ -156,12 +156,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!user) return;
 
     const token = hydrationGuard.current.snapshot();
-    const refreshed = await fetchProfile(user);
-    if (
-      hydrationGuard.current.isCurrent(token) &&
-      activeUserIdRef.current === user.id
-    ) {
-      setProfile(refreshed);
+    try {
+      const refreshed = await withDeadline(
+        () => fetchProfile(user),
+        PROFILE_HYDRATION_TIMEOUT_MS,
+        "Profile refresh",
+      );
+      if (
+        hydrationGuard.current.isCurrent(token) &&
+        activeUserIdRef.current === user.id
+      ) {
+        setProfile(refreshed);
+      }
+    } catch (error) {
+      if (
+        hydrationGuard.current.isCurrent(token) &&
+        activeUserIdRef.current === user.id
+      ) {
+        console.error("Profile refresh failed:", error);
+        setProfile(null);
+      }
     }
   }, [session?.user, fetchProfile]);
 
@@ -362,16 +376,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (updates.chapterId !== undefined) payload.chapter_id = updates.chapterId ?? null;
 
       // PostgREST can return a successful response for an UPDATE that matched
-      // zero rows. Require the authenticated user's canonical profile row to be
-      // returned before reporting success so onboarding/profile edits cannot be
-      // silently dropped when hydration failed to create the row or RLS hides it.
-      const { data: updatedRow, error } = await supabase
-        .from("profiles")
-        .update(payload)
-        .eq("id", user.id)
-        .select("id")
-        .maybeSingle();
+      // zero rows. Bound the persistence operation and require the authenticated
+      // user's canonical profile row before reporting success.
+      let updateResult;
+      try {
+        updateResult = await withDeadline(
+          () =>
+            supabase
+              .from("profiles")
+              .update(payload)
+              .eq("id", user.id)
+              .select("id")
+              .maybeSingle(),
+          AUTH_SESSION_OPERATION_TIMEOUT_MS,
+          "Profile update",
+        );
+      } catch (error) {
+        return {
+          error:
+            error instanceof Error ? error.message : "Profile update failed. Please try again.",
+        };
+      }
 
+      const { data: updatedRow, error } = updateResult;
       if (!error && !updatedRow) {
         const message = "Profile update did not persist to an authenticated profile row";
         console.error(message);
@@ -380,12 +407,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (!error) {
         const token = hydrationGuard.current.snapshot();
-        const refreshed = await fetchProfile(user);
-        if (
-          hydrationGuard.current.isCurrent(token) &&
-          activeUserIdRef.current === user.id
-        ) {
-          setProfile(refreshed);
+        try {
+          const refreshed = await withDeadline(
+            () => fetchProfile(user),
+            PROFILE_HYDRATION_TIMEOUT_MS,
+            "Profile refresh after update",
+          );
+          if (
+            hydrationGuard.current.isCurrent(token) &&
+            activeUserIdRef.current === user.id
+          ) {
+            setProfile(refreshed);
+          }
+        } catch (refreshError) {
+          if (
+            hydrationGuard.current.isCurrent(token) &&
+            activeUserIdRef.current === user.id
+          ) {
+            console.error("Profile refresh after update failed:", refreshError);
+          }
+          return {
+            error:
+              "Profile was saved, but refreshing the updated profile failed. Please try again.",
+          };
         }
       }
       return { error: error?.message ?? null };
