@@ -11,6 +11,7 @@ import {
 import type { Session, User } from "@supabase/supabase-js";
 import { getAuthRedirectUrl, supabase } from "@/lib/supabase";
 import { createAuthHydrationGuard } from "@/lib/authHydrationGuard";
+import { withDeadline } from "@/lib/asyncDeadline";
 import { mapProfile } from "@/lib/mappers";
 import type { UserProfile } from "@/types/domain";
 
@@ -29,6 +30,7 @@ interface AuthContextValue {
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+const PROFILE_HYDRATION_TIMEOUT_MS = 15_000;
 
 function googleDisplayName(user: User) {
   const meta = user.user_metadata ?? {};
@@ -177,7 +179,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // identity is still hydrating.
       setProfile(null);
       setLoading(true);
-      const nextProfile = await fetchProfile(nextSession.user);
+
+      let nextProfile: UserProfile | null;
+      try {
+        nextProfile = await withDeadline(
+          () => fetchProfile(nextSession.user),
+          PROFILE_HYDRATION_TIMEOUT_MS,
+          "Profile hydration",
+        );
+      } catch (error) {
+        if (
+          disposed ||
+          !guard.isCurrent(token) ||
+          activeUserIdRef.current !== nextSession.user.id
+        ) {
+          return;
+        }
+        console.error("Profile hydration failed:", error);
+        setProfile(null);
+        setLoading(false);
+        return;
+      }
 
       if (
         disposed ||
