@@ -43,6 +43,19 @@ describe("FinanceMeta Supabase project contract", () => {
     ).toThrow(/foreign Supabase project/i);
   });
 
+  it("fails closed when the production runtime has no Supabase URL", () => {
+    expect(() =>
+      assertFinanceMetaSupabaseProject(undefined, { allowLocal: false }),
+    ).toThrow(/required outside development/i);
+    expect(() =>
+      assertFinanceMetaSupabaseProject("", { allowLocal: false }),
+    ).toThrow(/required outside development/i);
+
+    expect(() =>
+      assertFinanceMetaSupabaseProject(undefined, { allowLocal: true }),
+    ).not.toThrow();
+  });
+
   it("allows loopback only for development and rejects the old port-0 fallback", () => {
     for (const url of [
       "http://localhost:54321",
