@@ -136,8 +136,11 @@ describe("FinanceMeta authorization boundary", () => {
     expect(fetchStart).toBeGreaterThanOrEqual(0);
     expect(fetchEnd).toBeGreaterThan(fetchStart);
     const fetchSection = authContext.slice(fetchStart, fetchEnd);
-    expect(fetchSection).toContain("const { error: avatarError } = await supabase");
+    expect(fetchSection).toContain(
+      "const { data: avatarUpdatedRow, error: avatarError } = await supabase",
+    );
     expect(fetchSection).toContain('console.error("Profile avatar sync failed:", avatarError.message);');
+    expect(fetchSection).toContain("else if (!avatarUpdatedRow || avatarUpdatedRow.id !== user.id)");
     expect(fetchSection).toContain("} else {\n          mapped.avatarUrl = avatarUrl;");
   });
 
