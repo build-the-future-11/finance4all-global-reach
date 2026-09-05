@@ -79,4 +79,44 @@ describe("FinanceMeta auth session deadline contract", () => {
     expect(deadlineCall).toBeGreaterThanOrEqual(0);
     expect(localClear).toBeGreaterThan(deadlineCall);
   });
+
+  it("bounds manual profile refresh and fails closed only for the current identity", () => {
+    const refreshStart = authContext.indexOf("const refreshProfile = useCallback");
+    const effectStart = authContext.indexOf("useEffect(() => {", refreshStart);
+    const refreshSection = authContext.slice(refreshStart, effectStart);
+
+    expect(refreshSection).toContain("await withDeadline(");
+    expect(refreshSection).toContain("() => fetchProfile(user)");
+    expect(refreshSection).toContain("PROFILE_HYDRATION_TIMEOUT_MS");
+    expect(refreshSection).toContain('"Profile refresh"');
+    expect(refreshSection).toContain("activeUserIdRef.current === user.id");
+    expect(refreshSection).toContain("setProfile(null);");
+  });
+
+  it("bounds profile update persistence before reporting success", () => {
+    const updateStart = authContext.indexOf("const updateProfile = useCallback");
+    const onboardingStart = authContext.indexOf("const needsOnboarding", updateStart);
+    const updateSection = authContext.slice(updateStart, onboardingStart);
+
+    expect(updateSection).toContain("updateResult = await withDeadline(");
+    expect(updateSection).toContain('.update(payload)');
+    expect(updateSection).toContain("AUTH_SESSION_OPERATION_TIMEOUT_MS");
+    expect(updateSection).toContain('"Profile update"');
+    expect(updateSection).toContain("Profile update failed. Please try again.");
+  });
+
+  it("bounds the post-update profile refresh and reports partial persistence truth", () => {
+    const updateStart = authContext.indexOf("const updateProfile = useCallback");
+    const onboardingStart = authContext.indexOf("const needsOnboarding", updateStart);
+    const updateSection = authContext.slice(updateStart, onboardingStart);
+
+    expect(updateSection).toContain("const refreshed = await withDeadline(");
+    expect(updateSection).toContain("() => fetchProfile(user)");
+    expect(updateSection).toContain("PROFILE_HYDRATION_TIMEOUT_MS");
+    expect(updateSection).toContain('"Profile refresh after update"');
+    expect(updateSection).toContain(
+      "Profile was saved, but refreshing the updated profile failed. Please try again.",
+    );
+    expect(updateSection).toContain("activeUserIdRef.current === user.id");
+  });
 });
