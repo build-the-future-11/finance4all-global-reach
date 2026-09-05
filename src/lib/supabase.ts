@@ -1,6 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
-import { assertFinanceMetaSupabaseProject } from "@/lib/supabaseProjectContract";
+import {
+  assertFinanceMetaSupabaseProject,
+  assertFinanceMetaSupabasePublicKey,
+} from "@/lib/supabaseProjectContract";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey =
@@ -15,8 +18,12 @@ if (!isSupabaseConfigured) {
   );
 }
 
+const allowLocalSupabase = import.meta.env.DEV;
 assertFinanceMetaSupabaseProject(supabaseUrl, {
-  allowLocal: import.meta.env.DEV,
+  allowLocal: allowLocalSupabase,
+});
+assertFinanceMetaSupabasePublicKey(supabaseKey, {
+  allowLocal: allowLocalSupabase,
 });
 
 export const supabase = createClient<Database>(
