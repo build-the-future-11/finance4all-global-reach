@@ -6,6 +6,9 @@ const mode = process.env.NODE_ENV === "development" ? "development" : "productio
 const fileEnv = loadEnv(mode, process.cwd(), "");
 const env = { ...fileEnv, ...process.env };
 
+const FINANCEMETA_SUPABASE_PROJECT_REF = "pnemeegkwyaicsbnbnmg";
+const FINANCEMETA_SUPABASE_HOST = `${FINANCEMETA_SUPABASE_PROJECT_REF}.supabase.co`;
+
 const supabaseUrl = String(env.VITE_SUPABASE_URL || "").trim();
 const supabaseKey = String(
   env.VITE_SUPABASE_ANON_KEY || env.VITE_SUPABASE_PUBLISHABLE_KEY || "",
@@ -25,6 +28,15 @@ if (!supabaseUrl) {
     if (url.hostname === "localhost" && url.port === "0") {
       failures.push("VITE_SUPABASE_URL must not use the old localhost:0 fallback");
     }
+
+    // FinanceMeta must never boot against another portfolio product's Supabase
+    // project. A valid-looking foreign project URL can otherwise pass every
+    // generic env check and silently send OAuth users to that project's Site URL.
+    if (!isLocal && url.hostname !== FINANCEMETA_SUPABASE_HOST) {
+      failures.push(
+        `VITE_SUPABASE_URL must target the FinanceMeta Supabase project (${FINANCEMETA_SUPABASE_HOST}); received ${url.hostname}`,
+      );
+    }
   } catch {
     failures.push("VITE_SUPABASE_URL must be a valid absolute URL");
   }
@@ -42,4 +54,6 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log("[Finance4All] Public Supabase configuration contract passed.");
+console.log(
+  `[Finance4All] Public Supabase configuration contract passed for ${FINANCEMETA_SUPABASE_PROJECT_REF}.`,
+);
