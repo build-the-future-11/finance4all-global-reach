@@ -11,7 +11,12 @@ export function assertFinanceMetaSupabaseProject(
   urlValue: string | undefined,
   { allowLocal }: FinanceMetaSupabaseProjectOptions,
 ) {
-  if (!urlValue) return;
+  if (!urlValue) {
+    if (allowLocal) return;
+    throw new Error(
+      "[Finance4All] VITE_SUPABASE_URL is required outside development.",
+    );
+  }
 
   let parsed: URL;
   try {
