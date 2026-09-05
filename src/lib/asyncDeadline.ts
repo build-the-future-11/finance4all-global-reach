@@ -5,13 +5,21 @@ export class DeadlineExceededError extends Error {
   }
 }
 
+export const MAX_DEADLINE_TIMEOUT_MS = 2_147_483_647;
+
 export async function withDeadline<T>(
   operation: () => Promise<T>,
   timeoutMs: number,
   label = "Operation",
 ): Promise<T> {
-  if (!Number.isInteger(timeoutMs) || timeoutMs < 1) {
-    throw new TypeError("timeoutMs must be a positive integer");
+  if (
+    !Number.isSafeInteger(timeoutMs) ||
+    timeoutMs < 1 ||
+    timeoutMs > MAX_DEADLINE_TIMEOUT_MS
+  ) {
+    throw new TypeError(
+      `timeoutMs must be a positive safe integer no greater than ${MAX_DEADLINE_TIMEOUT_MS}`,
+    );
   }
 
   let timer: ReturnType<typeof setTimeout> | undefined;
