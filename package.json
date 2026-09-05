@@ -16,7 +16,7 @@
     "typecheck": "tsc --noEmit",
     "audit:prod": "npm audit --omit=dev --audit-level=high",
     "preview": "vite preview",
-    "pretest": "node scripts/verify-release-toolchain.mjs",
+    "pretest": "node --test tests/release-toolchain.test.mjs && node scripts/verify-release-toolchain.mjs",
     "test": "vitest run",
     "test:watch": "vitest"
   },
