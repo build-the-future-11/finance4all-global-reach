@@ -310,7 +310,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (updates.openToCollaborate !== undefined) payload.open_to_collaborate = updates.openToCollaborate;
       if (updates.chapterId !== undefined) payload.chapter_id = updates.chapterId ?? null;
 
-      const { error } = await supabase.from("profiles").update(payload).eq("id", user.id);
+      // PostgREST can return a successful response for an UPDATE that matched
+      // zero rows. Require the authenticated user's canonical profile row to be
+      // returned before reporting success so onboarding/profile edits cannot be
+      // silently dropped when hydration failed to create the row or RLS hides it.
+      const { data: updatedRow, error } = await supabase
+        .from("profiles")
+        .update(payload)
+        .eq("id", user.id)
+        .select("id")
+        .maybeSingle();
+
+      if (!error && !updatedRow) {
+        const message = "Profile update did not persist to an authenticated profile row";
+        console.error(message);
+        return { error: message };
+      }
+
       if (!error) {
         const token = hydrationGuard.current.snapshot();
         const refreshed = await fetchProfile(user);
