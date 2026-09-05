@@ -1,7 +1,7 @@
 export const FINANCEMETA_SUPABASE_PROJECT_REF = "pnemeegkwyaicsbnbnmg";
 export const FINANCEMETA_SUPABASE_HOST = `${FINANCEMETA_SUPABASE_PROJECT_REF}.supabase.co`;
 
-const LOCAL_SUPABASE_HOSTS = new Set(["localhost", "127.0.0.1", "::1"]);
+const LOCAL_SUPABASE_HOSTS = new Set(["localhost", "127.0.0.1", "::1", "[::1]"]);
 
 export interface FinanceMetaSupabaseProjectOptions {
   allowLocal: boolean;
