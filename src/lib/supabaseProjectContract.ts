@@ -2,6 +2,7 @@ export const FINANCEMETA_SUPABASE_PROJECT_REF = "pnemeegkwyaicsbnbnmg";
 export const FINANCEMETA_SUPABASE_HOST = `${FINANCEMETA_SUPABASE_PROJECT_REF}.supabase.co`;
 
 const LOCAL_SUPABASE_HOSTS = new Set(["localhost", "127.0.0.1", "::1", "[::1]"]);
+const PUBLISHABLE_KEY_PATTERN = /^sb_publishable_[A-Za-z0-9_-]+$/;
 
 export interface FinanceMetaSupabaseProjectOptions {
   allowLocal: boolean;
@@ -99,9 +100,19 @@ export function assertFinanceMetaSupabasePublicKey(
       "[Finance4All] Supabase public key must not use the old missing-key fallback.",
     );
   }
-  if (/^sb_secret_/i.test(key) || readJwtRole(key) === "service_role") {
+
+  const jwtRole = readJwtRole(key);
+  if (/^sb_secret_/i.test(key) || jwtRole === "service_role") {
     throw new Error(
       "[Finance4All] Refusing to expose a Supabase secret/service-role key in the public client.",
+    );
+  }
+
+  if (allowLocal) return;
+
+  if (!PUBLISHABLE_KEY_PATTERN.test(key) && jwtRole !== "anon") {
+    throw new Error(
+      "[Finance4All] Production Supabase public key must be an sb_publishable_ key or a legacy anon JWT.",
     );
   }
 }
