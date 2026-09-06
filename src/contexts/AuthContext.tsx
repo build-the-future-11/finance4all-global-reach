@@ -53,11 +53,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const ensureProfile = useCallback(async (user: User) => {
-    const { data: existing } = await supabase
+    const { data: existing, error: existingError } = await supabase
       .from("profiles")
       .select(PUBLIC_PROFILE_COLUMNS)
       .eq("id", user.id)
       .maybeSingle();
+
+    if (existingError) {
+      console.error("Profile lookup failed:", existingError.message);
+      return null;
+    }
 
     if (existing) return mapProfile(existing);
 
@@ -76,6 +81,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .single();
 
     if (error) {
+      // Initial session hydration and the auth-state listener can legitimately
+      // race on a brand-new account. Recover only the database's duplicate-key
+      // signal by re-reading the canonical row; every other insert failure stays
+      // fail-closed rather than being treated as a successful profile creation.
+      if (error.code === "23505") {
+        const { data: concurrentExisting, error: concurrentReadError } = await supabase
+          .from("profiles")
+          .select(PUBLIC_PROFILE_COLUMNS)
+          .eq("id", user.id)
+          .maybeSingle();
+
+        if (concurrentReadError) {
+          console.error("Profile race recovery failed:", concurrentReadError.message);
+          return null;
+        }
+        if (concurrentExisting) return mapProfile(concurrentExisting);
+      }
+
       console.error("Profile ensure failed:", error.message);
       return null;
     }
