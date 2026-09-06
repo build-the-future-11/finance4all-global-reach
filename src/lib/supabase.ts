@@ -1,5 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
+import {
+  assertFinanceMetaSupabaseProject,
+  assertFinanceMetaSupabasePublicKey,
+} from "@/lib/supabaseProjectContract";
 
 const supabaseUrl = String(import.meta.env.VITE_SUPABASE_URL ?? "").trim();
 const supabaseKey =
@@ -19,6 +23,10 @@ if (!isSupabaseConfigured) {
     "[Finance4All] Missing Supabase env vars. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env, then restart the dev server.",
   );
 }
+
+const allowLocalSupabase = import.meta.env.DEV;
+assertFinanceMetaSupabaseProject(supabaseUrl, { allowLocal: allowLocalSupabase });
+assertFinanceMetaSupabasePublicKey(supabaseKey, { allowLocal: allowLocalSupabase });
 
 export const supabase = createClient<Database>(
   supabaseUrl || "http://localhost:0",
