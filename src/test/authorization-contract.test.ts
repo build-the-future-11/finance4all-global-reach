@@ -17,10 +17,10 @@ describe("FinanceMeta authorization boundary", () => {
   it("is a versioned migration after the original schema and hardening patches", () => {
     expect(path.basename(migrationPath)).toMatch(/^\d{14}_portal_security_and_privacy\.sql$/);
     for (const file of [
-      "001_initial_schema.sql",
-      "002_google_oauth.sql",
-      "003_bookmarks_notifications.sql",
-      "004_authorization_hardening.sql",
+      "20260709090402_initial_schema.sql",
+      "20260709104954_google_oauth.sql",
+      "20260710031219_bookmarks_notifications.sql",
+      "20260830141730_authorization_hardening.sql",
     ]) {
       expect(fs.existsSync(path.resolve(process.cwd(), "supabase/migrations", file))).toBe(true);
     }

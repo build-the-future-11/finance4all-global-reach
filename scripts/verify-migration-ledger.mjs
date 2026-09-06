@@ -20,8 +20,11 @@ export function repositoryMigrationVersions({
   for (const entry of entries) {
     if (entry?.isFile && !entry.isFile()) continue;
     const name = typeof entry === 'string' ? entry : entry.name;
+    if (!name.endsWith('.sql')) continue;
     const match = TIMESTAMPED_MIGRATION.exec(name);
-    if (!match) continue;
+    if (!match) {
+      fail(`migration file ${name} must use <14-digit timestamp>_<name>.sql`);
+    }
 
     const version = match[1];
     if (seen.has(version)) fail(`duplicate repository migration version ${version}`);
