@@ -11,6 +11,7 @@ const supabaseKey = String(
   env.VITE_SUPABASE_PUBLISHABLE_KEY || env.VITE_SUPABASE_ANON_KEY || "",
 ).trim();
 const authRedirectOrigin = String(env.VITE_AUTH_REDIRECT_ORIGIN || "").trim();
+const CANONICAL_SUPABASE_HOST = "pnemeegkwyaicsbnbnmg.supabase.co";
 
 const failures = [];
 
@@ -26,6 +27,9 @@ if (!supabaseUrl) {
     if (url.hostname === "localhost" && url.port === "0") {
       failures.push("VITE_SUPABASE_URL must not use the old localhost:0 fallback");
     }
+    if (!isLocal && url.hostname !== CANONICAL_SUPABASE_HOST) {
+      failures.push(`VITE_SUPABASE_URL must target the canonical FinanceMeta project (${CANONICAL_SUPABASE_HOST})`);
+    }
   } catch {
     failures.push("VITE_SUPABASE_URL must be a valid absolute URL");
   }
@@ -35,6 +39,8 @@ if (!supabaseKey) {
   failures.push("VITE_SUPABASE_ANON_KEY or VITE_SUPABASE_PUBLISHABLE_KEY is required");
 } else if (supabaseKey === "missing-key") {
   failures.push("Supabase public key must not use the old missing-key fallback");
+} else if (!supabaseKey.startsWith("sb_publishable_") && !supabaseKey.startsWith("eyJ")) {
+  failures.push("Supabase public key must be a publishable key or legacy anon JWT");
 }
 
 if (!authRedirectOrigin) {

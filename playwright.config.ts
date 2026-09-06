@@ -21,8 +21,8 @@ export default defineConfig({
     url: "http://127.0.0.1:4173",
     reuseExistingServer: !process.env.CI,
     env: {
-      VITE_SUPABASE_URL: "https://ci.example.invalid",
-      VITE_SUPABASE_PUBLISHABLE_KEY: "ci-public-key-for-browser-contract",
+      VITE_SUPABASE_URL: "https://pnemeegkwyaicsbnbnmg.supabase.co",
+      VITE_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_ci_browser_contract",
       VITE_AUTH_REDIRECT_ORIGIN: "https://finance4all-global-reach.vercel.app",
     },
   },
