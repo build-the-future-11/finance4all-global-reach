@@ -3,14 +3,20 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "packageManager": "npm@10.9.8",
   "scripts": {
     "dev": "vite",
+    "prebuild": "node scripts/verify-release-toolchain.mjs",
     "build": "npm run typecheck && node scripts/validate-public-env.mjs && vite build && node scripts/write-release-revision.mjs",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "audit:prod": "npm audit --omit=dev --audit-level=high",
     "preview": "vite preview",
+    "pretest": "node --test tests/release-toolchain.test.mjs && node scripts/verify-release-toolchain.mjs",
     "test": "vitest run && node --test tests/release-revision.test.mjs tests/security-headers.test.mjs",
     "test:e2e": "playwright test",
     "test:e2e:credentialed": "playwright test --config=playwright.credentialed.config.ts",
