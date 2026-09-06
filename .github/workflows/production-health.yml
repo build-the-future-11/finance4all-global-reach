@@ -1,0 +1,77 @@
+name: Production Health
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '23 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-health
+  cancel-in-progress: true
+
+jobs:
+  verify-production:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      PORTAL_URL: https://finance4all-global-reach.vercel.app
+      EXPECTED_SOURCE_SHA: ${{ github.sha }}
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ env.EXPECTED_SOURCE_SHA }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22
+
+      - name: Verify production HTTP contract
+        run: |
+          set -euo pipefail
+          mkdir -p production-evidence
+          node scripts/verify-production.mjs \
+            --receipt production-evidence/production-health.json
+
+      - name: Verify deployed revision is runtime-equivalent to main
+        shell: bash
+        run: |
+          set -euo pipefail
+          revision="$(node -e "const r=require('./production-evidence/production-health.json'); process.stdout.write(r.revision)")"
+          git fetch --no-tags --depth=1 origin "$revision"
+          git cat-file -e "${revision}^{commit}"
+
+          git diff --quiet "$revision" "$EXPECTED_SOURCE_SHA" -- \
+            src ':(exclude)src/test/**' public index.html package-lock.json vite.config.ts vercel.json \
+            tailwind.config.ts tsconfig.app.json tsconfig.json
+
+          git show "${revision}:package.json" \
+            | node -e "let s='';process.stdin.on('data',c=>s+=c).on('end',()=>{const p=JSON.parse(s);process.stdout.write(JSON.stringify({dependencies:p.dependencies,devDependencies:p.devDependencies}))})" \
+            > production-evidence/deployed-dependencies.json
+          node -e "const p=require('./package.json');process.stdout.write(JSON.stringify({dependencies:p.dependencies,devDependencies:p.devDependencies}))" \
+            > production-evidence/current-dependencies.json
+          cmp production-evidence/deployed-dependencies.json production-evidence/current-dependencies.json
+
+          printf 'deployed_revision=%s\ncurrent_main=%s\nruntime_equivalent=true\n' \
+            "$revision" "$EXPECTED_SOURCE_SHA" \
+            > production-evidence/runtime-equivalence.txt
+          cat production-evidence/runtime-equivalence.txt >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Digest production evidence
+        run: sha256sum production-evidence/* > production-evidence/SHA256SUMS
+
+      - name: Retain production health evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: portal-production-health-${{ env.EXPECTED_SOURCE_SHA }}
+          path: production-evidence
+          if-no-files-found: error
+          retention-days: 30
