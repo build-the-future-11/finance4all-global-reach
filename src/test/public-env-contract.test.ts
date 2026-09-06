@@ -26,6 +26,6 @@ describe("public environment contract", () => {
       encoding: "utf8",
     });
     expect(result.status).not.toBe(0);
-    expect(result.stderr).toContain("canonical FinanceMeta project");
+    expect(result.stderr).toContain("must target the FinanceMeta Supabase project");
   }, 15_000);
 });
