@@ -19,14 +19,19 @@ Your `.env` is already configured locally. Follow these steps in order.
 
 ---
 
-## Step 2: Run database setup (one paste)
+## Step 2: Verify and apply database migrations
 
-1. Go to **SQL Editor** → **New query**
-2. Open `supabase/migrations/001_initial_schema.sql` from this repo
-3. Copy **all** of it → paste → **Run**
-4. New query → open `supabase/seed.sql` → copy → paste → **Run**
+```bash
+npm ci
+npx supabase login
+npx supabase link --project-ref pnemeegkwyaicsbnbnmg
+npx supabase migration list --linked
+npx supabase db push --linked --dry-run
+npx supabase db push --linked
+```
 
-If you already ran step 2 before, just run `supabase/migrations/002_google_oauth.sql` instead.
+Stop if the linked project or history differs. Do not paste old individual migrations or seed data
+into production; the CLI must apply the complete pending versioned chain.
 
 ---
 
@@ -73,6 +78,6 @@ UPDATE profiles SET role = 'lead_researcher' WHERE email = 'you@gmail.com';
 | Error | Fix |
 |-------|-----|
 | Google redirects but login fails | Add `http://localhost:8080/auth/callback` to Redirect URLs |
-| Blank portal / no data | Run `001_initial_schema.sql` + `seed.sql` |
-| "relation does not exist" | Migration not run yet |
-| Profile not created | Run `002_google_oauth.sql` |
+| Blank portal / no data | Inspect linked migration history and API/database logs |
+| "relation does not exist" | Dry-run the linked migration push, then apply only pending migrations |
+| Profile not created | Inspect the Auth trigger and logs; do not replay old migrations blindly |

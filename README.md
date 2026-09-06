@@ -17,7 +17,8 @@ Global nonprofit landing site and **Supabase-powered member portal**.
 | `/portal/pathways` | Opportunities, studios, essays |
 | `/portal/events` | Chapters + events |
 | `/portal/network` | Profiles + connections |
-| `/portal/settings` | Profile settings |
+| `/portal/settings` | Profile settings, personal-data export, deletion requests |
+| `/portal/admin` | Content management and account-deletion review queue (admin only) |
 | `/evidence` | Public release, program, and research evidence boundary |
 
 ## Vercel deploy (required env vars)
@@ -53,5 +54,8 @@ against the live portal and verifies session separation and logout protection. C
 credentials.
 
 Database authorization is independently checked by
-`supabase/tests/two_identity_rls_certification.sql`. It impersonates two existing ordinary members
-inside a transaction and ends with `ROLLBACK`, so the certification does not retain mutations.
+`supabase/tests/two_identity_rls_certification.sql` and
+`supabase/tests/account_lifecycle_rls_certification.sql`. They exercise independent member
+identities and an admin inside transactions ending in `ROLLBACK`, so certification does not retain
+mutations. The account request does not pretend to delete an identity: an operator must perform the
+privileged Supabase Auth deletion after review, which then cascades member-owned data.

@@ -4,36 +4,46 @@ Follow these steps to connect your Finance4All portal to Supabase.
 
 ---
 
-## Step 1: Create a Supabase project
+## Step 1: Authenticate the pinned CLI
 
-1. Go to [https://supabase.com](https://supabase.com) and sign in (or create an account).
-2. Click **New project**.
-3. Choose your organization, then set:
-   - **Name:** `finance4all` (or anything you like)
-   - **Database password:** save this somewhere safe
-   - **Region:** pick the closest to your users
-4. Click **Create new project** and wait ~2 minutes for it to provision.
+This repository is fail-closed to the canonical project `pnemeegkwyaicsbnbnmg`. Install locked
+dependencies, authenticate locally, and link that exact project:
+
+```bash
+npm ci
+npx supabase login
+npx supabase link --project-ref pnemeegkwyaicsbnbnmg
+npx supabase migration list --linked
+```
+
+Never link or push this migration chain to a different project.
 
 ---
 
-## Step 2: Run the database migration
+## Step 2: Apply versioned migrations
 
-1. In your Supabase dashboard, open **SQL Editor** (left sidebar).
-2. Click **New query**.
-3. Apply every file in `supabase/migrations/` in filename order. Do not re-run an
-   already applied migration; inspect the current policies and schema first.
-4. Click **Run** (or press Cmd/Ctrl + Enter) for each unapplied migration.
-5. Confirm every migration succeeds before continuing.
+Create schema changes with `npx supabase migration new <name>`; never invent filenames or paste an
+unversioned production schema into the SQL Editor. Before applying, inspect linked history and use
+the dry run:
+
+```bash
+npx supabase migration list --linked
+npx supabase db push --linked --dry-run
+npx supabase db push --linked
+npx supabase migration list --linked
+```
+
+Stop if linked history is unexpected. A successful command is not enough: verify the new revision
+in `private.portal_schema_revisions`, lint the linked schema, and run the transaction-only SQL tests.
 
 This creates all tables, security policies, and the auto-profile trigger.
 
 ---
 
-## Step 3: Add seed data (optional but recommended)
+## Step 3: Add seed data locally (optional)
 
-1. In SQL Editor, click **New query** again.
-2. Copy everything from `supabase/seed.sql`, paste, and **Run**.
-3. This adds sample news, explainers, chapters, events, and opportunities so the portal isn't empty.
+`supabase/seed.sql` is development/demo content. Do not apply it to production as part of a schema
+deployment.
 
 ---
 
@@ -91,8 +101,8 @@ npm run dev
 2. Create an account with an email you can confirm and a password of at least 10 characters.
 3. Complete onboarding.
 4. You should land on `/portal` with stats and sample content.
-5. Run `supabase/tests/two_identity_rls_certification.sql` after the migrations. It performs
-   two-member authorization checks inside a transaction and rolls every mutation back.
+5. Run both files in `supabase/tests/` after the migrations. They perform multi-identity
+   authorization checks inside transactions and roll every mutation back.
 
 If you see data on the dashboard, Supabase is connected.
 
@@ -142,7 +152,7 @@ Redeploy after saving. The portal won't work in production without these.
 | Problem | Fix |
 |---------|-----|
 | "Supabase not connected" banner on login | `.env` missing or dev server not restarted |
-| Sign up works but no data loads | Run migration + seed SQL |
+| Sign up works but no data loads | Compare linked migration history, apply only pending migrations, then inspect API/database logs |
 | "new row violates row-level security" | Check the exact failing operation, grants, policy, and database logs before changing a migration |
 | Sign up but can't log in | Disable email confirmation in Auth settings, or check your inbox |
 | Profile not created on signup | Inspect the `on_auth_user_created` trigger and Auth/database logs; apply only the missing migration after confirming migration state |
@@ -156,6 +166,7 @@ Project root/
   .env                          ← your secrets (never commit)
   .env.example                  ← template
   supabase/
-    migrations/                         ← apply in filename order
+    migrations/                         ← versioned; apply with the pinned CLI
+    tests/                              ← transaction-only RLS certification
     seed.sql                            ← optional development/demo content
 ```

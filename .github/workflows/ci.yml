@@ -13,6 +13,40 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  database-authorization:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: public.ecr.aws/supabase/postgres:17.6.1.165
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        options: >-
+          --health-cmd "pg_isready -U postgres -d postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Replay migrations and certify account lifecycle RLS
+        shell: bash
+        env:
+          POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+        run: |
+          set -euo pipefail
+          test -n "$POSTGRES_CONTAINER"
+          docker cp supabase/tests/bare_postgres_bootstrap.sql "$POSTGRES_CONTAINER:/tmp/bare_postgres_bootstrap.sql"
+          docker cp supabase/migrations/. "$POSTGRES_CONTAINER:/tmp/portal-migrations/"
+          docker cp supabase/tests/account_lifecycle_rls_certification.sql "$POSTGRES_CONTAINER:/tmp/account_lifecycle_rls_certification.sql"
+          docker exec "$POSTGRES_CONTAINER" psql -v ON_ERROR_STOP=1 -U supabase_admin -d postgres -f /tmp/bare_postgres_bootstrap.sql
+          docker exec "$POSTGRES_CONTAINER" sh -lc 'set -eu; for migration in /tmp/portal-migrations/*.sql; do psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f "$migration"; done'
+          docker exec "$POSTGRES_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/account_lifecycle_rls_certification.sql
+
   verify:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
