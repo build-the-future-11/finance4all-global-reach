@@ -16,11 +16,27 @@ import type {
   UserProfile,
 } from "@/types/domain";
 
-export function mapProfile(row: Tables<"profiles">): UserProfile {
+export const PUBLIC_PROFILE_COLUMNS =
+  "id, display_name, role, bio, avatar_url, interests, open_to_collaborate, chapter_id, created_at, updated_at" as const;
+
+type PublicProfileRow = Pick<
+  Tables<"profiles">,
+  | "id"
+  | "display_name"
+  | "role"
+  | "bio"
+  | "avatar_url"
+  | "interests"
+  | "open_to_collaborate"
+  | "chapter_id"
+  | "created_at"
+  | "updated_at"
+>;
+
+export function mapProfile(row: PublicProfileRow): UserProfile {
   return {
     id: row.id,
     displayName: row.display_name,
-    email: row.email,
     role: row.role,
     bio: row.bio ?? undefined,
     avatarUrl: row.avatar_url ?? undefined,

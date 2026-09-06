@@ -20,9 +20,10 @@ Follow these steps to connect your Finance4All portal to Supabase.
 
 1. In your Supabase dashboard, open **SQL Editor** (left sidebar).
 2. Click **New query**.
-3. Open `supabase/migrations/001_initial_schema.sql` from this repo, copy the entire file, paste into the editor.
-4. Click **Run** (or press Cmd/Ctrl + Enter).
-5. You should see **Success. No rows returned**.
+3. Apply every file in `supabase/migrations/` in filename order. Do not re-run an
+   already applied migration; inspect the current policies and schema first.
+4. Click **Run** (or press Cmd/Ctrl + Enter) for each unapplied migration.
+5. Confirm every migration succeeds before continuing.
 
 This creates all tables, security policies, and the auto-profile trigger.
 
@@ -51,9 +52,9 @@ This creates all tables, security policies, and the auto-profile trigger.
 1. Go to **Project Settings** (gear icon) → **API**.
 2. Copy these two values:
    - **Project URL** — looks like `https://abcdefgh.supabase.co`
-   - **anon public** key — long string starting with `eyJ...`
+   - **Publishable key** — starts with `sb_publishable_...`
 
-> Use the **anon** key, not the service_role key. The anon key is safe for the browser.
+> Use the publishable key. Never expose a `service_role` or `sb_secret_...` key in the browser.
 
 ---
 
@@ -69,7 +70,8 @@ Open `.env` and paste your values:
 
 ```env
 VITE_SUPABASE_URL=https://YOUR_PROJECT_ID.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJYOUR_ANON_KEY_HERE
+VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_YOUR_KEY_HERE
+VITE_AUTH_REDIRECT_ORIGIN=http://localhost:8080
 ```
 
 Save the file. **Restart** the dev server if it's already running:
@@ -82,8 +84,8 @@ npm run dev
 
 ## Step 7: Test it
 
-1. Open [http://localhost:8080/signup](http://localhost:8080/signup)
-2. Create an account with any email + password (6+ chars).
+1. Open [http://localhost:8080/signup](http://localhost:8080/signup).
+2. Create an account with an email you can confirm and a password of at least 10 characters.
 3. Complete onboarding.
 4. You should land on `/portal` with stats and sample content.
 
@@ -118,12 +120,13 @@ Sign out and back in to see the updated role.
 
 ## Deploying (Vercel / Lovable / Netlify)
 
-Add the same two env vars in your hosting dashboard:
+Add the required public env vars in your hosting dashboard:
 
 | Variable | Value |
 |----------|-------|
 | `VITE_SUPABASE_URL` | Your project URL |
-| `VITE_SUPABASE_ANON_KEY` | Your anon key |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | Your publishable key |
+| `VITE_AUTH_REDIRECT_ORIGIN` | Your clean production origin |
 
 Redeploy after saving. The portal won't work in production without these.
 
@@ -135,7 +138,7 @@ Redeploy after saving. The portal won't work in production without these.
 |---------|-----|
 | "Supabase not connected" banner on login | `.env` missing or dev server not restarted |
 | Sign up works but no data loads | Run migration + seed SQL |
-| "new row violates row-level security" | Migration didn't run fully — re-run `001_initial_schema.sql` |
+| "new row violates row-level security" | Check the exact failing operation, grants, policy, and database logs before changing a migration |
 | Sign up but can't log in | Disable email confirmation in Auth settings, or check your inbox |
 | Profile not created on signup | Re-run migration (the `handle_new_user` trigger may be missing) |
 
@@ -148,6 +151,6 @@ Project root/
   .env                          ← your secrets (never commit)
   .env.example                  ← template
   supabase/
-    migrations/001_initial_schema.sql   ← run first
-    seed.sql                            ← run second
+    migrations/                         ← apply in filename order
+    seed.sql                            ← optional development/demo content
 ```

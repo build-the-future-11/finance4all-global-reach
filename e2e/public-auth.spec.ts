@@ -35,3 +35,16 @@ test("provider-unavailable signup fails closed", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Sign up with Google" })).toBeDisabled();
   await expect(page.getByRole("button", { name: "Create account with email" })).toBeDisabled();
 });
+
+test("auth callback explains provider failures instead of silently looping", async ({ page }) => {
+  await page.goto(
+    "/auth/callback#error=access_denied&error_code=signup_disabled&error_description=Signups+not+allowed",
+  );
+
+  await expect(page.getByRole("heading", { name: "Sign in was not completed" })).toBeVisible();
+  await expect(page.getByRole("alert")).toContainText("signup is currently closed");
+  await expect(page.getByRole("link", { name: "Return to sign in" })).toHaveAttribute(
+    "href",
+    "/login",
+  );
+});

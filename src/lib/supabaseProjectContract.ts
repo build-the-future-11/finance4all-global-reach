@@ -80,7 +80,7 @@ export function assertFinanceMetaSupabasePublicKey(
   const key = String(keyValue || "").trim();
   if (!key) {
     if (allowLocal) return;
-    throw new Error("[Finance4All] A Supabase anon or publishable key is required outside development.");
+    throw new Error("[Finance4All] A Supabase publishable key is required outside development.");
   }
   if (key === "missing-key") {
     throw new Error("[Finance4All] Supabase public key must not use the old missing-key fallback.");
@@ -92,16 +92,10 @@ export function assertFinanceMetaSupabasePublicKey(
       "[Finance4All] Refusing to expose a Supabase secret/service-role key in the public client.",
     );
   }
-  if (jwtRole && jwtRole !== "anon") {
-    throw new Error(
-      "[Finance4All] Production Supabase public key must be an sb_publishable_ key or a legacy anon JWT.",
-    );
-  }
-
   if (allowLocal) return;
-  if (!PUBLISHABLE_KEY_PATTERN.test(key) && jwtRole !== "anon") {
+  if (!PUBLISHABLE_KEY_PATTERN.test(key)) {
     throw new Error(
-      "[Finance4All] Production Supabase public key must be an sb_publishable_ key or a legacy anon JWT.",
+      "[Finance4All] Production Supabase public key must use the sb_publishable_ format.",
     );
   }
 }
