@@ -20,6 +20,8 @@ describe("FinanceMeta authorization boundary", () => {
       "20260709090402_initial_schema.sql",
       "20260709104954_google_oauth.sql",
       "20260710031219_bookmarks_notifications.sql",
+      "20260711032432_security_hardening.sql",
+      "20260711032433_education_progress.sql",
       "20260830141730_authorization_hardening.sql",
     ]) {
       expect(fs.existsSync(path.resolve(process.cwd(), "supabase/migrations", file))).toBe(true);
