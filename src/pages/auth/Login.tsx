@@ -7,12 +7,13 @@ import { portalInputClass } from "@/components/portal/PortalUI";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { sanitizePostAuthPath } from "@/lib/auth-navigation";
 
 export default function Login() {
   const { signIn, signInWithGoogle, user, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const from = (location.state as { from?: string })?.from ?? "/portal";
+  const from = sanitizePostAuthPath((location.state as { from?: string } | null)?.from);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -35,7 +36,7 @@ export default function Login() {
   const handleGoogle = async () => {
     setError("");
     setGoogleLoading(true);
-    const { error: err } = await signInWithGoogle();
+    const { error: err } = await signInWithGoogle(from);
     if (err) {
       setError(err);
       setGoogleLoading(false);

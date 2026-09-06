@@ -9,10 +9,10 @@ This is a **Vite** app. All client env vars must use the `VITE_` prefix so they 
 Before treating a Vercel deployment as production-ready, verify all of the following on the exact deployed commit:
 
 - `VITE_SUPABASE_URL` is present and points at the canonical FinanceMeta Supabase project.
-- Either `VITE_SUPABASE_ANON_KEY` or `VITE_SUPABASE_PUBLISHABLE_KEY` is present and is a browser-safe public key.
+- `VITE_SUPABASE_PUBLISHABLE_KEY` is present and uses the browser-safe `sb_publishable_...` format.
 - The variables are enabled for **Production and Preview** (and Development if Vercel development environments are used).
 - The deployment was rebuilt after any environment-variable change.
-- Database migrations `001` through `004` have been applied in order and migration state was checked before applying anything manually.
+- Database migrations through `20260906121145_portal_security_and_privacy.sql` have been applied in order.
 - Google OAuth redirect URLs match the deployed production and preview domains.
 
 If a Vercel deployment starts failing after the fail-closed configuration gate was introduced, check the build log for `validate-public-env` output first. Do not weaken or bypass the validator to make a deployment green.
@@ -31,13 +31,11 @@ In Vercel → Project → **Settings** → **Environment Variables**, add:
 | Name | Value | Environments |
 |------|-------|--------------|
 | `VITE_SUPABASE_URL` | `https://pnemeegkwyaicsbnbnmg.supabase.co` | Production, Preview, Development |
-| `VITE_SUPABASE_ANON_KEY` | Your Supabase **anon** JWT (`eyJ...`) | Production, Preview, Development |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | `sb_publishable_...` from Supabase dashboard | Production, Preview, Development |
+| `VITE_AUTH_REDIRECT_ORIGIN` | `https://finance4all-global-reach.vercel.app` | Production, Preview, Development |
 
-Optional (only if you omit `VITE_SUPABASE_ANON_KEY`):
-
-| Name | Value |
-|------|-------|
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | `sb_publishable_...` from Supabase dashboard |
+Legacy anon JWT variables are intentionally ignored. This prevents an obsolete
+key from another Supabase project from silently becoming the production fallback.
 
 **Never** add `SUPABASE_SERVICE_ROLE_KEY`, `sb_secret_...`, or any secret key to Vercel env vars that ship to the browser. Those are server-only.
 
@@ -90,6 +88,12 @@ The app callback route is `/auth/callback` (`src/lib/supabase.ts` → `getAuthRe
 https://pnemeegkwyaicsbnbnmg.supabase.co/auth/v1/callback
 ```
 
+In Supabase → **Authentication** → **Sign In / Providers** → **Email**:
+
+- set the minimum password length to `10` so backend enforcement matches the portal;
+- enable leaked-password protection when the project plan supports it;
+- record any plan limitation in release evidence instead of implying it is enabled.
+
 ## 4. Database
 
 Before applying anything, inspect the canonical Supabase project's migration state. Do not re-run migrations blindly.
@@ -101,17 +105,24 @@ Required migration order:
 3. `supabase/migrations/002_google_oauth.sql` (Google login)
 4. `supabase/migrations/003_bookmarks_notifications.sql` (bookmarks + notifications)
 5. `supabase/migrations/004_authorization_hardening.sql` (role/ownership/notification/view authorization hardening)
+6. `supabase/migrations/20260906121145_portal_security_and_privacy.sql` (least-privilege grants, member-email privacy, immutable ownership, safe auth helpers)
 
-Migration `004_authorization_hardening.sql` is a production security requirement, not an optional enhancement.
+Both authorization migrations are production security requirements, not optional enhancements.
 
-### Authorization certification after migration 004
+### Authorization certification after the latest migration
 
 Using an ordinary member account against the canonical production database, verify that:
 
 - changing `profiles.role` through the client/PostgREST is rejected;
 - creating a profile cannot self-assign an elevated role;
 - ordinary profile fields that are explicitly allowed remain editable;
+- another member's email cannot be selected from `profiles`;
 - a member cannot fabricate notifications;
+- a member cannot self-accept a lab application or self-award an editorial pick;
+- a connection recipient cannot rewrite either participant or the request message;
+- a studio author cannot transfer authorship or rewrite the submission timestamp;
+- the public contact form can insert only validated message fields, while only admins can read or change status;
+- the optional avatar bucket is private and readable only by signed-in members;
 - essay/community aggregate upvote counts remain visible while individual voter rows stay protected by RLS.
 
 Record the deployed commit and the date of this certification. Source CI alone is not production certification.
@@ -165,7 +176,7 @@ For each production release, retain a compact record containing:
 - Git commit SHA;
 - Vercel deployment URL and successful build result;
 - environment-contract validation result (never the secret/public-key value itself);
-- migration state through `004_authorization_hardening.sql`;
+- migration state through `20260906121145_portal_security_and_privacy.sql`;
 - auth/onboarding/protected-route smoke-test result;
 - ordinary-member authorization test result;
 - known failures or exceptions and their owner.

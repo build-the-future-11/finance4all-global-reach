@@ -28,7 +28,7 @@ import { toast } from "sonner";
 const SUGGESTED_INTERESTS = ["macro", "equities", "fintech", "credit", "startups", "research"];
 
 export default function Settings() {
-  const { profile, signOut } = useAuth();
+  const { profile, user, signOut } = useAuth();
   const { data: chapters } = useChapters();
   const updateProfile = useUpdateMyProfile();
 
@@ -85,7 +85,7 @@ export default function Settings() {
               </AvatarFallback>
             </Avatar>
             <h2 className="mt-4 text-lg font-semibold text-white">{profile?.displayName}</h2>
-            <p className="text-sm text-white/50">{profile?.email}</p>
+            <p className="text-sm text-white/50">{user?.email}</p>
             <p className="mt-1 text-xs capitalize text-white/40">
               {profile?.role?.replace("_", " ")}
             </p>

@@ -9,7 +9,8 @@ import {
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { getAuthRedirectUrl, supabase } from "@/lib/supabase";
-import { mapProfile } from "@/lib/mappers";
+import { mapProfile, PUBLIC_PROFILE_COLUMNS } from "@/lib/mappers";
+import { rememberPostAuthPath } from "@/lib/auth-navigation";
 import type { UserProfile } from "@/types/domain";
 
 interface AuthContextValue {
@@ -23,7 +24,7 @@ interface AuthContextValue {
     error: string | null;
     emailConfirmationRequired: boolean;
   }>;
-  signInWithGoogle: () => Promise<{ error: string | null }>;
+  signInWithGoogle: (returnTo?: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
   updateProfile: (updates: Partial<Pick<UserProfile, "displayName" | "bio" | "interests" | "openToCollaborate" | "chapterId">>) => Promise<{ error: string | null }>;
@@ -54,7 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const ensureProfile = useCallback(async (user: User) => {
     const { data: existing } = await supabase
       .from("profiles")
-      .select("*")
+      .select(PUBLIC_PROFILE_COLUMNS)
       .eq("id", user.id)
       .maybeSingle();
 
@@ -71,7 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         display_name: displayName,
         avatar_url: avatarUrl ?? null,
       })
-      .select("*")
+      .select(PUBLIC_PROFILE_COLUMNS)
       .single();
 
     if (error) {
@@ -86,7 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async (user: User) => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("*")
+        .select(PUBLIC_PROFILE_COLUMNS)
         .eq("id", user.id)
         .maybeSingle();
 
@@ -168,7 +169,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const signInWithGoogle = useCallback(async () => {
+  const signInWithGoogle = useCallback(async (returnTo?: string) => {
+    rememberPostAuthPath(returnTo);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {

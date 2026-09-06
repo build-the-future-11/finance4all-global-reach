@@ -14,7 +14,11 @@ function syntheticJwt(role: string) {
   return `${encode({ alg: "HS256", typ: "JWT" })}.${encode({ role })}.synthetic-signature`;
 }
 
-function runValidator(url: string, nodeEnv: "production" | "development", key = syntheticJwt("anon")) {
+function runValidator(
+  url: string,
+  nodeEnv: "production" | "development",
+  key = "sb_publishable_test_fixture",
+) {
   return spawnSync(process.execPath, [validatorPath], {
     cwd: process.cwd(),
     encoding: "utf8",
@@ -22,8 +26,7 @@ function runValidator(url: string, nodeEnv: "production" | "development", key = 
       ...process.env,
       NODE_ENV: nodeEnv,
       VITE_SUPABASE_URL: url,
-      VITE_SUPABASE_ANON_KEY: key,
-      VITE_SUPABASE_PUBLISHABLE_KEY: "",
+      VITE_SUPABASE_PUBLISHABLE_KEY: key,
       VITE_AUTH_REDIRECT_ORIGIN: "https://finance4all-global-reach.vercel.app",
     },
   });
@@ -43,10 +46,10 @@ describe("FinanceMeta Supabase project contract", () => {
 
   it("requires a real public Supabase key outside development", () => {
     expect(() => assertFinanceMetaSupabasePublicKey("sb_publishable_test_fixture", { allowLocal: false })).not.toThrow();
-    expect(() => assertFinanceMetaSupabasePublicKey(syntheticJwt("anon"), { allowLocal: false })).not.toThrow();
+    expect(() => assertFinanceMetaSupabasePublicKey(syntheticJwt("anon"), { allowLocal: false })).toThrow(/sb_publishable_/i);
     expect(() => assertFinanceMetaSupabasePublicKey(undefined, { allowLocal: false })).toThrow(/required outside development/i);
-    expect(() => assertFinanceMetaSupabasePublicKey("public-anon-key", { allowLocal: false })).toThrow(/sb_publishable_ key or a legacy anon JWT/i);
-    expect(() => assertFinanceMetaSupabasePublicKey(syntheticJwt("authenticated"), { allowLocal: false })).toThrow(/sb_publishable_ key or a legacy anon JWT/i);
+    expect(() => assertFinanceMetaSupabasePublicKey("public-anon-key", { allowLocal: false })).toThrow(/sb_publishable_/i);
+    expect(() => assertFinanceMetaSupabasePublicKey(syntheticJwt("authenticated"), { allowLocal: false })).toThrow(/sb_publishable_/i);
   });
 
   it("rejects secret and service-role keys from the public client", () => {
@@ -104,7 +107,7 @@ describe("FinanceMeta Supabase project contract", () => {
     for (const key of ["public-anon-key", syntheticJwt("authenticated"), "sb_publishable_"]) {
       const result = runValidator(url, "production", key);
       expect(result.status).toBe(1);
-      expect(result.stderr).toContain("must use an sb_publishable_ key or a legacy anon JWT");
+      expect(result.stderr).toContain("must use the sb_publishable_ format");
     }
   });
 

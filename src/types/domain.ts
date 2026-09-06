@@ -8,7 +8,6 @@ export type UserRole = z.infer<typeof UserRoleSchema>;
 export const UserProfileSchema = z.object({
   id: z.string().uuid(),
   displayName: z.string().min(1),
-  email: z.string().email(),
   role: UserRoleSchema,
   bio: z.string().optional(),
   avatarUrl: z.string().url().optional(),

@@ -23,7 +23,8 @@ Global nonprofit landing site and **Supabase-powered member portal**.
 
 ```
 VITE_SUPABASE_URL=https://pnemeegkwyaicsbnbnmg.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
+VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_your-key
+VITE_AUTH_REDIRECT_ORIGIN=https://finance4all-global-reach.vercel.app
 ```
 
 Add redirect URL in Supabase: `https://YOUR-APP.vercel.app/auth/callback`
