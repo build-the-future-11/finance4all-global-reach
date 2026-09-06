@@ -19,7 +19,10 @@ interface AuthContextValue {
   loading: boolean;
   needsOnboarding: boolean;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
-  signUp: (email: string, password: string, displayName: string) => Promise<{ error: string | null }>;
+  signUp: (email: string, password: string, displayName: string) => Promise<{
+    error: string | null;
+    emailConfirmationRequired: boolean;
+  }>;
   signInWithGoogle: () => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -118,23 +121,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [session?.user, fetchProfile]);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      if (data.session?.user) {
-        fetchProfile(data.session.user).finally(() => setLoading(false));
-      } else {
-        setLoading(false);
-      }
-    });
+    void supabase.auth.getSession()
+      .then(async ({ data, error }) => {
+        if (error) throw error;
+        setSession(data.session);
+        if (data.session?.user) await fetchProfile(data.session.user);
+      })
+      .catch((error: unknown) => {
+        console.error("Session initialization failed", error);
+        setSession(null);
+        setProfile(null);
+      })
+      .finally(() => setLoading(false));
 
     const { data: sub } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       setSession(nextSession);
       if (nextSession?.user) {
-        fetchProfile(nextSession.user);
+        setLoading(true);
+        void fetchProfile(nextSession.user).finally(() => setLoading(false));
       } else {
         setProfile(null);
+        setLoading(false);
       }
-      setLoading(false);
     });
 
     return () => sub.subscription.unsubscribe();
@@ -146,12 +154,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signUp = useCallback(async (email: string, password: string, displayName: string) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { display_name: displayName } },
+      options: {
+        emailRedirectTo: getAuthRedirectUrl(),
+        data: { display_name: displayName },
+      },
     });
-    return { error: error?.message ?? null };
+    return {
+      error: error?.message ?? null,
+      emailConfirmationRequired: Boolean(data.user && !data.session),
+    };
   }, []);
 
   const signInWithGoogle = useCallback(async () => {

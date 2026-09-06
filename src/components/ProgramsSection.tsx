@@ -17,78 +17,66 @@ const programs = [
   {
     icon: School,
     title: "Global Literacy Outreach",
-    short: "Teaching financial fundamentals in underserved schools worldwide.",
+    short: "A planned financial-literacy workshop format.",
     detail:
-      "Our volunteers visit underprivileged schools across multiple countries to teach essential concepts like budgeting, saving, investing, and entrepreneurship—giving students tools rarely covered in traditional curricula.",
+      "Launch requires a named lead, consent-safe participant records, a frozen lesson plan, and a published outcome report.",
   },
   {
     icon: Newspaper,
     title: "Economics Journal",
-    short: "Student-run publication with global reach.",
+    short: "A planned evidence-led student publication.",
     detail:
-      "Students from around the world submit opinion columns and market analysis. The strongest pieces are promoted to outlets connected to major financial and economic publications.",
+      "Launch requires an editorial standard, source citations, corrections policy, and a clear analysis-versus-advice boundary.",
   },
   {
     icon: FlaskConical,
     title: "Research Lab",
-    short: "Mentored research with leading universities.",
+    short: "A planned directory for reproducible student research.",
     detail:
-      "Students collaborate on research projects guided by mentors affiliated with institutions including Stanford University, MIT, the University of Chicago, and others.",
+      "Projects become active only with a named lead, research question, baseline, data provenance, and reproducible artifact.",
   },
   {
     icon: BookOpen,
     title: "Global School Clubs",
-    short: "Structured curriculum backed by industry pros.",
+    short: "A planned local chapter and curriculum model.",
     detail:
-      "Clubs run educational programs using a curriculum supported by professionals connected to quantitative trading firms such as Jane Street.",
+      "A chapter becomes active only after a verified lead publishes a qualifying output and maintains a current evidence record.",
   },
   {
     icon: GraduationCap,
     title: "School Visits",
-    short: "Hands-on financial workshops in communities.",
+    short: "A planned community workshop format.",
     detail:
-      "Interactive workshops in underprivileged communities teaching budgeting, investing basics, and entrepreneurship fundamentals.",
+      "Workshops remain planned until safeguarding, consent, curriculum, attendance, and outcome-reporting requirements are met.",
   },
   {
     icon: Mic,
     title: "Student Podcasts",
-    short: "Conversations with young entrepreneurs.",
+    short: "A planned interview and explanation series.",
     detail:
-      "A podcast series featuring successful student founders sharing their journeys and insights for the next generation.",
+      "Episodes require a named producer, guest consent, sources, corrections process, and a published recording before listing.",
   },
   {
     icon: Briefcase,
     title: "Industry Projects",
-    short: "Real problems judged by professionals.",
+    short: "A planned project-based learning track.",
     detail:
-      "Students tackle real finance challenges evaluated by industry professionals and university professors.",
+      "Projects require a defined problem, reviewer, public rubric, working artifact, and evidence before any adoption claim.",
   },
   {
     icon: Trophy,
     title: "Economics Olympiad",
-    short: "Global competition in economic reasoning.",
+    short: "A planned competition in economic reasoning.",
     detail:
-      "A worldwide olympiad where students apply economic thinking to real-world market problems.",
+      "Launch requires frozen rules, scoring, conflicts policy, data windows, anti-leakage controls, and reproducible judging records.",
   },
   {
     icon: Monitor,
     title: "Digital Education",
-    short: "Scaling financial literacy online.",
+    short: "A planned library of sourced learning material.",
     detail:
-      "Educational content delivered through digital platforms reaching thousands of students globally.",
+      "Content is published only with sources, review ownership, revision history, and a measurable completion rule.",
   },
-];
-
-const partners = [
-  "Jane Street",
-  "The Economics Lab",
-  "Colgate",
-  "KFC",
-  "Stanford Researchers",
-  "MIT Researchers",
-  "UC Berkeley Researchers",
-  "Harvard Researchers",
-  "EconScholars",
 ];
 
 function ProgramCard({ program }: { program: typeof programs[0] }) {
@@ -176,9 +164,9 @@ function ProgramCard({ program }: { program: typeof programs[0] }) {
 
 function ImpactNumbers() {
   const stats = [
-    { value: "25,000+", label: "Students Impacted" },
-    { value: "15+", label: "Countries Reached" },
-    { value: "50+", label: "Global Members" },
+    { value: "7", label: "Planned program families" },
+    { value: "1", label: "Synthetic research baseline" },
+    { value: "0", label: "Unsupported impact claims" },
   ];
 
   return (
@@ -206,43 +194,6 @@ function ImpactNumbers() {
   );
 }
 
-function PartnersSection() {
-  return (
-    <div className="mt-32">
-      <div className="text-center mb-12">
-        <h3 className="text-3xl font-bold text-white">
-          Partners & Collaborators
-        </h3>
-
-        <p className="text-white/70 text-sm mt-3 max-w-xl mx-auto">
-          Finance4All Meta collaborates with researchers, institutions,
-          and organizations advancing financial education worldwide.
-        </p>
-      </div>
-
-      <div className="flex flex-wrap justify-center gap-4">
-        {partners.map((p) => (
-          <div
-            key={p}
-            className="
-              px-6 py-2 rounded-full
-              border border-white/20
-              bg-white/[0.05]
-              text-white/80
-              hover:text-white
-              hover:border-white/40
-              hover:bg-white/[0.08]
-              transition
-            "
-          >
-            {p}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export default function ProgramsSection() {
   const ref = useScrollReveal();
 
@@ -263,15 +214,15 @@ export default function ProgramsSection() {
           </p>
 
           <h2 className="text-4xl sm:text-5xl font-bold text-white">
-            Programs Driving Global
+            Programs With Explicit
             <span className="bg-gradient-to-r from-emerald-300 to-purple-300 bg-clip-text text-transparent">
-              {" "}Financial Education
+              {" "}Evidence Gates
             </span>
           </h2>
 
           <p className="text-white/70 mt-4 text-sm">
-            Click any program to explore how students are building the future
-            of financial literacy.
+            Click a planned program to inspect what must exist before it is
+            described as active.
           </p>
         </div>
 
@@ -283,7 +234,6 @@ export default function ProgramsSection() {
 
         <ImpactNumbers />
 
-        <PartnersSection />
       </div>
     </section>
   );

@@ -27,12 +27,14 @@ interface GoogleSignInButtonProps {
   onClick: () => void;
   loading?: boolean;
   label?: string;
+  disabled?: boolean;
 }
 
 export default function GoogleSignInButton({
   onClick,
   loading,
   label = "Continue with Google",
+  disabled = false,
 }: GoogleSignInButtonProps) {
   return (
     <Button
@@ -40,7 +42,7 @@ export default function GoogleSignInButton({
       variant="outline"
       className="w-full border-white/15 bg-white/[0.06] text-white hover:bg-white/10 hover:text-white"
       onClick={onClick}
-      disabled={loading}
+      disabled={loading || disabled}
     >
       <GoogleIcon />
       {loading ? "Redirecting…" : label}
