@@ -12,6 +12,7 @@
     "audit:prod": "npm audit --omit=dev --audit-level=high",
     "preview": "vite preview",
     "test": "vitest run && node --test tests/release-revision.test.mjs",
+    "test:e2e": "playwright test",
     "test:watch": "vitest"
   },
   "dependencies": {

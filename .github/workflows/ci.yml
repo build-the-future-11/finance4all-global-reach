@@ -203,5 +203,7 @@ jobs:
         run: npm test
       - name: Production build
         run: npm run build
+      - name: Browser journey smoke tests
+        run: npm run test:e2e
       - name: Repository lint gate
         run: npm run lint
