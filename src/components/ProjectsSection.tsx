@@ -51,8 +51,8 @@ export default function ProjectsSection() {
             Membership Portal Foundations
           </h2>
           <p className="mt-4 text-sm text-white/70 sm:text-base">
-            A clean first release focused on content, opportunities, and research workflows.
-            This keeps launch simple while setting up the architecture for Phase 2 expansion.
+            An early-access release focused on content, opportunities, and research workflows.
+            Empty datasets remain visibly empty; availability is not presented as impact.
           </p>
         </div>
 
@@ -96,8 +96,8 @@ export default function ProjectsSection() {
               Launch Readiness
             </p>
             <p className="mt-2 max-w-2xl text-sm text-white/80">
-              Next immediate step: hook these modules to live datasets and user accounts. The
-              current UI blocks are ready to connect to APIs and auth.
+              Membership uses live authentication and protected routes. Program and research
+              listings appear only when factual records are published.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">

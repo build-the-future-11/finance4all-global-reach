@@ -8,8 +8,9 @@ const env = { ...fileEnv, ...process.env };
 
 const supabaseUrl = String(env.VITE_SUPABASE_URL || "").trim();
 const supabaseKey = String(
-  env.VITE_SUPABASE_ANON_KEY || env.VITE_SUPABASE_PUBLISHABLE_KEY || "",
+  env.VITE_SUPABASE_PUBLISHABLE_KEY || env.VITE_SUPABASE_ANON_KEY || "",
 ).trim();
+const authRedirectOrigin = String(env.VITE_AUTH_REDIRECT_ORIGIN || "").trim();
 
 const failures = [];
 
@@ -34,6 +35,19 @@ if (!supabaseKey) {
   failures.push("VITE_SUPABASE_ANON_KEY or VITE_SUPABASE_PUBLISHABLE_KEY is required");
 } else if (supabaseKey === "missing-key") {
   failures.push("Supabase public key must not use the old missing-key fallback");
+}
+
+if (!authRedirectOrigin) {
+  failures.push("VITE_AUTH_REDIRECT_ORIGIN is required");
+} else {
+  try {
+    const url = new URL(authRedirectOrigin);
+    if (url.protocol !== "https:" || url.pathname !== "/" || url.search || url.hash || url.username || url.password) {
+      failures.push("VITE_AUTH_REDIRECT_ORIGIN must be a clean https origin");
+    }
+  } catch {
+    failures.push("VITE_AUTH_REDIRECT_ORIGIN must be a valid absolute URL");
+  }
 }
 
 if (failures.length > 0) {

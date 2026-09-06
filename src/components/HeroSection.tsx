@@ -127,12 +127,9 @@ export default function HeroSection() {
           </h1>
 
           <p className="mb-8 text-lg sm:text-xl text-white/85 leading-relaxed">
-            Empowering the next generation of financial thinkers through
-            research, global education programs, and student-led initiatives.
-            Finance4All Meta began as a grassroots outreach program teaching
-            financial literacy across schools in India and is now expanding
-            into a global network of students passionate about economics,
-            markets, and entrepreneurship.
+            FinanceMeta is building a student-led platform for financial
+            literacy, research, and practical projects. Programs stay marked
+            as planned until a named lead and reviewable evidence are published.
           </p>
 
           {/* IMPACT */}
@@ -140,23 +137,23 @@ export default function HeroSection() {
           <div className="flex flex-wrap justify-center gap-12 mb-10 text-white">
 
             <div>
-              <p className="text-3xl font-bold text-emerald-300">25,000+</p>
+              <p className="text-3xl font-bold text-emerald-300">Planned</p>
               <p className="text-xs uppercase tracking-widest text-white/60">
-                Students Impacted
+                Program roadmap
               </p>
             </div>
 
             <div>
-              <p className="text-3xl font-bold text-emerald-300">15+</p>
+              <p className="text-3xl font-bold text-emerald-300">Evidence</p>
               <p className="text-xs uppercase tracking-widest text-white/60">
-                Countries
+                Before scale
               </p>
             </div>
 
             <div>
-              <p className="text-3xl font-bold text-emerald-300">50+</p>
+              <p className="text-3xl font-bold text-emerald-300">Open</p>
               <p className="text-xs uppercase tracking-widest text-white/60">
-                Global Members
+                To founding members
               </p>
             </div>
 

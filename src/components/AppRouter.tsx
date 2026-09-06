@@ -1,6 +1,5 @@
 import { lazy, Suspense } from "react";
-import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
-import FluidCursor from "@/components/FluidCursor";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/portal/ProtectedRoute";
 import RoleGuard from "@/components/portal/RoleGuard";
@@ -11,6 +10,8 @@ import Login from "@/pages/auth/Login";
 import Signup from "@/pages/auth/Signup";
 import Onboarding from "@/pages/auth/Onboarding";
 import AuthCallback from "@/pages/auth/AuthCallback";
+import ForgotPassword from "@/pages/auth/ForgotPassword";
+import ResetPassword from "@/pages/auth/ResetPassword";
 import PortalLayout from "@/layouts/PortalLayout";
 
 const Dashboard = lazy(() => import("@/pages/portal/Dashboard"));
@@ -37,18 +38,15 @@ function PortalFallback() {
 }
 
 function AppRoutes() {
-  const location = useLocation();
-  const isLanding = location.pathname === "/";
-
   return (
-    <>
-      {isLanding && <FluidCursor />}
-      <Suspense fallback={<PortalFallback />}>
+    <Suspense fallback={<PortalFallback />}>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
 
           <Route
             path="/onboarding"
@@ -101,8 +99,7 @@ function AppRoutes() {
 
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </Suspense>
-    </>
+    </Suspense>
   );
 }
 
