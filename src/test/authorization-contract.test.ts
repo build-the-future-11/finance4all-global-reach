@@ -80,7 +80,7 @@ describe("FinanceMeta authorization boundary", () => {
     expect(migration).toContain("GRANT UPDATE (read) ON TABLE public.notifications TO authenticated");
   });
 
-  it("preserves the public contact path without broad mutation grants", () => {
+  it("hardens the optional contact path before the later retirement migration", () => {
     expect(migration).toContain("GRANT INSERT (name, email, subject, message)");
     expect(migration).toContain("status = ''new''");
     expect(migration).toContain("BETWEEN 10 AND 5000");
@@ -104,7 +104,7 @@ describe("FinanceMeta authorization boundary", () => {
     }
   });
 
-  it("keeps the optional avatar bucket private", () => {
+  it("hardens the optional avatar bucket before the later retirement migration", () => {
     expect(migration).toContain("UPDATE storage.buckets SET public = false");
     expect(migration).toContain('DROP POLICY IF EXISTS "Public avatar read"');
     expect(migration).toContain('CREATE POLICY "Members read avatars"');
