@@ -12,7 +12,7 @@ Before treating a Vercel deployment as production-ready, verify all of the follo
 - `VITE_SUPABASE_PUBLISHABLE_KEY` is present and uses the browser-safe `sb_publishable_...` format.
 - The variables are enabled for **Production and Preview** (and Development if Vercel development environments are used).
 - The deployment was rebuilt after any environment-variable change.
-- Database migrations through `20260906150000_retire_unused_hosted_extensions.sql` have been applied in order.
+- Database migrations through `20260906172830_harden_recovered_profile_functions.sql` have been applied in order.
 - Google OAuth redirect URLs match the deployed production and preview domains.
 
 If a Vercel deployment starts failing after the fail-closed configuration gate was introduced, check the build log for `validate-public-env` output first. Do not weaken or bypass the validator to make a deployment green.
@@ -103,11 +103,17 @@ Required migration order:
 1. `supabase/migrations/20260709090402_initial_schema.sql`
 2. `supabase/migrations/20260709104954_google_oauth.sql` (Google login)
 3. `supabase/migrations/20260710031219_bookmarks_notifications.sql` (bookmarks + notifications)
-4. `supabase/migrations/20260830141730_authorization_hardening.sql` (role/ownership/notification/view authorization hardening)
-5. `supabase/migrations/20260906121145_portal_security_and_privacy.sql` (least-privilege grants, member-email privacy, immutable ownership, safe auth helpers)
-6. `supabase/migrations/20260906150000_retire_unused_hosted_extensions.sql` (retire unused hosted-only RPC/contact surfaces, archive existing rate telemetry privately, and leave the empty avatar bucket private and inert)
+4. `supabase/migrations/20260711032432_security_hardening.sql` (recovered profile and notification hardening that is present in production)
+5. `supabase/migrations/20260711032433_education_progress.sql` (recovered owner-scoped lesson progress table that is present in production)
+6. `supabase/migrations/20260830141730_authorization_hardening.sql` (role/ownership/notification/view authorization hardening)
+7. `supabase/migrations/20260906121145_portal_security_and_privacy.sql` (least-privilege grants, member-email privacy, immutable ownership, safe auth helpers)
+8. `supabase/migrations/20260906150000_retire_unused_hosted_extensions.sql` (retire unused hosted-only RPC/contact surfaces, archive existing rate telemetry privately, and leave the empty avatar bucket private and inert)
+9. `supabase/migrations/20260906171941_archive_abandoned_public_tables.sql` (reversibly move empty, unused tables from a partially applied branch into the private legacy namespace)
+10. `supabase/migrations/20260906172830_harden_recovered_profile_functions.sql` (pin recovered trigger functions to qualified objects and remove browser-role execution)
 
-Both authorization migrations are production security requirements, not optional enhancements.
+The recovered migrations were traced to commit `9539faadecc5d5c564b33e7610e02cbe1789f97c` and matched against the live schema before being restored. See `docs/PRODUCTION_SCHEMA_RECONCILIATION.md` for the observed production state and the remaining ledger-repair boundary.
+
+The authorization migrations are production security requirements, not optional enhancements.
 
 For a fresh local database, run `supabase db reset`. Apply `supabase/seed.sql` only to disposable local or explicitly approved staging environments. For a linked remote project, inspect `supabase migration list --linked` before `supabase db push`.
 
@@ -185,7 +191,7 @@ For each production release, retain a compact record containing:
 - Git commit SHA;
 - Vercel deployment URL and successful build result;
 - environment-contract validation result (never the secret/public-key value itself);
-- migration state through `20260906121145_portal_security_and_privacy.sql`;
+- migration state through `20260906172830_harden_recovered_profile_functions.sql`;
 - auth/onboarding/protected-route smoke-test result;
 - ordinary-member authorization test result;
 - known failures or exceptions and their owner.
