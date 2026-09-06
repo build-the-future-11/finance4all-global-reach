@@ -11,6 +11,7 @@ import type { Session, User } from "@supabase/supabase-js";
 import { getAuthRedirectUrl, supabase } from "@/lib/supabase";
 import { mapProfile, PUBLIC_PROFILE_COLUMNS } from "@/lib/mappers";
 import { rememberPostAuthPath } from "@/lib/auth-navigation";
+import { withDeadline } from "@/lib/asyncDeadline";
 import type { UserProfile } from "@/types/domain";
 
 interface AuthContextValue {
@@ -31,6 +32,7 @@ interface AuthContextValue {
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+const AUTH_OPERATION_TIMEOUT_MS = 15_000;
 
 function googleDisplayName(user: User) {
   const meta = user.user_metadata ?? {};
@@ -145,7 +147,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [session?.user, fetchProfile]);
 
   useEffect(() => {
-    void supabase.auth.getSession()
+    void withDeadline(
+      () => supabase.auth.getSession(),
+      AUTH_OPERATION_TIMEOUT_MS,
+      "Initial auth session fetch",
+    )
       .then(async ({ data, error }) => {
         if (error) throw error;
         setSession(data.session);
@@ -173,40 +179,86 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [fetchProfile]);
 
   const signIn = useCallback(async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error: error?.message ?? null };
+    try {
+      const { error } = await withDeadline(
+        () => supabase.auth.signInWithPassword({ email, password }),
+        AUTH_OPERATION_TIMEOUT_MS,
+        "Sign in",
+      );
+      return { error: error?.message ?? null };
+    } catch (error) {
+      return {
+        error: error instanceof Error ? error.message : "Sign in failed. Please try again.",
+      };
+    }
   }, []);
 
   const signUp = useCallback(async (email: string, password: string, displayName: string) => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: getAuthRedirectUrl(),
-        data: { display_name: displayName },
-      },
-    });
-    return {
-      error: error?.message ?? null,
-      emailConfirmationRequired: Boolean(data.user && !data.session),
-    };
+    try {
+      const { data, error } = await withDeadline(
+        () =>
+          supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              emailRedirectTo: getAuthRedirectUrl(),
+              data: { display_name: displayName },
+            },
+          }),
+        AUTH_OPERATION_TIMEOUT_MS,
+        "Sign up",
+      );
+      return {
+        error: error?.message ?? null,
+        emailConfirmationRequired: Boolean(data.user && !data.session),
+      };
+    } catch (error) {
+      return {
+        error: error instanceof Error ? error.message : "Sign up failed. Please try again.",
+        emailConfirmationRequired: false,
+      };
+    }
   }, []);
 
   const signInWithGoogle = useCallback(async (returnTo?: string) => {
     rememberPostAuthPath(returnTo);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: getAuthRedirectUrl(),
-        queryParams: { prompt: "select_account" },
-      },
-    });
-    return { error: error?.message ?? null };
+    try {
+      const { error } = await withDeadline(
+        () =>
+          supabase.auth.signInWithOAuth({
+            provider: "google",
+            options: {
+              redirectTo: getAuthRedirectUrl(),
+              queryParams: { prompt: "select_account" },
+            },
+          }),
+        AUTH_OPERATION_TIMEOUT_MS,
+        "Google sign in",
+      );
+      return { error: error?.message ?? null };
+    } catch (error) {
+      return {
+        error:
+          error instanceof Error ? error.message : "Google sign in failed. Please try again.",
+      };
+    }
   }, []);
 
   const signOut = useCallback(async () => {
-    await supabase.auth.signOut();
-    setProfile(null);
+    try {
+      const { error } = await withDeadline(
+        () => supabase.auth.signOut(),
+        AUTH_OPERATION_TIMEOUT_MS,
+        "Sign out",
+      );
+      if (error) {
+        console.error("Sign out failed:", error.message);
+        return;
+      }
+      setProfile(null);
+    } catch (error) {
+      console.error("Sign out failed:", error);
+    }
   }, []);
 
   const updateProfile = useCallback(
@@ -222,9 +274,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (updates.openToCollaborate !== undefined) payload.open_to_collaborate = updates.openToCollaborate;
       if (updates.chapterId !== undefined) payload.chapter_id = updates.chapterId ?? null;
 
-      const { error } = await supabase.from("profiles").update(payload).eq("id", session.user.id);
-      if (!error) await fetchProfile(session.user);
-      return { error: error?.message ?? null };
+      try {
+        const { error } = await withDeadline(
+          () => supabase.from("profiles").update(payload).eq("id", session.user.id),
+          AUTH_OPERATION_TIMEOUT_MS,
+          "Profile update",
+        );
+        if (!error) await fetchProfile(session.user);
+        return { error: error?.message ?? null };
+      } catch (error) {
+        return {
+          error:
+            error instanceof Error ? error.message : "Profile update failed. Please try again.",
+        };
+      }
     },
     [session?.user, fetchProfile],
   );
