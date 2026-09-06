@@ -4,21 +4,21 @@ import { useScrollReveal } from "@/hooks/useScrollReveal";
 const pillars = [
   {
     icon: Globe,
-    title: "Global reach",
+    title: "Evidence before reach",
     description:
-      "Chapters and programs spanning schools, universities, and communities worldwide — making finance education accessible everywhere.",
+      "Chapters and programs remain planned until named leads and reviewable operating records exist.",
   },
   {
     icon: Target,
     title: "Applied learning",
     description:
-      "From research labs and case competitions to real market analysis — members learn by doing, not just reading.",
+      "The roadmap prioritizes research artifacts, case work, and practical analysis over passive completion claims.",
   },
   {
     icon: Users,
-    title: "Member-driven",
+    title: "Member infrastructure",
     description:
-      "A growing network of students and researchers collaborating on projects, opportunities, and local events.",
+      "The current release provides live authentication and protected workflows while program evidence is built.",
   },
 ];
 
@@ -35,12 +35,12 @@ export default function AboutSection() {
         <div className="mx-auto max-w-3xl text-center">
           <p className="mb-3 text-sm uppercase tracking-widest text-emerald-300">Our mission</p>
           <h2 className="text-4xl font-bold text-white sm:text-5xl">
-            Finance education for everyone, everywhere
+            Build finance capability with evidence
           </h2>
           <p className="mt-4 text-sm text-white/70 sm:text-base">
-            Finance4All is a global nonprofit building the infrastructure for the next generation
-            of finance leaders — through outreach programs, research, and a member portal that
-            connects news, opportunities, and collaboration in one place.
+            FinanceMeta is building a student finance platform around a simple rule: public claims
+            follow reproducible work. The current release focuses on member infrastructure and an
+            evidence-gated program roadmap.
           </p>
         </div>
 
