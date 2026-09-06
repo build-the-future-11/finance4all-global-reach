@@ -9,6 +9,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getPublicAuthSettings, type PublicAuthSettings } from "@/lib/supabase";
+import {
+  getPasswordValidationError,
+  MIN_PASSWORD_LENGTH,
+  PASSWORD_REQUIREMENT,
+} from "@/lib/password-policy";
 
 export default function Signup() {
   const { signUp, signInWithGoogle, user, loading } = useAuth();
@@ -38,6 +43,11 @@ export default function Signup() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    const passwordError = getPasswordValidationError(password);
+    if (passwordError) {
+      setError(passwordError);
+      return;
+    }
     setSubmitting(true);
     const { error: err, emailConfirmationRequired } = await signUp(
       email.trim(),
@@ -155,9 +165,13 @@ export default function Signup() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                minLength={10}
+                minLength={MIN_PASSWORD_LENGTH}
+                aria-describedby="password-requirement"
                 className={portalInputClass}
               />
+              <p id="password-requirement" className="mt-1.5 text-xs text-white/45">
+                {PASSWORD_REQUIREMENT}
+              </p>
             </div>
             {error && (
               <p className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300">

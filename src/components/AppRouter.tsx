@@ -28,6 +28,7 @@ const MemberProfile = lazy(() => import("@/pages/portal/network/MemberProfile"))
 const Admin = lazy(() => import("@/pages/portal/Admin"));
 const Saved = lazy(() => import("@/pages/portal/Saved"));
 const Settings = lazy(() => import("@/pages/portal/Settings"));
+const Evidence = lazy(() => import("@/pages/Evidence"));
 
 function PortalFallback() {
   return (
@@ -47,6 +48,7 @@ function AppRoutes() {
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/evidence" element={<Evidence />} />
 
           <Route
             path="/onboarding"

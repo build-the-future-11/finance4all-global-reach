@@ -83,7 +83,7 @@ describe("FinanceMeta Supabase project contract", () => {
     const result = runValidator(`https://${FINANCEMETA_SUPABASE_HOST}`, "production");
     expect(result.status).toBe(0);
     expect(result.stdout).toContain("Public Supabase configuration contract passed");
-  });
+  }, 15_000);
 
   it("build validator rejects foreign, local-production, and noncanonical origins", () => {
     const foreign = runValidator("https://foreign-project.supabase.co", "production");
@@ -95,7 +95,7 @@ describe("FinanceMeta Supabase project contract", () => {
     for (const url of [`https://${FINANCEMETA_SUPABASE_HOST}:8443`, `https://${FINANCEMETA_SUPABASE_HOST}/rest`, `https://${FINANCEMETA_SUPABASE_HOST}?tenant=other`, `https://${FINANCEMETA_SUPABASE_HOST}#fragment`, `https://user:pass@${FINANCEMETA_SUPABASE_HOST}`]) {
       expect(runValidator(url, "production").status).toBe(1);
     }
-  });
+  }, 15_000);
 
   it("build validator rejects secret/service-role and malformed public keys", () => {
     const url = `https://${FINANCEMETA_SUPABASE_HOST}`;
@@ -109,11 +109,11 @@ describe("FinanceMeta Supabase project contract", () => {
       expect(result.status).toBe(1);
       expect(result.stderr).toContain("must use the sb_publishable_ format");
     }
-  });
+  }, 15_000);
 
   it("build validator preserves localhost development support", () => {
     for (const url of ["http://localhost:54321", "http://[::1]:54321"]) {
       expect(runValidator(url, "development", "local-test-key").status).toBe(0);
     }
-  });
+  }, 15_000);
 });

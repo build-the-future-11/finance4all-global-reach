@@ -7,6 +7,7 @@ const links = [
   { label: "About", href: "#about" },
   { label: "Programs", href: "#programs" },
   { label: "Projects", href: "#projects" },
+  { label: "Evidence", href: "/evidence" },
   { label: "Contact", href: "#contact" },
 ];
 
@@ -114,7 +115,15 @@ export default function Navbar() {
               {/* Desktop */}
               <div className="hidden items-center gap-2 md:flex">
                 {links.map((l) => (
-                  <a
+                  l.href.startsWith("/") ? (
+                    <Link
+                      key={l.href}
+                      to={l.href}
+                      className="rounded-full px-4 py-2 text-sm font-medium text-white/80 transition-all duration-300 hover:bg-white/15 hover:text-white hover:scale-[1.05]"
+                    >
+                      {l.label}
+                    </Link>
+                  ) : <a
                     key={l.href}
                     href={l.href}
                     className="rounded-full px-4 py-2 text-sm font-medium text-white/80 transition-all duration-300 hover:bg-white/15 hover:text-white hover:scale-[1.05]"
@@ -160,7 +169,16 @@ export default function Navbar() {
           >
             <div className="mt-3 rounded-3xl border border-white/20 bg-white/[0.07] p-3 backdrop-blur-xl">
               {links.map((l) => (
-                <a
+                l.href.startsWith("/") ? (
+                  <Link
+                    key={l.href}
+                    to={l.href}
+                    onClick={() => setOpen(false)}
+                    className="block rounded-xl px-4 py-3 text-white/80 transition hover:bg-white/15 hover:text-white"
+                  >
+                    {l.label}
+                  </Link>
+                ) : <a
                   key={l.href}
                   href={l.href}
                   onClick={() => setOpen(false)}

@@ -18,6 +18,7 @@ Global nonprofit landing site and **Supabase-powered member portal**.
 | `/portal/events` | Chapters + events |
 | `/portal/network` | Profiles + connections |
 | `/portal/settings` | Profile settings |
+| `/evidence` | Public release, program, and research evidence boundary |
 
 ## Vercel deploy (required env vars)
 
@@ -42,3 +43,15 @@ npm run dev
 ## Stack
 
 React · Vite · Tailwind · shadcn/ui · Supabase · TanStack Query
+
+## Production certification
+
+The normal CI suite uses a deterministic browser-safe configuration fixture. A separate manually
+triggered `Production Auth Certification` workflow signs in two non-privileged test identities
+against the live portal and verifies session separation and logout protection. Configure the four
+`E2E_MEMBER_A_*` and `E2E_MEMBER_B_*` repository secrets before running it; never commit test
+credentials.
+
+Database authorization is independently checked by
+`supabase/tests/two_identity_rls_certification.sql`. It impersonates two existing ordinary members
+inside a transaction and ends with `ROLLBACK`, so the certification does not retain mutations.
