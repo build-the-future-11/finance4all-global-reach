@@ -18,8 +18,8 @@ jobs:
     timeout-minutes: 15
     env:
       EXPECTED_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-      VITE_SUPABASE_URL: https://ci.example.invalid
-      VITE_SUPABASE_ANON_KEY: ci-public-key-for-build-contract-only
+      VITE_SUPABASE_URL: https://pnemeegkwyaicsbnbnmg.supabase.co
+      VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_contract_fixture
       VITE_AUTH_REDIRECT_ORIGIN: https://finance4all-global-reach.vercel.app
     steps:
       - name: Checkout exact source
