@@ -131,8 +131,8 @@ Using an ordinary member account against the canonical production database, veri
 - a member cannot self-accept a lab application or self-award an editorial pick;
 - a connection recipient cannot rewrite either participant or the request message;
 - a studio author cannot transfer authorship or rewrite the submission timestamp;
-- the public contact form can insert only validated message fields, while only admins can read or change status;
-- the optional avatar bucket is private and readable only by signed-in members;
+- the retired public contact table/RPC surface remains absent;
+- the retired avatar bucket has no public or member read policy;
 - essay/community aggregate upvote counts remain visible while individual voter rows stay protected by RLS.
 
 Record the deployed commit and the date of this certification. Source CI alone is not production certification.
