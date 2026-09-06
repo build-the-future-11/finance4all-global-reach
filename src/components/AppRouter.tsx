@@ -1,6 +1,5 @@
 import { lazy, Suspense } from "react";
-import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
-import FluidCursor from "@/components/FluidCursor";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/portal/ProtectedRoute";
 import RoleGuard from "@/components/portal/RoleGuard";
@@ -39,13 +38,8 @@ function PortalFallback() {
 }
 
 function AppRoutes() {
-  const location = useLocation();
-  const isLanding = location.pathname === "/";
-
   return (
-    <>
-      {isLanding && <FluidCursor />}
-      <Suspense fallback={<PortalFallback />}>
+    <Suspense fallback={<PortalFallback />}>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
@@ -105,8 +99,7 @@ function AppRoutes() {
 
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </Suspense>
-    </>
+    </Suspense>
   );
 }
 

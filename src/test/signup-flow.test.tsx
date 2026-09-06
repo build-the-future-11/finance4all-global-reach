@@ -16,6 +16,7 @@ vi.mock("@/contexts/AuthContext", () => ({
 }));
 
 vi.mock("@/lib/supabase", () => ({
+  isSupabaseConfigured: true,
   getPublicAuthSettings: settingsMocks.getPublicAuthSettings,
 }));
 

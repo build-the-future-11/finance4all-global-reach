@@ -6,6 +6,7 @@ import ForgotPassword from "@/pages/auth/ForgotPassword";
 const authMocks = vi.hoisted(() => ({ resetPasswordForEmail: vi.fn() }));
 
 vi.mock("@/lib/supabase", () => ({
+  isSupabaseConfigured: true,
   getAuthRedirectUrl: () => "https://finance4all-global-reach.vercel.app/reset-password",
   supabase: { auth: authMocks },
 }));
