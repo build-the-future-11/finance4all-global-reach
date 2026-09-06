@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit",
     "audit:prod": "npm audit --omit=dev --audit-level=high",
     "preview": "vite preview",
-    "test": "vitest run && node --test tests/release-revision.test.mjs tests/security-headers.test.mjs",
+    "test": "vitest run && node --test tests/release-revision.test.mjs tests/security-headers.test.mjs tests/migration-ledger.test.mjs",
     "test:e2e": "playwright test",
     "test:e2e:credentialed": "playwright test --config=playwright.credentialed.config.ts",
     "test:watch": "vitest"
