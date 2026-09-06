@@ -1,6 +1,8 @@
 # Production Schema Reconciliation
 
-Observed on 2026-09-06 against Supabase project `pnemeegkwyaicsbnbnmg`.
+Observed and repaired on 2026-09-06 against Supabase project
+`pnemeegkwyaicsbnbnmg`. The machine-readable receipt is
+`evidence/production-schema-reconciliation-20260906.json`.
 
 ## Verified state
 
@@ -15,7 +17,7 @@ Observed on 2026-09-06 against Supabase project `pnemeegkwyaicsbnbnmg`.
 - The abandoned `contact_submissions` table and its public RPC functions do not
   exist.
 - Nine tables from the same abandoned branch were partially created. Eight
-  remain public and empty; `education_lesson_progress` is the ninth and is
+  were public and empty; `education_lesson_progress` is the ninth and is
   retained because it came from a complete migration with a valid RLS contract.
 - `private.legacy_rate_limit_events` contains three preserved telemetry rows.
 
@@ -33,26 +35,38 @@ weekly_goal_baselines
 ```
 
 None is referenced by current application source. Migration
-`20260906171941_archive_abandoned_public_tables.sql` moves them to `private`
-with a `legacy_` prefix. It revokes public/member access and does not delete
-tables or rows.
+`20260906171941_archive_abandoned_public_tables.sql` moved them to `private`
+with a `legacy_` prefix. It revoked public/member access and did not delete
+tables or rows. Migration
+`20260906172830_harden_recovered_profile_functions.sql` also pinned the
+recovered trigger functions to an empty search path and removed browser-role
+execution.
 
 ## Reconciliation procedure
 
-1. Apply `20260906171941_archive_abandoned_public_tables.sql` and
-   `20260906172830_harden_recovered_profile_functions.sql` to the linked
-   production project and retain the command output.
-2. Re-run the read-only table, function, RLS, trigger, and row-count audit.
-3. Run `supabase migration list --linked` and retain the empty-ledger evidence.
-4. Mark the ten proven versions as applied using only the documented command:
+Completed:
+
+1. Both forward migrations executed in one production transaction and
+   committed only after their assertions passed.
+2. The post-repair audit found no missing expected public tables, no unexpected
+   public tables, and no expected table with RLS disabled.
+3. All eight archived tables and the three-row rate-limit table are present in
+   `private` with `legacy_` names.
+4. The hardened `sync_chapter_member_counts` function has an empty search path
+   and is not executable by `authenticated`.
+
+Still required from an authenticated Supabase CLI session:
+
+1. Run `supabase migration list --linked` and retain the empty-ledger evidence.
+2. Mark the ten proven versions as applied using only the documented command:
 
    ```bash
    supabase migration repair <version> --status applied
    ```
 
-5. Run `supabase migration list --linked` again and require exact equality with
+3. Run `supabase migration list --linked` again and require exact equality with
    `node scripts/verify-migration-ledger.mjs`.
-6. Retain the source SHA, before/after lists, verifier receipt, and operator.
+4. Retain the source SHA, before/after lists, verifier receipt, and operator.
 
 Do not insert directly into `supabase_migrations.schema_migrations`, and do not
 re-run historical SQL merely to populate the ledger.
