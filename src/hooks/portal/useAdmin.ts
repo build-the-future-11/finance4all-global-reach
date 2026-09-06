@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import type { EventStatus, NewsCategory, OpportunityType } from "@/types/domain";
+import { requireOptionalExternalHttpUrl } from "@/lib/external-url";
 
 export function useCreateNewsArticle() {
   const qc = useQueryClient();
@@ -12,12 +13,13 @@ export function useCreateNewsArticle() {
       tags: string[];
       sourceUrl?: string;
     }) => {
+      const sourceUrl = requireOptionalExternalHttpUrl(input.sourceUrl, "Source URL");
       const { error } = await supabase.from("news_articles").insert({
         title: input.title,
         summary: input.summary,
         category: input.category,
         tags: input.tags,
-        source_url: input.sourceUrl ?? null,
+        source_url: sourceUrl ?? null,
       });
       if (error) throw error;
     },
@@ -36,12 +38,13 @@ export function useCreateOpportunity() {
       applicationUrl?: string;
       tags: string[];
     }) => {
+      const applicationUrl = requireOptionalExternalHttpUrl(input.applicationUrl, "Application URL");
       const { error } = await supabase.from("opportunities").insert({
         title: input.title,
         organization: input.organization,
         type: input.type,
         description: input.description,
-        application_url: input.applicationUrl ?? null,
+        application_url: applicationUrl ?? null,
         tags: input.tags,
       });
       if (error) throw error;
@@ -61,13 +64,14 @@ export function useCreateEvent() {
       startsAt: string;
       registrationUrl?: string;
     }) => {
+      const registrationUrl = requireOptionalExternalHttpUrl(input.registrationUrl, "Registration URL");
       const { error } = await supabase.from("events").insert({
         chapter_id: input.chapterId,
         title: input.title,
         description: input.description,
         status: input.status,
         starts_at: input.startsAt,
-        registration_url: input.registrationUrl ?? null,
+        registration_url: registrationUrl ?? null,
       });
       if (error) throw error;
     },
