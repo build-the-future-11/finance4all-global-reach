@@ -1,5 +1,5 @@
 -- Patch: Google OAuth profile fields + fallback profile insert policy
--- Run this in Supabase SQL Editor if you already ran 001_initial_schema.sql
+-- Follows 20260709090402_initial_schema.sql.
 
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$

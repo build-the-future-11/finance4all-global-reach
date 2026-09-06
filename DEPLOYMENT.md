@@ -96,19 +96,22 @@ In Supabase → **Authentication** → **Sign In / Providers** → **Email**:
 
 ## 4. Database
 
-Before applying anything, inspect the canonical Supabase project's migration state. Do not re-run migrations blindly.
+Use the Supabase CLI migration workflow. Do not paste migration files into the production SQL Editor or re-run them blindly.
 
 Required migration order:
 
-1. `supabase/migrations/001_initial_schema.sql`
-2. `supabase/seed.sql` (seed data only; apply intentionally)
-3. `supabase/migrations/002_google_oauth.sql` (Google login)
-4. `supabase/migrations/003_bookmarks_notifications.sql` (bookmarks + notifications)
-5. `supabase/migrations/004_authorization_hardening.sql` (role/ownership/notification/view authorization hardening)
-6. `supabase/migrations/20260906121145_portal_security_and_privacy.sql` (least-privilege grants, member-email privacy, immutable ownership, safe auth helpers)
-7. `supabase/migrations/20260906150000_retire_unused_hosted_extensions.sql` (retire unused hosted-only RPC/contact surfaces, archive existing rate telemetry privately, and leave the empty avatar bucket private and inert)
+1. `supabase/migrations/20260709090402_initial_schema.sql`
+2. `supabase/migrations/20260709104954_google_oauth.sql` (Google login)
+3. `supabase/migrations/20260710031219_bookmarks_notifications.sql` (bookmarks + notifications)
+4. `supabase/migrations/20260830141730_authorization_hardening.sql` (role/ownership/notification/view authorization hardening)
+5. `supabase/migrations/20260906121145_portal_security_and_privacy.sql` (least-privilege grants, member-email privacy, immutable ownership, safe auth helpers)
+6. `supabase/migrations/20260906150000_retire_unused_hosted_extensions.sql` (retire unused hosted-only RPC/contact surfaces, archive existing rate telemetry privately, and leave the empty avatar bucket private and inert)
 
 Both authorization migrations are production security requirements, not optional enhancements.
+
+For a fresh local database, run `supabase db reset`. Apply `supabase/seed.sql` only to disposable local or explicitly approved staging environments. For a linked remote project, inspect `supabase migration list --linked` before `supabase db push`.
+
+If a migration was previously applied manually and its schema is already present, first prove the schema matches the repository migration. Then use the documented `supabase migration repair <version> --status applied` command to repair history without executing the SQL again. Record the before/after migration list and exact source SHA. Never insert directly into `supabase_migrations.schema_migrations`.
 
 ### Authorization certification after the latest migration
 

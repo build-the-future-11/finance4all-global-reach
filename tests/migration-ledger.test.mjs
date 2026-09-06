@@ -11,18 +11,43 @@ function file(name) {
   return { name, isFile: () => true };
 }
 
-test('extracts and sorts timestamped repository migration versions only', () => {
+const currentRepositoryVersions = [
+  '20260709090402',
+  '20260709104954',
+  '20260710031219',
+  '20260830141730',
+  '20260906121145',
+  '20260906150000',
+];
+
+test('the tracked repository has only canonical ordered migration files', () => {
+  assert.deepEqual(repositoryMigrationVersions(), currentRepositoryVersions);
+});
+
+test('extracts and sorts every repository migration version', () => {
   const versions = repositoryMigrationVersions({
     entries: [
-      file('004_authorization_hardening.sql'),
+      file('20260830141730_authorization_hardening.sql'),
       file('20260906150000_retire_unused_hosted_extensions.sql'),
-      file('001_initial_schema.sql'),
+      file('20260709090402_initial_schema.sql'),
       file('20260906121145_portal_security_and_privacy.sql'),
       file('README.md'),
     ],
   });
 
-  assert.deepEqual(versions, ['20260906121145', '20260906150000']);
+  assert.deepEqual(versions, [
+    '20260709090402',
+    '20260830141730',
+    '20260906121145',
+    '20260906150000',
+  ]);
+});
+
+test('rejects SQL migration files without canonical timestamps', () => {
+  assert.throws(
+    () => repositoryMigrationVersions({ entries: [file('001_initial_schema.sql')] }),
+    /must use <14-digit timestamp>_<name>\.sql/,
+  );
 });
 
 test('rejects duplicate timestamped repository versions', () => {
