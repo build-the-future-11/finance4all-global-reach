@@ -5,13 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run typecheck && node scripts/validate-public-env.mjs && vite build",
+    "build": "npm run typecheck && node scripts/validate-public-env.mjs && vite build && node scripts/write-release-revision.mjs",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "audit:prod": "npm audit --omit=dev --audit-level=high",
     "preview": "vite preview",
-    "test": "vitest run",
+    "test": "vitest run && node --test tests/release-revision.test.mjs",
     "test:watch": "vitest"
   },
   "dependencies": {
