@@ -1,6 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { mapConnectionRequest, mapIntroductionPost, mapProfile } from "@/lib/mappers";
+import {
+  mapConnectionRequest,
+  mapIntroductionPost,
+  mapProfile,
+  PUBLIC_PROFILE_COLUMNS,
+} from "@/lib/mappers";
 import type { ConnectionStatus } from "@/types/domain";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -10,7 +15,7 @@ export function useMemberProfiles() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("*")
+        .select(PUBLIC_PROFILE_COLUMNS)
         .neq("display_name", "")
         .order("display_name");
       if (error) throw error;
@@ -24,7 +29,11 @@ export function useProfileById(id: string | undefined) {
     queryKey: ["profile", id],
     enabled: Boolean(id),
     queryFn: async () => {
-      const { data, error } = await supabase.from("profiles").select("*").eq("id", id!).single();
+      const { data, error } = await supabase
+        .from("profiles")
+        .select(PUBLIC_PROFILE_COLUMNS)
+        .eq("id", id!)
+        .single();
       if (error) throw error;
       return mapProfile(data);
     },

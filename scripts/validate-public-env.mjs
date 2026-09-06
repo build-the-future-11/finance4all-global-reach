@@ -12,9 +12,7 @@ const PUBLISHABLE_KEY_PATTERN = /^sb_publishable_[A-Za-z0-9_-]+$/;
 const allowLocal = mode === "development";
 
 const supabaseUrl = String(env.VITE_SUPABASE_URL || "").trim();
-const supabaseKey = String(
-  env.VITE_SUPABASE_PUBLISHABLE_KEY || env.VITE_SUPABASE_ANON_KEY || "",
-).trim();
+const supabaseKey = String(env.VITE_SUPABASE_PUBLISHABLE_KEY || "").trim();
 const authRedirectOrigin = String(env.VITE_AUTH_REDIRECT_ORIGIN || "").trim();
 
 const failures = [];
@@ -55,17 +53,15 @@ if (!supabaseUrl) {
 }
 
 if (!supabaseKey) {
-  failures.push("VITE_SUPABASE_ANON_KEY or VITE_SUPABASE_PUBLISHABLE_KEY is required");
+  failures.push("VITE_SUPABASE_PUBLISHABLE_KEY is required");
 } else if (supabaseKey === "missing-key") {
   failures.push("Supabase public key must not use the old missing-key fallback");
 } else {
   const jwtRole = readJwtRole(supabaseKey);
   if (/^sb_secret_/i.test(supabaseKey) || jwtRole === "service_role") {
     failures.push("Supabase public configuration must not contain a secret/service-role key");
-  } else if (jwtRole && jwtRole !== "anon") {
-    failures.push("Supabase public configuration must use an sb_publishable_ key or a legacy anon JWT in production");
-  } else if (!allowLocal && !PUBLISHABLE_KEY_PATTERN.test(supabaseKey) && jwtRole !== "anon") {
-    failures.push("Supabase public configuration must use an sb_publishable_ key or a legacy anon JWT in production");
+  } else if (!allowLocal && !PUBLISHABLE_KEY_PATTERN.test(supabaseKey)) {
+    failures.push("VITE_SUPABASE_PUBLISHABLE_KEY must use the sb_publishable_ format in production");
   }
 }
 

@@ -1,6 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { mapLabApplication, mapProfile, mapResearchProject } from "@/lib/mappers";
+import {
+  mapLabApplication,
+  mapProfile,
+  mapResearchProject,
+  PUBLIC_PROFILE_COLUMNS,
+} from "@/lib/mappers";
 import type { LabApplicationStatus, ResearchProjectStatus } from "@/types/domain";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -187,7 +192,10 @@ export function useProfilesByIds(ids: string[]) {
     queryKey: ["profiles", ids],
     enabled: ids.length > 0,
     queryFn: async () => {
-      const { data, error } = await supabase.from("profiles").select("*").in("id", ids);
+      const { data, error } = await supabase
+        .from("profiles")
+        .select(PUBLIC_PROFILE_COLUMNS)
+        .in("id", ids);
       if (error) throw error;
       return Object.fromEntries(data.map((p) => [p.id, mapProfile(p)]));
     },
