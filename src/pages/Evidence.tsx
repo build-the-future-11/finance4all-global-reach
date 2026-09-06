@@ -2,11 +2,10 @@ import { useEffect, useState } from "react";
 import { ArrowLeft, ExternalLink, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { readReleaseRevision, type ReleaseRevisionPayload } from "@/lib/release-revision";
 
 const GLOBAL_REPO = "https://github.com/build-the-future-11/FinanceMeta-Global";
 const PORTAL_REPO = "https://github.com/build-the-future-11/finance4all-global-reach";
-
-type ReleaseRevision = { sha?: string };
 
 function EvidenceLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
@@ -30,8 +29,9 @@ export default function Evidence() {
     let active = true;
     void fetch("/release-revision.json", { cache: "no-store" })
       .then((response) => (response.ok ? response.json() : null))
-      .then((value: ReleaseRevision | null) => {
-        if (active && value?.sha && /^[0-9a-f]{40}$/i.test(value.sha)) setRevision(value.sha);
+      .then((value: ReleaseRevisionPayload | null) => {
+        const deployedRevision = readReleaseRevision(value);
+        if (active && deployedRevision) setRevision(deployedRevision);
       })
       .catch(() => undefined);
     return () => {
