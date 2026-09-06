@@ -6,6 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/lib/supabase";
+import {
+  getPasswordValidationError,
+  MIN_PASSWORD_LENGTH,
+  PASSWORD_REQUIREMENT,
+} from "@/lib/password-policy";
 
 export default function ResetPassword() {
   const navigate = useNavigate();
@@ -16,7 +21,8 @@ export default function ResetPassword() {
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (password.length < 10) return setError("Use at least 10 characters.");
+    const passwordError = getPasswordValidationError(password);
+    if (passwordError) return setError(passwordError);
     if (password !== confirm) return setError("Passwords do not match.");
     setSubmitting(true);
     const { error: updateError } = await supabase.auth.updateUser({ password });
@@ -26,16 +32,16 @@ export default function ResetPassword() {
   };
 
   return (
-    <AuthLayout title="Choose a new password" subtitle="Your new password must be at least 10 characters." footer={null}>
+    <AuthLayout title="Choose a new password" subtitle={PASSWORD_REQUIREMENT} footer={null}>
       <form onSubmit={submit} className="space-y-4">
         <div>
           <Label htmlFor="new-password" className="text-white/70">New password</Label>
-          <Input id="new-password" type="password" autoComplete="new-password" required minLength={10}
+          <Input id="new-password" type="password" autoComplete="new-password" required minLength={MIN_PASSWORD_LENGTH}
             value={password} onChange={(event) => setPassword(event.target.value)} className={portalInputClass} />
         </div>
         <div>
           <Label htmlFor="confirm-password" className="text-white/70">Confirm password</Label>
-          <Input id="confirm-password" type="password" autoComplete="new-password" required minLength={10}
+          <Input id="confirm-password" type="password" autoComplete="new-password" required minLength={MIN_PASSWORD_LENGTH}
             value={confirm} onChange={(event) => setConfirm(event.target.value)} className={portalInputClass} />
         </div>
         {error && <p role="alert" className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</p>}

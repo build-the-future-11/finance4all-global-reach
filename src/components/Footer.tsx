@@ -35,6 +35,7 @@ export default function Footer() {
             <div className="mt-3 flex flex-col gap-2 text-sm">
               <a href="#about" className="text-white/70 transition hover:text-white">About</a>
               <a href="#programs" className="text-white/70 transition hover:text-white">Programs</a>
+              <Link to="/evidence" className="text-white/70 transition hover:text-white">Evidence</Link>
               <a href="#contact" className="text-white/70 transition hover:text-white">Contact</a>
             </div>
           </div>

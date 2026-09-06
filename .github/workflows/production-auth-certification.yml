@@ -1,0 +1,35 @@
+name: Production Auth Certification
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  two-member-journey:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      E2E_PORTAL_URL: https://finance4all-global-reach.vercel.app
+      E2E_MEMBER_A_EMAIL: ${{ secrets.E2E_MEMBER_A_EMAIL }}
+      E2E_MEMBER_A_PASSWORD: ${{ secrets.E2E_MEMBER_A_PASSWORD }}
+      E2E_MEMBER_B_EMAIL: ${{ secrets.E2E_MEMBER_B_EMAIL }}
+      E2E_MEMBER_B_PASSWORD: ${{ secrets.E2E_MEMBER_B_PASSWORD }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --fund=false
+      - run: npx playwright install --with-deps chromium
+      - name: Require both production test identities
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$E2E_MEMBER_A_EMAIL"
+          test -n "$E2E_MEMBER_A_PASSWORD"
+          test -n "$E2E_MEMBER_B_EMAIL"
+          test -n "$E2E_MEMBER_B_PASSWORD"
+      - run: npm run test:e2e:credentialed

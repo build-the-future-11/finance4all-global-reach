@@ -22,6 +22,17 @@ test("login and password recovery routes are reachable", async ({ page }) => {
   await expect(page.getByRole("button", { name: "Send recovery link" })).toBeEnabled();
 });
 
+test("evidence page links claims to canonical records", async ({ page }) => {
+  await page.goto("/evidence");
+
+  await expect(page.getByRole("heading", { name: "What is verified today" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Open program registry" })).toHaveAttribute(
+    "href",
+    /FinanceMeta-Global\/blob\/main\/registry\/programs\.json$/,
+  );
+  await expect(page.getByText(/does not prove educational impact/i)).toBeVisible();
+});
+
 test("provider-unavailable signup fails closed", async ({ page }) => {
   await page.route("**/auth/v1/settings", (route) =>
     route.fulfill({

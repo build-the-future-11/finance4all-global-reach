@@ -12,7 +12,7 @@ Before treating a Vercel deployment as production-ready, verify all of the follo
 - `VITE_SUPABASE_PUBLISHABLE_KEY` is present and uses the browser-safe `sb_publishable_...` format.
 - The variables are enabled for **Production and Preview** (and Development if Vercel development environments are used).
 - The deployment was rebuilt after any environment-variable change.
-- Database migrations through `20260906121145_portal_security_and_privacy.sql` have been applied in order.
+- Database migrations through `20260906150000_retire_unused_hosted_extensions.sql` have been applied in order.
 - Google OAuth redirect URLs match the deployed production and preview domains.
 
 If a Vercel deployment starts failing after the fail-closed configuration gate was introduced, check the build log for `validate-public-env` output first. Do not weaken or bypass the validator to make a deployment green.
@@ -106,6 +106,7 @@ Required migration order:
 4. `supabase/migrations/003_bookmarks_notifications.sql` (bookmarks + notifications)
 5. `supabase/migrations/004_authorization_hardening.sql` (role/ownership/notification/view authorization hardening)
 6. `supabase/migrations/20260906121145_portal_security_and_privacy.sql` (least-privilege grants, member-email privacy, immutable ownership, safe auth helpers)
+7. `supabase/migrations/20260906150000_retire_unused_hosted_extensions.sql` (retire unused hosted-only RPC/contact surfaces, archive existing rate telemetry privately, and leave the empty avatar bucket private and inert)
 
 Both authorization migrations are production security requirements, not optional enhancements.
 
@@ -126,6 +127,11 @@ Using an ordinary member account against the canonical production database, veri
 - essay/community aggregate upvote counts remain visible while individual voter rows stay protected by RLS.
 
 Record the deployed commit and the date of this certification. Source CI alone is not production certification.
+
+Run `supabase/tests/two_identity_rls_certification.sql` in the SQL Editor for a transaction-only,
+two-member RLS check. Then run the manual `Production Auth Certification` GitHub workflow with two
+dedicated ordinary-member credentials to certify browser sign-in, session isolation, logout, and
+protected-route behavior. These checks prove different layers and neither substitutes for the other.
 
 ## 5. Deploy
 

@@ -41,7 +41,10 @@ This creates all tables, security policies, and the auto-profile trigger.
 
 1. Go to **Authentication** → **Providers**.
 2. Make sure **Email** is enabled (on by default).
-3. For local development, disable email confirmation:
+3. Set the minimum password length to `10` and enable **Secure password change**.
+   The hosted FinanceMeta project uses both settings. Leaked-password screening requires a paid
+   Supabase plan and must not be reported as enabled on the free plan.
+4. For local development, disable email confirmation:
    - Go to **Authentication** → **Settings** (or **Sign In / Providers** → email settings)
    - Turn off **Confirm email** so you can sign up instantly without checking inbox.
 
@@ -88,6 +91,8 @@ npm run dev
 2. Create an account with an email you can confirm and a password of at least 10 characters.
 3. Complete onboarding.
 4. You should land on `/portal` with stats and sample content.
+5. Run `supabase/tests/two_identity_rls_certification.sql` after the migrations. It performs
+   two-member authorization checks inside a transaction and rolls every mutation back.
 
 If you see data on the dashboard, Supabase is connected.
 
@@ -140,7 +145,7 @@ Redeploy after saving. The portal won't work in production without these.
 | Sign up works but no data loads | Run migration + seed SQL |
 | "new row violates row-level security" | Check the exact failing operation, grants, policy, and database logs before changing a migration |
 | Sign up but can't log in | Disable email confirmation in Auth settings, or check your inbox |
-| Profile not created on signup | Re-run migration (the `handle_new_user` trigger may be missing) |
+| Profile not created on signup | Inspect the `on_auth_user_created` trigger and Auth/database logs; apply only the missing migration after confirming migration state |
 
 ---
 
