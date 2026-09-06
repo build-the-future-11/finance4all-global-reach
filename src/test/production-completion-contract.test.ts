@@ -17,6 +17,17 @@ const rlsCertification = readFileSync(
   "supabase/tests/two_identity_rls_certification.sql",
   "utf8",
 );
+const productionSchemaReceipt = JSON.parse(
+  readFileSync("evidence/production-schema-reconciliation-20260906.json", "utf8"),
+) as {
+  project_ref: string;
+  post_repair: {
+    missing_expected_public_tables: string[];
+    unexpected_public_tables: string[];
+    expected_tables_with_rls_disabled: string[];
+  };
+  ledger_status: string;
+};
 
 describe("production completion contracts", () => {
   it("retires empty hosted-only surfaces and preserves existing telemetry", () => {
@@ -61,6 +72,16 @@ describe("production completion contracts", () => {
         `REVOKE ALL ON FUNCTION public.${fn}() FROM PUBLIC, anon, authenticated`,
       );
     }
+  });
+
+  it("records repaired production schema separately from the blocked ledger", () => {
+    expect(productionSchemaReceipt.project_ref).toBe("pnemeegkwyaicsbnbnmg");
+    expect(productionSchemaReceipt.post_repair.missing_expected_public_tables).toEqual([]);
+    expect(productionSchemaReceipt.post_repair.unexpected_public_tables).toEqual([]);
+    expect(productionSchemaReceipt.post_repair.expected_tables_with_rls_disabled).toEqual([]);
+    expect(productionSchemaReceipt.ledger_status).toBe(
+      "BLOCKED_AUTHENTICATED_CLI_REPAIR_REQUIRED",
+    );
   });
 
   it("certifies two identities without retaining mutations", () => {
