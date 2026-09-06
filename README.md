@@ -1,5 +1,8 @@
 # Finance4All Global Reach
 
+> **Canonical FinanceMeta/Finance4All portal source:** `build-the-future-11/finance4all-global-reach`  
+> `build-the-future-11/FinanceMeta-Landing` and `build-the-future-11/FinanceMeta-Global` are separate sibling/legacy surfaces; do not use them as the portal deployment source unless a task explicitly targets those repositories.
+
 Global nonprofit landing site and **Supabase-powered member portal**.
 
 **Live on Vercel:** set env vars (see [DEPLOYMENT.md](DEPLOYMENT.md)) then deploy.
