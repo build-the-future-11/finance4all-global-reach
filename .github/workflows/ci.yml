@@ -203,6 +203,8 @@ jobs:
         run: npm test
       - name: Production build
         run: npm run build
+      - name: Component catalog build
+        run: npm run build-storybook
       - name: Browser journey smoke tests
         run: npm run test:e2e
       - name: Repository lint gate
