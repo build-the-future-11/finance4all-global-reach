@@ -34,7 +34,7 @@ const directApplications = [
   },
   {
     label: "Partners, speakers & collaborators",
-    description: "For schools, researchers, founders, organizations, speakers, and potential partners.",
+    description: "For schools, researchers, institutions, organizations, speakers, and potential partners.",
     url: "https://tally.so/r/2EWxzb?utm_source=website&utm_medium=opportunity_card&utm_campaign=partnerships",
   },
 ] as const;
