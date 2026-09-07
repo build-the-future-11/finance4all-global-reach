@@ -3,6 +3,9 @@ import { ArrowRight, BookOpenText, BriefcaseBusiness, FlaskConical, Newspaper } 
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { portalRoutes } from "@/routes/portal";
 
+const FINANCEMETA_APPLICATION_URL =
+  "https://tally.so/r/5B7blP?utm_source=website&utm_medium=cta&utm_campaign=general_application";
+
 const phaseOneModules = [
   {
     icon: Newspaper,
@@ -93,26 +96,34 @@ export default function ProjectsSection() {
         >
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-emerald-200/90">
-              Launch Readiness
+              Join FinanceMeta
             </p>
             <p className="mt-2 max-w-2xl text-sm text-white/80">
-              Membership uses live authentication and protected routes. Program and research
-              listings appear only when factual records are published.
+              Apply for research, FinTech Studio, publications, chapters, workshops, and other
+              active contributor opportunities. Existing members can use the portal separately.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Link
-              to="/login"
+            <a
+              href={FINANCEMETA_APPLICATION_URL}
+              target="_blank"
+              rel="noreferrer"
               className="inline-flex items-center gap-2 rounded-full bg-white/90 px-5 py-2 text-sm font-semibold text-black transition hover:bg-white"
             >
-              Sign in to Portal
+              Apply to FinanceMeta
               <ArrowRight className="h-4 w-4" />
-            </Link>
+            </a>
             <Link
               to="/signup"
               className="inline-flex items-center gap-2 rounded-full border border-white/30 px-5 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
             >
-              Create account
+              Create portal account
+            </Link>
+            <Link
+              to="/login"
+              className="inline-flex items-center px-2 py-2 text-sm font-medium text-white/70 transition hover:text-white"
+            >
+              Sign in
             </Link>
           </div>
         </div>
