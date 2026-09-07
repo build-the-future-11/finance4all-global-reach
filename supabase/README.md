@@ -16,14 +16,16 @@ Follow these steps to connect your Finance4All portal to Supabase.
 
 ---
 
-## Step 2: Run the database migration
+## Step 2: Run the database migrations
 
-1. In your Supabase dashboard, open **SQL Editor** (left sidebar).
-2. Click **New query**.
-3. Apply every file in `supabase/migrations/` in filename order. Do not re-run an
-   already applied migration; inspect the current policies and schema first.
-4. Click **Run** (or press Cmd/Ctrl + Enter) for each unapplied migration.
-5. Confirm every migration succeeds before continuing.
+Use the Supabase CLI workflow documented in `DEPLOYMENT.md`. First inspect
+`supabase migration list --linked`, then apply only migrations that are absent from a linked
+environment. Do not paste the migration sequence into the production SQL Editor and do not rerun a
+version whose schema is already present. When schema was applied outside the migration system, prove
+schema equivalence first and use supported `supabase migration repair` commands to reconcile history.
+
+For a new disposable local database, `supabase db reset` applies the tracked migrations in order.
+Confirm the command completes before continuing.
 
 This creates all tables, security policies, and the auto-profile trigger.
 
@@ -91,8 +93,8 @@ npm run dev
 2. Create an account with an email you can confirm and a password of at least 10 characters.
 3. Complete onboarding.
 4. You should land on `/portal` with stats and sample content.
-5. Run `supabase/tests/two_identity_rls_certification.sql` after the migrations. It performs
-   two-member authorization checks inside a transaction and rolls every mutation back.
+5. Run the manual `Production RLS Certification` workflow after production migrations. It performs
+   a two-member authorization matrix inside a transaction and rolls every mutation back.
 
 If you see data on the dashboard, Supabase is connected.
 

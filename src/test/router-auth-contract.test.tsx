@@ -12,7 +12,7 @@ const authState = vi.hoisted(() => ({
   needsOnboarding: false,
 }));
 
-vi.mock("@/contexts/AuthContext", () => ({
+vi.mock("@/contexts/useAuth", () => ({
   useAuth: () => authState,
 }));
 

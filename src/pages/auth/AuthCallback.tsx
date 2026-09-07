@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/useAuth";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, Loader2 } from "lucide-react";
 import { readAuthCallbackError, takePostAuthPath } from "@/lib/auth-navigation";
@@ -43,9 +43,9 @@ export default function AuthCallback() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#060a12] text-white">
+    <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#060a12] text-white">
       <Loader2 className="h-8 w-8 animate-spin text-emerald-400" />
       <p className="text-sm text-white/50">Completing sign in…</p>
-    </div>
+    </main>
   );
 }

@@ -1,7 +1,7 @@
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { LogOut, Menu, X } from "lucide-react";
 import { useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/useAuth";
 import { portalNav, portalRoutes } from "@/routes/portal";
 import ThemeToggle from "@/components/ThemeToggle";
 import MobileBottomNav from "@/components/portal/MobileBottomNav";

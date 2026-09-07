@@ -6,6 +6,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: production-auth-certification
+  cancel-in-progress: false
+
 jobs:
   two-member-journey:
     runs-on: ubuntu-24.04
@@ -16,14 +20,39 @@ jobs:
       E2E_MEMBER_A_PASSWORD: ${{ secrets.E2E_MEMBER_A_PASSWORD }}
       E2E_MEMBER_B_EMAIL: ${{ secrets.E2E_MEMBER_B_EMAIL }}
       E2E_MEMBER_B_PASSWORD: ${{ secrets.E2E_MEMBER_B_PASSWORD }}
+      EXPECTED_SOURCE_SHA: ${{ github.sha }}
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - name: Checkout exact source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ env.EXPECTED_SOURCE_SHA }}
+          persist-credentials: false
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 22
           cache: npm
       - run: npm ci --no-audit --fund=false
       - run: npx playwright install --with-deps chromium
+      - name: Require exact deployed source
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p production-auth-evidence
+          PORTAL_URL="$E2E_PORTAL_URL" node scripts/verify-production.mjs \
+            --receipt production-auth-evidence/production-health.json
+          node --input-type=module <<'NODE'
+          import { readFileSync, writeFileSync } from 'node:fs';
+
+          const receipt = JSON.parse(readFileSync('production-auth-evidence/production-health.json', 'utf8'));
+          const expected = process.env.EXPECTED_SOURCE_SHA;
+          if (receipt.revision !== expected) {
+            throw new Error(`deployed revision ${receipt.revision} does not equal source ${expected}`);
+          }
+          writeFileSync(
+            'production-auth-evidence/source-binding.json',
+            `${JSON.stringify({ sourceSha: expected, deployedRevision: receipt.revision, exact: true }, null, 2)}\n`,
+          );
+          NODE
       - name: Require both production test identities
         shell: bash
         run: |
@@ -32,4 +61,39 @@ jobs:
           test -n "$E2E_MEMBER_A_PASSWORD"
           test -n "$E2E_MEMBER_B_EMAIL"
           test -n "$E2E_MEMBER_B_PASSWORD"
-      - run: npm run test:e2e:credentialed
+      - name: Run credentialed two-member persistence journey
+        run: npm run test:e2e:credentialed
+      - name: Record successful credentialed certification
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import { writeFileSync } from 'node:fs';
+
+          writeFileSync(
+            'production-auth-evidence/auth-certification.json',
+            `${JSON.stringify({
+              schema: 'financemeta.production-auth-certification.v1',
+              checkedAt: new Date().toISOString(),
+              sourceSha: process.env.EXPECTED_SOURCE_SHA,
+              portalUrl: process.env.E2E_PORTAL_URL,
+              result: 'PASS',
+              assertions: [
+                'two-member-session-isolation',
+                'settings-persistence-after-reload',
+                'logout-protected-route-denial',
+                'persistence-after-reauthentication',
+                'test-marker-restored',
+              ],
+            }, null, 2)}\n`,
+          );
+          NODE
+          sha256sum production-auth-evidence/* > production-auth-evidence/SHA256SUMS
+      - name: Retain redacted production auth evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: production-auth-${{ env.EXPECTED_SOURCE_SHA }}
+          path: production-auth-evidence
+          if-no-files-found: error
+          retention-days: 30

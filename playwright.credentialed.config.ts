@@ -4,7 +4,7 @@ export default defineConfig({
   testDir: "./e2e-credentialed",
   fullyParallel: false,
   forbidOnly: true,
-  retries: 1,
+  retries: 0,
   reporter: "list",
   use: {
     baseURL: process.env.E2E_PORTAL_URL ?? "https://finance4all-global-reach.vercel.app",

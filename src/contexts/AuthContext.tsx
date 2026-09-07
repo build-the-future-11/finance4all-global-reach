@@ -1,7 +1,5 @@
 import {
-  createContext,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useState,
@@ -13,25 +11,7 @@ import { mapProfile, PUBLIC_PROFILE_COLUMNS } from "@/lib/mappers";
 import { rememberPostAuthPath } from "@/lib/auth-navigation";
 import { withDeadline } from "@/lib/asyncDeadline";
 import type { UserProfile } from "@/types/domain";
-
-interface AuthContextValue {
-  session: Session | null;
-  user: User | null;
-  profile: UserProfile | null;
-  loading: boolean;
-  needsOnboarding: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: string | null }>;
-  signUp: (email: string, password: string, displayName: string) => Promise<{
-    error: string | null;
-    emailConfirmationRequired: boolean;
-  }>;
-  signInWithGoogle: (returnTo?: string) => Promise<{ error: string | null }>;
-  signOut: () => Promise<void>;
-  refreshProfile: () => Promise<void>;
-  updateProfile: (updates: Partial<Pick<UserProfile, "displayName" | "bio" | "interests" | "openToCollaborate" | "chapterId">>) => Promise<{ error: string | null }>;
-}
-
-const AuthContext = createContext<AuthContextValue | null>(null);
+import { AuthContext } from "@/contexts/auth-context";
 const AUTH_OPERATION_TIMEOUT_MS = 15_000;
 
 function googleDisplayName(user: User) {
@@ -312,10 +292,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-
-export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
-  return ctx;
 }
