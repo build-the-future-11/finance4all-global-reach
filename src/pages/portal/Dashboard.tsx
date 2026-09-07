@@ -9,7 +9,7 @@ import {
   Search,
   Users,
 } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/useAuth";
 import { useActivityFeed } from "@/hooks/portal/useActivityFeed";
 import { useNewsArticles } from "@/hooks/portal/useDebriefed";
 import { useResearchProjects, useMyLabApplications } from "@/hooks/portal/useLabs";

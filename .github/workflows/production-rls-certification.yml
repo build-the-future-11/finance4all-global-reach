@@ -1,0 +1,60 @@
+name: Production RLS Certification
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-rls-certification
+  cancel-in-progress: false
+
+jobs:
+  two-identity-rls:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      FINANCEMETA_DATABASE_URL: ${{ secrets.FINANCEMETA_DATABASE_URL }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Require the canonical FinanceMeta database connection
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$FINANCEMETA_DATABASE_URL"
+          case "$FINANCEMETA_DATABASE_URL" in
+            *pnemeegkwyaicsbnbnmg*) ;;
+            *) echo "Database URL is not for the canonical FinanceMeta project" >&2; exit 1 ;;
+          esac
+      - name: Verify PostgreSQL client
+        shell: bash
+        run: psql --version
+      - name: Run rollback-only two-identity authorization matrix
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p production-rls-evidence
+          {
+            printf 'checked_at=%s\n' "$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            printf 'source_sha=%s\n' "$GITHUB_SHA"
+            psql --no-psqlrc --set ON_ERROR_STOP=1 \
+              "$FINANCEMETA_DATABASE_URL" \
+              --file supabase/tests/two_identity_rls_certification.sql
+            psql --no-psqlrc --set ON_ERROR_STOP=1 \
+              "$FINANCEMETA_DATABASE_URL" \
+              --file supabase/tests/account_lifecycle_rls_certification.sql
+            printf 'result=PASS\n'
+          } 2>&1 | tee production-rls-evidence/rls-certification.log
+          sha256sum production-rls-evidence/rls-certification.log \
+            > production-rls-evidence/SHA256SUMS
+      - name: Retain production RLS evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: production-rls-${{ github.sha }}
+          path: production-rls-evidence
+          if-no-files-found: error
+          retention-days: 30

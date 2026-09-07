@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, Plus } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/useAuth";
 import {
   useCreateResearchProject,
   useMyLabApplications,
@@ -60,7 +60,8 @@ function ProjectDetail({ id }: { id: string }) {
   const lead = project ? leads?.[project.leadResearcherId] : undefined;
   const saved = bookmarks?.has(id) ?? false;
 
-  const handleApply = async () => {
+  const handleApply = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (!motivation.trim()) return;
     try {
       await submitApp.mutateAsync({ projectId: id, motivation });
@@ -133,10 +134,13 @@ function ProjectDetail({ id }: { id: string }) {
                 <DialogHeader>
                   <DialogTitle>Apply to {project.title}</DialogTitle>
                 </DialogHeader>
-                <div className="space-y-4">
+                <form className="space-y-4" onSubmit={handleApply}>
                   <div>
-                    <Label className="text-white/70">Why are you interested?</Label>
+                    <Label htmlFor="lab-application-motivation" className="text-white/70">Why are you interested?</Label>
                     <Textarea
+                      id="lab-application-motivation"
+                      name="motivation"
+                      required
                       value={motivation}
                       onChange={(e) => setMotivation(e.target.value)}
                       rows={4}
@@ -144,13 +148,13 @@ function ProjectDetail({ id }: { id: string }) {
                     />
                   </div>
                   <Button
-                    onClick={handleApply}
+                    type="submit"
                     disabled={submitApp.isPending}
                     className="bg-emerald-500 hover:bg-emerald-400"
                   >
                     Submit application
                   </Button>
-                </div>
+                </form>
               </DialogContent>
             </Dialog>
           )}
@@ -191,7 +195,8 @@ export default function MetaLabs() {
     });
   }, [projects, statusFilter, search]);
 
-  const handleCreate = async () => {
+  const handleCreate = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (!title.trim() || !description.trim()) return;
     try {
       await createProject.mutateAsync({
@@ -233,14 +238,17 @@ export default function MetaLabs() {
                 <DialogHeader>
                   <DialogTitle>Publish research project</DialogTitle>
                 </DialogHeader>
-                <div className="space-y-4">
+                <form className="space-y-4" onSubmit={handleCreate}>
                   <div>
-                    <Label className="text-white/70">Title</Label>
-                    <Input value={title} onChange={(e) => setTitle(e.target.value)} className={portalInputClass} />
+                    <Label htmlFor="lab-project-title" className="text-white/70">Title</Label>
+                    <Input id="lab-project-title" name="title" required value={title} onChange={(e) => setTitle(e.target.value)} className={portalInputClass} />
                   </div>
                   <div>
-                    <Label className="text-white/70">Description</Label>
+                    <Label htmlFor="lab-project-description" className="text-white/70">Description</Label>
                     <Textarea
+                      id="lab-project-description"
+                      name="description"
+                      required
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
                       rows={4}
@@ -248,8 +256,10 @@ export default function MetaLabs() {
                     />
                   </div>
                   <div>
-                    <Label className="text-white/70">Tags (comma-separated)</Label>
+                    <Label htmlFor="lab-project-tags" className="text-white/70">Tags (comma-separated)</Label>
                     <Input
+                      id="lab-project-tags"
+                      name="tags"
                       value={tags}
                       onChange={(e) => setTags(e.target.value)}
                       placeholder="macro, fintech"
@@ -257,13 +267,13 @@ export default function MetaLabs() {
                     />
                   </div>
                   <Button
-                    onClick={handleCreate}
+                    type="submit"
                     disabled={createProject.isPending}
                     className="bg-emerald-500 hover:bg-emerald-400"
                   >
                     Publish
                   </Button>
-                </div>
+                </form>
               </DialogContent>
             </Dialog>
           ) : undefined
@@ -288,6 +298,7 @@ export default function MetaLabs() {
           </TabsList>
         </Tabs>
         <Input
+          aria-label="Search research projects"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search projects…"

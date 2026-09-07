@@ -5,7 +5,7 @@ import { verifyReleaseToolchain } from '../scripts/verify-release-toolchain.mjs'
 
 const packageJson = {
   packageManager: 'npm@10.9.8',
-  engines: { node: '^20.19.0 || >=22.12.0' },
+  engines: { node: '>=22.12.0' },
 };
 
 function existsFrom(files) {
@@ -13,7 +13,7 @@ function existsFrom(files) {
   return (file) => set.has(file);
 }
 
-test('accepts the single npm release contract on supported Vite runtimes', () => {
+test('accepts the single npm release contract on Node 22.12+', () => {
   const result = verifyReleaseToolchain({
     packageJson,
     exists: existsFrom(['package-lock.json']),
@@ -44,7 +44,7 @@ test('rejects Node engine floor drift', () => {
       nodeVersion: '22.23.2',
       userAgent: 'npm/10.9.8',
     }),
-    /engines\.node must be exactly \^20\.19\.0 \|\| >=22\.12\.0/,
+    /engines\.node must be exactly >=22\.12\.0/,
   );
 });
 
@@ -72,36 +72,18 @@ test('rejects missing npm lockfile and conflicting lockfiles', () => {
   }
 });
 
-test('rejects runtime execution outside the Vite support floor', () => {
-  assert.throws(
-    () => verifyReleaseToolchain({
-      packageJson,
-      exists: existsFrom(['package-lock.json']),
-      nodeVersion: '18.20.8',
-      userAgent: 'npm/10.9.8',
-    }),
-    /Node \^20\.19\.0 or >=22\.12\.0 is required/,
-  );
-
-  assert.throws(
-    () => verifyReleaseToolchain({
-      packageJson,
-      exists: existsFrom(['package-lock.json']),
-      nodeVersion: '22.11.0',
-      userAgent: 'npm/10.9.8',
-    }),
-    /Node \^20\.19\.0 or >=22\.12\.0 is required/,
-  );
-
-  assert.throws(
-    () => verifyReleaseToolchain({
-      packageJson,
-      exists: existsFrom(['package-lock.json']),
-      nodeVersion: '20.18.3',
-      userAgent: 'npm/10.9.8',
-    }),
-    /Node \^20\.19\.0 or >=22\.12\.0 is required/,
-  );
+test('rejects runtime execution below Node 22.12', () => {
+  for (const nodeVersion of ['20.19.6', '22.11.0']) {
+    assert.throws(
+      () => verifyReleaseToolchain({
+        packageJson,
+        exists: existsFrom(['package-lock.json']),
+        nodeVersion,
+        userAgent: 'npm/10.9.8',
+      }),
+      /Node >=22\.12 is required/,
+    );
+  }
 });
 
 test('rejects release scripts invoked through a non-npm package manager', () => {

@@ -11,12 +11,7 @@ interface AuthLayoutProps {
 export default function AuthLayout({ title, subtitle, children, footer }: AuthLayoutProps) {
   return (
     <div className="flex min-h-screen bg-[#060a12]">
-      {/* Brand panel — desktop */}
-      <div className="relative hidden w-[45%] overflow-hidden lg:flex lg:flex-col lg:justify-between lg:p-12">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-1/4 top-1/4 h-96 w-96 rounded-full bg-emerald-500/20 blur-[120px]" />
-          <div className="absolute bottom-1/4 right-1/4 h-80 w-80 rounded-full bg-blue-500/15 blur-[100px]" />
-        </div>
+      <aside className="relative hidden w-[45%] border-r border-white/10 bg-[#08101c] lg:flex lg:flex-col lg:justify-between lg:p-12">
         <div className="relative">
           <Link to="/" className="text-sm text-white/50 transition hover:text-white/80">
             ← Back to site
@@ -39,10 +34,10 @@ export default function AuthLayout({ title, subtitle, children, footer }: AuthLa
             </div>
           ))}
         </div>
-      </div>
+      </aside>
 
       {/* Form panel */}
-      <div className="flex flex-1 items-center justify-center px-4 py-12">
+      <main className="flex flex-1 items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
           <Link to="/" className="mb-6 inline-block text-sm text-white/50 hover:text-white/80 lg:hidden">
             ← Back to site
@@ -68,7 +63,7 @@ export default function AuthLayout({ title, subtitle, children, footer }: AuthLa
             </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

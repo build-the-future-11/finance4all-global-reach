@@ -36,6 +36,15 @@ npx supabase migration list --linked
 Stop if linked history is unexpected. A successful command is not enough: verify the new revision
 in `private.portal_schema_revisions`, lint the linked schema, and run the transaction-only SQL tests.
 
+Use the Supabase CLI workflow documented in `DEPLOYMENT.md`. First inspect
+`supabase migration list --linked`, then apply only migrations that are absent from a linked
+environment. Do not paste the migration sequence into the production SQL Editor and do not rerun a
+version whose schema is already present. When schema was applied outside the migration system, prove
+schema equivalence first and use supported `supabase migration repair` commands to reconcile history.
+
+For a new disposable local database, `supabase db reset` applies the tracked migrations in order.
+Confirm the command completes before continuing.
+
 This creates all tables, security policies, and the auto-profile trigger.
 
 ---
@@ -101,8 +110,8 @@ npm run dev
 2. Create an account with an email you can confirm and a password of at least 10 characters.
 3. Complete onboarding.
 4. You should land on `/portal` with stats and sample content.
-5. Run both files in `supabase/tests/` after the migrations. They perform multi-identity
-   authorization checks inside transactions and roll every mutation back.
+5. Run the manual `Production RLS Certification` workflow after production migrations. It runs
+   both the two-member matrix and account-lifecycle certification in rollback-only transactions.
 
 If you see data on the dashboard, Supabase is connected.
 

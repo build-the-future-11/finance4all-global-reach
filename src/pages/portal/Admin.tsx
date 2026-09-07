@@ -44,7 +44,7 @@ export default function Admin() {
   const { data: events } = useEvents();
   const { data: explainers } = useExplainers();
   const { data: chapters } = useChapters();
-  const { data: deletionRequests } = useAccountDeletionRequests();
+  const { data: deletionRequests, isLoading: deletionLoading, isError: deletionError, refetch: retryDeletions } = useAccountDeletionRequests();
 
   const createNews = useCreateNewsArticle();
   const createOpp = useCreateOpportunity();
@@ -121,17 +121,17 @@ export default function Admin() {
             <h3 className="font-semibold text-white">Publish article</h3>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
-                <Label className="text-white/70">Title</Label>
-                <Input value={newsForm.title} onChange={(e) => setNewsForm({ ...newsForm, title: e.target.value })} className={portalInputClass} />
+                <Label htmlFor="admin-news-title" className="text-white/70">Title</Label>
+                <Input id="admin-news-title" name="title" value={newsForm.title} onChange={(e) => setNewsForm({ ...newsForm, title: e.target.value })} className={portalInputClass} />
               </div>
               <div className="sm:col-span-2">
-                <Label className="text-white/70">Summary</Label>
-                <Textarea value={newsForm.summary} onChange={(e) => setNewsForm({ ...newsForm, summary: e.target.value })} rows={2} className={portalInputClass} />
+                <Label htmlFor="admin-news-summary" className="text-white/70">Summary</Label>
+                <Textarea id="admin-news-summary" name="summary" value={newsForm.summary} onChange={(e) => setNewsForm({ ...newsForm, summary: e.target.value })} rows={2} className={portalInputClass} />
               </div>
               <div>
-                <Label className="text-white/70">Category</Label>
+                <Label htmlFor="admin-news-category" className="text-white/70">Category</Label>
                 <Select value={newsForm.category} onValueChange={(v) => setNewsForm({ ...newsForm, category: v as NewsCategory })}>
-                  <SelectTrigger className={portalInputClass}><SelectValue /></SelectTrigger>
+                  <SelectTrigger id="admin-news-category" className={portalInputClass}><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {["macro", "markets", "ipo", "company"].map((c) => (
                       <SelectItem key={c} value={c}>{c}</SelectItem>
@@ -140,12 +140,12 @@ export default function Admin() {
                 </Select>
               </div>
               <div>
-                <Label className="text-white/70">Tags (comma-separated)</Label>
-                <Input value={newsForm.tags} onChange={(e) => setNewsForm({ ...newsForm, tags: e.target.value })} className={portalInputClass} />
+                <Label htmlFor="admin-news-tags" className="text-white/70">Tags (comma-separated)</Label>
+                <Input id="admin-news-tags" name="tags" value={newsForm.tags} onChange={(e) => setNewsForm({ ...newsForm, tags: e.target.value })} className={portalInputClass} />
               </div>
               <div className="sm:col-span-2">
-                <Label className="text-white/70">Source URL (optional)</Label>
-                <Input value={newsForm.sourceUrl} onChange={(e) => setNewsForm({ ...newsForm, sourceUrl: e.target.value })} className={portalInputClass} />
+                <Label htmlFor="admin-news-source-url" className="text-white/70">Source URL (optional)</Label>
+                <Input id="admin-news-source-url" name="sourceUrl" type="url" value={newsForm.sourceUrl} onChange={(e) => setNewsForm({ ...newsForm, sourceUrl: e.target.value })} className={portalInputClass} />
               </div>
             </div>
             <Button
@@ -175,7 +175,7 @@ export default function Admin() {
                   <p className="font-medium text-white">{a.title}</p>
                   <CategoryBadge>{a.category}</CategoryBadge>
                 </div>
-                <Button size="icon" variant="ghost" className="text-red-400/70 hover:text-red-400" onClick={async () => {
+                <Button aria-label={`Delete ${a.title}`} size="icon" variant="ghost" className="text-red-400/70 hover:text-red-400" onClick={async () => {
                   try {
                     await deleteNews.mutateAsync(a.id);
                     toast.success("Deleted");
@@ -195,17 +195,17 @@ export default function Admin() {
             <h3 className="font-semibold text-white">Add opportunity</h3>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <div>
-                <Label className="text-white/70">Title</Label>
-                <Input value={oppForm.title} onChange={(e) => setOppForm({ ...oppForm, title: e.target.value })} className={portalInputClass} />
+                <Label htmlFor="admin-opportunity-title" className="text-white/70">Title</Label>
+                <Input id="admin-opportunity-title" name="title" value={oppForm.title} onChange={(e) => setOppForm({ ...oppForm, title: e.target.value })} className={portalInputClass} />
               </div>
               <div>
-                <Label className="text-white/70">Organization</Label>
-                <Input value={oppForm.organization} onChange={(e) => setOppForm({ ...oppForm, organization: e.target.value })} className={portalInputClass} />
+                <Label htmlFor="admin-opportunity-organization" className="text-white/70">Organization</Label>
+                <Input id="admin-opportunity-organization" name="organization" value={oppForm.organization} onChange={(e) => setOppForm({ ...oppForm, organization: e.target.value })} className={portalInputClass} />
               </div>
               <div>
-                <Label className="text-white/70">Type</Label>
+                <Label htmlFor="admin-opportunity-type" className="text-white/70">Type</Label>
                 <Select value={oppForm.type} onValueChange={(v) => setOppForm({ ...oppForm, type: v as OpportunityType })}>
-                  <SelectTrigger className={portalInputClass}><SelectValue /></SelectTrigger>
+                  <SelectTrigger id="admin-opportunity-type" className={portalInputClass}><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {["internship", "program", "challenge", "project_role"].map((t) => (
                       <SelectItem key={t} value={t}>{t.replace("_", " ")}</SelectItem>
@@ -214,15 +214,19 @@ export default function Admin() {
                 </Select>
               </div>
               <div>
-                <Label className="text-white/70">Application URL</Label>
-                <Input value={oppForm.applicationUrl} onChange={(e) => setOppForm({ ...oppForm, applicationUrl: e.target.value })} className={portalInputClass} />
+                <Label htmlFor="admin-opportunity-url" className="text-white/70">Application URL</Label>
+                <Input id="admin-opportunity-url" name="applicationUrl" type="url" value={oppForm.applicationUrl} onChange={(e) => setOppForm({ ...oppForm, applicationUrl: e.target.value })} className={portalInputClass} />
               </div>
               <div className="sm:col-span-2">
-                <Label className="text-white/70">Description</Label>
-                <Textarea value={oppForm.description} onChange={(e) => setOppForm({ ...oppForm, description: e.target.value })} rows={3} className={portalInputClass} />
+                <Label htmlFor="admin-opportunity-description" className="text-white/70">Description</Label>
+                <Textarea id="admin-opportunity-description" name="description" value={oppForm.description} onChange={(e) => setOppForm({ ...oppForm, description: e.target.value })} rows={3} className={portalInputClass} />
+              </div>
+              <div className="sm:col-span-2">
+                <Label htmlFor="admin-opportunity-tags" className="text-white/70">Tags (comma-separated)</Label>
+                <Input id="admin-opportunity-tags" name="tags" value={oppForm.tags} onChange={(e) => setOppForm({ ...oppForm, tags: e.target.value })} className={portalInputClass} />
               </div>
             </div>
-            <Button className="mt-4 bg-emerald-500 hover:bg-emerald-400" onClick={async () => {
+            <Button disabled={createOpp.isPending} className="mt-4 bg-emerald-500 hover:bg-emerald-400" onClick={async () => {
               try {
                 await createOpp.mutateAsync({ ...oppForm, tags: parseTags(oppForm.tags), applicationUrl: oppForm.applicationUrl || undefined });
                 toast.success("Opportunity added");
@@ -241,9 +245,9 @@ export default function Admin() {
             <h3 className="font-semibold text-white">Create event</h3>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <div>
-                <Label className="text-white/70">Chapter</Label>
+                <Label htmlFor="admin-event-chapter" className="text-white/70">Chapter</Label>
                 <Select value={eventForm.chapterId} onValueChange={(v) => setEventForm({ ...eventForm, chapterId: v })}>
-                  <SelectTrigger className={portalInputClass}><SelectValue placeholder="Select chapter" /></SelectTrigger>
+                  <SelectTrigger id="admin-event-chapter" className={portalInputClass}><SelectValue placeholder="Select chapter" /></SelectTrigger>
                   <SelectContent>
                     {chapters?.map((c) => (
                       <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
@@ -252,19 +256,23 @@ export default function Admin() {
                 </Select>
               </div>
               <div>
-                <Label className="text-white/70">Starts at</Label>
-                <Input type="datetime-local" value={eventForm.startsAt} onChange={(e) => setEventForm({ ...eventForm, startsAt: e.target.value })} className={portalInputClass} />
+                <Label htmlFor="admin-event-start" className="text-white/70">Starts at</Label>
+                <Input id="admin-event-start" name="startsAt" type="datetime-local" value={eventForm.startsAt} onChange={(e) => setEventForm({ ...eventForm, startsAt: e.target.value })} className={portalInputClass} />
               </div>
               <div className="sm:col-span-2">
-                <Label className="text-white/70">Title</Label>
-                <Input value={eventForm.title} onChange={(e) => setEventForm({ ...eventForm, title: e.target.value })} className={portalInputClass} />
+                <Label htmlFor="admin-event-title" className="text-white/70">Title</Label>
+                <Input id="admin-event-title" name="title" value={eventForm.title} onChange={(e) => setEventForm({ ...eventForm, title: e.target.value })} className={portalInputClass} />
               </div>
               <div className="sm:col-span-2">
-                <Label className="text-white/70">Description</Label>
-                <Textarea value={eventForm.description} onChange={(e) => setEventForm({ ...eventForm, description: e.target.value })} rows={3} className={portalInputClass} />
+                <Label htmlFor="admin-event-description" className="text-white/70">Description</Label>
+                <Textarea id="admin-event-description" name="description" value={eventForm.description} onChange={(e) => setEventForm({ ...eventForm, description: e.target.value })} rows={3} className={portalInputClass} />
+              </div>
+              <div className="sm:col-span-2">
+                <Label htmlFor="admin-event-registration-url" className="text-white/70">Registration URL (optional)</Label>
+                <Input id="admin-event-registration-url" name="registrationUrl" type="url" value={eventForm.registrationUrl} onChange={(e) => setEventForm({ ...eventForm, registrationUrl: e.target.value })} className={portalInputClass} />
               </div>
             </div>
-            <Button className="mt-4 bg-emerald-500 hover:bg-emerald-400" onClick={async () => {
+            <Button disabled={createEvent.isPending} className="mt-4 bg-emerald-500 hover:bg-emerald-400" onClick={async () => {
               try {
                 await createEvent.mutateAsync({
                   ...eventForm,
@@ -289,24 +297,24 @@ export default function Admin() {
             <div className="mt-4 space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <Label className="text-white/70">Slug (URL)</Label>
-                  <Input value={explainerForm.slug} onChange={(e) => setExplainerForm({ ...explainerForm, slug: e.target.value })} placeholder="what-is-an-ipo" className={portalInputClass} />
+                  <Label htmlFor="admin-explainer-slug" className="text-white/70">Slug (URL)</Label>
+                  <Input id="admin-explainer-slug" name="slug" value={explainerForm.slug} onChange={(e) => setExplainerForm({ ...explainerForm, slug: e.target.value })} placeholder="what-is-an-ipo" className={portalInputClass} />
                 </div>
                 <div>
-                  <Label className="text-white/70">Title</Label>
-                  <Input value={explainerForm.title} onChange={(e) => setExplainerForm({ ...explainerForm, title: e.target.value })} className={portalInputClass} />
+                  <Label htmlFor="admin-explainer-title" className="text-white/70">Title</Label>
+                  <Input id="admin-explainer-title" name="title" value={explainerForm.title} onChange={(e) => setExplainerForm({ ...explainerForm, title: e.target.value })} className={portalInputClass} />
                 </div>
               </div>
               <div>
-                <Label className="text-white/70">Summary</Label>
-                <Input value={explainerForm.summary} onChange={(e) => setExplainerForm({ ...explainerForm, summary: e.target.value })} className={portalInputClass} />
+                <Label htmlFor="admin-explainer-summary" className="text-white/70">Summary</Label>
+                <Input id="admin-explainer-summary" name="summary" value={explainerForm.summary} onChange={(e) => setExplainerForm({ ...explainerForm, summary: e.target.value })} className={portalInputClass} />
               </div>
               <div>
-                <Label className="text-white/70">Body (markdown)</Label>
-                <Textarea value={explainerForm.body} onChange={(e) => setExplainerForm({ ...explainerForm, body: e.target.value })} rows={8} className={portalInputClass} />
+                <Label htmlFor="admin-explainer-body" className="text-white/70">Body (markdown)</Label>
+                <Textarea id="admin-explainer-body" name="body" value={explainerForm.body} onChange={(e) => setExplainerForm({ ...explainerForm, body: e.target.value })} rows={8} className={portalInputClass} />
               </div>
             </div>
-            <Button className="mt-4 bg-emerald-500 hover:bg-emerald-400" onClick={async () => {
+            <Button disabled={createExplainer.isPending} className="mt-4 bg-emerald-500 hover:bg-emerald-400" onClick={async () => {
               try {
                 await createExplainer.mutateAsync(explainerForm);
                 toast.success("Explainer published");
@@ -328,7 +336,12 @@ export default function Admin() {
             </p>
           </PortalCard>
 
-          {deletionRequests?.length ? deletionRequests.map((request) => {
+          {deletionLoading ? <p role="status">Loading account requests…</p> : deletionError ? (
+            <div role="alert">
+              Unable to load account requests.
+              <Button variant="outline" className="ml-3" onClick={() => void retryDeletions()}>Retry</Button>
+            </div>
+          ) : deletionRequests?.length ? deletionRequests.map((request) => {
             const review = deletionReviews[request.id] ?? {
               status: request.status,
               reviewNote: request.review_note ?? "",

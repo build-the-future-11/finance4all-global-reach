@@ -29,6 +29,22 @@ const accountLifecycleCertification = readFileSync(
   "supabase/tests/account_lifecycle_rls_certification.sql",
   "utf8",
 );
+const rlsWorkflow = readFileSync(
+  ".github/workflows/production-rls-certification.yml",
+  "utf8",
+);
+const credentialedJourney = readFileSync(
+  "e2e-credentialed/two-member-auth.spec.ts",
+  "utf8",
+);
+const credentialedConfig = readFileSync(
+  "playwright.credentialed.config.ts",
+  "utf8",
+);
+const authWorkflow = readFileSync(
+  ".github/workflows/production-auth-certification.yml",
+  "utf8",
+);
 const productionSchemaReceipt = JSON.parse(
   readFileSync("evidence/production-schema-reconciliation-20260906.json", "utf8"),
 ) as {
@@ -109,6 +125,7 @@ describe("production completion contracts", () => {
     expect(rlsCertification).toContain("SET LOCAL ROLE authenticated");
     expect(rlsCertification).toContain("ordinary member updated another profile");
     expect(rlsCertification).toContain("ordinary member forged a notification");
+    expect(rlsCertification).toContain("unexpected public tables require explicit certification");
     expect(rlsCertification.trimEnd()).toMatch(/ROLLBACK;$/);
   });
 
@@ -125,5 +142,26 @@ describe("production completion contracts", () => {
     expect(accountLifecycleCertification).toContain("the database records the reviewing admin identity");
     expect(accountLifecycleCertification).toContain("pgTAP plan failed");
     expect(accountLifecycleCertification.trimEnd()).toMatch(/ROLLBACK;$/);
+  });
+
+  it("runs the RLS matrix only against the canonical database and retains evidence", () => {
+    expect(rlsWorkflow).toContain("FINANCEMETA_DATABASE_URL");
+    expect(rlsWorkflow).toContain("pnemeegkwyaicsbnbnmg");
+    expect(rlsWorkflow).toContain("--set ON_ERROR_STOP=1");
+    expect(rlsWorkflow).toContain("two_identity_rls_certification.sql");
+    expect(rlsWorkflow).toContain("retention-days: 30");
+  });
+
+  it("certifies that member activity survives reload and reauthentication", () => {
+    expect(credentialedJourney).toContain("FinanceMeta production certification");
+    expect(credentialedJourney).toContain("await pageA.reload()");
+    expect(credentialedJourney).toContain("await signOut(pageA)");
+    expect(credentialedJourney).toContain("await signIn(pageA, memberA)");
+    expect(credentialedJourney).toContain("await bioA.inputValue()");
+    expect(credentialedConfig).toContain("retries: 0");
+    expect(authWorkflow).toContain("receipt.revision !== expected");
+    expect(authWorkflow).toContain("production-auth-evidence/auth-certification.json");
+    expect(authWorkflow).toContain("test-marker-restored");
+    expect(authWorkflow).toContain("retention-days: 30");
   });
 });

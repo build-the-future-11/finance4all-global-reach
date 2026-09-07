@@ -6,7 +6,7 @@ import {
   mapNewsArticle,
 } from "@/lib/mappers";
 import type { NewsCategory } from "@/types/domain";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/useAuth";
 
 export function useNewsArticles(category?: NewsCategory | "all") {
   return useQuery({

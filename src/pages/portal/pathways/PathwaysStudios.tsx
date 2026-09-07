@@ -28,7 +28,8 @@ export default function PathwaysStudios() {
   const [repoUrl, setRepoUrl] = useState("");
   const [demoUrl, setDemoUrl] = useState("");
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (!title.trim() || !writeup.trim()) return;
     try {
       await submit.mutateAsync({
@@ -60,25 +61,25 @@ export default function PathwaysStudios() {
             </DialogTrigger>
             <DialogContent className="border-white/15 bg-[#0c1220] text-white">
               <DialogHeader><DialogTitle>Submit to Studios</DialogTitle></DialogHeader>
-              <div className="space-y-4">
+              <form className="space-y-4" onSubmit={handleSubmit}>
                 <div>
-                  <Label>Title</Label>
-                  <Input value={title} onChange={(e) => setTitle(e.target.value)} className="mt-1 border-white/20 bg-white/5" />
+                  <Label htmlFor="studio-title">Title</Label>
+                  <Input id="studio-title" name="title" required value={title} onChange={(e) => setTitle(e.target.value)} className="mt-1 border-white/20 bg-white/5" />
                 </div>
                 <div>
-                  <Label>Writeup</Label>
-                  <Textarea value={writeup} onChange={(e) => setWriteup(e.target.value)} rows={4} className="mt-1 border-white/20 bg-white/5" />
+                  <Label htmlFor="studio-writeup">Writeup</Label>
+                  <Textarea id="studio-writeup" name="writeup" required value={writeup} onChange={(e) => setWriteup(e.target.value)} rows={4} className="mt-1 border-white/20 bg-white/5" />
                 </div>
                 <div>
-                  <Label>Repo URL (optional)</Label>
-                  <Input value={repoUrl} onChange={(e) => setRepoUrl(e.target.value)} className="mt-1 border-white/20 bg-white/5" />
+                  <Label htmlFor="studio-repo-url">Repo URL (optional)</Label>
+                  <Input id="studio-repo-url" name="repoUrl" type="url" value={repoUrl} onChange={(e) => setRepoUrl(e.target.value)} className="mt-1 border-white/20 bg-white/5" />
                 </div>
                 <div>
-                  <Label>Demo URL (optional)</Label>
-                  <Input value={demoUrl} onChange={(e) => setDemoUrl(e.target.value)} className="mt-1 border-white/20 bg-white/5" />
+                  <Label htmlFor="studio-demo-url">Demo URL (optional)</Label>
+                  <Input id="studio-demo-url" name="demoUrl" type="url" value={demoUrl} onChange={(e) => setDemoUrl(e.target.value)} className="mt-1 border-white/20 bg-white/5" />
                 </div>
-                <Button onClick={handleSubmit} disabled={submit.isPending}>Publish</Button>
-              </div>
+                <Button type="submit" disabled={submit.isPending}>Publish</Button>
+              </form>
             </DialogContent>
           </Dialog>
         }

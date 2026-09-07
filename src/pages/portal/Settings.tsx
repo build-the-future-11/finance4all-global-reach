@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/useAuth";
 import { useChapters } from "@/hooks/portal/useEvents";
 import { useUpdateMyProfile } from "@/hooks/portal/useNetwork";
 import {
@@ -38,7 +38,7 @@ export default function Settings() {
   const { profile, user, signOut } = useAuth();
   const { data: chapters } = useChapters();
   const updateProfile = useUpdateMyProfile();
-  const { data: deletionRequest } = useMyAccountDeletionRequest(user?.id);
+  const { data: deletionRequest, isLoading: deletionLoading, isError: deletionError, refetch: retryDeletion } = useMyAccountDeletionRequest(user?.id);
   const requestDeletion = useRequestAccountDeletion();
   const cancelDeletion = useCancelAccountDeletion();
   const exportMyData = useExportMyData();
@@ -56,7 +56,8 @@ export default function Settings() {
     );
   };
 
-  const handleSave = async () => {
+  const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     try {
       const { error } = await updateProfile.mutateAsync({
         displayName: displayName.trim(),
@@ -126,31 +127,40 @@ export default function Settings() {
         </PortalCard>
 
         <PortalCard className="p-6 lg:col-span-2">
-          <div className="space-y-5">
+          <form className="space-y-5" onSubmit={handleSave}>
             <div>
-              <Label className="text-white/70">Display name</Label>
+              <Label htmlFor="settings-display-name" className="text-white/70">
+                Display name
+              </Label>
               <Input
+                id="settings-display-name"
+                name="displayName"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 className={portalInputClass}
               />
             </div>
             <div>
-              <Label className="text-white/70">Bio</Label>
+              <Label htmlFor="settings-bio" className="text-white/70">
+                Bio
+              </Label>
               <Textarea
+                id="settings-bio"
+                name="bio"
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 rows={3}
                 className={portalInputClass}
               />
             </div>
-            <div>
-              <Label className="text-white/70">Interests</Label>
+            <fieldset>
+              <legend className="text-sm font-medium text-white/70">Interests</legend>
               <div className="mt-2 flex flex-wrap gap-2">
                 {SUGGESTED_INTERESTS.map((tag) => (
                   <button
                     key={tag}
                     type="button"
+                    aria-pressed={interests.includes(tag)}
                     onClick={() => toggleInterest(tag)}
                     className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
                       interests.includes(tag)
@@ -162,12 +172,14 @@ export default function Settings() {
                   </button>
                 ))}
               </div>
-            </div>
+            </fieldset>
             {chapters && chapters.length > 0 && (
               <div>
-                <Label className="text-white/70">Chapter</Label>
+                <Label htmlFor="settings-chapter" className="text-white/70">
+                  Chapter
+                </Label>
                 <Select value={chapterId} onValueChange={setChapterId}>
-                  <SelectTrigger className={portalInputClass}>
+                  <SelectTrigger id="settings-chapter" className={portalInputClass}>
                     <SelectValue placeholder="Select a chapter" />
                   </SelectTrigger>
                   <SelectContent>
@@ -182,24 +194,33 @@ export default function Settings() {
             )}
             <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] p-4">
               <div>
-                <p className="text-sm font-medium text-white">Open to collaborate</p>
-                <p className="text-xs text-white/45">Shown on your public profile</p>
+                <Label htmlFor="settings-open-to-collaborate" className="text-sm font-medium text-white">
+                  Open to collaborate
+                </Label>
+                <p id="settings-open-to-collaborate-description" className="text-xs text-white/45">
+                  Shown on your public profile
+                </p>
               </div>
-              <Switch checked={openToCollaborate} onCheckedChange={setOpenToCollaborate} />
+              <Switch
+                id="settings-open-to-collaborate"
+                checked={openToCollaborate}
+                onCheckedChange={setOpenToCollaborate}
+                aria-describedby="settings-open-to-collaborate-description"
+              />
             </div>
             <div className="flex flex-wrap gap-3 pt-2">
               <Button
-                onClick={handleSave}
+                type="submit"
                 disabled={updateProfile.isPending}
                 className="bg-emerald-500 hover:bg-emerald-400"
               >
                 {updateProfile.isPending ? "Saving…" : "Save changes"}
               </Button>
-              <Button variant="outline" className={portalButtonOutline} onClick={() => signOut()}>
+              <Button type="button" variant="outline" className={portalButtonOutline} onClick={() => signOut()}>
                 Sign out
               </Button>
             </div>
-          </div>
+          </form>
         </PortalCard>
       </div>
 
@@ -233,7 +254,12 @@ export default function Settings() {
                 Submit a reviewed deletion request. Export your data first; approved deletion permanently removes your sign-in and member data.
               </p>
 
-              {deletionRequest && deletionRequest.status !== "cancelled" && deletionRequest.status !== "rejected" ? (
+              {deletionLoading ? <p role="status" className="mt-4 text-sm">Loading account request…</p> : deletionError ? (
+                <div role="alert" className="mt-4 text-sm">
+                  Unable to load your account request.
+                  <Button variant="outline" className="ml-3" onClick={() => void retryDeletion()}>Retry</Button>
+                </div>
+              ) : deletionRequest && deletionRequest.status !== "cancelled" && deletionRequest.status !== "rejected" ? (
                 <div className="mt-4 rounded-lg border border-amber-300/20 bg-amber-300/[0.06] p-3 text-sm text-amber-100/80">
                   Request status: <span className="font-semibold capitalize">{deletionRequest.status.replace("_", " ")}</span>
                   {deletionRequest.status === "pending" && (
@@ -258,6 +284,7 @@ export default function Settings() {
               ) : (
                 <>
                   <Textarea
+                    aria-label="Deletion reason (optional)"
                     value={deletionReason}
                     onChange={(event) => setDeletionReason(event.target.value.slice(0, 1000))}
                     rows={3}

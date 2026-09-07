@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/useAuth";
 import AuthLayout from "@/components/portal/AuthLayout";
 import GoogleSignInButton, { AuthDivider } from "@/components/portal/GoogleSignInButton";
 import { portalInputClass } from "@/components/portal/PortalUI";

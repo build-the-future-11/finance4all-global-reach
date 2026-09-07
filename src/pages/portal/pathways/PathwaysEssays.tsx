@@ -34,7 +34,8 @@ export default function PathwaysEssays() {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (!title.trim() || !body.trim()) return;
     try {
       await submitEssay.mutateAsync({ title: title.trim(), body: body.trim() });
@@ -67,17 +68,17 @@ export default function PathwaysEssays() {
             </DialogTrigger>
             <DialogContent className="border-white/15 bg-[#0c1220] text-white">
               <DialogHeader><DialogTitle>Submit your take</DialogTitle></DialogHeader>
-              <div className="space-y-4">
+              <form className="space-y-4" onSubmit={handleSubmit}>
                 <div>
-                  <Label>Title</Label>
-                  <Input value={title} onChange={(e) => setTitle(e.target.value)} className="mt-1 border-white/20 bg-white/5" />
+                  <Label htmlFor="essay-title">Title</Label>
+                  <Input id="essay-title" name="title" required value={title} onChange={(e) => setTitle(e.target.value)} className="mt-1 border-white/20 bg-white/5" />
                 </div>
                 <div>
-                  <Label>Essay</Label>
-                  <Textarea value={body} onChange={(e) => setBody(e.target.value)} rows={8} className="mt-1 border-white/20 bg-white/5" />
+                  <Label htmlFor="essay-body">Essay</Label>
+                  <Textarea id="essay-body" name="body" required value={body} onChange={(e) => setBody(e.target.value)} rows={8} className="mt-1 border-white/20 bg-white/5" />
                 </div>
-                <Button onClick={handleSubmit} disabled={submitEssay.isPending}>Publish</Button>
-              </div>
+                <Button type="submit" disabled={submitEssay.isPending}>Publish</Button>
+              </form>
             </DialogContent>
           </Dialog>
         }

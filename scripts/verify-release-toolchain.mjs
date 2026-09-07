@@ -3,7 +3,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 
 const EXPECTED_PACKAGE_MANAGER = 'npm@10.9.8';
-const EXPECTED_NODE_ENGINE = '^20.19.0 || >=22.12.0';
+const EXPECTED_NODE_ENGINE = '>=22.12.0';
 const FORBIDDEN_LOCKFILES = [
   'bun.lock',
   'bun.lockb',
@@ -38,16 +38,14 @@ export function verifyReleaseToolchain({
     fail(`conflicting lockfiles are not allowed: ${conflicting.join(', ')}`);
   }
 
-  const nodeMajor = Number.parseInt(String(nodeVersion).split('.')[0], 10);
-  const [nodeMinor = 0] = String(nodeVersion).split('.').slice(1).map(Number);
-  const supportedNode =
-    Number.isInteger(nodeMajor) &&
-    Number.isInteger(nodeMinor) &&
-    ((nodeMajor === 20 && nodeMinor >= 19) ||
-      (nodeMajor === 22 && nodeMinor >= 12) ||
-      nodeMajor > 22);
-  if (!supportedNode) {
-    fail(`Node ^20.19.0 or >=22.12.0 is required; observed ${nodeVersion}`);
+  const [nodeMajor, nodeMinor] = String(nodeVersion).split('.').map((part) => Number.parseInt(part, 10));
+  if (
+    !Number.isInteger(nodeMajor) ||
+    !Number.isInteger(nodeMinor) ||
+    nodeMajor < 22 ||
+    (nodeMajor === 22 && nodeMinor < 12)
+  ) {
+    fail(`Node >=22.12 is required; observed ${nodeVersion}`);
   }
 
   if (userAgent && !userAgent.startsWith('npm/')) {
