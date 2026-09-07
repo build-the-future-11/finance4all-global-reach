@@ -31,7 +31,8 @@ VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_your-key
 VITE_AUTH_REDIRECT_ORIGIN=https://finance4all-global-reach.vercel.app
 ```
 
-Add redirect URL in Supabase: `https://YOUR-APP.vercel.app/auth/callback`
+Add this exact redirect URL in Supabase:
+`https://finance4all-global-reach.vercel.app/auth/callback`
 
 Full guide: **[DEPLOYMENT.md](DEPLOYMENT.md)**
 
@@ -44,9 +45,19 @@ npm run validate:env
 npm run dev
 ```
 
+## Component catalog
+
+Storybook documents the portal's shared UI primitives with the production Tailwind theme and
+automatic accessibility checks enabled.
+
+```bash
+npm run storybook
+npm run build-storybook
+```
+
 ## Stack
 
-React · Vite · Tailwind · shadcn/ui · Supabase · TanStack Query
+React · Vite · Tailwind · shadcn/ui · Storybook · Supabase · TanStack Query
 
 ## Production certification
 
