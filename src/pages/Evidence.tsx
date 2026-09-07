@@ -63,7 +63,7 @@ export default function Evidence() {
           <h2 id="release-heading" className="text-2xl font-semibold">Portal release</h2>
           <dl className="mt-6 divide-y divide-white/10 border-y border-white/10">
             <div className="grid gap-2 py-5 sm:grid-cols-[13rem_1fr]">
-              <dt className="text-sm text-white/45">Current deployment revision</dt>
+              <dt className="text-sm text-white/50">Current deployment revision</dt>
               <dd className="min-w-0 font-mono text-sm text-white/80">
                 {revision ? (
                   <EvidenceLink href={`${PORTAL_REPO}/commit/${revision}`}>{revision}</EvidenceLink>
@@ -73,13 +73,13 @@ export default function Evidence() {
               </dd>
             </div>
             <div className="grid gap-2 py-5 sm:grid-cols-[13rem_1fr]">
-              <dt className="text-sm text-white/45">Verified surface</dt>
+              <dt className="text-sm text-white/50">Verified surface</dt>
               <dd className="text-sm leading-6 text-white/75">
                 Build, public routes, authentication entry points, protected routing, and database authorization contracts.
               </dd>
             </div>
             <div className="grid gap-2 py-5 sm:grid-cols-[13rem_1fr]">
-              <dt className="text-sm text-white/45">Source and checks</dt>
+              <dt className="text-sm text-white/50">Source and checks</dt>
               <dd className="text-sm">
                 <EvidenceLink href={`${PORTAL_REPO}/actions/workflows/ci.yml`}>Portal CI history</EvidenceLink>
               </dd>

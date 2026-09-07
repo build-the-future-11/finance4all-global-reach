@@ -7,7 +7,7 @@ import {
   PUBLIC_PROFILE_COLUMNS,
 } from "@/lib/mappers";
 import type { LabApplicationStatus, ResearchProjectStatus } from "@/types/domain";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/useAuth";
 
 export function useResearchProjects(status?: ResearchProjectStatus | "all") {
   return useQuery({

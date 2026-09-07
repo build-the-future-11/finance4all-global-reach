@@ -5,7 +5,7 @@ import {
   mapOpportunity,
   mapStudioSubmission,
 } from "@/lib/mappers";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/useAuth";
 import { requireOptionalExternalHttpUrl } from "@/lib/external-url";
 
 export function useOpportunities() {

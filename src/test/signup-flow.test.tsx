@@ -6,7 +6,7 @@ import Signup from "@/pages/auth/Signup";
 const authMocks = vi.hoisted(() => ({ signUp: vi.fn(), signInWithGoogle: vi.fn() }));
 const settingsMocks = vi.hoisted(() => ({ getPublicAuthSettings: vi.fn() }));
 
-vi.mock("@/contexts/AuthContext", () => ({
+vi.mock("@/contexts/useAuth", () => ({
   useAuth: () => ({
     signUp: authMocks.signUp,
     signInWithGoogle: authMocks.signInWithGoogle,

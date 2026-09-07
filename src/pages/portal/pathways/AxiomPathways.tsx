@@ -81,6 +81,7 @@ export default function AxiomPathways() {
           </TabsList>
         </Tabs>
         <Input
+          aria-label="Search opportunities"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search opportunities…"

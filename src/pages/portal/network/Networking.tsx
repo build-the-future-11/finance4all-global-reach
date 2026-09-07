@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Plus } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/useAuth";
 import {
   useConnectionRequests,
   useCreateIntroduction,
@@ -59,7 +59,8 @@ export default function Networking() {
     }
   };
 
-  const handleCreateIntro = async () => {
+  const handleCreateIntro = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (!headline.trim() || !lookingFor.trim()) return;
     try {
       await createIntro.mutateAsync({
@@ -122,28 +123,34 @@ export default function Networking() {
               <DialogHeader>
                 <DialogTitle>Introduction</DialogTitle>
               </DialogHeader>
-              <div className="space-y-4">
+              <form className="space-y-4" onSubmit={handleCreateIntro}>
                 <div>
-                  <Label className="text-white/70">Headline</Label>
+                  <Label htmlFor="introduction-headline" className="text-white/70">Headline</Label>
                   <Input
+                    id="introduction-headline"
+                    name="headline"
+                    required
                     value={headline}
                     onChange={(e) => setHeadline(e.target.value)}
                     className={portalInputClass}
                   />
                 </div>
                 <div>
-                  <Label className="text-white/70">What are you looking for?</Label>
+                  <Label htmlFor="introduction-looking-for" className="text-white/70">What are you looking for?</Label>
                   <Textarea
+                    id="introduction-looking-for"
+                    name="lookingFor"
+                    required
                     value={lookingFor}
                     onChange={(e) => setLookingFor(e.target.value)}
                     rows={3}
                     className={portalInputClass}
                   />
                 </div>
-                <Button onClick={handleCreateIntro} className="bg-emerald-500 hover:bg-emerald-400">
+                <Button type="submit" disabled={createIntro.isPending} className="bg-emerald-500 hover:bg-emerald-400">
                   Post
                 </Button>
-              </div>
+              </form>
             </DialogContent>
           </Dialog>
         }
@@ -151,10 +158,12 @@ export default function Networking() {
 
       <PortalCard className="mb-8 flex items-center justify-between p-5">
         <div>
-          <p className="font-medium text-white">Your profile visibility</p>
-          <p className="text-sm text-white/50">Let others know you're open to collaborate</p>
+          <Label htmlFor="network-profile-visibility" className="font-medium text-white">Your profile visibility</Label>
+          <p id="network-profile-visibility-description" className="text-sm text-white/50">Let others know you're open to collaborate</p>
         </div>
         <Switch
+          id="network-profile-visibility"
+          aria-describedby="network-profile-visibility-description"
           checked={profile?.openToCollaborate ?? false}
           onCheckedChange={handleCollaborateToggle}
         />
@@ -214,13 +223,14 @@ export default function Networking() {
           <h2 className="text-lg font-semibold text-white">Members</h2>
           <div className="flex flex-wrap items-center gap-3">
             <Input
+              aria-label="Search members"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by name or interest…"
               className={`max-w-xs ${portalInputClass}`}
             />
-            <label className="flex items-center gap-2 text-sm text-white/55">
-              <Switch checked={collaboratorsOnly} onCheckedChange={setCollaboratorsOnly} />
+            <label htmlFor="network-collaborators-only" className="flex items-center gap-2 text-sm text-white/55">
+              <Switch id="network-collaborators-only" checked={collaboratorsOnly} onCheckedChange={setCollaboratorsOnly} />
               Open to collaborate
             </label>
           </div>

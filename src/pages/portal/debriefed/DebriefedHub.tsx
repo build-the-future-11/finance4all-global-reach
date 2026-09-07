@@ -74,6 +74,7 @@ export default function DebriefedHub() {
           <div className="mt-4 flex items-center justify-between">
             <span className="text-sm text-white/70">Enable weekly email digest</span>
             <Switch
+              aria-label="Enable weekly email digest"
               checked={prefs?.weeklyDigestEnabled ?? false}
               onCheckedChange={(v) => handleDigestToggle("weeklyDigestEnabled", v)}
             />
@@ -85,6 +86,7 @@ export default function DebriefedHub() {
           <div className="mt-4 flex items-center justify-between">
             <span className="text-sm text-white/70">I'm subscribed</span>
             <Switch
+              aria-label="Confirm Substack subscription"
               checked={prefs?.substackSubscribed ?? false}
               onCheckedChange={(v) => handleDigestToggle("substackSubscribed", v)}
             />

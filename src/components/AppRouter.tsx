@@ -32,9 +32,10 @@ const Evidence = lazy(() => import("@/pages/Evidence"));
 
 function PortalFallback() {
   return (
-    <div className="min-h-[50vh]">
+    <main className="min-h-screen bg-[#060a12] text-white" aria-label="Loading page">
+      <h1 className="sr-only">Loading page</h1>
       <LoadingState />
-    </div>
+    </main>
   );
 }
 

@@ -2,6 +2,9 @@
 
 This is a **Vite** app. All client env vars must use the `VITE_` prefix so they are exposed at build time. Do **not** use `NEXT_PUBLIC_`.
 
+The supported release runtime is Node.js 22.12 or newer with npm 10.9.8. `npm ci` is the only
+supported dependency installation path for CI and production builds.
+
 ## Current release gate
 
 `main` now fails closed when the browser Supabase configuration is missing, malformed, or placeholder-valued. A green GitHub Actions build does **not** prove that the Vercel project has the same environment configuration, because CI supplies its own test values.
@@ -137,9 +140,11 @@ Using an ordinary member account against the canonical production database, veri
 
 Record the deployed commit and the date of this certification. Source CI alone is not production certification.
 
-Run `supabase/tests/two_identity_rls_certification.sql` in the SQL Editor for a transaction-only,
-two-member RLS check. Then run the manual `Production Auth Certification` GitHub workflow with two
-dedicated ordinary-member credentials to certify browser sign-in, session isolation, logout, and
+Configure `FINANCEMETA_DATABASE_URL` as a GitHub Actions secret containing a direct or session-pooler
+connection string for the canonical `pnemeegkwyaicsbnbnmg` project. Run the manual `Production RLS
+Certification` workflow for a rollback-only authorization matrix covering every canonical public
+table. Then run `Production Auth Certification` with two dedicated ordinary-member credentials to
+certify browser sign-in, persisted profile activity, session isolation, logout/login, and
 protected-route behavior. These checks prove different layers and neither substitutes for the other.
 
 ## 5. Deploy

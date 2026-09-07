@@ -28,30 +28,74 @@ async function signIn(page: Page, account: typeof memberA) {
   await expect(page).toHaveURL(/\/portal(?:\/|$)/);
 }
 
+async function openSettings(page: Page, email: string) {
+  await page.goto("/portal/settings");
+  await expect(page).toHaveURL(/\/portal\/settings$/);
+  await expect(page.getByText(email, { exact: true })).toBeVisible();
+  await expect(page.getByLabel("Display name")).toBeVisible();
+}
+
+async function signOut(page: Page) {
+  await page.getByRole("button", { name: "Sign out" }).first().click();
+  await expect(page).toHaveURL(/\/login$/);
+}
+
 test.beforeAll(requireCredentials);
 
-test("two independent members authenticate, stay isolated, and sign out", async ({ browser }) => {
+test("two members stay isolated and member activity survives reload and reauthentication", async ({
+  browser,
+}) => {
   const contextA = await browser.newContext();
   const contextB = await browser.newContext();
   const pageA = await contextA.newPage();
   const pageB = await contextB.newPage();
 
-  await signIn(pageA, memberA);
-  await signIn(pageB, memberB);
+  let originalBio: string | undefined;
 
-  await pageA.goto("/portal/settings");
-  await pageB.goto("/portal/settings");
-  await expect(pageA.getByText(memberA.email, { exact: true })).toBeVisible();
-  await expect(pageB.getByText(memberB.email, { exact: true })).toBeVisible();
-  await expect(pageA.getByText(memberB.email, { exact: true })).toHaveCount(0);
-  await expect(pageB.getByText(memberA.email, { exact: true })).toHaveCount(0);
+  try {
+    await signIn(pageA, memberA);
+    await signIn(pageB, memberB);
 
-  await pageA.getByRole("button", { name: "Sign out" }).first().click();
-  await expect(pageA).toHaveURL(/\/login$/);
-  await pageA.goto("/portal/settings");
-  await expect(pageA).toHaveURL(/\/login$/);
-  await expect(pageB).toHaveURL(/\/portal\/settings$/);
+    await openSettings(pageA, memberA.email);
+    await openSettings(pageB, memberB.email);
+    await expect(pageA.getByText(memberB.email, { exact: true })).toHaveCount(0);
+    await expect(pageB.getByText(memberA.email, { exact: true })).toHaveCount(0);
 
-  await contextA.close();
-  await contextB.close();
+    const bioA = pageA.getByLabel("Bio");
+    const bioB = pageB.getByLabel("Bio");
+    originalBio = await bioA.inputValue();
+    const persistenceMarker = `FinanceMeta production certification ${Date.now()}`;
+
+    await bioA.fill(persistenceMarker);
+    await pageA.getByRole("button", { name: "Save changes" }).click();
+    await expect(pageA.getByText("Profile updated", { exact: true })).toBeVisible();
+
+    await pageA.reload();
+    await expect(pageA.getByLabel("Bio")).toHaveValue(persistenceMarker);
+    await expect(bioB).not.toHaveValue(persistenceMarker);
+
+    await signOut(pageA);
+    await pageA.goto("/portal/settings");
+    await expect(pageA).toHaveURL(/\/login$/);
+    await expect(pageB).toHaveURL(/\/portal\/settings$/);
+
+    await signIn(pageA, memberA);
+    await openSettings(pageA, memberA.email);
+    await expect(pageA.getByLabel("Bio")).toHaveValue(persistenceMarker);
+  } finally {
+    try {
+      if (originalBio !== undefined) {
+        if (new URL(pageA.url()).pathname === "/login") await signIn(pageA, memberA);
+        await openSettings(pageA, memberA.email);
+        await pageA.getByLabel("Bio").fill(originalBio);
+        await pageA.getByRole("button", { name: "Save changes" }).click();
+        await expect(pageA.getByText("Profile updated", { exact: true })).toBeVisible();
+        await pageA.reload();
+        await expect(pageA.getByLabel("Bio")).toHaveValue(originalBio);
+      }
+    } finally {
+      await contextA.close();
+      await contextB.close();
+    }
+  }
 });

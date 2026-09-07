@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/useAuth";
 import { useChapters } from "@/hooks/portal/useEvents";
 import { useUpdateMyProfile } from "@/hooks/portal/useNetwork";
 import { portalRoutes } from "@/routes/portal";
@@ -44,7 +44,8 @@ export default function Settings() {
     );
   };
 
-  const handleSave = async () => {
+  const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     try {
       const { error } = await updateProfile.mutateAsync({
         displayName: displayName.trim(),
@@ -96,31 +97,40 @@ export default function Settings() {
         </PortalCard>
 
         <PortalCard className="p-6 lg:col-span-2">
-          <div className="space-y-5">
+          <form className="space-y-5" onSubmit={handleSave}>
             <div>
-              <Label className="text-white/70">Display name</Label>
+              <Label htmlFor="settings-display-name" className="text-white/70">
+                Display name
+              </Label>
               <Input
+                id="settings-display-name"
+                name="displayName"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 className={portalInputClass}
               />
             </div>
             <div>
-              <Label className="text-white/70">Bio</Label>
+              <Label htmlFor="settings-bio" className="text-white/70">
+                Bio
+              </Label>
               <Textarea
+                id="settings-bio"
+                name="bio"
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 rows={3}
                 className={portalInputClass}
               />
             </div>
-            <div>
-              <Label className="text-white/70">Interests</Label>
+            <fieldset>
+              <legend className="text-sm font-medium text-white/70">Interests</legend>
               <div className="mt-2 flex flex-wrap gap-2">
                 {SUGGESTED_INTERESTS.map((tag) => (
                   <button
                     key={tag}
                     type="button"
+                    aria-pressed={interests.includes(tag)}
                     onClick={() => toggleInterest(tag)}
                     className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
                       interests.includes(tag)
@@ -132,12 +142,14 @@ export default function Settings() {
                   </button>
                 ))}
               </div>
-            </div>
+            </fieldset>
             {chapters && chapters.length > 0 && (
               <div>
-                <Label className="text-white/70">Chapter</Label>
+                <Label htmlFor="settings-chapter" className="text-white/70">
+                  Chapter
+                </Label>
                 <Select value={chapterId} onValueChange={setChapterId}>
-                  <SelectTrigger className={portalInputClass}>
+                  <SelectTrigger id="settings-chapter" className={portalInputClass}>
                     <SelectValue placeholder="Select a chapter" />
                   </SelectTrigger>
                   <SelectContent>
@@ -152,24 +164,33 @@ export default function Settings() {
             )}
             <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] p-4">
               <div>
-                <p className="text-sm font-medium text-white">Open to collaborate</p>
-                <p className="text-xs text-white/45">Shown on your public profile</p>
+                <Label htmlFor="settings-open-to-collaborate" className="text-sm font-medium text-white">
+                  Open to collaborate
+                </Label>
+                <p id="settings-open-to-collaborate-description" className="text-xs text-white/45">
+                  Shown on your public profile
+                </p>
               </div>
-              <Switch checked={openToCollaborate} onCheckedChange={setOpenToCollaborate} />
+              <Switch
+                id="settings-open-to-collaborate"
+                checked={openToCollaborate}
+                onCheckedChange={setOpenToCollaborate}
+                aria-describedby="settings-open-to-collaborate-description"
+              />
             </div>
             <div className="flex flex-wrap gap-3 pt-2">
               <Button
-                onClick={handleSave}
+                type="submit"
                 disabled={updateProfile.isPending}
                 className="bg-emerald-500 hover:bg-emerald-400"
               >
                 {updateProfile.isPending ? "Saving…" : "Save changes"}
               </Button>
-              <Button variant="outline" className={portalButtonOutline} onClick={() => signOut()}>
+              <Button type="button" variant="outline" className={portalButtonOutline} onClick={() => signOut()}>
                 Sign out
               </Button>
             </div>
-          </div>
+          </form>
         </PortalCard>
       </div>
     </div>

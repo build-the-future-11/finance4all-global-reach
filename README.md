@@ -1,11 +1,14 @@
 # Finance4All Global Reach
 
 > **Canonical FinanceMeta/Finance4All portal source:** `build-the-future-11/finance4all-global-reach`  
-> `build-the-future-11/FinanceMeta-Landing` and `build-the-future-11/FinanceMeta-Global` are separate sibling/legacy surfaces; do not use them as the portal deployment source unless a task explicitly targets those repositories.
+> `build-the-future-11/FinanceMeta-Landing` and `build-the-future-11/FinanceMeta-Global` are separate sibling surfaces; do not use them as the portal deployment source unless a task explicitly targets those repositories.
 
 Student finance learning site and **Supabase-powered member portal**.
 
 **Live on Vercel:** set env vars (see [DEPLOYMENT.md](DEPLOYMENT.md)) then deploy.
+
+**Runtime:** Node.js 22.12 or newer and npm 10.9.8. The release contract rejects older Node
+versions, alternate package managers, and conflicting lockfiles.
 
 ## Portal modules
 
@@ -37,6 +40,7 @@ Full guide: **[DEPLOYMENT.md](DEPLOYMENT.md)**
 ```bash
 npm ci
 cp .env.example .env   # add Supabase keys
+npm run validate:env
 npm run dev
 ```
 
@@ -54,4 +58,14 @@ credentials.
 
 Database authorization is independently checked by
 `supabase/tests/two_identity_rls_certification.sql`. It impersonates two existing ordinary members
-inside a transaction and ends with `ROLLBACK`, so the certification does not retain mutations.
+inside a transaction, inventories every canonical public table, exercises owner and cross-member
+mutations, and ends with `ROLLBACK`. Configure the canonical project's database connection as the
+`FINANCEMETA_DATABASE_URL` Actions secret and run `Production RLS Certification`; the retained log
+must end in `result=PASS` before the production authorization gate is considered complete.
+
+`npm run test:e2e` runs real Chromium interactions plus Axe against every public entry and recovery
+route. These browser checks complement the component and source-contract tests; they do not replace
+the credentialed production workflow.
+
+The current evidence and remaining external blockers are tracked in
+[`docs/PRODUCTION_READINESS.md`](docs/PRODUCTION_READINESS.md).

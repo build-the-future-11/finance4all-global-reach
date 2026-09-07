@@ -5,7 +5,7 @@ import { verifyReleaseToolchain } from '../scripts/verify-release-toolchain.mjs'
 
 const packageJson = {
   packageManager: 'npm@10.9.8',
-  engines: { node: '>=20.0.0' },
+  engines: { node: '>=22.12.0' },
 };
 
 function existsFrom(files) {
@@ -13,7 +13,7 @@ function existsFrom(files) {
   return (file) => set.has(file);
 }
 
-test('accepts the single npm release contract on Node 20+', () => {
+test('accepts the single npm release contract on Node 22.12+', () => {
   const result = verifyReleaseToolchain({
     packageJson,
     exists: existsFrom(['package-lock.json']),
@@ -39,12 +39,12 @@ test('rejects package-manager declaration drift', () => {
 test('rejects Node engine floor drift', () => {
   assert.throws(
     () => verifyReleaseToolchain({
-      packageJson: { ...packageJson, engines: { node: '>=18' } },
+      packageJson: { ...packageJson, engines: { node: '>=20.0.0' } },
       exists: existsFrom(['package-lock.json']),
       nodeVersion: '22.23.2',
       userAgent: 'npm/10.9.8',
     }),
-    /engines\.node must be exactly >=20\.0\.0/,
+    /engines\.node must be exactly >=22\.12\.0/,
   );
 });
 
@@ -72,16 +72,18 @@ test('rejects missing npm lockfile and conflicting lockfiles', () => {
   }
 });
 
-test('rejects runtime execution below Node 20', () => {
-  assert.throws(
-    () => verifyReleaseToolchain({
-      packageJson,
-      exists: existsFrom(['package-lock.json']),
-      nodeVersion: '18.20.8',
-      userAgent: 'npm/10.9.8',
-    }),
-    /Node >=20 is required/,
-  );
+test('rejects runtime execution below Node 22.12', () => {
+  for (const nodeVersion of ['20.19.6', '22.11.0']) {
+    assert.throws(
+      () => verifyReleaseToolchain({
+        packageJson,
+        exists: existsFrom(['package-lock.json']),
+        nodeVersion,
+        userAgent: 'npm/10.9.8',
+      }),
+      /Node >=22\.12 is required/,
+    );
+  }
 });
 
 test('rejects release scripts invoked through a non-npm package manager', () => {
