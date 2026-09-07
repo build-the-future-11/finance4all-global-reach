@@ -8,6 +8,7 @@ const env = { ...fileEnv, ...process.env };
 
 const FINANCEMETA_SUPABASE_PROJECT_REF = "pnemeegkwyaicsbnbnmg";
 const FINANCEMETA_SUPABASE_HOST = `${FINANCEMETA_SUPABASE_PROJECT_REF}.supabase.co`;
+const FINANCEMETA_PORTAL_ORIGIN = "https://finance4all-global-reach.vercel.app";
 const PUBLISHABLE_KEY_PATTERN = /^sb_publishable_[A-Za-z0-9_-]+$/;
 const allowLocal = mode === "development";
 
@@ -70,8 +71,16 @@ if (!authRedirectOrigin) {
 } else {
   try {
     const url = new URL(authRedirectOrigin);
-    if (url.protocol !== "https:" || url.pathname !== "/" || url.search || url.hash || url.username || url.password) {
-      failures.push("VITE_AUTH_REDIRECT_ORIGIN must be a clean https origin");
+    const isLocal = ["localhost", "127.0.0.1", "::1", "[::1]"].includes(url.hostname);
+    if (url.pathname !== "/" || url.search || url.hash || url.username || url.password) {
+      failures.push("VITE_AUTH_REDIRECT_ORIGIN must be a clean origin");
+    } else if (isLocal) {
+      if (!allowLocal) failures.push("VITE_AUTH_REDIRECT_ORIGIN may target localhost only in development");
+      if (url.protocol !== "http:" && url.protocol !== "https:") {
+        failures.push("Local VITE_AUTH_REDIRECT_ORIGIN must use http or https");
+      }
+    } else if (url.origin !== FINANCEMETA_PORTAL_ORIGIN) {
+      failures.push(`VITE_AUTH_REDIRECT_ORIGIN must equal ${FINANCEMETA_PORTAL_ORIGIN}`);
     }
   } catch {
     failures.push("VITE_AUTH_REDIRECT_ORIGIN must be a valid absolute URL");

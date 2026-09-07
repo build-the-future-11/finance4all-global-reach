@@ -1,11 +1,50 @@
 export const FINANCEMETA_SUPABASE_PROJECT_REF = "pnemeegkwyaicsbnbnmg";
 export const FINANCEMETA_SUPABASE_HOST = `${FINANCEMETA_SUPABASE_PROJECT_REF}.supabase.co`;
+export const FINANCEMETA_PORTAL_ORIGIN = "https://finance4all-global-reach.vercel.app";
 
 const LOCAL_SUPABASE_HOSTS = new Set(["localhost", "127.0.0.1", "::1", "[::1]"]);
 const PUBLISHABLE_KEY_PATTERN = /^sb_publishable_[A-Za-z0-9_-]+$/;
 
 export interface FinanceMetaSupabaseProjectOptions {
   allowLocal: boolean;
+}
+
+export function assertFinanceMetaAuthRedirectOrigin(
+  value: string | undefined,
+  { allowLocal }: FinanceMetaSupabaseProjectOptions,
+) {
+  if (!value) {
+    if (allowLocal) return;
+    throw new Error("[Finance4All] VITE_AUTH_REDIRECT_ORIGIN is required outside development.");
+  }
+
+  let parsed: URL;
+  try {
+    parsed = new URL(value);
+  } catch {
+    throw new Error("[Finance4All] VITE_AUTH_REDIRECT_ORIGIN is not a valid absolute URL.");
+  }
+
+  if (parsed.pathname !== "/" || parsed.search || parsed.hash || parsed.username || parsed.password) {
+    throw new Error("[Finance4All] VITE_AUTH_REDIRECT_ORIGIN must be a clean origin.");
+  }
+
+  const isLocal = LOCAL_SUPABASE_HOSTS.has(parsed.hostname);
+  if (isLocal) {
+    if (!allowLocal) {
+      throw new Error("[Finance4All] Local auth redirect origins are allowed only in development.");
+    }
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      throw new Error("[Finance4All] Local auth redirect origin must use http or https.");
+    }
+    return;
+  }
+
+  if (parsed.origin !== FINANCEMETA_PORTAL_ORIGIN) {
+    throw new Error(
+      `[Finance4All] Refusing foreign auth redirect origin ${parsed.origin}. Expected ${FINANCEMETA_PORTAL_ORIGIN}.`,
+    );
+  }
 }
 
 function readJwtRole(key: string): string | null {

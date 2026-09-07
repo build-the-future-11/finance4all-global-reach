@@ -28,6 +28,20 @@ describe("public environment contract", () => {
     expect(result.stderr).toContain("must target the FinanceMeta Supabase project");
   }, 15_000);
 
+  it("rejects the VertexED auth redirect origin", () => {
+    const result = spawnSync(process.execPath, [script], {
+      env: {
+        ...validEnv,
+        VITE_AUTH_REDIRECT_ORIGIN: "https://www.vertexed.app",
+      },
+      encoding: "utf8",
+    });
+    expect(result.status).not.toBe(0);
+    expect(result.stderr).toContain(
+      "VITE_AUTH_REDIRECT_ORIGIN must equal https://finance4all-global-reach.vercel.app",
+    );
+  }, 15_000);
+
   it("does not accept a legacy anon JWT as a hidden fallback", () => {
     const { VITE_SUPABASE_PUBLISHABLE_KEY: _removed, ...envWithoutPublishableKey } = validEnv;
     const result = spawnSync(process.execPath, [script], {
