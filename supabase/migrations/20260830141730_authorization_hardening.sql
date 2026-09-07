@@ -1,5 +1,5 @@
 -- FinanceMeta authorization and notification integrity hardening
--- Apply after 001_initial_schema.sql, 002_google_oauth.sql and 003_bookmarks_notifications.sql.
+-- Follows the initial schema, OAuth, and bookmark/notification migrations.
 -- Prevent members from escalating profiles.role through direct PostgREST/client writes.
 -- Make the authenticated essay aggregate view execute with caller permissions so underlying essay RLS applies.
 -- Preserve community upvote totals through a narrow SECURITY DEFINER count function that exposes counts, not voter rows.

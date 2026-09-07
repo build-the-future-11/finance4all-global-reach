@@ -15,6 +15,8 @@ import type {
   StudioSubmission,
   UserProfile,
 } from "@/types/domain";
+import { normalizeExternalHttpUrl } from "@/lib/external-url";
+import { sanitizePostAuthPath } from "@/lib/auth-navigation";
 
 export const PUBLIC_PROFILE_COLUMNS =
   "id, display_name, role, bio, avatar_url, interests, open_to_collaborate, chapter_id, created_at, updated_at" as const;
@@ -39,7 +41,7 @@ export function mapProfile(row: PublicProfileRow): UserProfile {
     displayName: row.display_name,
     role: row.role,
     bio: row.bio ?? undefined,
-    avatarUrl: row.avatar_url ?? undefined,
+    avatarUrl: normalizeExternalHttpUrl(row.avatar_url),
     interests: row.interests,
     openToCollaborate: row.open_to_collaborate,
     chapterId: row.chapter_id ?? undefined,
@@ -54,7 +56,7 @@ export function mapNewsArticle(row: Tables<"news_articles">): NewsArticle {
     title: row.title,
     summary: row.summary,
     category: row.category,
-    sourceUrl: row.source_url ?? undefined,
+    sourceUrl: normalizeExternalHttpUrl(row.source_url),
     publishedAt: row.published_at,
     tags: row.tags,
   };
@@ -115,7 +117,7 @@ export function mapOpportunity(row: Tables<"opportunities">): Opportunity {
     organization: row.organization,
     type: row.type,
     description: row.description,
-    applicationUrl: row.application_url ?? undefined,
+    applicationUrl: normalizeExternalHttpUrl(row.application_url),
     deadline: row.deadline ?? undefined,
     tags: row.tags,
     isActive: row.is_active,
@@ -127,8 +129,8 @@ export function mapStudioSubmission(row: Tables<"studio_submissions">): StudioSu
     id: row.id,
     authorId: row.author_id,
     title: row.title,
-    repoUrl: row.repo_url ?? undefined,
-    demoUrl: row.demo_url ?? undefined,
+    repoUrl: normalizeExternalHttpUrl(row.repo_url),
+    demoUrl: normalizeExternalHttpUrl(row.demo_url),
     writeup: row.writeup,
     submittedAt: row.submitted_at,
   };
@@ -162,7 +164,12 @@ export function mapChapter(row: Tables<"chapters">): Chapter {
 
 export function mapEvent(row: Tables<"events">): Event {
   const links = Array.isArray(row.program_links)
-    ? (row.program_links as { label: string; url: string }[])
+    ? row.program_links.flatMap((value) => {
+        if (!value || typeof value !== "object" || Array.isArray(value)) return [];
+        const label = "label" in value && typeof value.label === "string" ? value.label.trim() : "";
+        const url = "url" in value ? normalizeExternalHttpUrl(value.url) : undefined;
+        return label && url ? [{ label, url }] : [];
+      })
     : [];
   return {
     id: row.id,
@@ -172,7 +179,7 @@ export function mapEvent(row: Tables<"events">): Event {
     status: row.status,
     startsAt: row.starts_at,
     endsAt: row.ends_at ?? undefined,
-    registrationUrl: row.registration_url ?? undefined,
+    registrationUrl: normalizeExternalHttpUrl(row.registration_url),
     programLinks: links,
   };
 }
@@ -206,7 +213,7 @@ export function mapNotification(row: Tables<"notifications">): Notification {
     type: row.type,
     title: row.title,
     body: row.body,
-    link: row.link ?? undefined,
+    link: row.link ? sanitizePostAuthPath(row.link, "") || undefined : undefined,
     read: row.read,
     createdAt: row.created_at,
   };

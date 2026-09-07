@@ -17,10 +17,12 @@ describe("FinanceMeta authorization boundary", () => {
   it("is a versioned migration after the original schema and hardening patches", () => {
     expect(path.basename(migrationPath)).toMatch(/^\d{14}_portal_security_and_privacy\.sql$/);
     for (const file of [
-      "001_initial_schema.sql",
-      "002_google_oauth.sql",
-      "003_bookmarks_notifications.sql",
-      "004_authorization_hardening.sql",
+      "20260709090402_initial_schema.sql",
+      "20260709104954_google_oauth.sql",
+      "20260710031219_bookmarks_notifications.sql",
+      "20260711032432_security_hardening.sql",
+      "20260711032433_education_progress.sql",
+      "20260830141730_authorization_hardening.sql",
     ]) {
       expect(fs.existsSync(path.resolve(process.cwd(), "supabase/migrations", file))).toBe(true);
     }
@@ -78,7 +80,7 @@ describe("FinanceMeta authorization boundary", () => {
     expect(migration).toContain("GRANT UPDATE (read) ON TABLE public.notifications TO authenticated");
   });
 
-  it("preserves the public contact path without broad mutation grants", () => {
+  it("hardens the optional contact path before the later retirement migration", () => {
     expect(migration).toContain("GRANT INSERT (name, email, subject, message)");
     expect(migration).toContain("status = ''new''");
     expect(migration).toContain("BETWEEN 10 AND 5000");
@@ -102,7 +104,7 @@ describe("FinanceMeta authorization boundary", () => {
     }
   });
 
-  it("keeps the optional avatar bucket private", () => {
+  it("hardens the optional avatar bucket before the later retirement migration", () => {
     expect(migration).toContain("UPDATE storage.buckets SET public = false");
     expect(migration).toContain('DROP POLICY IF EXISTS "Public avatar read"');
     expect(migration).toContain('CREATE POLICY "Members read avatars"');

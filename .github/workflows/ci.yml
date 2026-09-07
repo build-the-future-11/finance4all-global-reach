@@ -42,9 +42,11 @@ jobs:
           test -n "$POSTGRES_CONTAINER"
           docker cp supabase/tests/bare_postgres_bootstrap.sql "$POSTGRES_CONTAINER:/tmp/bare_postgres_bootstrap.sql"
           docker cp supabase/migrations/. "$POSTGRES_CONTAINER:/tmp/portal-migrations/"
+          docker cp supabase/tests/two_identity_rls_certification.sql "$POSTGRES_CONTAINER:/tmp/two_identity_rls_certification.sql"
           docker cp supabase/tests/account_lifecycle_rls_certification.sql "$POSTGRES_CONTAINER:/tmp/account_lifecycle_rls_certification.sql"
           docker exec "$POSTGRES_CONTAINER" psql -v ON_ERROR_STOP=1 -U supabase_admin -d postgres -f /tmp/bare_postgres_bootstrap.sql
           docker exec "$POSTGRES_CONTAINER" sh -lc 'set -eu; for migration in /tmp/portal-migrations/*.sql; do psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f "$migration"; done'
+          docker exec "$POSTGRES_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/two_identity_rls_certification.sql
           docker exec "$POSTGRES_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/account_lifecycle_rls_certification.sql
 
   verify:

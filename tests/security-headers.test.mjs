@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const deploymentDoc = readFileSync(new URL("../DEPLOYMENT.md", import.meta.url), "utf8");
+const globalStyles = readFileSync(new URL("../src/index.css", import.meta.url), "utf8");
 const vercelConfig = JSON.parse(
   readFileSync(new URL("../vercel.json", import.meta.url), "utf8"),
 );
@@ -46,4 +47,12 @@ test("CSP connect-src is pinned to the documented canonical Supabase project", (
   );
   assert.match(csp, new RegExp(`connect-src[^;]*https://${expectedHost}`));
   assert.match(csp, new RegExp(`connect-src[^;]*wss://${expectedHost}`));
+});
+
+test("production styling does not depend on third-party font infrastructure", () => {
+  const csp = globalCsp();
+
+  assert.doesNotMatch(globalStyles, /@import\s+url\(/i);
+  assert.doesNotMatch(csp, /fonts\.(?:googleapis|gstatic)\.com/i);
+  assert.match(csp, /font-src 'self' data:/);
 });

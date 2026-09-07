@@ -1,77 +1,50 @@
-# Finance4All — Quick Setup (test in 5 minutes)
+# Finance4All Local Supabase Setup
 
-Your `.env` is already configured locally. Follow these steps in order.
+This repository uses the Supabase CLI migration ledger. The SQL files in `supabase/migrations/` are ordered, timestamped migrations; do not paste them individually into a hosted SQL Editor.
 
----
+## Local database
 
-## Step 1: Add redirect URL in Supabase (required for Google login)
+Prerequisites: Docker and the Supabase CLI.
 
-1. Open [Supabase Dashboard](https://supabase.com/dashboard/project/pnemeegkwyaicsbnbnmg)
-2. Go to **Authentication** → **URL Configuration**
-3. Set **Site URL** to: `http://localhost:8080`
-4. Under **Redirect URLs**, add:
-   ```
-   http://localhost:8080/auth/callback
-   ```
-5. Click **Save**
+```bash
+npx supabase start
+npx supabase db reset
+```
 
-> When you deploy, also add `https://your-domain.com/auth/callback`
+`npx supabase db reset` rebuilds the local database from every tracked migration and then applies `supabase/seed.sql`. Treat the seed as development data, not production content.
 
----
+Copy the local values reported by `supabase status` into `.env`:
 
-## Step 2: Verify and apply database migrations
+```text
+VITE_SUPABASE_URL=http://127.0.0.1:54321
+VITE_SUPABASE_PUBLISHABLE_KEY=<local publishable or anon key>
+VITE_AUTH_REDIRECT_ORIGIN=http://localhost:8080
+```
+
+Then start the portal:
 
 ```bash
 npm ci
-npx supabase login
-npx supabase link --project-ref pnemeegkwyaicsbnbnmg
-npx supabase migration list --linked
-npx supabase db push --linked --dry-run
-npx supabase db push --linked
+npm run dev -- --host 127.0.0.1 --port 8080
 ```
 
-Stop if the linked project or history differs. Do not paste old individual migrations or seed data
-into production; the CLI must apply the complete pending versioned chain.
+## Hosted project
 
----
-
-## Step 3: Start the app
+Follow [DEPLOYMENT.md](../DEPLOYMENT.md). Before any remote schema change:
 
 ```bash
-npm install
-npm run dev
+npx supabase link --project-ref <project-ref>
+npx supabase migration list --linked
+npx supabase db push --linked --dry-run
 ```
 
-Open: **http://localhost:8080/login**
+Only run `supabase db push` after the dry run and environment identity are reviewed. If SQL was applied manually in the past, reconcile the actual schema first and use `supabase migration repair <version> --status applied`; never re-run a non-idempotent migration merely to populate history.
 
----
+## OAuth
 
-## Step 4: Sign in
+For local Google OAuth, add `http://localhost:8080/auth/callback` to the project's allowed redirect URLs. The provider callback remains `https://<project-ref>.supabase.co/auth/v1/callback` in Google Cloud.
 
-Click **Continue with Google** — or use email/password on `/signup`.
-
-After login you'll land on `/portal` with news, events, opportunities, and more.
-
----
-
-## Google OAuth checklist
-
-| Setting | Value |
-|---------|-------|
-| Provider enabled | Authentication → Providers → Google ✅ |
-| Site URL | `http://localhost:8080` |
-| Redirect URL | `http://localhost:8080/auth/callback` |
-| Google Cloud redirect | `https://pnemeegkwyaicsbnbnmg.supabase.co/auth/v1/callback` (set in Google Console) |
-
----
-
-## Promote your account (optional)
-
-```sql
-UPDATE profiles SET role = 'lead_researcher' WHERE email = 'you@gmail.com';
-```
-
----
+Do not commit API secrets, database passwords, OAuth client secrets, or member credentials.
 
 ## Troubleshooting
 

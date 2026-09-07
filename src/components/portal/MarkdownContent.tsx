@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { normalizeExternalHttpUrl } from "@/lib/external-url";
 
 interface MarkdownContentProps {
   content: string;
@@ -30,17 +31,18 @@ function inlineFormat(text: string): React.ReactNode[] {
     } else {
       const linkMatch = /\[([^\]]+)\]\(([^)]+)\)/.exec(token);
       if (linkMatch) {
-        parts.push(
+        const href = normalizeExternalHttpUrl(linkMatch[2]);
+        parts.push(href ? (
           <a
             key={key++}
-            href={linkMatch[2]}
+            href={href}
             target="_blank"
             rel="noopener noreferrer"
             className="text-emerald-300 underline underline-offset-2 hover:text-emerald-200"
           >
             {linkMatch[1]}
-          </a>,
-        );
+          </a>
+        ) : linkMatch[1]);
       }
     }
     last = match.index + token.length;

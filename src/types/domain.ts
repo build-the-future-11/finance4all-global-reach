@@ -1,4 +1,10 @@
 import { z } from "zod";
+import { normalizeExternalHttpUrl } from "@/lib/external-url";
+
+const ExternalHttpUrlSchema = z.string().url().refine(
+  (value) => Boolean(normalizeExternalHttpUrl(value)),
+  "Must be an http or https URL without embedded credentials",
+);
 
 // ─── Auth & Users ───────────────────────────────────────────────────────────
 
@@ -10,7 +16,7 @@ export const UserProfileSchema = z.object({
   displayName: z.string().min(1),
   role: UserRoleSchema,
   bio: z.string().optional(),
-  avatarUrl: z.string().url().optional(),
+  avatarUrl: ExternalHttpUrlSchema.optional(),
   interests: z.array(z.string()).default([]),
   openToCollaborate: z.boolean().default(false),
   chapterId: z.string().uuid().optional(),
@@ -29,7 +35,7 @@ export const NewsArticleSchema = z.object({
   title: z.string(),
   summary: z.string(),
   category: NewsCategorySchema,
-  sourceUrl: z.string().url().optional(),
+  sourceUrl: ExternalHttpUrlSchema.optional(),
   publishedAt: z.string().datetime(),
   tags: z.array(z.string()).default([]),
 });
@@ -113,7 +119,7 @@ export const OpportunitySchema = z.object({
   organization: z.string(),
   type: OpportunityTypeSchema,
   description: z.string(),
-  applicationUrl: z.string().url().optional(),
+  applicationUrl: ExternalHttpUrlSchema.optional(),
   deadline: z.string().datetime().optional(),
   tags: z.array(z.string()).default([]),
   isActive: z.boolean().default(true),
@@ -124,8 +130,8 @@ export const StudioSubmissionSchema = z.object({
   id: z.string().uuid(),
   authorId: z.string().uuid(),
   title: z.string(),
-  repoUrl: z.string().url().optional(),
-  demoUrl: z.string().url().optional(),
+  repoUrl: ExternalHttpUrlSchema.optional(),
+  demoUrl: ExternalHttpUrlSchema.optional(),
   writeup: z.string(),
   submittedAt: z.string().datetime(),
 });
@@ -166,9 +172,9 @@ export const EventSchema = z.object({
   status: EventStatusSchema,
   startsAt: z.string().datetime(),
   endsAt: z.string().datetime().optional(),
-  registrationUrl: z.string().url().optional(),
+  registrationUrl: ExternalHttpUrlSchema.optional(),
   programLinks: z
-    .array(z.object({ label: z.string(), url: z.string().url() }))
+    .array(z.object({ label: z.string(), url: ExternalHttpUrlSchema }))
     .default([]),
 });
 export type Event = z.infer<typeof EventSchema>;

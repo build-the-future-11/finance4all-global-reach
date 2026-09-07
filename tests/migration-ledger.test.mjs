@@ -1,0 +1,117 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+
+import {
+  parseProductionVersions,
+  repositoryMigrationVersions,
+  verifyMigrationLedger,
+} from '../scripts/verify-migration-ledger.mjs';
+
+function file(name) {
+  return { name, isFile: () => true };
+}
+
+const currentRepositoryVersions = [
+  '20260709090402',
+  '20260709104954',
+  '20260710031219',
+  '20260711032432',
+  '20260711032433',
+  '20260830141730',
+  '20260906121145',
+  '20260906150000',
+  '20260906150632',
+  '20260906171941',
+  '20260906172830',
+  '20260907110357',
+];
+
+test('the tracked repository has only canonical ordered migration files', () => {
+  assert.deepEqual(repositoryMigrationVersions(), currentRepositoryVersions);
+});
+
+test('extracts and sorts every repository migration version', () => {
+  const versions = repositoryMigrationVersions({
+    entries: [
+      file('20260830141730_authorization_hardening.sql'),
+      file('20260906150000_retire_unused_hosted_extensions.sql'),
+      file('20260709090402_initial_schema.sql'),
+      file('20260906121145_portal_security_and_privacy.sql'),
+      file('README.md'),
+    ],
+  });
+
+  assert.deepEqual(versions, [
+    '20260709090402',
+    '20260830141730',
+    '20260906121145',
+    '20260906150000',
+  ]);
+});
+
+test('rejects SQL migration files without canonical timestamps', () => {
+  assert.throws(
+    () => repositoryMigrationVersions({ entries: [file('001_initial_schema.sql')] }),
+    /must use <14-digit timestamp>_<name>\.sql/,
+  );
+});
+
+test('rejects duplicate timestamped repository versions', () => {
+  assert.throws(
+    () => repositoryMigrationVersions({
+      entries: [
+        file('20260906121145_first.sql'),
+        file('20260906121145_second.sql'),
+      ],
+    }),
+    /duplicate repository migration version 20260906121145/,
+  );
+});
+
+test('parses a production ledger from comma or whitespace separated versions', () => {
+  assert.deepEqual(
+    parseProductionVersions('20260906150000, 20260906121145\n20260904012631'),
+    ['20260904012631', '20260906121145', '20260906150000'],
+  );
+});
+
+test('rejects malformed and duplicate production ledger versions', () => {
+  assert.throws(
+    () => parseProductionVersions('20260906121145 not-a-version'),
+    /invalid production migration version not-a-version/,
+  );
+  assert.throws(
+    () => parseProductionVersions('20260906121145 20260906121145'),
+    /duplicate production migration version 20260906121145/,
+  );
+});
+
+test('accepts exact repository and production timestamp history equivalence', () => {
+  const result = verifyMigrationLedger({
+    repositoryVersions: ['20260906121145', '20260906150000'],
+    productionVersions: ['20260906150000', '20260906121145'],
+  });
+
+  assert.equal(result.status, 'MATCH');
+  assert.equal(result.latestVersion, '20260906150000');
+});
+
+test('fails closed when repository migrations are missing from production ledger', () => {
+  assert.throws(
+    () => verifyMigrationLedger({
+      repositoryVersions: ['20260906121145', '20260906150000'],
+      productionVersions: ['20260906121145'],
+    }),
+    /repository-only versions: 20260906150000/,
+  );
+});
+
+test('fails closed when production ledger contains versions absent from repository history', () => {
+  assert.throws(
+    () => verifyMigrationLedger({
+      repositoryVersions: ['20260906121145', '20260906150000'],
+      productionVersions: ['20260904012631', '20260906121145', '20260906150000'],
+    }),
+    /production-only versions: 20260904012631/,
+  );
+});

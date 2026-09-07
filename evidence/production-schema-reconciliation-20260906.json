@@ -1,0 +1,41 @@
+{
+  "schema": "financemeta.production-schema-reconciliation.v1",
+  "observed_at": "2026-09-06T17:28:45Z",
+  "project_ref": "pnemeegkwyaicsbnbnmg",
+  "repository": "build-the-future-11/finance4all-global-reach",
+  "source_sha": "8eef71512b2249fae1b2b24fa873a0db98c3f389",
+  "merged_pull_request": 56,
+  "forward_migrations": [
+    "20260906171941_archive_abandoned_public_tables.sql",
+    "20260906172830_harden_recovered_profile_functions.sql"
+  ],
+  "transaction_result": "PRODUCTION_REPAIR_APPLIED",
+  "post_repair": {
+    "missing_expected_public_tables": [],
+    "unexpected_public_tables": [],
+    "expected_tables_with_rls_disabled": [],
+    "authenticated_can_execute_sync_chapter_member_counts": false,
+    "sync_chapter_member_counts_config": [
+      "search_path=\"\""
+    ],
+    "private_legacy_tables": [
+      "legacy_digest_send_log",
+      "legacy_education_lessons",
+      "legacy_education_modules",
+      "legacy_rate_limit_events",
+      "legacy_resource_guides",
+      "legacy_resource_items",
+      "legacy_testimonials",
+      "legacy_webinars",
+      "legacy_weekly_goal_baselines"
+    ]
+  },
+  "migration_ledger_table": null,
+  "ledger_status": "BLOCKED_AUTHENTICATED_CLI_REPAIR_REQUIRED",
+  "notes": [
+    "No public tables or rows were deleted.",
+    "The eight archived public tables contained zero rows before migration.",
+    "private.legacy_rate_limit_events retained three rows before and after this repair.",
+    "The internal Supabase migration ledger was not written directly."
+  ]
+}

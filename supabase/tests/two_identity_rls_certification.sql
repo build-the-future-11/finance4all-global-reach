@@ -1,19 +1,41 @@
 -- Transaction-only production authorization certification.
--- Requires at least two ordinary profiles. Every mutation is rolled back.
+-- Creates two synthetic ordinary identities and rolls every mutation back.
 
 BEGIN;
 
+CREATE TEMP TABLE portal_certification_identity_seed (
+  id uuid PRIMARY KEY,
+  email text NOT NULL UNIQUE
+);
+
+INSERT INTO portal_certification_identity_seed (id, email) VALUES
+  (pg_catalog.gen_random_uuid(), 'rls-member-a-' || pg_catalog.gen_random_uuid()::text || '@example.test'),
+  (pg_catalog.gen_random_uuid(), 'rls-member-b-' || pg_catalog.gen_random_uuid()::text || '@example.test');
+
+INSERT INTO auth.users (
+  instance_id, id, aud, role, email, encrypted_password,
+  confirmed_at, raw_app_meta_data, raw_user_meta_data,
+  created_at, updated_at
+)
+SELECT
+  '00000000-0000-0000-0000-000000000000', id,
+  'authenticated', 'authenticated', email, '',
+  pg_catalog.now(), '{"provider":"email","providers":["email"]}'::jsonb,
+  '{"display_name":"RLS certification member"}'::jsonb,
+  pg_catalog.now(), pg_catalog.now()
+FROM portal_certification_identity_seed;
+
 CREATE TEMP TABLE portal_certification_members AS
-SELECT id, pg_catalog.row_number() OVER (ORDER BY created_at, id) AS ordinal
-FROM public.profiles
-WHERE role = 'member'::public.user_role
-ORDER BY created_at, id
-LIMIT 2;
+SELECT p.id, pg_catalog.row_number() OVER (ORDER BY p.id) AS ordinal
+FROM public.profiles p
+JOIN portal_certification_identity_seed seed USING (id)
+WHERE p.role = 'member'::public.user_role
+ORDER BY p.id;
 
 DO $preflight$
 BEGIN
   IF (SELECT pg_catalog.count(*) FROM portal_certification_members) <> 2 THEN
-    RAISE EXCEPTION 'two ordinary member profiles are required';
+    RAISE EXCEPTION 'synthetic ordinary member profiles were not created';
   END IF;
 END;
 $preflight$;

@@ -12,7 +12,7 @@ Before treating a Vercel deployment as production-ready, verify all of the follo
 - `VITE_SUPABASE_PUBLISHABLE_KEY` is present and uses the browser-safe `sb_publishable_...` format.
 - The variables are enabled for **Production and Preview** (and Development if Vercel development environments are used).
 - The deployment was rebuilt after any environment-variable change.
-- Database migrations through `20260906150000_retire_unused_hosted_extensions.sql` have been applied in order.
+- Database migrations through `20260907110357_trusted_profile_role_administration.sql`, including the member-account lifecycle migration, have been applied in order.
 - Google OAuth redirect URLs match the deployed production and preview domains.
 
 If a Vercel deployment starts failing after the fail-closed configuration gate was introduced, check the build log for `validate-public-env` output first. Do not weaken or bypass the validator to make a deployment green.
@@ -96,19 +96,30 @@ In Supabase → **Authentication** → **Sign In / Providers** → **Email**:
 
 ## 4. Database
 
-Before applying anything, inspect the canonical Supabase project's migration state. Do not re-run migrations blindly.
+Use the Supabase CLI migration workflow. Do not paste migration files into the production SQL Editor or re-run them blindly.
 
 Required migration order:
 
-1. `supabase/migrations/001_initial_schema.sql`
-2. `supabase/seed.sql` (seed data only; apply intentionally)
-3. `supabase/migrations/002_google_oauth.sql` (Google login)
-4. `supabase/migrations/003_bookmarks_notifications.sql` (bookmarks + notifications)
-5. `supabase/migrations/004_authorization_hardening.sql` (role/ownership/notification/view authorization hardening)
-6. `supabase/migrations/20260906121145_portal_security_and_privacy.sql` (least-privilege grants, member-email privacy, immutable ownership, safe auth helpers)
-7. `supabase/migrations/20260906150000_retire_unused_hosted_extensions.sql` (retire unused hosted-only RPC/contact surfaces, archive existing rate telemetry privately, and leave the empty avatar bucket private and inert)
+1. `supabase/migrations/20260709090402_initial_schema.sql`
+2. `supabase/migrations/20260709104954_google_oauth.sql` (Google login)
+3. `supabase/migrations/20260710031219_bookmarks_notifications.sql` (bookmarks + notifications)
+4. `supabase/migrations/20260711032432_security_hardening.sql` (recovered profile and notification hardening that is present in production)
+5. `supabase/migrations/20260711032433_education_progress.sql` (recovered owner-scoped lesson progress table that is present in production)
+6. `supabase/migrations/20260830141730_authorization_hardening.sql` (role/ownership/notification/view authorization hardening)
+7. `supabase/migrations/20260906121145_portal_security_and_privacy.sql` (least-privilege grants, member-email privacy, immutable ownership, safe auth helpers)
+8. `supabase/migrations/20260906150000_retire_unused_hosted_extensions.sql` (retire unused hosted-only RPC/contact surfaces, archive existing rate telemetry privately, and leave the empty avatar bucket private and inert)
+9. `supabase/migrations/20260906150632_member_account_lifecycle.sql` (member data export, reviewed deletion requests, and administrator review isolation)
+10. `supabase/migrations/20260906171941_archive_abandoned_public_tables.sql` (reversibly move empty, unused tables from a partially applied branch into the private legacy namespace)
+11. `supabase/migrations/20260906172830_harden_recovered_profile_functions.sql` (pin recovered trigger functions to qualified objects and remove browser-role execution)
+12. `supabase/migrations/20260907110357_trusted_profile_role_administration.sql` (retain member role-change denial while allowing trusted database operators to provision the initial administrator)
 
-Both authorization migrations are production security requirements, not optional enhancements.
+The recovered migrations were traced to commit `9539faadecc5d5c564b33e7610e02cbe1789f97c` and matched against the live schema before being restored. See `docs/PRODUCTION_SCHEMA_RECONCILIATION.md` for the observed production state and the remaining ledger-repair boundary.
+
+The authorization migrations are production security requirements, not optional enhancements.
+
+For a fresh local database, run `supabase db reset`. Apply `supabase/seed.sql` only to disposable local or explicitly approved staging environments. For a linked remote project, inspect `supabase migration list --linked` before `supabase db push`.
+
+If a migration was previously applied manually and its schema is already present, first prove the schema matches the repository migration. Then use the documented `supabase migration repair <version> --status applied` command to repair history without executing the SQL again. Record the before/after migration list and exact source SHA. Never insert directly into `supabase_migrations.schema_migrations`.
 
 ### Authorization certification after the latest migration
 
@@ -122,9 +133,12 @@ Using an ordinary member account against the canonical production database, veri
 - a member cannot self-accept a lab application or self-award an editorial pick;
 - a connection recipient cannot rewrite either participant or the request message;
 - a studio author cannot transfer authorship or rewrite the submission timestamp;
-- the public contact form can insert only validated message fields, while only admins can read or change status;
-- the optional avatar bucket is private and readable only by signed-in members;
+- the retired public contact table/RPC surface remains absent;
+- the retired avatar bucket has no public or member read policy;
 - essay/community aggregate upvote counts remain visible while individual voter rows stay protected by RLS.
+- members can export only their own data and can see only their own deletion request;
+- ordinary members cannot read or review another member's deletion request;
+- administrator reviews record the reviewing administrator identity.
 
 Record the deployed commit and the date of this certification. Source CI alone is not production certification.
 
@@ -182,7 +196,7 @@ For each production release, retain a compact record containing:
 - Git commit SHA;
 - Vercel deployment URL and successful build result;
 - environment-contract validation result (never the secret/public-key value itself);
-- migration state through `20260906121145_portal_security_and_privacy.sql`;
+- migration state through `20260907110357_trusted_profile_role_administration.sql`, including `20260906150632_member_account_lifecycle.sql`;
 - auth/onboarding/protected-route smoke-test result;
 - ordinary-member authorization test result;
 - known failures or exceptions and their owner.

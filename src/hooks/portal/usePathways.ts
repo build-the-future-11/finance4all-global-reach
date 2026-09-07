@@ -6,6 +6,7 @@ import {
   mapStudioSubmission,
 } from "@/lib/mappers";
 import { useAuth } from "@/contexts/AuthContext";
+import { requireOptionalExternalHttpUrl } from "@/lib/external-url";
 
 export function useOpportunities() {
   return useQuery({
@@ -86,12 +87,14 @@ export function useSubmitStudio() {
       repoUrl?: string;
       demoUrl?: string;
     }) => {
+      const repoUrl = requireOptionalExternalHttpUrl(input.repoUrl, "Repository URL");
+      const demoUrl = requireOptionalExternalHttpUrl(input.demoUrl, "Demo URL");
       const { error } = await supabase.from("studio_submissions").insert({
         author_id: user!.id,
         title: input.title,
         writeup: input.writeup,
-        repo_url: input.repoUrl ?? null,
-        demo_url: input.demoUrl ?? null,
+        repo_url: repoUrl ?? null,
+        demo_url: demoUrl ?? null,
       });
       if (error) throw error;
     },
