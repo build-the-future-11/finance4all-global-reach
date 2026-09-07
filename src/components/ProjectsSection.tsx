@@ -6,6 +6,39 @@ import { portalRoutes } from "@/routes/portal";
 const FINANCEMETA_APPLICATION_URL =
   "https://tally.so/r/5B7blP?utm_source=website&utm_medium=cta&utm_campaign=general_application";
 
+const directApplications = [
+  {
+    label: "General application",
+    description: "Get routed to the FinanceMeta team or program that best matches your interests and skills.",
+    url: "https://tally.so/r/5B7blP?utm_source=website&utm_medium=opportunity_card&utm_campaign=general_application",
+  },
+  {
+    label: "Launch a chapter",
+    description: "Build an official FinanceMeta chapter at your school, university, or in your city.",
+    url: "https://tally.so/r/XxaB1j?utm_source=website&utm_medium=opportunity_card&utm_campaign=chapter_registration",
+  },
+  {
+    label: "Quant Research Cohort",
+    description: "Work on quantitative finance, markets, data, modeling, and financial ML research.",
+    url: "https://tally.so/r/xXqylk?utm_source=website&utm_medium=opportunity_card&utm_campaign=quant_research_cohort",
+  },
+  {
+    label: "Financial Foundations Cohort",
+    description: "Build strong foundations across finance, economics, markets, and applied financial thinking.",
+    url: "https://tally.so/r/q4rLG9?utm_source=website&utm_medium=opportunity_card&utm_campaign=financial_foundations",
+  },
+  {
+    label: "FinTech Studio",
+    description: "Build financial products, tools, prototypes, and research-to-product experiments.",
+    url: "https://tally.so/r/Me4d6p?utm_source=website&utm_medium=opportunity_card&utm_campaign=fintech_studio",
+  },
+  {
+    label: "Partners, speakers & collaborators",
+    description: "For schools, researchers, institutions, organizations, speakers, and potential partners.",
+    url: "https://tally.so/r/2EWxzb?utm_source=website&utm_medium=opportunity_card&utm_campaign=partnerships",
+  },
+] as const;
+
 const phaseOneModules = [
   {
     icon: Newspaper,
@@ -125,6 +158,36 @@ export default function ProjectsSection() {
             >
               Sign in
             </Link>
+          </div>
+        </div>
+
+        <div id="applications" className="mt-8">
+          <div className="mb-5 flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-emerald-200/90">Direct applications</p>
+              <h3 className="mt-2 text-2xl font-semibold text-white">Choose the path that matches what you want to do.</h3>
+            </div>
+            <p className="max-w-xl text-sm text-white/60">
+              Use the general application if you are unsure. Otherwise, applying directly keeps review and routing faster.
+            </p>
+          </div>
+
+          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+            {directApplications.map((application) => (
+              <a
+                key={application.label}
+                href={application.url}
+                target="_blank"
+                rel="noreferrer"
+                className="group rounded-2xl border border-white/15 bg-white/[0.035] p-5 transition hover:-translate-y-0.5 hover:border-emerald-300/50 hover:bg-white/[0.06]"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <h4 className="font-semibold text-white">{application.label}</h4>
+                  <ArrowRight className="mt-0.5 h-4 w-4 shrink-0 text-emerald-300 transition group-hover:translate-x-1" />
+                </div>
+                <p className="mt-2 text-sm leading-relaxed text-white/65">{application.description}</p>
+              </a>
+            ))}
           </div>
         </div>
       </div>
