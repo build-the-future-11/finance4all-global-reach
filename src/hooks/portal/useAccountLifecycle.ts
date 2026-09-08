@@ -69,7 +69,9 @@ export function useAccountDeletionRequests(status: AccountDeletionStatus | "all"
         .limit(26);
       if (status !== "all") query = query.eq("status", status);
       if (pageParam) {
-        query = query.or(`requested_at.gt.${pageParam.at},and(requested_at.eq.${pageParam.at},id.gt.${pageParam.id})`);
+        const at = JSON.stringify(pageParam.at);
+        const id = JSON.stringify(pageParam.id);
+        query = query.or(`requested_at.gt.${at},and(requested_at.eq.${at},id.gt.${id})`);
       }
       const { data, error } = await query;
       if (error) throw error;

@@ -13,6 +13,7 @@ export function validateDatabaseTarget(value) {
     throw new Error("Database connection does not identify the canonical FinanceMeta project");
   }
   if ([...url.searchParams.keys()].some((key) => key !== "sslmode")
+    || url.searchParams.getAll("sslmode").length > 1
     || (url.searchParams.has("sslmode") && !["require", "verify-ca", "verify-full"].includes(url.searchParams.get("sslmode")))) {
     throw new Error("Database connection must use TLS without routing overrides");
   }

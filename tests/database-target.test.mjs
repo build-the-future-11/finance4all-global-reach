@@ -13,5 +13,6 @@ test("rejects project text hidden in foreign connections and TLS bypasses", () =
     "postgres://postgres.foreign:test@aws-0-ap-south-1.pooler.supabase.com/postgres",
     "postgres://postgres:test@db.pnemeegkwyaicsbnbnmg.supabase.co/postgres?host=evil.example",
     "postgres://postgres:test@db.pnemeegkwyaicsbnbnmg.supabase.co/postgres?sslmode=disable",
+    "postgres://postgres:test@db.pnemeegkwyaicsbnbnmg.supabase.co/postgres?sslmode=require&sslmode=disable",
   ]) assert.throws(() => validateDatabaseTarget(url));
 });

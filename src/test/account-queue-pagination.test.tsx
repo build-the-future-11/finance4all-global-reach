@@ -11,7 +11,11 @@ vi.mock("@/lib/supabase", () => ({ supabase: { from: () => {
   const chain = {
     select: () => chain, order: () => chain,
     limit: (size: number) => { limit = size; return chain; },
-    or: (filter: string) => { cursor = Number(filter.match(/id.gt.(\d+)/)?.[1]); return chain; },
+    or: (filter: string) => {
+      expect(filter).toContain('requested_at.gt."2026-09-08T00:00:00+00:00"');
+      cursor = Number(filter.match(/id\.gt\."(\d+)"/)?.[1]);
+      return chain;
+    },
     then: (resolve: (value: unknown) => unknown) => Promise.resolve({ data: rows.filter((row) => Number(row.id) > cursor).slice(0, limit), error: null }).then(resolve),
   };
   return chain;
