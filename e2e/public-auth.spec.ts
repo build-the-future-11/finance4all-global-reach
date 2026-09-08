@@ -12,6 +12,21 @@ test("public claims stay inside the evidence boundary", async ({ page }) => {
   await expect(page.getByText(/growing network of students/i)).toHaveCount(0);
 });
 
+test("public learning hub and Five Foundations lesson are reachable without authentication", async ({ page }) => {
+  await page.goto("/learn");
+
+  await expect(page.getByRole("heading", { name: "Learn the mechanics, not the hype." })).toBeVisible();
+  await expect(page.getByText("No account", { exact: true })).toBeVisible();
+  await page.getByRole("link", { name: "Open lesson" }).click();
+
+  await expect(page).toHaveURL(/\/learn\/five-foundations$/);
+  await expect(page.getByRole("heading", { level: 1, name: "Five Foundations" })).toBeVisible();
+  await expect(page.getByText(/general financial education, not financial advice/i)).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Five questions" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Worked answers" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "2021 National Standards alignment" })).toBeVisible();
+});
+
 test("login and password recovery routes are reachable", async ({ page }) => {
   await page.goto("/login");
   await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible();
