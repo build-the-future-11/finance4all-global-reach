@@ -3,6 +3,7 @@ import { ThemeProvider } from "next-themes";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import AppRouter from "@/components/AppRouter";
+import AppErrorBoundary from "@/components/AppErrorBoundary";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -14,14 +15,16 @@ const queryClient = new QueryClient({
 });
 
 const App = () => (
-  <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Sonner />
-        <AppRouter />
-      </TooltipProvider>
-    </QueryClientProvider>
-  </ThemeProvider>
+  <AppErrorBoundary>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Sonner />
+          <AppRouter />
+        </TooltipProvider>
+      </QueryClientProvider>
+    </ThemeProvider>
+  </AppErrorBoundary>
 );
 
 export default App;

@@ -52,14 +52,6 @@ export const ExplainerCardSchema = z.object({
 });
 export type ExplainerCard = z.infer<typeof ExplainerCardSchema>;
 
-export const DigestPreferenceSchema = z.object({
-  userId: z.string().uuid(),
-  weeklyDigestEnabled: z.boolean().default(false),
-  substackSubscribed: z.boolean().default(false),
-  preferredCategories: z.array(NewsCategorySchema).default([]),
-});
-export type DigestPreference = z.infer<typeof DigestPreferenceSchema>;
-
 // ─── Finance Meta Labs ────────────────────────────────────────────────────────
 
 export const ResearchProjectStatusSchema = z.enum([

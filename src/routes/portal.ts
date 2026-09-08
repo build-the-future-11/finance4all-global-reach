@@ -52,7 +52,7 @@ export const portalNav: PortalNavItem[] = [
     label: "Debriefed",
     path: portalRoutes.debriefed,
     icon: Newspaper,
-    description: "News feed, explainers, and weekly digest",
+    description: "News feed, explainers, and source links",
     children: [
       { label: "News Feed", path: portalRoutes.debriefed },
       { label: "Explainers", path: portalRoutes.debriefedExplainers },

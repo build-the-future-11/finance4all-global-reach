@@ -2,7 +2,6 @@ import type { Tables } from "@/types/database";
 import type {
   Chapter,
   ConnectionRequest,
-  DigestPreference,
   EssaySubmission,
   Event,
   ExplainerCard,
@@ -71,15 +70,6 @@ export function mapExplainer(row: Tables<"explainer_cards">): ExplainerCard {
     body: row.body,
     difficulty: row.difficulty,
     relatedTerms: row.related_terms,
-  };
-}
-
-export function mapDigestPreference(row: Tables<"digest_preferences">): DigestPreference {
-  return {
-    userId: row.user_id,
-    weeklyDigestEnabled: row.weekly_digest_enabled,
-    substackSubscribed: row.substack_subscribed,
-    preferredCategories: row.preferred_categories,
   };
 }
 
