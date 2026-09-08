@@ -1,7 +1,7 @@
 BEGIN;
 
 CREATE EXTENSION IF NOT EXISTS pgtap WITH SCHEMA extensions;
-SELECT plan(26);
+SELECT plan(27);
 
 SELECT ok(
   NOT has_table_privilege('anon', 'public.account_deletion_requests', 'select'),
@@ -166,6 +166,14 @@ SELECT is(
    WHERE user_id = '10000000-0000-0000-0000-000000000002'),
   '10000000-0000-0000-0000-000000000003',
   'the database records the reviewing admin identity'
+);
+SELECT throws_ok(
+  $$UPDATE public.account_deletion_requests
+    SET status = 'pending'
+    WHERE user_id = '10000000-0000-0000-0000-000000000002'$$,
+  'P0003',
+  'reviewed deletion requests cannot be moved back to pending',
+  'an admin cannot reopen a reviewed request into member-cancellable pending state'
 );
 
 SELECT pg_catalog.set_config('request.jwt.claim.sub', '10000000-0000-0000-0000-000000000002', true);
