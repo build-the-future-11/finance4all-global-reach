@@ -45,6 +45,12 @@ function groupResults(results: SearchResult[]) {
   return groups;
 }
 
+export function searchResultCommandValue(
+  item: Pick<SearchResult, "id" | "type">,
+) {
+  return `${item.type}:${item.id}`;
+}
+
 export default function PortalSearch() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -136,7 +142,7 @@ export default function PortalSearch() {
                   {items?.map((item) => (
                     <CommandItem
                       key={item.id}
-                      value={item.title}
+                      value={searchResultCommandValue(item)}
                       onSelect={() => handleSelect(item.href)}
                       className="cursor-pointer text-white/80 aria-selected:bg-emerald-500/15 aria-selected:text-emerald-200"
                     >
