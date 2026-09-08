@@ -22,6 +22,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { useSelectedRecord } from "@/hooks/useSelectedRecord";
 
 const CATEGORIES: { value: NewsCategory | "all"; label: string }[] = [
   { value: "all", label: "All" },
@@ -33,8 +34,9 @@ const CATEGORIES: { value: NewsCategory | "all"; label: string }[] = [
 
 export default function DebriefedHub() {
   useDocumentTitle("Debriefed");
+  const { selectedId, notice } = useSelectedRecord();
   const [category, setCategory] = useState<NewsCategory | "all">("all");
-  const { data: articles, isLoading, error, refetch } = useNewsArticles(category);
+  const { data: articles, isLoading, error, refetch } = useNewsArticles(category, selectedId);
   const { data: prefs } = useDigestPreferences();
   const updatePrefs = useUpdateDigestPreferences();
   const { data: bookmarks } = useNewsBookmarks();
@@ -54,6 +56,7 @@ export default function DebriefedHub() {
 
   return (
     <div>
+      {notice}
       <PortalPageHeader
         eyebrow="Finance Debriefed"
         title="News & market pulse"

@@ -96,11 +96,14 @@ export function useReviewAccountDeletionRequest() {
       status: AccountDeletionStatus;
       reviewNote?: string;
     }) => {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from("account_deletion_requests")
         .update({ status, review_note: reviewNote?.trim() || null })
-        .eq("id", id);
+        .eq("id", id)
+        .select("id")
+        .single();
       if (error) throw error;
+      if (data?.id !== id) throw new Error("The request was not updated. Refresh and check your permissions.");
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["account-deletion-requests"] }),
   });

@@ -122,8 +122,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Sync Google avatar if profile is missing one
       const avatarUrl = googleAvatarUrl(user);
       if (!mapped.avatarUrl && avatarUrl) {
-        await supabase.from("profiles").update({ avatar_url: avatarUrl }).eq("id", user.id);
-        mapped.avatarUrl = avatarUrl;
+        const { data: saved, error: saveError } = await supabase.from("profiles")
+          .update({ avatar_url: avatarUrl }).eq("id", user.id)
+          .select("id, avatar_url").single();
+        if (!saveError && saved?.id === user.id && saved.avatar_url === avatarUrl) {
+          mapped.avatarUrl = avatarUrl;
+        } else {
+          // Optional synchronization must not discard a valid profile or imply persistence.
+          console.warn("Profile avatar synchronization was not confirmed.");
+        }
       }
 
       applyProfile(mapped);
