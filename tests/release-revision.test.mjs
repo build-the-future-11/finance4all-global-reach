@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { assertCleanReleaseSource, resolveReleaseRevision, validateReleaseRevision } from "../scripts/release-revision.mjs";
+import { assertCleanReleaseSource, normalizeVercelConfig, resolveReleaseRevision, validateReleaseRevision } from "../scripts/release-revision.mjs";
 
 test("release provenance refuses modified, staged, and untracked source", () => {
   assert.doesNotThrow(() => assertCleanReleaseSource({ status: () => "" }));
@@ -12,6 +12,23 @@ test("release provenance refuses modified, staged, and untracked source", () => 
 
 const SHA_A = "0123456789abcdef0123456789abcdef01234567";
 const SHA_B = "89abcdef0123456789abcdef0123456789abcdef";
+
+test("Vercel normalization restores only semantically identical configuration at exact HEAD", () => {
+  let restored;
+  const options = {
+    env: { VERCEL: "1", VERCEL_GIT_COMMIT_SHA: SHA_A }, gitHead: () => SHA_A,
+    committed: () => '{"framework":"vite","rewrites":[]}\n',
+    working: () => '{ "rewrites": [], "framework": "vite" }',
+    restore: (value) => { restored = value; },
+  };
+  normalizeVercelConfig(options);
+  assert.equal(restored, options.committed());
+  restored = undefined;
+  assert.throws(() => normalizeVercelConfig({ ...options, working: () => '{"framework":"nextjs","rewrites":[]}' }), /Changed keys:.*framework/);
+  assert.equal(restored, undefined);
+  assert.throws(() => normalizeVercelConfig({ ...options, gitHead: () => SHA_B }), /differs from checked-out HEAD/);
+  normalizeVercelConfig({ ...options, env: {}, working: () => { throw new Error('must not read'); } });
+});
 
 test("release revisions accept only immutable lowercase Git SHAs", () => {
   assert.equal(validateReleaseRevision(SHA_A), SHA_A);
