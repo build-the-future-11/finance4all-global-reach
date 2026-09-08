@@ -2,6 +2,7 @@ import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { beforeEach, expect, it, vi } from "vitest";
+import { searchResultCommandValue } from "@/components/portal/PortalSearch";
 import { searchFilter, usePortalSearch } from "@/hooks/portal/usePortalSearch";
 
 const state = vi.hoisted(() => ({ failed: false, filteredBeforeLimit: true, crowded: false }));
@@ -46,6 +47,14 @@ it("finds the exact match beyond a crowded prefix candidate window", async () =>
   expect(result.current.data?.[0].id).toBe("40");
   expect(result.current.data).toHaveLength(12);
   expect(new Set(result.current.data?.map((row) => row.id)).size).toBe(12);
+});
+it("assigns command items identity independent of shared titles", () => {
+  const first = { id: "news-1", type: "news" as const };
+  const second = { id: "news-2", type: "news" as const };
+  const crossType = { id: "news-1", type: "event" as const };
+  expect(searchResultCommandValue(first)).toBe("news:news-1");
+  expect(searchResultCommandValue(second)).not.toBe(searchResultCommandValue(first));
+  expect(searchResultCommandValue(crossType)).not.toBe(searchResultCommandValue(first));
 });
 it("builds disjoint server-side relevance tiers", () => {
   expect(searchFilter(["title", "summary"], "needle", "exact")).toBe('title.ilike."needle"');
