@@ -25,6 +25,14 @@ const packageJson = {
   engines: { node: '>=22.12.0' },
 };
 
+test('CI audit artifacts stay outside the release source checkout', () => {
+  const workflow = readFileSync(new URL('../.github/workflows/ci.yml', import.meta.url), 'utf8');
+  assert.ok(workflow.includes('${{ runner.temp }}/portal-ci-evidence'));
+  for (const line of workflow.split('\n').filter((line) => line.includes('ci-evidence'))) {
+    assert.ok(line.includes('${{ runner.temp }}/portal-ci-evidence'), line);
+  }
+});
+
 function existsFrom(files) {
   const set = new Set(files);
   return (file) => set.has(file);
