@@ -2,7 +2,7 @@ import { renderHook, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { beforeEach, expect, it, vi } from "vitest";
-import { searchResultCommandValue } from "@/components/portal/PortalSearch";
+import { searchResultCommandValue } from "@/lib/search-result-command";
 import { searchFilter, usePortalSearch } from "@/hooks/portal/usePortalSearch";
 
 const state = vi.hoisted(() => ({ failed: false, filteredBeforeLimit: true, crowded: false }));
