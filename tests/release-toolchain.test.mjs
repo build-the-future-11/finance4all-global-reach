@@ -1,7 +1,22 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 
 import { verifyReleaseToolchain } from '../scripts/verify-release-toolchain.mjs';
+
+test('lockfile retains every Rolldown platform binding for clean cross-platform installs', () => {
+  const lock = JSON.parse(readFileSync(new URL('../package-lock.json', import.meta.url), 'utf8'));
+  const rolldown = lock.packages['node_modules/rolldown'];
+  assert.ok(rolldown, 'Rolldown must be locked');
+  const bindings = Object.entries(rolldown.optionalDependencies ?? {});
+  assert.ok(bindings.some(([name]) => name === '@rolldown/binding-linux-x64-gnu'));
+  for (const [name, version] of bindings) {
+    const binding = lock.packages[`node_modules/${name}`];
+    assert.ok(binding, `Missing cross-platform binding: ${name}`);
+    assert.equal(binding.version, version, `Mismatched binding: ${name}`);
+    assert.ok(binding.integrity, `Missing registry integrity: ${name}`);
+  }
+});
 
 const packageJson = {
   packageManager: 'npm@10.9.8',
