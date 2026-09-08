@@ -6,6 +6,7 @@ import ThemeToggle from "./ThemeToggle";
 const links = [
   { label: "About", href: "#about" },
   { label: "Programs", href: "#programs" },
+  { label: "Learn", href: "/learn" },
   { label: "Projects", href: "#projects" },
   { label: "Evidence", href: "/evidence" },
   { label: "Contact", href: "#contact" },
@@ -16,7 +17,6 @@ export default function Navbar() {
   const navRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number | null>(null);
 
-  // Close mobile menu on resize
   useEffect(() => {
     const resize = () => {
       if (window.innerWidth >= 768) setOpen(false);
@@ -25,7 +25,6 @@ export default function Navbar() {
     return () => window.removeEventListener("resize", resize);
   }, []);
 
-  // Optimized mouse move (RAF throttled)
   const handleMove = (e: React.MouseEvent) => {
     if (!navRef.current) return;
 
@@ -43,7 +42,6 @@ export default function Navbar() {
 
   return (
     <>
-      {/* SVG FILTER (lighter + smoother) */}
       <svg className="pointer-events-none fixed w-0 h-0">
         <filter id="liquid-glass" x="-20%" y="-20%" width="140%" height="140%">
           <feTurbulence
@@ -67,19 +65,14 @@ export default function Navbar() {
 
       <nav className="fixed inset-x-0 top-0 z-50 px-4 py-3">
         <div className="relative mx-auto max-w-6xl">
-
-          {/* Ambient glow */}
           <div className="pointer-events-none absolute left-1/4 top-0 h-32 w-32 rounded-full bg-emerald-300/20 blur-[120px]" />
           <div className="pointer-events-none absolute right-1/3 bottom-0 h-36 w-36 rounded-full bg-purple-300/20 blur-[140px]" />
 
-          {/* NAV CONTAINER */}
           <div
             ref={navRef}
             onMouseMove={handleMove}
             className="group relative overflow-hidden rounded-full border border-white/20 px-6 py-3 backdrop-blur-xl bg-white/[0.05] shadow-[0_20px_60px_rgba(0,0,0,0.35)]"
           >
-
-            {/* Glass distortion (isolated layer) */}
             <div
               className="absolute inset-0 rounded-full opacity-70"
               style={{
@@ -88,7 +81,6 @@ export default function Navbar() {
               }}
             />
 
-            {/* Cursor light */}
             <div
               className="pointer-events-none absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100"
               style={{
@@ -97,22 +89,15 @@ export default function Navbar() {
               }}
             />
 
-            {/* Subtle top sheen */}
             <div className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-br from-white/40 via-white/10 to-transparent opacity-30" />
-
-            {/* Border highlight */}
             <div className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-inset ring-white/25" />
 
-            {/* CONTENT */}
             <div className="relative z-10 flex items-center justify-between">
-
-              {/* Logo */}
               <a href="#" className="flex items-center gap-2 text-lg tracking-tight">
                 <span className="font-semibold text-white">Finance4All</span>
                 <span className="text-white/50">Meta</span>
               </a>
 
-              {/* Desktop */}
               <div className="hidden items-center gap-2 md:flex">
                 {links.map((l) => (
                   l.href.startsWith("/") ? (
@@ -140,7 +125,6 @@ export default function Navbar() {
                 <ThemeToggle />
               </div>
 
-              {/* Mobile toggle */}
               <div className="flex items-center gap-2 md:hidden">
                 <ThemeToggle />
 
@@ -159,7 +143,6 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* Mobile menu (animated) */}
           <div
             className={`md:hidden transition-all duration-300 ease-out ${
               open
@@ -196,7 +179,6 @@ export default function Navbar() {
               </Link>
             </div>
           </div>
-
         </div>
       </nav>
     </>
