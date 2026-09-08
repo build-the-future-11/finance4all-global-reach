@@ -10,6 +10,7 @@ import {
   Users,
 } from "lucide-react";
 import { usePortalSearch, type SearchResult } from "@/hooks/portal/usePortalSearch";
+import { searchResultCommandValue } from "@/lib/search-result-command";
 import {
   CommandDialog,
   CommandEmpty,
@@ -136,7 +137,7 @@ export default function PortalSearch() {
                   {items?.map((item) => (
                     <CommandItem
                       key={item.id}
-                      value={item.title}
+                      value={searchResultCommandValue(item)}
                       onSelect={() => handleSelect(item.href)}
                       className="cursor-pointer text-white/80 aria-selected:bg-emerald-500/15 aria-selected:text-emerald-200"
                     >
