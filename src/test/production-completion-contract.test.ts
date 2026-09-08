@@ -13,8 +13,20 @@ const recoveredFunctionHardening = readFileSync(
   "supabase/migrations/20260906172830_harden_recovered_profile_functions.sql",
   "utf8",
 );
+const trustedRoleAdministration = readFileSync(
+  "supabase/migrations/20260907110357_trusted_profile_role_administration.sql",
+  "utf8",
+);
 const rlsCertification = readFileSync(
   "supabase/tests/two_identity_rls_certification.sql",
+  "utf8",
+);
+const accountLifecycleMigration = readFileSync(
+  "supabase/migrations/20260906150632_member_account_lifecycle.sql",
+  "utf8",
+);
+const accountLifecycleCertification = readFileSync(
+  "supabase/tests/account_lifecycle_rls_certification.sql",
   "utf8",
 );
 const rlsWorkflow = readFileSync(
@@ -90,6 +102,15 @@ describe("production completion contracts", () => {
     }
   });
 
+  it("preserves a trusted operator path without exposing role changes to members", () => {
+    expect(trustedRoleAdministration).toContain("CURRENT_USER NOT IN ('postgres', 'supabase_admin')");
+    expect(trustedRoleAdministration).toContain("AND NOT public.is_admin()");
+    expect(trustedRoleAdministration).toContain("USING ERRCODE = '42501'");
+    expect(trustedRoleAdministration).toContain(
+      "REVOKE ALL ON FUNCTION public.protect_profile_role() FROM PUBLIC, anon, authenticated",
+    );
+  });
+
   it("records repaired production schema separately from the blocked ledger", () => {
     expect(productionSchemaReceipt.project_ref).toBe("pnemeegkwyaicsbnbnmg");
     expect(productionSchemaReceipt.post_repair.missing_expected_public_tables).toEqual([]);
@@ -108,13 +129,29 @@ describe("production completion contracts", () => {
     expect(rlsCertification.trimEnd()).toMatch(/ROLLBACK;$/);
   });
 
+  it("implements member data export and a reviewed deletion lifecycle", () => {
+    expect(accountLifecycleMigration).toContain("FUNCTION public.export_my_data()");
+    expect(accountLifecycleMigration).toContain("FUNCTION public.request_account_deletion");
+    expect(accountLifecycleMigration).toContain("FUNCTION public.cancel_account_deletion()");
+    expect(accountLifecycleMigration).toContain("Admins review deletion requests");
+    expect(accountLifecycleMigration).not.toContain("service_role");
+  });
+
+  it("certifies lifecycle isolation across members and an admin", () => {
+    expect(accountLifecycleCertification).toContain("member B cannot see member A request data");
+    expect(accountLifecycleCertification).toContain("the database records the reviewing admin identity");
+    expect(accountLifecycleCertification).toContain("pgTAP plan failed");
+    expect(accountLifecycleCertification.trimEnd()).toMatch(/ROLLBACK;$/);
+  });
+
   it("runs the RLS matrix only against the canonical database and exact checked-out source", () => {
     expect(rlsWorkflow).toContain("EXPECTED_SOURCE_SHA: ${{ github.sha }}");
     expect(rlsWorkflow).toContain("ref: ${{ env.EXPECTED_SOURCE_SHA }}");
     expect(rlsWorkflow).toContain('actual="$(git rev-parse HEAD)"');
     expect(rlsWorkflow).toContain('test "$actual" = "$EXPECTED_SOURCE_SHA"');
     expect(rlsWorkflow).toContain("FINANCEMETA_DATABASE_URL");
-    expect(rlsWorkflow).toContain("pnemeegkwyaicsbnbnmg");
+    expect(rlsWorkflow).toContain("node scripts/validate-database-target.mjs");
+    expect(rlsWorkflow).toContain("PGSSLMODE: require");
     expect(rlsWorkflow).toContain("--set ON_ERROR_STOP=1");
     expect(rlsWorkflow).toContain("two_identity_rls_certification.sql");
     expect(rlsWorkflow).toContain("retention-days: 30");

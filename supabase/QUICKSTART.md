@@ -7,11 +7,11 @@ This repository uses the Supabase CLI migration ledger. The SQL files in `supaba
 Prerequisites: Docker and the Supabase CLI.
 
 ```bash
-supabase start
-supabase db reset
+npx supabase start
+npx supabase db reset
 ```
 
-`supabase db reset` rebuilds the local database from every tracked migration and then applies `supabase/seed.sql`. Treat the seed as development data, not production content.
+`npx supabase db reset` rebuilds the local database from every tracked migration and then applies `supabase/seed.sql`. Treat the seed as development data, not production content.
 
 Copy the local values reported by `supabase status` into `.env`:
 
@@ -33,9 +33,9 @@ npm run dev -- --host 127.0.0.1 --port 8080
 Follow [DEPLOYMENT.md](../DEPLOYMENT.md). Before any remote schema change:
 
 ```bash
-supabase link --project-ref <project-ref>
-supabase migration list --linked
-supabase db push --dry-run
+npx supabase link --project-ref <project-ref>
+npx supabase migration list --linked
+npx supabase db push --linked --dry-run
 ```
 
 Only run `supabase db push` after the dry run and environment identity are reviewed. If SQL was applied manually in the past, reconcile the actual schema first and use `supabase migration repair <version> --status applied`; never re-run a non-idempotent migration merely to populate history.
@@ -45,3 +45,12 @@ Only run `supabase db push` after the dry run and environment identity are revie
 For local Google OAuth, add `http://localhost:8080/auth/callback` to the project's allowed redirect URLs. The provider callback remains `https://<project-ref>.supabase.co/auth/v1/callback` in Google Cloud.
 
 Do not commit API secrets, database passwords, OAuth client secrets, or member credentials.
+
+## Troubleshooting
+
+| Error | Fix |
+|-------|-----|
+| Google redirects but login fails | Add `http://localhost:8080/auth/callback` to Redirect URLs |
+| Blank portal / no data | Inspect linked migration history and API/database logs |
+| "relation does not exist" | Dry-run the linked migration push, then apply only pending migrations |
+| Profile not created | Inspect the Auth trigger and logs; do not replay old migrations blindly |

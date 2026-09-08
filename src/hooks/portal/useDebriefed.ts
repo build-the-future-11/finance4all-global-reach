@@ -8,12 +8,13 @@ import {
 import type { NewsCategory } from "@/types/domain";
 import { useAuth } from "@/contexts/useAuth";
 
-export function useNewsArticles(category?: NewsCategory | "all") {
+export function useNewsArticles(category?: NewsCategory | "all", selectedId?: string) {
   return useQuery({
-    queryKey: ["news", category],
+    queryKey: ["news", category, selectedId],
     queryFn: async () => {
       let q = supabase.from("news_articles").select("*").order("published_at", { ascending: false });
-      if (category && category !== "all") q = q.eq("category", category);
+      if (selectedId) q = q.eq("id", selectedId);
+      else if (category && category !== "all") q = q.eq("category", category);
       const { data, error } = await q;
       if (error) throw error;
       return data.map(mapNewsArticle);

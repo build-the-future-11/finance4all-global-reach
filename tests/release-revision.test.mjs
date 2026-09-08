@@ -1,7 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { resolveReleaseRevision, validateReleaseRevision } from "../scripts/release-revision.mjs";
+import { assertCleanReleaseSource, resolveReleaseRevision, validateReleaseRevision } from "../scripts/release-revision.mjs";
+
+test("release provenance refuses modified, staged, and untracked source", () => {
+  assert.doesNotThrow(() => assertCleanReleaseSource({ status: () => "" }));
+  for (const status of [" M src/app.ts", "M  package.json", "?? new-source.ts"]) {
+    assert.throws(() => assertCleanReleaseSource({ status: () => status }), /clean source checkout/);
+  }
+});
 
 const SHA_A = "0123456789abcdef0123456789abcdef01234567";
 const SHA_B = "89abcdef0123456789abcdef0123456789abcdef";

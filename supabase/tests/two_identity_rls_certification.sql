@@ -1,14 +1,36 @@
 -- Transaction-only production authorization certification.
--- Requires at least two ordinary profiles. Every fixture and mutation is rolled back.
+-- Creates two synthetic ordinary identities and rolls every mutation back.
 
 BEGIN;
 
+CREATE TEMP TABLE portal_certification_identity_seed (
+  id uuid PRIMARY KEY,
+  email text NOT NULL UNIQUE
+);
+
+INSERT INTO portal_certification_identity_seed (id, email) VALUES
+  (pg_catalog.gen_random_uuid(), 'rls-member-a-' || pg_catalog.gen_random_uuid()::text || '@example.test'),
+  (pg_catalog.gen_random_uuid(), 'rls-member-b-' || pg_catalog.gen_random_uuid()::text || '@example.test');
+
+INSERT INTO auth.users (
+  instance_id, id, aud, role, email, encrypted_password,
+  confirmed_at, raw_app_meta_data, raw_user_meta_data,
+  created_at, updated_at
+)
+SELECT
+  '00000000-0000-0000-0000-000000000000', id,
+  'authenticated', 'authenticated', email, '',
+  pg_catalog.now(), '{"provider":"email","providers":["email"]}'::jsonb,
+  '{"display_name":"RLS certification member"}'::jsonb,
+  pg_catalog.now(), pg_catalog.now()
+FROM portal_certification_identity_seed;
+
 CREATE TEMP TABLE portal_certification_members AS
-SELECT id, pg_catalog.row_number() OVER (ORDER BY created_at, id) AS ordinal
-FROM public.profiles
-WHERE role = 'member'::public.user_role
-ORDER BY created_at, id
-LIMIT 2;
+SELECT p.id, pg_catalog.row_number() OVER (ORDER BY p.id) AS ordinal
+FROM public.profiles p
+JOIN portal_certification_identity_seed seed USING (id)
+WHERE p.role = 'member'::public.user_role
+ORDER BY p.id;
 
 CREATE TEMP TABLE portal_certification_fixtures (
   fixture text PRIMARY KEY,
@@ -26,13 +48,14 @@ DECLARE
   anon_accessible_tables text;
 BEGIN
   IF (SELECT pg_catalog.count(*) FROM portal_certification_members) <> 2 THEN
-    RAISE EXCEPTION 'two ordinary member profiles are required';
+    RAISE EXCEPTION 'synthetic ordinary member profiles were not created';
   END IF;
 
   SELECT pg_catalog.string_agg(expected.table_name, ', ' ORDER BY expected.table_name)
   INTO missing_tables
   FROM (
     VALUES
+      ('account_deletion_requests'),
       ('chapters'),
       ('connection_requests'),
       ('digest_preferences'),
@@ -67,6 +90,7 @@ BEGIN
   WHERE n.nspname = 'public'
     AND c.relkind IN ('r', 'p')
     AND c.relname <> ALL (ARRAY[
+      'account_deletion_requests',
       'chapters', 'connection_requests', 'digest_preferences',
       'education_lesson_progress', 'essay_submissions', 'essay_upvotes',
       'event_registrations', 'events', 'explainer_cards',

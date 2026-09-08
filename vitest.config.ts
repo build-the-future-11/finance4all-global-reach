@@ -5,6 +5,10 @@ import path from "path";
 export default defineConfig({
   plugins: [react()],
   test: {
+    // Keep per-file isolation while avoiding fork startup failures on the local runtime.
+    pool: "threads",
+    maxWorkers: 2,
+    isolate: true,
     environment: "jsdom",
     globals: true,
     setupFiles: ["./src/test/setup.ts"],

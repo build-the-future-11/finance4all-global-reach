@@ -3,6 +3,7 @@ import {
   useEffect,
   useMemo,
   useState,
+  useRef,
   type ReactNode,
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
@@ -11,6 +12,7 @@ import { mapProfile, PUBLIC_PROFILE_COLUMNS } from "@/lib/mappers";
 import { rememberPostAuthPath } from "@/lib/auth-navigation";
 import { withDeadline } from "@/lib/asyncDeadline";
 import type { UserProfile } from "@/types/domain";
+import { useQueryClient } from "@tanstack/react-query";
 import { AuthContext } from "@/contexts/auth-context";
 const AUTH_OPERATION_TIMEOUT_MS = 15_000;
 
@@ -30,6 +32,9 @@ function googleAvatarUrl(user: User) {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const queryClient = useQueryClient();
+  const activeUser = useRef<string | null>(null);
+  const authGeneration = useRef(0);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -90,6 +95,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const fetchProfile = useCallback(
     async (user: User) => {
+      const generation = authGeneration.current;
+      const applyProfile = (value: UserProfile | null) => {
+        if (authGeneration.current === generation && activeUser.current === user.id) setProfile(value);
+      };
       const { data, error } = await supabase
         .from("profiles")
         .select(PUBLIC_PROFILE_COLUMNS)
@@ -98,13 +107,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (error) {
         console.error("Profile fetch failed:", error.message);
-        setProfile(null);
+        applyProfile(null);
         return;
       }
 
       if (!data) {
         const ensured = await ensureProfile(user);
-        setProfile(ensured);
+        applyProfile(ensured);
         return;
       }
 
@@ -113,11 +122,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Sync Google avatar if profile is missing one
       const avatarUrl = googleAvatarUrl(user);
       if (!mapped.avatarUrl && avatarUrl) {
-        await supabase.from("profiles").update({ avatar_url: avatarUrl }).eq("id", user.id);
-        mapped.avatarUrl = avatarUrl;
+        const { data: saved, error: saveError } = await supabase.from("profiles")
+          .update({ avatar_url: avatarUrl }).eq("id", user.id)
+          .select("id, avatar_url").single();
+        if (!saveError && saved?.id === user.id && saved.avatar_url === avatarUrl) {
+          mapped.avatarUrl = avatarUrl;
+        } else {
+          // Optional synchronization must not discard a valid profile or imply persistence.
+          console.warn("Profile avatar synchronization was not confirmed.");
+        }
       }
 
-      setProfile(mapped);
+      applyProfile(mapped);
     },
     [ensureProfile],
   );
@@ -127,6 +143,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [session?.user, fetchProfile]);
 
   useEffect(() => {
+    let disposed = false;
+    let receivedAuthEvent = false;
+    const applySession = (nextSession: Session | null) => {
+      const nextUser = nextSession?.user.id ?? null;
+      if (activeUser.current !== nextUser) {
+        authGeneration.current += 1;
+        activeUser.current = nextUser;
+        queryClient.clear();
+        setProfile(null);
+      }
+      setSession(nextSession);
+    };
     void withDeadline(
       () => supabase.auth.getSession(),
       AUTH_OPERATION_TIMEOUT_MS,
@@ -134,29 +162,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     )
       .then(async ({ data, error }) => {
         if (error) throw error;
-        setSession(data.session);
-        if (data.session?.user) await fetchProfile(data.session.user);
+        if (disposed || receivedAuthEvent) return;
+        applySession(data.session);
+        if (data.session?.user) await withDeadline(() => fetchProfile(data.session!.user), AUTH_OPERATION_TIMEOUT_MS, "Profile initialization");
       })
       .catch((error: unknown) => {
+        if (disposed || receivedAuthEvent) return;
         console.error("Session initialization failed", error);
-        setSession(null);
-        setProfile(null);
+        applySession(null);
       })
-      .finally(() => setLoading(false));
+      .finally(() => { if (!disposed && !receivedAuthEvent) setLoading(false); });
 
     const { data: sub } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      setSession(nextSession);
+      receivedAuthEvent = true;
+      applySession(nextSession);
+      const generation = authGeneration.current;
       if (nextSession?.user) {
         setLoading(true);
-        void fetchProfile(nextSession.user).finally(() => setLoading(false));
+        void withDeadline(() => fetchProfile(nextSession.user), AUTH_OPERATION_TIMEOUT_MS, "Profile refresh").catch(() => {
+          if (!disposed && authGeneration.current === generation) {
+            authGeneration.current += 1;
+            setProfile(null);
+          }
+        }).finally(() => {
+          if (!disposed && activeUser.current === nextSession.user.id) setLoading(false);
+        });
       } else {
         setProfile(null);
         setLoading(false);
       }
     });
 
-    return () => sub.subscription.unsubscribe();
-  }, [fetchProfile]);
+    return () => { disposed = true; authGeneration.current += 1; sub.subscription.unsubscribe(); };
+  }, [fetchProfile, queryClient]);
 
   const signIn = useCallback(async (email: string, password: string) => {
     try {

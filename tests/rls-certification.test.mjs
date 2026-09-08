@@ -8,6 +8,7 @@ const sql = await readFile(
 );
 
 const publicTables = [
+  "account_deletion_requests",
   "chapters",
   "connection_requests",
   "digest_preferences",

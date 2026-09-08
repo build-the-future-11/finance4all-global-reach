@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { useSelectedRecord } from "@/hooks/useSelectedRecord";
 
 function groupEventsByMonth(events: { id: string; title: string; startsAt: string }[]) {
   const groups = new Map<string, typeof events>();
@@ -32,6 +33,7 @@ function groupEventsByMonth(events: { id: string; title: string; startsAt: strin
 
 export default function EventsChapters() {
   useDocumentTitle("Events");
+  const { selectedId, notice } = useSelectedRecord();
   const [selectedChapter, setSelectedChapter] = useState<string>("all");
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
   const {
@@ -45,7 +47,7 @@ export default function EventsChapters() {
     isLoading: eventsLoading,
     error: eventsError,
     refetch: refetchEvents,
-  } = useEvents(selectedChapter === "all" ? undefined : selectedChapter);
+  } = useEvents(selectedChapter === "all" ? undefined : selectedChapter, selectedId);
   const { data: registrations } = useEventRegistrations();
   const toggleReg = useToggleEventRegistration();
 
@@ -71,6 +73,7 @@ export default function EventsChapters() {
 
   return (
     <div>
+      {notice}
       <PortalPageHeader
         eyebrow="Global reach"
         title="Events + Chapters"

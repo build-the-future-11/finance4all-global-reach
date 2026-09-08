@@ -14,12 +14,13 @@ export function useChapters() {
   });
 }
 
-export function useEvents(chapterId?: string) {
+export function useEvents(chapterId?: string, selectedId?: string) {
   return useQuery({
-    queryKey: ["events", chapterId],
+    queryKey: ["events", chapterId, selectedId],
     queryFn: async () => {
       let q = supabase.from("events").select("*").order("starts_at", { ascending: true });
-      if (chapterId) q = q.eq("chapter_id", chapterId);
+      if (selectedId) q = q.eq("id", selectedId);
+      else if (chapterId) q = q.eq("chapter_id", chapterId);
       const { data, error } = await q;
       if (error) throw error;
       return data.map(mapEvent);

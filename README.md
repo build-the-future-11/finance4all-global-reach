@@ -20,7 +20,8 @@ versions, alternate package managers, and conflicting lockfiles.
 | `/portal/pathways` | Opportunities, studios, essays |
 | `/portal/events` | Chapters + events |
 | `/portal/network` | Profiles + connections |
-| `/portal/settings` | Profile settings |
+| `/portal/settings` | Profile settings, personal-data export, deletion requests |
+| `/portal/admin` | Content management and account-deletion review queue (admin only) |
 | `/evidence` | Public release, program, and research evidence boundary |
 
 ## Vercel deploy (required env vars)
@@ -68,8 +69,14 @@ against the live portal and verifies session separation and logout protection. C
 credentials.
 
 Database authorization is independently checked by
-`supabase/tests/two_identity_rls_certification.sql`. It impersonates two existing ordinary members
-inside a transaction, inventories every canonical public table, exercises owner and cross-member
+`supabase/tests/two_identity_rls_certification.sql` and
+`supabase/tests/account_lifecycle_rls_certification.sql`. They exercise independent member
+identities and an admin inside transactions ending in `ROLLBACK`, so certification does not retain
+mutations. The account request does not pretend to delete an identity: an operator must perform the
+privileged Supabase Auth deletion after review, which then cascades member-owned data.
+
+The two-identity suite creates synthetic ordinary members inside a transaction,
+inventories every canonical public table, exercises owner and cross-member
 mutations, and ends with `ROLLBACK`. Configure the canonical project's database connection as the
 `FINANCEMETA_DATABASE_URL` Actions secret and run `Production RLS Certification`; the retained log
 must end in `result=PASS` before the production authorization gate is considered complete.
@@ -80,3 +87,16 @@ the credentialed production workflow.
 
 The current evidence and remaining external blockers are tracked in
 [`docs/PRODUCTION_READINESS.md`](docs/PRODUCTION_READINESS.md).
+
+Release builds require a clean Git checkout, including untracked source files,
+before writing `dist/release-revision.json`. Commit reviewed changes first; use
+`npm run build:dev` for an ordinary development bundle without a release receipt.
+Production RLS certification parses the database host and user identity and
+requires TLS; project text embedded in a foreign URL is rejected.
+
+Portal search filters authorized records before applying result limits. It
+searches after a short typing pause, ranks the returned matches by title, and
+reports backend failures explicitly. Inputs are limited to 128 characters;
+asterisk wildcard searches and control characters are rejected. Results remain
+bounded to 20 matching candidates per category and 12 displayed matches.
+The account-review queue supports status filtering and incremental loading.

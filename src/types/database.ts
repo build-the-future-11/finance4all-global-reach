@@ -8,6 +8,7 @@ export type OpportunityType = "internship" | "program" | "challenge" | "project_
 export type EventStatus = "upcoming" | "live" | "completed";
 export type ConnectionStatus = "pending" | "accepted" | "declined";
 export type ExplainerDifficulty = "beginner" | "intermediate";
+export type AccountDeletionStatus = "pending" | "in_progress" | "cancelled" | "rejected";
 export type NotificationType =
   | "connection_request"
   | "connection_accepted"
@@ -280,13 +281,45 @@ export interface Database {
         };
         Update: Partial<Database["public"]["Tables"]["notifications"]["Insert"]>;
       };
+      account_deletion_requests: {
+        Row: {
+          id: string;
+          user_id: string;
+          contact_email: string;
+          status: AccountDeletionStatus;
+          reason: string | null;
+          review_note: string | null;
+          requested_at: string;
+          updated_at: string;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+        };
+        Insert: never;
+        Update: {
+          status?: AccountDeletionStatus;
+          review_note?: string | null;
+        };
+      };
     };
     Views: {
       essay_submissions_with_counts: {
         Row: Database["public"]["Tables"]["essay_submissions"]["Row"] & { upvote_count: number };
       };
     };
-    Functions: Record<string, never>;
+    Functions: {
+      request_account_deletion: {
+        Args: { request_reason?: string | null };
+        Returns: Database["public"]["Tables"]["account_deletion_requests"]["Row"];
+      };
+      cancel_account_deletion: {
+        Args: Record<string, never>;
+        Returns: Database["public"]["Tables"]["account_deletion_requests"]["Row"];
+      };
+      export_my_data: {
+        Args: Record<string, never>;
+        Returns: Json;
+      };
+    };
     Enums: Record<string, never>;
   };
 }

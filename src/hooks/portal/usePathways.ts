@@ -8,15 +8,17 @@ import {
 import { useAuth } from "@/contexts/useAuth";
 import { requireOptionalExternalHttpUrl } from "@/lib/external-url";
 
-export function useOpportunities() {
+export function useOpportunities(selectedId?: string) {
   return useQuery({
-    queryKey: ["opportunities"],
+    queryKey: ["opportunities", selectedId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("opportunities")
         .select("*")
         .eq("is_active", true)
         .order("created_at", { ascending: false });
+      if (selectedId) query = query.eq("id", selectedId);
+      const { data, error } = await query;
       if (error) throw error;
       return data.map(mapOpportunity);
     },

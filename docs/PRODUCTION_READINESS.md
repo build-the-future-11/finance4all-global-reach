@@ -33,7 +33,7 @@ used as a FinanceMeta authentication, database, callback, or certification subst
 | P2 | Four Fast Refresh warnings weakened the lint signal | Hooks and reusable constants were exported from component modules | Split auth context/hook ownership and stop exporting unused UI variants | Verified on main with zero lint warnings |
 | P1 | The implementation release was not exact-source deployed | Vercel had previously reported a provider build-rate limit | Deploy protected main and require `/release-revision.json` to equal the implementation merge SHA | Resolved for `ce6fe4c781d17d02f3c8f5547b39d55b964e7069`; health checks enforce successor revisions |
 | P1 | Landing-to-member golden journey remains open | Landing health and portal health do not prove an authenticated handoff | After auth and deployment gates pass, run the landing CTA through login, onboarding, persisted activity, logout/login, and cleanup; close landing issue #16 only with retained evidence | Blocked by upstream production gates |
-| P1 | Member privacy/legal operations are incomplete | No qualified policy approval or certified deletion/export workflow exists | Obtain qualified review, publish accurate policies, implement account export/deletion, and test retention promises before broad onboarding | External legal and product decisions required |
+| P1 | Member privacy operations need production acceptance | Export, reviewed deletion requests, cancellation, and administrator review are implemented locally; production migration and policy approval remain unverified | Apply and certify lifecycle migrations, test live flows, and approve retention procedures before broad onboarding | Production access and policy decisions required |
 
 ## Source verification completed in this wave
 

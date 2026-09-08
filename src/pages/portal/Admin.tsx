@@ -11,6 +11,10 @@ import {
   useDeleteNewsArticle,
 } from "@/hooks/portal/useAdmin";
 import {
+  useAccountDeletionRequests,
+  useReviewAccountDeletionRequest,
+} from "@/hooks/portal/useAccountLifecycle";
+import {
   PortalCard,
   PortalPageHeader,
   portalInputClass,
@@ -30,21 +34,25 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { NewsCategory, OpportunityType } from "@/types/domain";
+import type { AccountDeletionStatus } from "@/types/database";
 import { toast } from "sonner";
 import { Trash2 } from "lucide-react";
 
 export default function Admin() {
+  const [deletionStatus, setDeletionStatus] = useState<AccountDeletionStatus | "all">("all");
   const { data: news } = useNewsArticles();
   const { data: opportunities } = useOpportunities();
   const { data: events } = useEvents();
   const { data: explainers } = useExplainers();
   const { data: chapters } = useChapters();
+  const { data: deletionRequests, isLoading: deletionLoading, isError: deletionError, refetch: retryDeletions, hasNextPage, fetchNextPage, isFetchingNextPage } = useAccountDeletionRequests(deletionStatus);
 
   const createNews = useCreateNewsArticle();
   const createOpp = useCreateOpportunity();
   const createEvent = useCreateEvent();
   const createExplainer = useCreateExplainer();
   const deleteNews = useDeleteNewsArticle();
+  const reviewDeletion = useReviewAccountDeletionRequest();
 
   const [newsForm, setNewsForm] = useState({
     title: "",
@@ -75,6 +83,9 @@ export default function Admin() {
     body: "",
     difficulty: "beginner" as "beginner" | "intermediate",
   });
+  const [deletionReviews, setDeletionReviews] = useState<
+    Record<string, { status: AccountDeletionStatus; reviewNote: string }>
+  >({});
 
   const parseTags = (s: string) =>
     s.split(",").map((t) => t.trim()).filter(Boolean);
@@ -84,7 +95,7 @@ export default function Admin() {
       <PortalPageHeader
         eyebrow="Admin"
         title="Content management"
-        description="Publish news, opportunities, events, and explainers without SQL."
+        description="Publish portal content and review member account-deletion requests."
       />
 
       <Tabs defaultValue="news" className="space-y-6">
@@ -100,6 +111,9 @@ export default function Admin() {
           </TabsTrigger>
           <TabsTrigger value="explainers" className="data-[state=active]:bg-emerald-500/20 data-[state=active]:text-emerald-300">
             Explainers ({explainers?.length ?? 0})
+          </TabsTrigger>
+          <TabsTrigger value="account-deletions" className="data-[state=active]:bg-emerald-500/20 data-[state=active]:text-emerald-300">
+            Account requests
           </TabsTrigger>
         </TabsList>
 
@@ -313,6 +327,103 @@ export default function Admin() {
               Publish explainer
             </Button>
           </PortalCard>
+        </TabsContent>
+
+        <TabsContent value="account-deletions" className="space-y-4">
+          <Select value={deletionStatus} onValueChange={(value) => setDeletionStatus(value as AccountDeletionStatus | "all")}>
+            <SelectTrigger aria-label="Filter account requests by status"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {(["all", "pending", "in_progress", "rejected", "cancelled"] as const).map((status) => <SelectItem key={status} value={status}>{status.replace("_", " ")}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <PortalCard className="p-5">
+            <h3 className="font-semibold text-white">Deletion review procedure</h3>
+            <p className="mt-2 text-sm text-white/50">
+              Mark a request in progress while verifying ownership and retention obligations. Use the privileged Supabase Auth deletion operation only after that review; deleting the Auth identity cascades the request and member-owned data. Reject or cancel requests that must not proceed.
+            </p>
+          </PortalCard>
+
+          {deletionLoading ? <p role="status">Loading account requests…</p> : deletionError ? (
+            <div role="alert">
+              Unable to load account requests.
+              <Button variant="outline" className="ml-3" onClick={() => void retryDeletions()}>Retry</Button>
+            </div>
+          ) : deletionRequests?.length ? deletionRequests.map((request) => {
+            const review = deletionReviews[request.id] ?? {
+              status: request.status,
+              reviewNote: request.review_note ?? "",
+            };
+            return (
+              <PortalCard key={request.id} className="p-5">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="font-medium text-white">{request.contact_email}</p>
+                    <p className="mt-1 text-xs text-white/40">
+                      Requested {new Date(request.requested_at).toLocaleString()} · {request.user_id}
+                    </p>
+                  </div>
+                  <span className="rounded-full bg-white/[0.06] px-3 py-1 text-xs capitalize text-white/70">
+                    {request.status.replace("_", " ")}
+                  </span>
+                </div>
+                {request.reason && (
+                  <p className="mt-4 rounded-lg border border-white/10 bg-white/[0.03] p-3 text-sm text-white/65">
+                    {request.reason}
+                  </p>
+                )}
+                <div className="mt-4 grid gap-3 sm:grid-cols-[180px_1fr_auto]">
+                  <Select
+                    value={review.status}
+                    onValueChange={(status) => setDeletionReviews((current) => ({
+                      ...current,
+                      [request.id]: { ...review, status: status as AccountDeletionStatus },
+                    }))}
+                  >
+                    <SelectTrigger aria-label={`Review status for ${request.contact_email}`} className={portalInputClass}><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {(["pending", "in_progress", "rejected", "cancelled"] as const).map((status) => (
+                        <SelectItem key={status} value={status}>{status.replace("_", " ")}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    value={review.reviewNote}
+                    maxLength={2000}
+                    placeholder="Review note (included in member export)"
+                    aria-label={`Review note for ${request.contact_email}`}
+                    className={portalInputClass}
+                    onChange={(event) => setDeletionReviews((current) => ({
+                      ...current,
+                      [request.id]: { ...review, reviewNote: event.target.value },
+                    }))}
+                  />
+                  <Button
+                    className="bg-emerald-500 hover:bg-emerald-400"
+                    disabled={reviewDeletion.isPending}
+                    onClick={async () => {
+                      try {
+                        await reviewDeletion.mutateAsync({
+                          id: request.id,
+                          status: review.status,
+                          reviewNote: review.reviewNote,
+                        });
+                        toast.success("Account request updated");
+                      } catch (e) {
+                        toast.error(e instanceof Error ? e.message : "Failed to update request");
+                      }
+                    }}
+                  >
+                    Save review
+                  </Button>
+                </div>
+              </PortalCard>
+            );
+          }) : (
+            <PortalCard className="p-8 text-center text-sm text-white/45">
+              No account-deletion requests.
+            </PortalCard>
+          )}
+          {hasNextPage && <Button disabled={isFetchingNextPage} onClick={() => void fetchNextPage()}>{isFetchingNextPage ? "Loading…" : "Load more account requests"}</Button>}
         </TabsContent>
       </Tabs>
     </div>

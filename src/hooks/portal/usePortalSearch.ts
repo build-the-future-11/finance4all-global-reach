@@ -10,23 +10,41 @@ export interface SearchResult {
   href: string;
 }
 
+export function searchFilter(columns: string[], query: string, tier: "all" | "exact" | "prefix" | "remaining" = "all"): string {
+  if (query.length > 128 || [...query].some((character) => character.charCodeAt(0) < 32 || character === "*")) throw new Error("Use up to 128 characters without control characters or asterisks.");
+  const pattern = `%${query.replace(/[\\%_]/g, (character) => `\\${character}`)}%`;
+  const quoted = `"${pattern.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
+  const exact = quoted.slice(0, 1) + quoted.slice(2, -2) + quoted.slice(-1);
+  const prefix = quoted.slice(0, 1) + quoted.slice(2);
+  const title = columns[0];
+  if (tier === "exact") return `${title}.ilike.${exact}`;
+  if (tier === "prefix") return `and(${title}.ilike.${prefix},${title}.not.ilike.${exact})`;
+  const matches = columns.map((column) => `${column}.ilike.${quoted}`).join(",");
+  if (tier === "remaining") return `and(or(${matches}),${title}.not.ilike.${prefix})`;
+  return matches;
+}
+
 export function usePortalSearch(query: string) {
   const q = query.trim().toLowerCase();
 
   return useQuery({
     queryKey: ["portal-search", q],
     enabled: q.length >= 2,
-    queryFn: async (): Promise<SearchResult[]> => {
+    queryFn: async ({ signal }): Promise<SearchResult[]> => {
+      const results: SearchResult[] = [];
+      for (const tier of ["exact", "prefix", "remaining"] as const) {
       const [news, labs, opps, events, members, explainers] = await Promise.all([
-        supabase.from("news_articles").select("id, title, summary").limit(20),
-        supabase.from("research_projects").select("id, title, description").neq("status", "draft").limit(20),
-        supabase.from("opportunities").select("id, title, organization").eq("is_active", true).limit(20),
-        supabase.from("events").select("id, title, description").limit(20),
-        supabase.from("profiles").select("id, display_name, bio").neq("display_name", "").limit(30),
-        supabase.from("explainer_cards").select("id, slug, title, summary").limit(20),
+        supabase.from("news_articles").select("id, title, summary").or(searchFilter(["title","summary"], q, tier)).order("id").limit(12).abortSignal(signal),
+        supabase.from("research_projects").select("id, title, description").neq("status", "draft").or(searchFilter(["title","description"], q, tier)).order("id").limit(12).abortSignal(signal),
+        supabase.from("opportunities").select("id, title, organization").eq("is_active", true).or(searchFilter(["title","organization"], q, tier)).order("id").limit(12).abortSignal(signal),
+        supabase.from("events").select("id, title, description").or(searchFilter(["title","description"], q, tier)).order("id").limit(12).abortSignal(signal),
+        supabase.from("profiles").select("id, display_name, bio").neq("display_name", "").or(searchFilter(["display_name","bio"], q, tier)).order("id").limit(12).abortSignal(signal),
+        supabase.from("explainer_cards").select("id, slug, title, summary").or(searchFilter(["title","summary"], q, tier)).order("id").limit(12).abortSignal(signal),
       ]);
 
-      const results: SearchResult[] = [];
+      if ([news, labs, opps, events, members, explainers].some((response) => response.error)) {
+        throw new Error("Search is temporarily unavailable. Please retry.");
+      }
 
       news.data
         ?.filter((r) => r.title.toLowerCase().includes(q) || r.summary.toLowerCase().includes(q))
@@ -36,7 +54,7 @@ export function usePortalSearch(query: string) {
             type: "news",
             title: r.title,
             subtitle: r.summary.slice(0, 80),
-            href: portalRoutes.debriefed,
+            href: `${portalRoutes.debriefed}?selected=${encodeURIComponent(r.id)}`,
           }),
         );
 
@@ -60,7 +78,7 @@ export function usePortalSearch(query: string) {
             type: "opportunity",
             title: r.title,
             subtitle: r.organization,
-            href: portalRoutes.pathways,
+            href: `${portalRoutes.pathways}?selected=${encodeURIComponent(r.id)}`,
           }),
         );
 
@@ -72,7 +90,7 @@ export function usePortalSearch(query: string) {
             type: "event",
             title: r.title,
             subtitle: "Event",
-            href: portalRoutes.events,
+            href: `${portalRoutes.events}?selected=${encodeURIComponent(r.id)}`,
           }),
         );
 
@@ -104,7 +122,12 @@ export function usePortalSearch(query: string) {
           }),
         );
 
-      return results.slice(0, 12);
+      if (results.length >= 12) break;
+      }
+      return results.sort((a, b) => {
+        const rank = (item: SearchResult) => item.title.toLowerCase() === q ? 0 : item.title.toLowerCase().startsWith(q) ? 1 : 2;
+        return rank(a) - rank(b) || a.id.localeCompare(b.id) || a.type.localeCompare(b.type);
+      }).slice(0, 12);
     },
     staleTime: 10_000,
   });

@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { useSelectedRecord } from "@/hooks/useSelectedRecord";
 
 const TYPES: { value: OpportunityType | "all"; label: string }[] = [
   { value: "all", label: "All" },
@@ -30,15 +31,17 @@ const TYPES: { value: OpportunityType | "all"; label: string }[] = [
 
 export default function AxiomPathways() {
   useDocumentTitle("Pathways");
+  const { selectedId, notice } = useSelectedRecord();
   const [typeFilter, setTypeFilter] = useState<OpportunityType | "all">("all");
   const [search, setSearch] = useState("");
-  const { data: opportunities, isLoading, error, refetch } = useOpportunities();
+  const { data: opportunities, isLoading, error, refetch } = useOpportunities(selectedId);
   const { data: interests } = useOpportunityInterests();
   const toggle = useToggleOpportunityInterest();
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return opportunities?.filter((opp) => {
+      if (selectedId) return opp.id === selectedId;
       if (typeFilter !== "all" && opp.type !== typeFilter) return false;
       if (!q) return true;
       return (
@@ -47,7 +50,7 @@ export default function AxiomPathways() {
         opp.description.toLowerCase().includes(q)
       );
     });
-  }, [opportunities, typeFilter, search]);
+  }, [opportunities, typeFilter, search, selectedId]);
 
   const handleToggle = async (id: string, currentlyInterested: boolean) => {
     try {
@@ -60,6 +63,7 @@ export default function AxiomPathways() {
 
   return (
     <div>
+      {notice}
       <PortalPageHeader
         eyebrow="Careers"
         title="Axiom Pathways"

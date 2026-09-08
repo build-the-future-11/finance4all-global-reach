@@ -13,6 +13,42 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  database-authorization:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: public.ecr.aws/supabase/postgres:17.6.1.165
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        options: >-
+          --health-cmd "pg_isready -U postgres -d postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Replay migrations and certify account lifecycle RLS
+        shell: bash
+        env:
+          POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+        run: |
+          set -euo pipefail
+          test -n "$POSTGRES_CONTAINER"
+          docker cp supabase/tests/bare_postgres_bootstrap.sql "$POSTGRES_CONTAINER:/tmp/bare_postgres_bootstrap.sql"
+          docker cp supabase/migrations/. "$POSTGRES_CONTAINER:/tmp/portal-migrations/"
+          docker cp supabase/tests/two_identity_rls_certification.sql "$POSTGRES_CONTAINER:/tmp/two_identity_rls_certification.sql"
+          docker cp supabase/tests/account_lifecycle_rls_certification.sql "$POSTGRES_CONTAINER:/tmp/account_lifecycle_rls_certification.sql"
+          docker exec "$POSTGRES_CONTAINER" psql -v ON_ERROR_STOP=1 -U supabase_admin -d postgres -f /tmp/bare_postgres_bootstrap.sql
+          docker exec "$POSTGRES_CONTAINER" sh -lc 'set -eu; for migration in /tmp/portal-migrations/*.sql; do psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f "$migration"; done'
+          docker exec "$POSTGRES_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/two_identity_rls_certification.sql
+          docker exec "$POSTGRES_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/account_lifecycle_rls_certification.sql
+
   verify:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
@@ -44,12 +80,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p ci-evidence
+          mkdir -p ${{ runner.temp }}/portal-ci-evidence
           selected=""
 
           for attempt in 1 2; do
-            log="ci-evidence/npm-audit-prod-attempt-${attempt}.json"
-            status_file="ci-evidence/npm-audit-prod-attempt-${attempt}.status"
+            log="${{ runner.temp }}/portal-ci-evidence/npm-audit-prod-attempt-${attempt}.json"
+            status_file="${{ runner.temp }}/portal-ci-evidence/npm-audit-prod-attempt-${attempt}.status"
 
             set +e
             timeout 180s npm audit \
@@ -101,17 +137,17 @@ jobs:
 
             if [ "$validation_status" -eq 0 ] && [ "$status" -eq 0 ]; then
               selected="$log"
-              printf 'CLEAN\n' > ci-evidence/audit-classification.txt
+              printf 'CLEAN\n' > ${{ runner.temp }}/portal-ci-evidence/audit-classification.txt
               break
             fi
 
             if [ "$validation_status" -eq 1 ]; then
-              printf 'VULNERABLE\n' > ci-evidence/audit-classification.txt
+              printf 'VULNERABLE\n' > ${{ runner.temp }}/portal-ci-evidence/audit-classification.txt
               echo "npm audit returned a valid report with high or critical production vulnerabilities" >&2
               exit 1
             fi
 
-            printf 'TRANSPORT_OR_SCHEMA_ERROR\n' > ci-evidence/audit-classification.txt
+            printf 'TRANSPORT_OR_SCHEMA_ERROR\n' > ${{ runner.temp }}/portal-ci-evidence/audit-classification.txt
             echo "npm audit attempt ${attempt} did not return a valid clean vulnerability report" >&2
             if [ "$attempt" -ge 2 ]; then
               if [ "$status" -eq 124 ]; then
@@ -125,15 +161,15 @@ jobs:
           done
 
           test -n "$selected"
-          cp "$selected" ci-evidence/npm-audit-prod.json
-          test -s ci-evidence/npm-audit-prod.json
-          sha256sum ci-evidence/npm-audit-prod.json > ci-evidence/npm-audit-prod.sha256
+          cp "$selected" ${{ runner.temp }}/portal-ci-evidence/npm-audit-prod.json
+          test -s ${{ runner.temp }}/portal-ci-evidence/npm-audit-prod.json
+          sha256sum ${{ runner.temp }}/portal-ci-evidence/npm-audit-prod.json > ${{ runner.temp }}/portal-ci-evidence/npm-audit-prod.sha256
       - name: Record CI provenance
         if: always()
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p ci-evidence
+          mkdir -p ${{ runner.temp }}/portal-ci-evidence
           {
             printf 'source_sha=%s\n' "$EXPECTED_SOURCE_SHA"
             printf 'workflow_sha=%s\n' "$GITHUB_SHA"
@@ -144,19 +180,19 @@ jobs:
             printf 'npm=%s\n' "$(npm --version)"
             printf 'package_lock_sha256='
             sha256sum package-lock.json | awk '{print $1}'
-            if [ -s ci-evidence/npm-audit-prod.json ]; then
+            if [ -s ${{ runner.temp }}/portal-ci-evidence/npm-audit-prod.json ]; then
               printf 'npm_audit_sha256='
-              sha256sum ci-evidence/npm-audit-prod.json | awk '{print $1}'
+              sha256sum ${{ runner.temp }}/portal-ci-evidence/npm-audit-prod.json | awk '{print $1}'
             else
               printf 'npm_audit_sha256=MISSING\n'
             fi
-          } > ci-evidence/provenance.txt
+          } > ${{ runner.temp }}/portal-ci-evidence/provenance.txt
       - name: Upload production dependency audit evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: production-dependency-audit-${{ env.EXPECTED_SOURCE_SHA }}
-          path: ci-evidence
+          path: ${{ runner.temp }}/portal-ci-evidence
           if-no-files-found: error
           retention-days: 14
       - name: Generate bounded candidate safe lockfile remediation
@@ -164,7 +200,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if ! grep -qx 'VULNERABLE' ci-evidence/audit-classification.txt 2>/dev/null; then
+          if ! grep -qx 'VULNERABLE' ${{ runner.temp }}/portal-ci-evidence/audit-classification.txt 2>/dev/null; then
             echo "candidate_skipped=non-vulnerability-audit-failure" >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
@@ -178,10 +214,10 @@ jobs:
             --json \
             --fetch-timeout=150000 \
             --fetch-retries=0 \
-            > ci-evidence/npm-audit-candidate.json 2>&1
+            > ${{ runner.temp }}/portal-ci-evidence/npm-audit-candidate.json 2>&1
           audit_status=$?
           set -e
-          printf 'fix_status=%s\naudit_status=%s\n' "$fix_status" "$audit_status" > ci-evidence/remediation-status.txt
+          printf 'fix_status=%s\naudit_status=%s\n' "$fix_status" "$audit_status" > ${{ runner.temp }}/portal-ci-evidence/remediation-status.txt
           if cmp -s package-lock.before-remediation.json package-lock.json; then
             echo "candidate_changed=false" >> "$GITHUB_STEP_SUMMARY"
           else
@@ -194,7 +230,7 @@ jobs:
           name: production-dependency-remediation-candidate-${{ env.EXPECTED_SOURCE_SHA }}
           path: |
             package-lock.json
-            ci-evidence
+            ${{ runner.temp }}/portal-ci-evidence
           if-no-files-found: error
           retention-days: 7
       - name: TypeScript compilation gate

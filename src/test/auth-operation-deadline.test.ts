@@ -12,7 +12,7 @@ describe("FinanceMeta auth operation deadline contract", () => {
     expect(authContext).toContain("const AUTH_OPERATION_TIMEOUT_MS = 15_000;");
     expect(authContext).toContain("() => supabase.auth.getSession()");
     expect(authContext).toContain('"Initial auth session fetch"');
-    expect(authContext).toContain(".finally(() => setLoading(false));");
+    expect(authContext).toContain("if (!disposed && !receivedAuthEvent) setLoading(false)");
   });
 
   it("bounds sign-in, sign-up, and OAuth bootstrap without fabricating local state", () => {
