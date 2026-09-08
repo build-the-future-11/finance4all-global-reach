@@ -33,6 +33,11 @@ test('CI audit artifacts stay outside the release source checkout', () => {
   }
 });
 
+test('Vercel installs the lockfile without rewriting release inputs', () => {
+  const config = JSON.parse(readFileSync(new URL('../vercel.json', import.meta.url), 'utf8'));
+  assert.equal(config.installCommand, 'npm ci --no-audit --fund=false');
+});
+
 function existsFrom(files) {
   const set = new Set(files);
   return (file) => set.has(file);

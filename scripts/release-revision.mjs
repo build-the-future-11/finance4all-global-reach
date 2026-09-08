@@ -3,7 +3,8 @@ import { execFileSync } from "node:child_process";
 const REVISION_PATTERN = /^[0-9a-f]{40}$/;
 
 export function assertCleanReleaseSource({ status = () => execFileSync("git", ["status", "--porcelain", "--untracked-files=normal"], { encoding: "utf8" }) } = {}) {
-  if (status().trim()) throw new Error("Release build requires a clean source checkout; commit or preserve pending work before building a release.");
+  const changes = status().trim();
+  if (changes) throw new Error(`Release build requires a clean source checkout; commit or preserve pending work before building a release. Changed paths: ${JSON.stringify(changes)}`);
 }
 
 export function validateReleaseRevision(value, label = "release revision") {
