@@ -76,3 +76,16 @@ the credentialed production workflow.
 
 The current evidence and remaining external blockers are tracked in
 [`docs/PRODUCTION_READINESS.md`](docs/PRODUCTION_READINESS.md).
+
+Release builds require a clean Git checkout, including untracked source files,
+before writing `dist/release-revision.json`. Commit reviewed changes first; use
+`npm run build:dev` for an ordinary development bundle without a release receipt.
+Production RLS certification parses the database host and user identity and
+requires TLS; project text embedded in a foreign URL is rejected.
+
+Portal search filters authorized records before applying result limits. It
+searches after a short typing pause, ranks the returned matches by title, and
+reports backend failures explicitly. Inputs are limited to 128 characters;
+asterisk wildcard searches and control characters are rejected. Results remain
+bounded to 20 matching candidates per category and 12 displayed matches.
+The account-review queue supports status filtering and incremental loading.

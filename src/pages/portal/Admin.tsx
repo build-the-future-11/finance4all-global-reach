@@ -39,12 +39,13 @@ import { toast } from "sonner";
 import { Trash2 } from "lucide-react";
 
 export default function Admin() {
+  const [deletionStatus, setDeletionStatus] = useState<AccountDeletionStatus | "all">("all");
   const { data: news } = useNewsArticles();
   const { data: opportunities } = useOpportunities();
   const { data: events } = useEvents();
   const { data: explainers } = useExplainers();
   const { data: chapters } = useChapters();
-  const { data: deletionRequests, isLoading: deletionLoading, isError: deletionError, refetch: retryDeletions } = useAccountDeletionRequests();
+  const { data: deletionRequests, isLoading: deletionLoading, isError: deletionError, refetch: retryDeletions, hasNextPage, fetchNextPage, isFetchingNextPage } = useAccountDeletionRequests(deletionStatus);
 
   const createNews = useCreateNewsArticle();
   const createOpp = useCreateOpportunity();
@@ -112,7 +113,7 @@ export default function Admin() {
             Explainers ({explainers?.length ?? 0})
           </TabsTrigger>
           <TabsTrigger value="account-deletions" className="data-[state=active]:bg-emerald-500/20 data-[state=active]:text-emerald-300">
-            Account requests ({deletionRequests?.filter((request) => request.status === "pending" || request.status === "in_progress").length ?? 0})
+            Account requests
           </TabsTrigger>
         </TabsList>
 
@@ -329,6 +330,12 @@ export default function Admin() {
         </TabsContent>
 
         <TabsContent value="account-deletions" className="space-y-4">
+          <Select value={deletionStatus} onValueChange={(value) => setDeletionStatus(value as AccountDeletionStatus | "all")}>
+            <SelectTrigger aria-label="Filter account requests by status"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {(["all", "pending", "in_progress", "rejected", "cancelled"] as const).map((status) => <SelectItem key={status} value={status}>{status.replace("_", " ")}</SelectItem>)}
+            </SelectContent>
+          </Select>
           <PortalCard className="p-5">
             <h3 className="font-semibold text-white">Deletion review procedure</h3>
             <p className="mt-2 text-sm text-white/50">
@@ -372,7 +379,7 @@ export default function Admin() {
                       [request.id]: { ...review, status: status as AccountDeletionStatus },
                     }))}
                   >
-                    <SelectTrigger className={portalInputClass}><SelectValue /></SelectTrigger>
+                    <SelectTrigger aria-label={`Review status for ${request.contact_email}`} className={portalInputClass}><SelectValue /></SelectTrigger>
                     <SelectContent>
                       {(["pending", "in_progress", "rejected", "cancelled"] as const).map((status) => (
                         <SelectItem key={status} value={status}>{status.replace("_", " ")}</SelectItem>
@@ -383,6 +390,7 @@ export default function Admin() {
                     value={review.reviewNote}
                     maxLength={2000}
                     placeholder="Review note (included in member export)"
+                    aria-label={`Review note for ${request.contact_email}`}
                     className={portalInputClass}
                     onChange={(event) => setDeletionReviews((current) => ({
                       ...current,
@@ -415,6 +423,7 @@ export default function Admin() {
               No account-deletion requests.
             </PortalCard>
           )}
+          {hasNextPage && <Button disabled={isFetchingNextPage} onClick={() => void fetchNextPage()}>{isFetchingNextPage ? "Loading…" : "Load more account requests"}</Button>}
         </TabsContent>
       </Tabs>
     </div>

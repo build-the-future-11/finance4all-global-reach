@@ -47,7 +47,7 @@ const STATUSES: { value: ResearchProjectStatus | "all"; label: string }[] = [
 function ProjectDetail({ id }: { id: string }) {
   useDocumentTitle("Lab project");
   const { profile } = useAuth();
-  const { data: project, isLoading, error } = useResearchProject(id);
+  const { data: project, isLoading, error, refetch } = useResearchProject(id);
   const { data: myApps } = useMyLabApplications();
   const { data: leads } = useProfilesByIds(project ? [project.leadResearcherId] : []);
   const { data: bookmarks } = useProjectBookmarks();
@@ -80,7 +80,8 @@ function ProjectDetail({ id }: { id: string }) {
       </QueryStatus>
     );
   }
-  if (error || !project) return <EmptyState message="Project not found." />;
+  if (error) return <QueryStatus isLoading={false} error={new Error("Unable to load this project.")} onRetry={() => void refetch()}><div /></QueryStatus>;
+  if (!project) return <EmptyState message="Project not found." />;
 
   return (
     <div>

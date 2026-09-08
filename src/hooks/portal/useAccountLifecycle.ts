@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import type { AccountDeletionStatus } from "@/types/database";
 
@@ -56,18 +56,30 @@ export function useExportMyData() {
   });
 }
 
-export function useAccountDeletionRequests() {
-  return useQuery({
-    queryKey: ["account-deletion-requests"],
-    queryFn: async () => {
-      const { data, error } = await supabase
+export function useAccountDeletionRequests(status: AccountDeletionStatus | "all" = "all") {
+  const result = useInfiniteQuery({
+    queryKey: ["account-deletion-requests", status],
+    initialPageParam: null as { at: string; id: string } | null,
+    queryFn: async ({ pageParam }) => {
+      let query = supabase
         .from("account_deletion_requests")
         .select("*")
-        .order("requested_at", { ascending: true });
+        .order("requested_at", { ascending: true })
+        .order("id", { ascending: true })
+        .limit(26);
+      if (status !== "all") query = query.eq("status", status);
+      if (pageParam) {
+        query = query.or(`requested_at.gt.${pageParam.at},and(requested_at.eq.${pageParam.at},id.gt.${pageParam.id})`);
+      }
+      const { data, error } = await query;
       if (error) throw error;
-      return data;
+      const rows = (data ?? []).slice(0, 25);
+      const last = rows.at(-1);
+      return { rows, next: data && data.length > 25 && last ? { at: last.requested_at, id: last.id } : null };
     },
+    getNextPageParam: (page) => page.next,
   });
+  return { ...result, data: result.data?.pages.flatMap((page) => page.rows) };
 }
 
 export function useReviewAccountDeletionRequest() {

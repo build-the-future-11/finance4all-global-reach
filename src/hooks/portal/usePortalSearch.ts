@@ -10,22 +10,32 @@ export interface SearchResult {
   href: string;
 }
 
+export function searchFilter(columns: string[], query: string): string {
+  if (query.length > 128 || [...query].some((character) => character.charCodeAt(0) < 32 || character === "*")) throw new Error("Use up to 128 characters without control characters or asterisks.");
+  const pattern = `%${query.replace(/[\\%_]/g, (character) => `\\${character}`)}%`;
+  const quoted = `"${pattern.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
+  return columns.map((column) => `${column}.ilike.${quoted}`).join(",");
+}
+
 export function usePortalSearch(query: string) {
   const q = query.trim().toLowerCase();
 
   return useQuery({
     queryKey: ["portal-search", q],
     enabled: q.length >= 2,
-    queryFn: async (): Promise<SearchResult[]> => {
+    queryFn: async ({ signal }): Promise<SearchResult[]> => {
       const [news, labs, opps, events, members, explainers] = await Promise.all([
-        supabase.from("news_articles").select("id, title, summary").limit(20),
-        supabase.from("research_projects").select("id, title, description").neq("status", "draft").limit(20),
-        supabase.from("opportunities").select("id, title, organization").eq("is_active", true).limit(20),
-        supabase.from("events").select("id, title, description").limit(20),
-        supabase.from("profiles").select("id, display_name, bio").neq("display_name", "").limit(30),
-        supabase.from("explainer_cards").select("id, slug, title, summary").limit(20),
+        supabase.from("news_articles").select("id, title, summary").or(searchFilter(["title","summary"], q)).order("id").limit(20).abortSignal(signal),
+        supabase.from("research_projects").select("id, title, description").neq("status", "draft").or(searchFilter(["title","description"], q)).order("id").limit(20).abortSignal(signal),
+        supabase.from("opportunities").select("id, title, organization").eq("is_active", true).or(searchFilter(["title","organization"], q)).order("id").limit(20).abortSignal(signal),
+        supabase.from("events").select("id, title, description").or(searchFilter(["title","description"], q)).order("id").limit(20).abortSignal(signal),
+        supabase.from("profiles").select("id, display_name, bio").neq("display_name", "").or(searchFilter(["display_name","bio"], q)).order("id").limit(20).abortSignal(signal),
+        supabase.from("explainer_cards").select("id, slug, title, summary").or(searchFilter(["title","summary"], q)).order("id").limit(20).abortSignal(signal),
       ]);
 
+      if ([news, labs, opps, events, members, explainers].some((response) => response.error)) {
+        throw new Error("Search is temporarily unavailable. Please retry.");
+      }
       const results: SearchResult[] = [];
 
       news.data
@@ -104,7 +114,10 @@ export function usePortalSearch(query: string) {
           }),
         );
 
-      return results.slice(0, 12);
+      return results.sort((a, b) => {
+        const rank = (item: SearchResult) => item.title.toLowerCase() === q ? 0 : item.title.toLowerCase().startsWith(q) ? 1 : 2;
+        return rank(a) - rank(b) || a.title.localeCompare(b.title) || a.id.localeCompare(b.id);
+      }).slice(0, 12);
     },
     staleTime: 10_000,
   });

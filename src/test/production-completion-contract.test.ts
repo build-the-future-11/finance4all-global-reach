@@ -146,7 +146,8 @@ describe("production completion contracts", () => {
 
   it("runs the RLS matrix only against the canonical database and retains evidence", () => {
     expect(rlsWorkflow).toContain("FINANCEMETA_DATABASE_URL");
-    expect(rlsWorkflow).toContain("pnemeegkwyaicsbnbnmg");
+    expect(rlsWorkflow).toContain("node scripts/validate-database-target.mjs");
+    expect(rlsWorkflow).toContain("PGSSLMODE: require");
     expect(rlsWorkflow).toContain("--set ON_ERROR_STOP=1");
     expect(rlsWorkflow).toContain("two_identity_rls_certification.sql");
     expect(rlsWorkflow).toContain("retention-days: 30");

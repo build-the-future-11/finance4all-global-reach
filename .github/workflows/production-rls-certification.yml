@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:
+      PGSSLMODE: require
       FINANCEMETA_DATABASE_URL: ${{ secrets.FINANCEMETA_DATABASE_URL }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -25,10 +26,7 @@ jobs:
         run: |
           set -euo pipefail
           test -n "$FINANCEMETA_DATABASE_URL"
-          case "$FINANCEMETA_DATABASE_URL" in
-            *pnemeegkwyaicsbnbnmg*) ;;
-            *) echo "Database URL is not for the canonical FinanceMeta project" >&2; exit 1 ;;
-          esac
+          node scripts/validate-database-target.mjs
       - name: Verify PostgreSQL client
         shell: bash
         run: psql --version

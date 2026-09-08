@@ -49,7 +49,12 @@ export default function PortalSearch() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
-  const { data: results, isLoading } = usePortalSearch(query);
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(query), 250);
+    return () => clearTimeout(timer);
+  }, [query]);
+  const { data: results, isLoading, error, refetch } = usePortalSearch(open ? debouncedQuery : "");
 
   const handleSelect = useCallback(
     (href: string) => {
@@ -96,10 +101,12 @@ export default function PortalSearch() {
         <Search className="h-4 w-4" />
       </button>
 
-      <CommandDialog open={open} onOpenChange={setOpen}>
+      <CommandDialog open={open} onOpenChange={setOpen} shouldFilter={false}>
         <CommandInput
           placeholder="Search news, labs, opportunities, events, members…"
           value={query}
+          maxLength={128}
+          aria-label="Search portal"
           onValueChange={setQuery}
           className="border-white/10 text-white placeholder:text-white/35"
         />
@@ -108,8 +115,13 @@ export default function PortalSearch() {
             <div className="px-4 py-8 text-center text-sm text-white/40">
               Type at least 2 characters to search
             </div>
-          ) : isLoading ? (
+          ) : isLoading || query !== debouncedQuery ? (
             <div className="px-4 py-8 text-center text-sm text-white/40">Searching…</div>
+          ) : error ? (
+            <div role="alert" className="p-4 text-sm">
+              {error instanceof Error ? error.message : "Search unavailable."}
+              <button type="button" className="ml-3 underline" onClick={() => void refetch()}>Retry</button>
+            </div>
           ) : !results?.length ? (
             <CommandEmpty className="text-white/40">No results found.</CommandEmpty>
           ) : (
