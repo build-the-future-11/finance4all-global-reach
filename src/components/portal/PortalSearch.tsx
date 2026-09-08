@@ -10,6 +10,7 @@ import {
   Users,
 } from "lucide-react";
 import { usePortalSearch, type SearchResult } from "@/hooks/portal/usePortalSearch";
+import { searchResultCommandValue } from "@/lib/search-result-command";
 import {
   CommandDialog,
   CommandEmpty,
@@ -43,12 +44,6 @@ function groupResults(results: SearchResult[]) {
     (groups[r.type] ??= []).push(r);
   }
   return groups;
-}
-
-export function searchResultCommandValue(
-  item: Pick<SearchResult, "id" | "type">,
-) {
-  return `${item.type}:${item.id}`;
 }
 
 export default function PortalSearch() {
