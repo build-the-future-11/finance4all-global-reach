@@ -4,12 +4,13 @@ import { readFileSync } from 'node:fs';
 
 import { verifyReleaseToolchain } from '../scripts/verify-release-toolchain.mjs';
 
-test('lockfile retains every Rolldown platform binding for clean cross-platform installs', () => {
+for (const family of ['rolldown', 'lightningcss', 'supabase']) {
+test(`lockfile retains every ${family} platform binding for clean cross-platform installs`, () => {
   const lock = JSON.parse(readFileSync(new URL('../package-lock.json', import.meta.url), 'utf8'));
-  const rolldown = lock.packages['node_modules/rolldown'];
-  assert.ok(rolldown, 'Rolldown must be locked');
-  const bindings = Object.entries(rolldown.optionalDependencies ?? {});
-  assert.ok(bindings.some(([name]) => name === '@rolldown/binding-linux-x64-gnu'));
+  const parent = lock.packages[`node_modules/${family}`];
+  assert.ok(parent, `${family} must be locked`);
+  const bindings = Object.entries(parent.optionalDependencies ?? {});
+  assert.ok(bindings.some(([name]) => name.includes('linux-x64')));
   for (const [name, version] of bindings) {
     const binding = lock.packages[`node_modules/${name}`];
     assert.ok(binding, `Missing cross-platform binding: ${name}`);
@@ -17,6 +18,7 @@ test('lockfile retains every Rolldown platform binding for clean cross-platform 
     assert.ok(binding.integrity, `Missing registry integrity: ${name}`);
   }
 });
+}
 
 const packageJson = {
   packageManager: 'npm@10.9.8',
