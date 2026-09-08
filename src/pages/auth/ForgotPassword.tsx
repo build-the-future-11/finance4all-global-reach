@@ -5,7 +5,10 @@ import { portalInputClass } from "@/components/portal/PortalUI";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { withDeadline } from "@/lib/asyncDeadline";
 import { getAuthRedirectUrl, supabase } from "@/lib/supabase";
+
+const AUTH_OPERATION_TIMEOUT_MS = 15_000;
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -18,15 +21,22 @@ export default function ForgotPassword() {
     setError("");
     setMessage("");
     setSubmitting(true);
-    const { error: recoveryError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-      redirectTo: getAuthRedirectUrl("/reset-password"),
-    });
-    setSubmitting(false);
-    if (recoveryError) {
+    try {
+      const { error: recoveryError } = await withDeadline(
+        () =>
+          supabase.auth.resetPasswordForEmail(email.trim(), {
+            redirectTo: getAuthRedirectUrl("/reset-password"),
+          }),
+        AUTH_OPERATION_TIMEOUT_MS,
+        "Password recovery",
+      );
+      if (recoveryError) throw recoveryError;
+      setMessage("If an account exists for that address, a reset link is on its way.");
+    } catch {
       setError("We could not request a recovery link. Please wait a moment and try again.");
-      return;
+    } finally {
+      setSubmitting(false);
     }
-    setMessage("If an account exists for that address, a reset link is on its way.");
   };
 
   return (

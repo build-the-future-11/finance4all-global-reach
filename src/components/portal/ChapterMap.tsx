@@ -63,7 +63,7 @@ export default function ChapterMap({ chapters, selectedId, onSelect }: ChapterMa
       })}
 
       <div className="absolute bottom-3 left-3 rounded-lg bg-black/40 px-2 py-1 text-[10px] text-white/40 backdrop-blur-sm">
-        {chapters.length} global chapters
+        {chapters.length} listed chapter locations
       </div>
     </div>
   );

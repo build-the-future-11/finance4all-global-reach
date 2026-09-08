@@ -36,8 +36,8 @@ export default function DebriefedHub() {
     <div>
       <PortalPageHeader
         eyebrow="Finance Debriefed"
-        title="News & market pulse"
-        description="Global macro updates, market movers, and IPO watchlists."
+        title="Finance article library"
+        description="Curated articles organized by category, with publication dates and source links."
         action={
           <Link to={portalRoutes.debriefedExplainers}>
             <Button variant="outline" className={portalButtonOutline}>

@@ -7,6 +7,13 @@ const migrationPath = path.resolve(
   "supabase/migrations/20260906121145_portal_security_and_privacy.sql",
 );
 const migration = fs.readFileSync(migrationPath, "utf8");
+const eligibilityMigration = fs.readFileSync(
+  path.resolve(
+    process.cwd(),
+    "supabase/migrations/20260908120000_enforce_action_eligibility.sql",
+  ),
+  "utf8",
+);
 const authContext = fs.readFileSync(
   path.resolve(process.cwd(), "src/contexts/AuthContext.tsx"),
   "utf8",
@@ -53,6 +60,17 @@ describe("FinanceMeta authorization boundary", () => {
     expect(migration).toContain("reviewer_id = (SELECT auth.uid())");
     expect(migration).toContain("GRANT UPDATE (title, description, status, tags, application_deadline)");
     expect(migration).not.toContain("GRANT UPDATE (lead_researcher_id");
+  });
+
+  it("rejects new actions against closed or expired parent records", () => {
+    expect(eligibilityMigration).toContain("project.status = 'open'::public.research_project_status");
+    expect(eligibilityMigration).toContain("project.application_deadline > pg_catalog.now()");
+    expect(eligibilityMigration).toContain("opportunity.is_active");
+    expect(eligibilityMigration).toContain("opportunity.deadline > pg_catalog.now()");
+    expect(eligibilityMigration).toContain("event.status = 'upcoming'::public.event_status");
+    expect(eligibilityMigration).toContain("event.starts_at > pg_catalog.now()");
+    expect(eligibilityMigration).toContain('CREATE POLICY "Users delete own event registrations"');
+    expect(eligibilityMigration).toContain('CREATE POLICY "Users delete own opportunity interests"');
   });
 
   it("prevents editorial self-promotion and connection rewrites", () => {

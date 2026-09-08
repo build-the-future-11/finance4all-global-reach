@@ -15,7 +15,7 @@ versions, alternate package managers, and conflicting lockfiles.
 | Route | Feature |
 |-------|---------|
 | `/portal` | Dashboard |
-| `/portal/debriefed` | News + digest prefs |
+| `/portal/debriefed` | Curated news, source links, and bookmarks |
 | `/portal/labs` | Research projects + apply |
 | `/portal/pathways` | Opportunities, studios, essays |
 | `/portal/events` | Chapters + events |

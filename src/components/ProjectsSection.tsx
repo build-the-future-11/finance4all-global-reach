@@ -44,8 +44,8 @@ const phaseOneModules = [
     icon: Newspaper,
     title: "Finance Debriefed",
     href: portalRoutes.debriefed,
-    summary: "Global macro updates, market movers, and IPO watchlists in one place.",
-    bullets: ["Daily global economic pulse", "Gainers/losers tracker", "IPO + company spotlight"],
+    summary: "Curated finance articles with categories, publication dates, and source links.",
+    bullets: ["Category filters", "Source links", "Member bookmarks"],
   },
   {
     icon: BookOpenText,
@@ -58,8 +58,8 @@ const phaseOneModules = [
     icon: FlaskConical,
     title: "Finance Meta Labs",
     href: portalRoutes.labs,
-    summary: "Research project directory with verified lead researchers and open applications.",
-    bullets: ["Lead researcher verification", "Student application flow", "Professor + student collaboration"],
+    summary: "Member research directory with role-gated publishing and application workflows.",
+    bullets: ["Project status filters", "Member application flow", "Lead review queue"],
   },
   {
     icon: BriefcaseBusiness,

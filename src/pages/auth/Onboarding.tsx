@@ -62,6 +62,11 @@ export default function Onboarding() {
     profile?.avatarUrl ||
     (user?.user_metadata?.avatar_url as string) ||
     (user?.user_metadata?.picture as string);
+  const authProviders = Array.isArray(user?.app_metadata?.providers)
+    ? user.app_metadata.providers
+    : [];
+  const signedInWithGoogle =
+    user?.app_metadata?.provider === "google" || authProviders.includes("google");
 
   return (
     <AuthLayout
@@ -69,7 +74,7 @@ export default function Onboarding() {
       subtitle="A few details so the community can find and connect with you."
       footer={<span className="text-white/35">You can update this anytime in Network.</span>}
     >
-      {avatarUrl && (
+      {avatarUrl && signedInWithGoogle && (
         <div className="mb-6 flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-4">
           <Avatar className="h-12 w-12 border border-white/15">
             <AvatarImage src={avatarUrl} />

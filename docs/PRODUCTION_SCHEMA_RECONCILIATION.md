@@ -58,15 +58,19 @@ Completed:
 Still required from an authenticated Supabase CLI session:
 
 1. Run `supabase migration list --linked` and retain the empty-ledger evidence.
-2. Mark the ten proven versions as applied using only the documented command:
+2. Mark the ten previously applied and proven versions as applied using only the documented command:
 
    ```bash
    supabase migration repair <version> --status applied
    ```
 
-3. Run `supabase migration list --linked` again and require exact equality with
-   `node scripts/verify-migration-ledger.mjs`.
-4. Retain the source SHA, before/after lists, verifier receipt, and operator.
+3. Apply `20260908120000_enforce_action_eligibility.sql` through the normal
+   Supabase migration command; do not mark this new migration applied without
+   executing it.
+4. Run `supabase migration list --linked` again and require exact equality with
+   all eleven repository versions via `node scripts/verify-migration-ledger.mjs`.
+5. Run the updated two-identity RLS certification and retain the source SHA,
+   before/after lists, verifier receipt, and operator.
 
 Do not insert directly into `supabase_migrations.schema_migrations`, and do not
 re-run historical SQL merely to populate the ledger.
@@ -75,5 +79,6 @@ re-run historical SQL merely to populate the ledger.
 
 The repository does not contain a Supabase access token or database password,
 and it must not. Ledger repair therefore requires an authenticated operator CLI
-session. Until the procedure above is completed, source history is recovered
-but production migration-ledger certification remains incomplete.
+session. Until the procedure above is completed, source history is recovered,
+the new eligibility policies are not live, and production migration-ledger
+certification remains incomplete.

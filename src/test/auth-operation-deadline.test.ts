@@ -6,6 +6,14 @@ const authContext = fs.readFileSync(
   path.resolve(process.cwd(), "src/contexts/AuthContext.tsx"),
   "utf8",
 );
+const forgotPassword = fs.readFileSync(
+  path.resolve(process.cwd(), "src/pages/auth/ForgotPassword.tsx"),
+  "utf8",
+);
+const resetPassword = fs.readFileSync(
+  path.resolve(process.cwd(), "src/pages/auth/ResetPassword.tsx"),
+  "utf8",
+);
 
 describe("FinanceMeta auth operation deadline contract", () => {
   it("bounds initial session bootstrap so global loading cannot hang forever", () => {
@@ -53,5 +61,17 @@ describe("FinanceMeta auth operation deadline contract", () => {
     expect(updateSection).toContain('.update(payload).eq("id", session.user.id)');
     expect(updateSection).toContain('"Profile update"');
     expect(updateSection).toContain("if (!error) await fetchProfile(session.user);");
+  });
+
+  it("bounds password recovery and update while always restoring submit controls", () => {
+    expect(forgotPassword).toContain("await withDeadline(");
+    expect(forgotPassword).toContain('"Password recovery"');
+    expect(forgotPassword).toContain("finally {");
+    expect(forgotPassword).toContain("setSubmitting(false);");
+
+    expect(resetPassword).toContain("await withDeadline(");
+    expect(resetPassword).toContain('"Password update"');
+    expect(resetPassword).toContain("finally {");
+    expect(resetPassword).toContain("setSubmitting(false);");
   });
 });

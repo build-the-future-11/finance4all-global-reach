@@ -5,12 +5,15 @@ import { portalInputClass } from "@/components/portal/PortalUI";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { withDeadline } from "@/lib/asyncDeadline";
 import { supabase } from "@/lib/supabase";
 import {
   getPasswordValidationError,
   MIN_PASSWORD_LENGTH,
   PASSWORD_REQUIREMENT,
 } from "@/lib/password-policy";
+
+const AUTH_OPERATION_TIMEOUT_MS = 15_000;
 
 export default function ResetPassword() {
   const navigate = useNavigate();
@@ -24,11 +27,21 @@ export default function ResetPassword() {
     const passwordError = getPasswordValidationError(password);
     if (passwordError) return setError(passwordError);
     if (password !== confirm) return setError("Passwords do not match.");
+    setError("");
     setSubmitting(true);
-    const { error: updateError } = await supabase.auth.updateUser({ password });
-    setSubmitting(false);
-    if (updateError) return setError(updateError.message);
-    navigate("/portal", { replace: true });
+    try {
+      const { error: updateError } = await withDeadline(
+        () => supabase.auth.updateUser({ password }),
+        AUTH_OPERATION_TIMEOUT_MS,
+        "Password update",
+      );
+      if (updateError) throw updateError;
+      navigate("/portal", { replace: true });
+    } catch {
+      setError("We could not update your password. Request a new recovery link and try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (

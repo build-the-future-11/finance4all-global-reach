@@ -88,12 +88,12 @@ describe("router auth compatibility contract", () => {
               </RoleGuard>
             }
           />
-          <Route path={portalRoutes.labs} element={<div>labs-fallback</div>} />
+          <Route path={portalRoutes.dashboard} element={<div>dashboard-fallback</div>} />
         </Routes>
       </MemoryRouter>,
     );
 
-    expect(screen.getByText("labs-fallback")).toBeInTheDocument();
+    expect(screen.getByText("dashboard-fallback")).toBeInTheDocument();
     expect(screen.queryByText("admin-content")).not.toBeInTheDocument();
   });
 

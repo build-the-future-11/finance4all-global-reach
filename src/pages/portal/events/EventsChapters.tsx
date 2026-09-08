@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { acceptsEventRegistration } from "@/lib/actionEligibility";
 
 function groupEventsByMonth(events: { id: string; title: string; startsAt: string }[]) {
   const groups = new Map<string, typeof events>();
@@ -74,7 +75,7 @@ export default function EventsChapters() {
       <PortalPageHeader
         eyebrow="Global reach"
         title="Events + Chapters"
-        description="Explore chapters worldwide, discover local events, and register your interest."
+        description="Browse listed chapters, discover their events, and register your interest."
       />
 
       <QueryStatus
@@ -213,6 +214,7 @@ export default function EventsChapters() {
             {events?.map((event) => {
               const chapter = chapterMap[event.chapterId];
               const registered = registrations?.has(event.id) ?? false;
+              const acceptsRegistration = acceptsEventRegistration(event);
               return (
                 <PortalCard key={event.id} className="p-5">
                   <div className="flex flex-wrap items-start justify-between gap-4">
@@ -250,11 +252,12 @@ export default function EventsChapters() {
                         size="sm"
                         variant={registered ? "default" : "outline"}
                         className={registered ? "bg-emerald-500 hover:bg-emerald-400" : "border-white/20 text-white"}
+                        disabled={toggleReg.isPending || (!registered && !acceptsRegistration)}
                         onClick={() => handleRegister(event.id, registered)}
                       >
-                        {registered ? "Registered" : "Register interest"}
+                        {registered ? "Registered" : acceptsRegistration ? "Register interest" : "Registration closed"}
                       </Button>
-                      {event.registrationUrl && (
+                      {event.registrationUrl && acceptsRegistration && (
                         <a href={event.registrationUrl} target="_blank" rel="noopener noreferrer">
                           <Button size="sm" variant="outline" className="w-full border-white/20 text-white">
                             External signup <ExternalLink className="h-3.5 w-3.5" />

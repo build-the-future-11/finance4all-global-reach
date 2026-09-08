@@ -36,6 +36,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { acceptsLabApplications } from "@/lib/actionEligibility";
 
 const STATUSES: { value: ResearchProjectStatus | "all"; label: string }[] = [
   { value: "all", label: "All" },
@@ -59,6 +60,7 @@ function ProjectDetail({ id }: { id: string }) {
   const alreadyApplied = myApps?.some((a) => a.projectId === id);
   const lead = project ? leads?.[project.leadResearcherId] : undefined;
   const saved = bookmarks?.has(id) ?? false;
+  const applicationsOpen = project ? acceptsLabApplications(project) : false;
 
   const handleApply = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -121,7 +123,11 @@ function ProjectDetail({ id }: { id: string }) {
         )}
       </PortalCard>
 
-      {project.status === "open" && profile?.role === "member" && (
+      {project.status === "open" && !applicationsOpen && (
+        <p className="mt-6 text-sm text-white/55">Applications are closed for this project.</p>
+      )}
+
+      {applicationsOpen && profile?.role === "member" && (
         <div className="mt-6">
           {alreadyApplied ? (
             <Badge className="bg-emerald-400/15 text-emerald-300">Application submitted</Badge>
@@ -225,7 +231,7 @@ export default function MetaLabs() {
       <PortalPageHeader
         eyebrow="Research"
         title="Finance Meta Labs"
-        description="Research projects with verified lead researchers and open applications."
+        description="Member-visible research projects with role-gated publishing and applications."
         action={
           canCreate ? (
             <Dialog open={open} onOpenChange={setOpen}>

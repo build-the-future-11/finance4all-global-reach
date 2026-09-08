@@ -5,6 +5,7 @@ const ExternalHttpUrlSchema = z.string().url().refine(
   (value) => Boolean(normalizeExternalHttpUrl(value)),
   "Must be an http or https URL without embedded credentials",
 );
+const TimestampSchema = z.string().datetime({ offset: true });
 
 // ─── Auth & Users ───────────────────────────────────────────────────────────
 
@@ -13,15 +14,15 @@ export type UserRole = z.infer<typeof UserRoleSchema>;
 
 export const UserProfileSchema = z.object({
   id: z.string().uuid(),
-  displayName: z.string().min(1),
+  displayName: z.string(),
   role: UserRoleSchema,
   bio: z.string().optional(),
   avatarUrl: ExternalHttpUrlSchema.optional(),
   interests: z.array(z.string()).default([]),
   openToCollaborate: z.boolean().default(false),
   chapterId: z.string().uuid().optional(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  createdAt: TimestampSchema,
+  updatedAt: TimestampSchema,
 });
 export type UserProfile = z.infer<typeof UserProfileSchema>;
 
@@ -36,7 +37,7 @@ export const NewsArticleSchema = z.object({
   summary: z.string(),
   category: NewsCategorySchema,
   sourceUrl: ExternalHttpUrlSchema.optional(),
-  publishedAt: z.string().datetime(),
+  publishedAt: TimestampSchema,
   tags: z.array(z.string()).default([]),
 });
 export type NewsArticle = z.infer<typeof NewsArticleSchema>;
@@ -69,9 +70,9 @@ export const ResearchProjectSchema = z.object({
   status: ResearchProjectStatusSchema,
   leadResearcherId: z.string().uuid(),
   tags: z.array(z.string()).default([]),
-  applicationDeadline: z.string().datetime().optional(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  applicationDeadline: TimestampSchema.optional(),
+  createdAt: TimestampSchema,
+  updatedAt: TimestampSchema,
 });
 export type ResearchProject = z.infer<typeof ResearchProjectSchema>;
 
@@ -89,8 +90,8 @@ export const LabApplicationSchema = z.object({
   applicantId: z.string().uuid(),
   status: LabApplicationStatusSchema,
   motivation: z.string(),
-  submittedAt: z.string().datetime(),
-  reviewedAt: z.string().datetime().optional(),
+  submittedAt: TimestampSchema,
+  reviewedAt: TimestampSchema.optional(),
   reviewerId: z.string().uuid().optional(),
 });
 export type LabApplication = z.infer<typeof LabApplicationSchema>;
@@ -112,7 +113,7 @@ export const OpportunitySchema = z.object({
   type: OpportunityTypeSchema,
   description: z.string(),
   applicationUrl: ExternalHttpUrlSchema.optional(),
-  deadline: z.string().datetime().optional(),
+  deadline: TimestampSchema.optional(),
   tags: z.array(z.string()).default([]),
   isActive: z.boolean().default(true),
 });
@@ -125,7 +126,7 @@ export const StudioSubmissionSchema = z.object({
   repoUrl: ExternalHttpUrlSchema.optional(),
   demoUrl: ExternalHttpUrlSchema.optional(),
   writeup: z.string(),
-  submittedAt: z.string().datetime(),
+  submittedAt: TimestampSchema,
 });
 export type StudioSubmission = z.infer<typeof StudioSubmissionSchema>;
 
@@ -136,7 +137,7 @@ export const EssaySubmissionSchema = z.object({
   body: z.string(),
   upvoteCount: z.number().int().nonnegative().default(0),
   isEditorialPick: z.boolean().default(false),
-  submittedAt: z.string().datetime(),
+  submittedAt: TimestampSchema,
 });
 export type EssaySubmission = z.infer<typeof EssaySubmissionSchema>;
 
@@ -150,8 +151,8 @@ export const ChapterSchema = z.object({
   name: z.string(),
   city: z.string(),
   country: z.string(),
-  latitude: z.number(),
-  longitude: z.number(),
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
   memberCount: z.number().int().nonnegative().default(0),
 });
 export type Chapter = z.infer<typeof ChapterSchema>;
@@ -162,8 +163,8 @@ export const EventSchema = z.object({
   title: z.string(),
   description: z.string(),
   status: EventStatusSchema,
-  startsAt: z.string().datetime(),
-  endsAt: z.string().datetime().optional(),
+  startsAt: TimestampSchema,
+  endsAt: TimestampSchema.optional(),
   registrationUrl: ExternalHttpUrlSchema.optional(),
   programLinks: z
     .array(z.object({ label: z.string(), url: ExternalHttpUrlSchema }))
@@ -182,7 +183,7 @@ export const ConnectionRequestSchema = z.object({
   toUserId: z.string().uuid(),
   status: ConnectionStatusSchema,
   message: z.string().optional(),
-  createdAt: z.string().datetime(),
+  createdAt: TimestampSchema,
 });
 export type ConnectionRequest = z.infer<typeof ConnectionRequestSchema>;
 
@@ -192,7 +193,7 @@ export const IntroductionPostSchema = z.object({
   headline: z.string(),
   lookingFor: z.string(),
   interests: z.array(z.string()).default([]),
-  createdAt: z.string().datetime(),
+  createdAt: TimestampSchema,
 });
 export type IntroductionPost = z.infer<typeof IntroductionPostSchema>;
 
@@ -214,6 +215,6 @@ export const NotificationSchema = z.object({
   body: z.string(),
   link: z.string().optional(),
   read: z.boolean().default(false),
-  createdAt: z.string().datetime(),
+  createdAt: TimestampSchema,
 });
 export type Notification = z.infer<typeof NotificationSchema>;

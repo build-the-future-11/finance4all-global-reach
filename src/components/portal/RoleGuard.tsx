@@ -12,7 +12,7 @@ export default function RoleGuard({ allowed, children }: RoleGuardProps) {
   const { profile } = useAuth();
 
   if (!profile || !allowed.includes(profile.role)) {
-    return <Navigate to={portalRoutes.labs} replace />;
+    return <Navigate to={portalRoutes.dashboard} replace />;
   }
 
   return <>{children}</>;

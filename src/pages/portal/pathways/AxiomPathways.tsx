@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { acceptsOpportunityInterest } from "@/lib/actionEligibility";
 
 const TYPES: { value: OpportunityType | "all"; label: string }[] = [
   { value: "all", label: "All" },
@@ -99,6 +100,7 @@ export default function AxiomPathways() {
         <div className="space-y-4">
           {filtered?.map((opp) => {
             const saved = interests?.has(opp.id) ?? false;
+            const acceptsInterest = acceptsOpportunityInterest(opp);
             return (
               <PortalCard key={opp.id} className="p-5">
                 <div className="flex flex-wrap items-start justify-between gap-4">
@@ -127,12 +129,13 @@ export default function AxiomPathways() {
                       size="sm"
                       variant={saved ? "default" : "outline"}
                       className={saved ? "bg-emerald-500 hover:bg-emerald-400" : "border-white/20 text-white"}
+                      disabled={toggle.isPending || (!saved && !acceptsInterest)}
                       onClick={() => handleToggle(opp.id, saved)}
                     >
                       <Star className={`h-3.5 w-3.5 ${saved ? "fill-current" : ""}`} />
-                      {saved ? "Saved" : "Save"}
+                      {saved ? "Saved" : acceptsInterest ? "Save" : "Closed"}
                     </Button>
-                    {opp.applicationUrl && (
+                    {opp.applicationUrl && acceptsInterest && (
                       <a href={opp.applicationUrl} target="_blank" rel="noopener noreferrer">
                         <Button size="sm" variant="outline" className={`w-full ${portalButtonOutline}`}>
                           Apply <ExternalLink className="h-3.5 w-3.5" />

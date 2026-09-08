@@ -22,6 +22,7 @@ const currentRepositoryVersions = [
   '20260906150000',
   '20260906171941',
   '20260906172830',
+  '20260908120000',
 ];
 
 test('the tracked repository has only canonical ordered migration files', () => {

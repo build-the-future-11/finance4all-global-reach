@@ -133,12 +133,15 @@ DECLARE
   explainer_id uuid := pg_catalog.gen_random_uuid();
   project_id uuid := pg_catalog.gen_random_uuid();
   draft_project_id uuid := pg_catalog.gen_random_uuid();
+  closed_project_id uuid := pg_catalog.gen_random_uuid();
   opportunity_id uuid := pg_catalog.gen_random_uuid();
   alternate_opportunity_id uuid := pg_catalog.gen_random_uuid();
+  expired_opportunity_id uuid := pg_catalog.gen_random_uuid();
   studio_id uuid := pg_catalog.gen_random_uuid();
   essay_id uuid := pg_catalog.gen_random_uuid();
   event_id uuid := pg_catalog.gen_random_uuid();
   alternate_event_id uuid := pg_catalog.gen_random_uuid();
+  completed_event_id uuid := pg_catalog.gen_random_uuid();
   connection_id uuid := pg_catalog.gen_random_uuid();
   introduction_id uuid := pg_catalog.gen_random_uuid();
   application_id uuid := pg_catalog.gen_random_uuid();
@@ -165,12 +168,14 @@ BEGIN
     id, title, description, status, lead_researcher_id
   ) VALUES
     (project_id, 'Certification project', 'Rollback-only fixture', 'open', member_b),
-    (draft_project_id, 'Private draft project', 'Rollback-only fixture', 'draft', member_b);
+    (draft_project_id, 'Private draft project', 'Rollback-only fixture', 'draft', member_b),
+    (closed_project_id, 'Closed certification project', 'Rollback-only fixture', 'closed', member_b);
 
-  INSERT INTO public.opportunities (id, title, organization, type, description)
+  INSERT INTO public.opportunities (id, title, organization, type, description, deadline)
   VALUES
-    (opportunity_id, 'Certification opportunity', 'FinanceMeta', 'program', 'Rollback-only fixture'),
-    (alternate_opportunity_id, 'Alternate certification opportunity', 'FinanceMeta', 'program', 'Rollback-only fixture');
+    (opportunity_id, 'Certification opportunity', 'FinanceMeta', 'program', 'Rollback-only fixture', NULL),
+    (alternate_opportunity_id, 'Alternate certification opportunity', 'FinanceMeta', 'program', 'Rollback-only fixture', NULL),
+    (expired_opportunity_id, 'Expired certification opportunity', 'FinanceMeta', 'program', 'Rollback-only fixture', pg_catalog.now() - interval '1 day');
 
   INSERT INTO public.studio_submissions (id, author_id, title, writeup)
   VALUES (studio_id, member_b, 'Member B studio fixture', 'Rollback-only fixture');
@@ -182,7 +187,8 @@ BEGIN
     id, chapter_id, title, description, status, starts_at
   ) VALUES
     (event_id, chapter_id, 'Certification event', 'Rollback-only fixture', 'upcoming', pg_catalog.now() + interval '1 day'),
-    (alternate_event_id, chapter_id, 'Alternate certification event', 'Rollback-only fixture', 'upcoming', pg_catalog.now() + interval '2 days');
+    (alternate_event_id, chapter_id, 'Alternate certification event', 'Rollback-only fixture', 'upcoming', pg_catalog.now() + interval '2 days'),
+    (completed_event_id, chapter_id, 'Completed certification event', 'Rollback-only fixture', 'completed', pg_catalog.now() - interval '1 day');
 
   INSERT INTO public.connection_requests (
     id, from_user_id, to_user_id, status, message
@@ -227,12 +233,15 @@ BEGIN
     ('explainer', explainer_id),
     ('project', project_id),
     ('draft_project', draft_project_id),
+    ('closed_project', closed_project_id),
     ('opportunity', opportunity_id),
     ('alternate_opportunity', alternate_opportunity_id),
+    ('expired_opportunity', expired_opportunity_id),
     ('studio', studio_id),
     ('essay', essay_id),
     ('event', event_id),
     ('alternate_event', alternate_event_id),
+    ('completed_event', completed_event_id),
     ('connection', connection_id),
     ('introduction', introduction_id),
     ('application', application_id),
@@ -262,12 +271,15 @@ DECLARE
   explainer_id uuid := (SELECT id FROM portal_certification_fixtures WHERE fixture = 'explainer');
   project_id uuid := (SELECT id FROM portal_certification_fixtures WHERE fixture = 'project');
   draft_project_id uuid := (SELECT id FROM portal_certification_fixtures WHERE fixture = 'draft_project');
+  closed_project_id uuid := (SELECT id FROM portal_certification_fixtures WHERE fixture = 'closed_project');
   opportunity_id uuid := (SELECT id FROM portal_certification_fixtures WHERE fixture = 'opportunity');
   alternate_opportunity_id uuid := (SELECT id FROM portal_certification_fixtures WHERE fixture = 'alternate_opportunity');
+  expired_opportunity_id uuid := (SELECT id FROM portal_certification_fixtures WHERE fixture = 'expired_opportunity');
   studio_id uuid := (SELECT id FROM portal_certification_fixtures WHERE fixture = 'studio');
   essay_id uuid := (SELECT id FROM portal_certification_fixtures WHERE fixture = 'essay');
   event_id uuid := (SELECT id FROM portal_certification_fixtures WHERE fixture = 'event');
   alternate_event_id uuid := (SELECT id FROM portal_certification_fixtures WHERE fixture = 'alternate_event');
+  completed_event_id uuid := (SELECT id FROM portal_certification_fixtures WHERE fixture = 'completed_event');
   connection_id uuid := (SELECT id FROM portal_certification_fixtures WHERE fixture = 'connection');
   introduction_id uuid := (SELECT id FROM portal_certification_fixtures WHERE fixture = 'introduction');
   application_id uuid := (SELECT id FROM portal_certification_fixtures WHERE fixture = 'application');
@@ -382,6 +394,13 @@ BEGIN
   VALUES (alternate_opportunity_id, member_a);
   BEGIN
     INSERT INTO public.opportunity_interests (opportunity_id, user_id)
+    VALUES (expired_opportunity_id, member_a);
+    RAISE EXCEPTION 'ordinary member saved an expired opportunity';
+  EXCEPTION
+    WHEN insufficient_privilege THEN NULL;
+  END;
+  BEGIN
+    INSERT INTO public.opportunity_interests (opportunity_id, user_id)
     VALUES (alternate_opportunity_id, member_b);
     RAISE EXCEPTION 'ordinary member forged another member opportunity interest';
   EXCEPTION
@@ -390,6 +409,13 @@ BEGIN
 
   INSERT INTO public.event_registrations (event_id, user_id)
   VALUES (alternate_event_id, member_a);
+  BEGIN
+    INSERT INTO public.event_registrations (event_id, user_id)
+    VALUES (completed_event_id, member_a);
+    RAISE EXCEPTION 'ordinary member registered for a completed event';
+  EXCEPTION
+    WHEN insufficient_privilege THEN NULL;
+  END;
   BEGIN
     INSERT INTO public.event_registrations (event_id, user_id)
     VALUES (alternate_event_id, member_b);
@@ -484,6 +510,14 @@ BEGIN
   INSERT INTO public.lab_applications (project_id, applicant_id, motivation)
   VALUES (project_id, member_a, 'Rollback-only fixture')
   RETURNING id INTO own_application_id;
+
+  BEGIN
+    INSERT INTO public.lab_applications (project_id, applicant_id, motivation)
+    VALUES (closed_project_id, member_a, 'Closed project fixture');
+    RAISE EXCEPTION 'ordinary member applied to a closed project';
+  EXCEPTION
+    WHEN insufficient_privilege THEN NULL;
+  END;
 
   UPDATE public.lab_applications
   SET status = 'accepted', reviewed_at = pg_catalog.now(), reviewer_id = member_a

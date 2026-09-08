@@ -13,6 +13,10 @@ const recoveredFunctionHardening = readFileSync(
   "supabase/migrations/20260906172830_harden_recovered_profile_functions.sql",
   "utf8",
 );
+const actionEligibility = readFileSync(
+  "supabase/migrations/20260908120000_enforce_action_eligibility.sql",
+  "utf8",
+);
 const rlsCertification = readFileSync(
   "supabase/tests/two_identity_rls_certification.sql",
   "utf8",
@@ -88,6 +92,15 @@ describe("production completion contracts", () => {
         `REVOKE ALL ON FUNCTION public.${fn}() FROM PUBLIC, anon, authenticated`,
       );
     }
+  });
+
+  it("enforces action eligibility below the browser layer", () => {
+    expect(actionEligibility).toContain("project.status = 'open'::public.research_project_status");
+    expect(actionEligibility).toContain("opportunity.deadline > pg_catalog.now()");
+    expect(actionEligibility).toContain("event.starts_at > pg_catalog.now()");
+    expect(rlsCertification).toContain("ordinary member applied to a closed project");
+    expect(rlsCertification).toContain("ordinary member saved an expired opportunity");
+    expect(rlsCertification).toContain("ordinary member registered for a completed event");
   });
 
   it("records repaired production schema separately from the blocked ledger", () => {
