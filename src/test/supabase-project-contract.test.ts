@@ -2,7 +2,9 @@ import { spawnSync } from "node:child_process";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  FINANCEMETA_PORTAL_ORIGIN,
   FINANCEMETA_SUPABASE_HOST,
+  assertFinanceMetaAuthRedirectOrigin,
   assertFinanceMetaSupabaseProject,
   assertFinanceMetaSupabasePublicKey,
 } from "@/lib/supabaseProjectContract";
@@ -33,6 +35,21 @@ function runValidator(
 }
 
 describe("FinanceMeta Supabase project contract", () => {
+  it("pins production auth callbacks to the FinanceMeta portal", () => {
+    expect(() =>
+      assertFinanceMetaAuthRedirectOrigin(FINANCEMETA_PORTAL_ORIGIN, { allowLocal: false }),
+    ).not.toThrow();
+    expect(() =>
+      assertFinanceMetaAuthRedirectOrigin("https://www.vertexed.app", { allowLocal: false }),
+    ).toThrow(/foreign auth redirect origin/i);
+    expect(() =>
+      assertFinanceMetaAuthRedirectOrigin("http://localhost:8080", { allowLocal: true }),
+    ).not.toThrow();
+    expect(() =>
+      assertFinanceMetaAuthRedirectOrigin("http://localhost:8080", { allowLocal: false }),
+    ).toThrow(/only in development/i);
+  });
+
   it("accepts only the canonical https project in production runtime", () => {
     expect(() => assertFinanceMetaSupabaseProject(`https://${FINANCEMETA_SUPABASE_HOST}`, { allowLocal: false })).not.toThrow();
     expect(() => assertFinanceMetaSupabaseProject(`http://${FINANCEMETA_SUPABASE_HOST}`, { allowLocal: false })).toThrow(/must use https/i);

@@ -144,7 +144,11 @@ describe("production completion contracts", () => {
     expect(accountLifecycleCertification.trimEnd()).toMatch(/ROLLBACK;$/);
   });
 
-  it("runs the RLS matrix only against the canonical database and retains evidence", () => {
+  it("runs the RLS matrix only against the canonical database and exact checked-out source", () => {
+    expect(rlsWorkflow).toContain("EXPECTED_SOURCE_SHA: ${{ github.sha }}");
+    expect(rlsWorkflow).toContain("ref: ${{ env.EXPECTED_SOURCE_SHA }}");
+    expect(rlsWorkflow).toContain('actual="$(git rev-parse HEAD)"');
+    expect(rlsWorkflow).toContain('test "$actual" = "$EXPECTED_SOURCE_SHA"');
     expect(rlsWorkflow).toContain("FINANCEMETA_DATABASE_URL");
     expect(rlsWorkflow).toContain("node scripts/validate-database-target.mjs");
     expect(rlsWorkflow).toContain("PGSSLMODE: require");
@@ -160,6 +164,9 @@ describe("production completion contracts", () => {
     expect(credentialedJourney).toContain("await signIn(pageA, memberA)");
     expect(credentialedJourney).toContain("await bioA.inputValue()");
     expect(credentialedConfig).toContain("retries: 0");
+    expect(authWorkflow).toContain("ref: ${{ env.EXPECTED_SOURCE_SHA }}");
+    expect(authWorkflow).toContain('actual="$(git rev-parse HEAD)"');
+    expect(authWorkflow).toContain('test "$actual" = "$EXPECTED_SOURCE_SHA"');
     expect(authWorkflow).toContain("receipt.revision !== expected");
     expect(authWorkflow).toContain("production-auth-evidence/auth-certification.json");
     expect(authWorkflow).toContain("test-marker-restored");

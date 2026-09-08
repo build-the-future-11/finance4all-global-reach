@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 import {
+  assertFinanceMetaAuthRedirectOrigin,
   assertFinanceMetaSupabaseProject,
   assertFinanceMetaSupabasePublicKey,
 } from "@/lib/supabaseProjectContract";
@@ -41,10 +42,8 @@ export const supabase = createClient<Database>(
 export function getAuthRedirectUrl(path = "/auth/callback") {
   const configuredOrigin = String(import.meta.env.VITE_AUTH_REDIRECT_ORIGIN ?? "").trim();
   const base = configuredOrigin || window.location.origin;
+  assertFinanceMetaAuthRedirectOrigin(base, { allowLocal: import.meta.env.DEV });
   const origin = new URL(base);
-  if (origin.pathname !== "/" || origin.search || origin.hash || origin.username || origin.password) {
-    throw new Error("VITE_AUTH_REDIRECT_ORIGIN must be a clean origin");
-  }
 
   const redirect = new URL(path, origin);
   if (redirect.origin !== origin.origin) throw new Error("Auth redirects must stay on the configured origin");
