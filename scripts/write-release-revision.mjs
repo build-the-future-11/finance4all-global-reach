@@ -1,11 +1,12 @@
 import { existsSync, writeFileSync } from "node:fs";
 
-import { assertCleanReleaseSource, resolveReleaseRevision } from "./release-revision.mjs";
+import { assertCleanReleaseSource, normalizeVercelConfig, resolveReleaseRevision } from "./release-revision.mjs";
 
 if (!existsSync("dist")) {
   throw new Error("release revision writer requires an existing dist directory");
 }
 
+normalizeVercelConfig();
 assertCleanReleaseSource();
 const revision = resolveReleaseRevision();
 writeFileSync(
