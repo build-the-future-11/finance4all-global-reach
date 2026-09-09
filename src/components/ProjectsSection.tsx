@@ -6,7 +6,20 @@ import { portalRoutes } from "@/routes/portal";
 const FINANCEMETA_APPLICATION_URL =
   "https://tally.so/r/5B7blP?utm_source=website&utm_medium=cta&utm_campaign=general_application";
 
+const FALL_2026_RESEARCH_APPLICATION =
+  "https://tally.so/r/5B7YlP?utm_source=website&utm_medium=opportunity_card&utm_campaign=fall_2026_research_cohorts";
+
 const directApplications = [
+  {
+    label: "Quantitative Markets & Microstructure Lab",
+    description: "Fall 2026 research cohort for market microstructure, event studies, volatility, risk, forecasting, and reproducible quantitative research.",
+    url: `${FALL_2026_RESEARCH_APPLICATION}&track=quantitative_markets_microstructure`,
+  },
+  {
+    label: "Financial Systems, Access & Policy Lab",
+    description: "Fall 2026 research cohort for lending, credit access, payments, financial inclusion, policy evaluation, fairness, and economic data.",
+    url: `${FALL_2026_RESEARCH_APPLICATION}&track=financial_systems_access_policy`,
+  },
   {
     label: "General application",
     description: "Get routed to the FinanceMeta team or program that best matches your interests and skills.",
