@@ -101,8 +101,8 @@ export default function HeroSection() {
           <p className="mb-8 text-lg sm:text-xl text-white/85 leading-relaxed">
             FinanceMeta is a student-led network for quantitative research, financial systems,
             fintech builds, and practical financial education. Finance4All is the applied
-            education and community arm. Programs activate only with a named owner, a review path,
-            and an inspectable output.
+            education and community arm. Programs stay marked as planned until a named owner,
+            review path, and inspectable output are published.
           </p>
 
           <div className="flex flex-wrap justify-center gap-12 mb-10 text-white">
