@@ -2,7 +2,10 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "../playwright-fixture";
 
 const PUBLIC_ROUTES = [
-  { route: "/", heading: "Global Financial Literacy Initiative" },
+  {
+    route: "/",
+    heading: /Study financial systems\.\s*Build what the evidence supports\./i,
+  },
   { route: "/evidence", heading: "What is verified today" },
   { route: "/login", heading: "Welcome back" },
   { route: "/signup", heading: "Join FinanceMeta" },

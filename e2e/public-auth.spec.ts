@@ -3,7 +3,11 @@ import { expect, test } from "../playwright-fixture";
 test("public claims stay inside the evidence boundary", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.getByRole("heading", { name: "Global Financial Literacy Initiative" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      name: /Study financial systems\.\s*Build what the evidence supports\./i,
+    }),
+  ).toBeVisible();
   await expect(page.getByRole("heading", { name: "Programs With Explicit Evidence Gates" })).toBeVisible();
   await expect(page.getByText("0", { exact: true })).toBeVisible();
   await expect(page.getByText("Unsupported impact claims", { exact: true })).toBeVisible();
