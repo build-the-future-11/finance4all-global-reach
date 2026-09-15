@@ -127,3 +127,18 @@ test('rejects release scripts invoked through a non-npm package manager', () => 
     /release scripts must run under npm/,
   );
 });
+
+const nodePinnedWorkflows = [
+  '../.github/workflows/ci.yml',
+  '../.github/workflows/production-health.yml',
+  '../.github/workflows/production-migration-ledger-certification.yml',
+  '../.github/workflows/production-auth-certification.yml',
+];
+
+test('Node-based GitHub workflows pin the verified Node 22.23.2 runtime', () => {
+  for (const workflowPath of nodePinnedWorkflows) {
+    const workflow = readFileSync(new URL(workflowPath, import.meta.url), 'utf8');
+    assert.match(workflow, /node-version:\s*22\.23\.2\s*$/m, `${workflowPath} must pin Node 22.23.2`);
+    assert.doesNotMatch(workflow, /node-version:\s*['"]?22['"]?\s*$/m, `${workflowPath} must not float on Node 22`);
+  }
+});
