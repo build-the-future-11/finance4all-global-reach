@@ -164,7 +164,7 @@ function ProgramCard({ program }: { program: typeof programs[0] }) {
 
 function ImpactNumbers() {
   const stats = [
-    { value: "7", label: "Planned program families" },
+    { value: "9", label: "Planned program families" },
     { value: "1", label: "Synthetic research baseline" },
     { value: "0", label: "Unsupported impact claims" },
   ];
