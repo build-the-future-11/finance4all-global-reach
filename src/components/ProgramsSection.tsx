@@ -81,7 +81,7 @@ const programs = [
 
 function ProgramCard({ program }: { program: typeof programs[0] }) {
   const [expanded, setExpanded] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLButtonElement>(null);
   const Icon = program.icon;
 
   const handleMove = (e: React.MouseEvent) => {
@@ -96,24 +96,28 @@ function ProgramCard({ program }: { program: typeof programs[0] }) {
   };
 
   return (
-    <div
+    <button
       ref={cardRef}
+      type="button"
+      aria-expanded={expanded}
       onMouseMove={handleMove}
       onClick={() => setExpanded(!expanded)}
       className="
-        group relative cursor-pointer p-6 rounded-3xl
+        group relative w-full cursor-pointer p-6 rounded-3xl text-left
         border border-white/20
         backdrop-blur-xl
         bg-white/[0.04]
         transition-all duration-500
         hover:border-white/40
         hover:-translate-y-1
+        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 focus-visible:ring-offset-2 focus-visible:ring-offset-black
         overflow-hidden
       "
     >
       {/* cursor glow */}
       <div
-        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition"
+        aria-hidden="true"
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition pointer-events-none"
         style={{
           background:
             "radial-gradient(circle 250px at var(--x) var(--y), rgba(255,255,255,0.15), transparent 60%)",
@@ -121,13 +125,13 @@ function ProgramCard({ program }: { program: typeof programs[0] }) {
       />
 
       {/* gradient edge glow */}
-      <div className="absolute inset-0 rounded-3xl pointer-events-none bg-[linear-gradient(120deg,transparent,rgba(255,255,255,0.2),transparent)] opacity-20" />
+      <div aria-hidden="true" className="absolute inset-0 rounded-3xl pointer-events-none bg-[linear-gradient(120deg,transparent,rgba(255,255,255,0.2),transparent)] opacity-20" />
 
       <div className="relative flex flex-col gap-3">
         <div className="flex items-start justify-between">
           <div className="flex gap-3">
             <div className="p-3 rounded-xl bg-white/10 border border-white/20 backdrop-blur-md text-emerald-300">
-              <Icon className="h-5 w-5" />
+              <Icon className="h-5 w-5" aria-hidden="true" />
             </div>
 
             <div>
@@ -142,6 +146,7 @@ function ProgramCard({ program }: { program: typeof programs[0] }) {
           </div>
 
           <ChevronDown
+            aria-hidden="true"
             className={`h-4 w-4 text-white/70 transition-transform duration-300 ${
               expanded ? "rotate-180" : ""
             }`}
@@ -158,7 +163,7 @@ function ProgramCard({ program }: { program: typeof programs[0] }) {
           </p>
         </div>
       </div>
-    </div>
+    </button>
   );
 }
 
