@@ -1,7 +1,7 @@
 BEGIN;
 
 CREATE EXTENSION IF NOT EXISTS pgtap WITH SCHEMA extensions;
-SELECT plan(27);
+SELECT plan(32);
 
 SELECT ok(
   NOT has_table_privilege('anon', 'public.account_deletion_requests', 'select'),
@@ -156,6 +156,30 @@ SELECT is(
   'an admin can review the complete request queue'
 );
 SELECT lives_ok(
+  $$SELECT public.request_account_deletion('Admin self-service request')$$,
+  'an administrator can request deletion for their own account through the member RPC'
+);
+SELECT lives_ok(
+  $$SELECT public.cancel_account_deletion()$$,
+  'an administrator can cancel their own pending deletion request through the member RPC'
+);
+SELECT ok(
+  (SELECT status = 'cancelled' AND reviewed_at IS NULL AND reviewed_by IS NULL
+   FROM public.account_deletion_requests
+   WHERE user_id = '10000000-0000-0000-0000-000000000003'),
+  'admin self-cancellation stays a member action and does not fabricate review metadata'
+);
+SELECT lives_ok(
+  $$SELECT public.request_account_deletion('Admin self-service resubmission')$$,
+  'an administrator can resubmit their own cancelled deletion request through the member RPC'
+);
+SELECT ok(
+  (SELECT status = 'pending' AND reviewed_at IS NULL AND reviewed_by IS NULL
+   FROM public.account_deletion_requests
+   WHERE user_id = '10000000-0000-0000-0000-000000000003'),
+  'admin self-resubmission returns to pending without fabricated review metadata'
+);
+SELECT lives_ok(
   $$UPDATE public.account_deletion_requests
     SET status = 'in_progress', review_note = 'Identity confirmed'
     WHERE user_id = '10000000-0000-0000-0000-000000000002'$$,
@@ -173,7 +197,7 @@ SELECT throws_ok(
     WHERE user_id = '10000000-0000-0000-0000-000000000002'$$,
   'P0003',
   'reviewed deletion requests cannot be moved back to pending',
-  'an admin cannot reopen a reviewed request into member-cancellable pending state'
+  'an admin cannot reopen another member reviewed request into member-cancellable pending state'
 );
 
 SELECT pg_catalog.set_config('request.jwt.claim.sub', '10000000-0000-0000-0000-000000000002', true);
