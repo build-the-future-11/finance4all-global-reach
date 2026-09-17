@@ -14,7 +14,16 @@ describe("public evidence boundary", () => {
     );
 
     expect(screen.getByText(/programs stay marked as planned/i)).toBeInTheDocument();
-    expect(screen.getByText("7")).toBeInTheDocument();
+
+    const researchLabsLabel = screen.getByText("Fall research labs");
+    expect(researchLabsLabel.parentElement).toHaveTextContent("2");
+
+    const intakeLabel = screen.getByText("Program intake");
+    expect(intakeLabel.parentElement).toHaveTextContent("Open");
+
+    const evidenceLabel = screen.getByText("Before outcomes");
+    expect(evidenceLabel.parentElement).toHaveTextContent("Evidence");
+
     expect(container.textContent).not.toMatch(/25,000|15\+|50\+|Jane Street|Stanford|Harvard|KFC/);
   });
 });
