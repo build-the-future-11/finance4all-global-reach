@@ -33,6 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getAdministrativeReviewStatuses } from "@/lib/accountDeletionReview";
 import type { NewsCategory, OpportunityType } from "@/types/domain";
 import type { AccountDeletionStatus } from "@/types/database";
 import { toast } from "sonner";
@@ -353,6 +354,7 @@ export default function Admin() {
               status: request.status,
               reviewNote: request.review_note ?? "",
             };
+            const reviewStatuses = getAdministrativeReviewStatuses(request.status);
             return (
               <PortalCard key={request.id} className="p-5">
                 <div className="flex flex-wrap items-start justify-between gap-3">
@@ -381,7 +383,7 @@ export default function Admin() {
                   >
                     <SelectTrigger aria-label={`Review status for ${request.contact_email}`} className={portalInputClass}><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      {(["pending", "in_progress", "rejected", "cancelled"] as const).map((status) => (
+                      {reviewStatuses.map((status) => (
                         <SelectItem key={status} value={status}>{status.replace("_", " ")}</SelectItem>
                       ))}
                     </SelectContent>
