@@ -85,7 +85,7 @@ export default function Admin() {
     difficulty: "beginner" as "beginner" | "intermediate",
   });
   const [deletionReviews, setDeletionReviews] = useState<
-    Record<string, { status: AccountDeletionStatus; reviewNote: string }>
+    Record<string, { status: AccountDeletionStatus; reviewNote: string; expectedUpdatedAt: string }>
   >({});
 
   const parseTags = (s: string) =>
@@ -353,6 +353,7 @@ export default function Admin() {
             const review = deletionReviews[request.id] ?? {
               status: request.status,
               reviewNote: request.review_note ?? "",
+              expectedUpdatedAt: request.updated_at,
             };
             const reviewStatuses = getAdministrativeReviewStatuses(request.status);
             return (
@@ -408,6 +409,12 @@ export default function Admin() {
                           id: request.id,
                           status: review.status,
                           reviewNote: review.reviewNote,
+                          expectedUpdatedAt: review.expectedUpdatedAt,
+                        });
+                        setDeletionReviews((current) => {
+                          const next = { ...current };
+                          delete next[request.id];
+                          return next;
                         });
                         toast.success("Account request updated");
                       } catch (e) {
