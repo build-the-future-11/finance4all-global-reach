@@ -91,19 +91,24 @@ export function useReviewAccountDeletionRequest() {
       id,
       status,
       reviewNote,
+      expectedUpdatedAt,
     }: {
       id: string;
       status: AccountDeletionStatus;
       reviewNote?: string;
+      expectedUpdatedAt: string;
     }) => {
       const { data, error } = await supabase
         .from("account_deletion_requests")
         .update({ status, review_note: reviewNote?.trim() || null })
         .eq("id", id)
+        .eq("updated_at", expectedUpdatedAt)
         .select("id")
-        .single();
+        .maybeSingle();
       if (error) throw error;
-      if (data?.id !== id) throw new Error("The request was not updated. Refresh and check your permissions.");
+      if (data?.id !== id) {
+        throw new Error("This request changed since you loaded it. Refresh and review the latest state before saving.");
+      }
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["account-deletion-requests"] }),
   });
