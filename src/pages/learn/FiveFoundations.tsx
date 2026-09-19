@@ -46,12 +46,12 @@ export default function FiveFoundations() {
   useDocumentTitle("Five Foundations");
 
   return (
-    <main className="min-h-screen bg-[#060a12] px-5 py-10 text-white sm:px-8 sm:py-16 print:bg-white print:text-black">
+    <main className="resource-page min-h-screen px-5 py-10 sm:px-8 sm:py-16 print:bg-white print:text-black">
       <div className="mx-auto max-w-5xl">
         <div className="flex flex-wrap items-center justify-between gap-4 print:hidden">
           <Link to="/learn" className="inline-flex items-center gap-2 text-sm text-white/60 hover:text-white">
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-            FinanceMeta Learn
+            Finance for All Learn
           </Link>
           <button
             type="button"
@@ -66,7 +66,7 @@ export default function FiveFoundations() {
         <header className="mt-12 max-w-4xl border-b border-white/10 pb-10 print:mt-0 print:border-black/15">
           <div className="flex items-center gap-2 text-emerald-300 print:text-black">
             <BookOpen className="h-5 w-5" aria-hidden="true" />
-            <p className="text-sm font-medium">FinanceMeta open lesson · Version 1.0 · September 2026</p>
+            <p className="text-sm font-medium">Finance for All open lesson · Version 1.0 · September 2026</p>
           </div>
           <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-6xl">Five Foundations</h1>
           <p className="mt-5 max-w-3xl text-base leading-7 text-white/65 print:text-black/70">
@@ -292,13 +292,13 @@ export default function FiveFoundations() {
           <div className="mt-7 flex gap-3 rounded-2xl border border-amber-300/20 bg-amber-300/[0.04] p-4 print:border-black/20 print:bg-transparent">
             <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-300 print:text-black" aria-hidden="true" />
             <p className="text-sm leading-6">
-              Publication here does not mean Jump$tart, the CFPB, the SEC, a school, or any other external body has endorsed FinanceMeta or this lesson. Standards alignment and source use are factual references; any external review or listing is named only after it actually occurs.
+              Publication here does not mean Jump$tart, the CFPB, the SEC, a school, or any other external body has endorsed Finance for All or this lesson. Standards alignment and source use are factual references; any external review or listing is named only after it actually occurs.
             </p>
           </div>
         </LessonSection>
 
         <footer className="border-t border-white/10 py-10 text-sm text-white/45 print:border-black/15 print:text-black/55">
-          <p>FinanceMeta · Five Foundations v1.0 · Free educational resource · No account required.</p>
+          <p>Finance for All · Five Foundations v1.0 · Free educational resource · No account required.</p>
           <p className="mt-2 print:hidden"><Link to="/evidence" className="underline decoration-white/20 underline-offset-4 hover:text-white">Public evidence boundary</Link></p>
         </footer>
       </div>

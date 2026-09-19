@@ -3,17 +3,14 @@ import { expect, test } from "../playwright-fixture";
 test("public claims stay inside the evidence boundary", async ({ page }) => {
   await page.goto("/");
 
-  await expect(
-    page.getByRole("heading", {
-      name: /Study financial systems\.\s*Build what the evidence supports\./i,
-    }),
-  ).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Programs With Explicit Evidence Gates" })).toBeVisible();
-  await expect(page.getByText("0", { exact: true })).toBeVisible();
-  await expect(page.getByText("Unsupported impact claims", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Your learning, projects, and people\.\s*One member space\./i })).toBeVisible();
+  await expect(page.getByText("Finance for All", { exact: true }).first()).toBeVisible();
+  await expect(page.getByText("Finance for All is a Finance Meta initiative.", { exact: true })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Start with a free lesson" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Founder" })).toHaveCount(0);
   await expect(page.getByText(/global nonprofit building/i)).toHaveCount(0);
   await expect(page.getByText(/growing network of students/i)).toHaveCount(0);
+  await expect(page.getByText(/students reached/i)).toHaveCount(0);
 });
 
 test("public learning hub and Five Foundations lesson are reachable without authentication", async ({ page }) => {

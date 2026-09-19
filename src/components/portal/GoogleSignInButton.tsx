@@ -57,7 +57,7 @@ export function AuthDivider() {
         <span className="w-full border-t border-white/10" />
       </div>
       <div className="relative flex justify-center text-xs uppercase">
-        <span className="bg-[#0c1220] px-3 text-white/55">or</span>
+        <span className="auth-divider-label px-3">or</span>
       </div>
     </div>
   );

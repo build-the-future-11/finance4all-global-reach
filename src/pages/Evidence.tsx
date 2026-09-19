@@ -40,11 +40,11 @@ export default function Evidence() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-[#060a12] px-5 py-10 text-white sm:px-8 sm:py-16">
+    <main className="resource-page min-h-screen px-5 py-10 sm:px-8 sm:py-16">
       <div className="mx-auto max-w-5xl">
         <Link to="/" className="inline-flex items-center gap-2 text-sm text-white/60 hover:text-white">
           <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-          FinanceMeta
+          Finance for All
         </Link>
 
         <header className="mt-12 max-w-3xl border-b border-white/10 pb-10">

@@ -31,8 +31,8 @@ const TYPE_ICONS = {
 
 const TYPE_LABELS = {
   news: "News",
-  lab: "Labs",
-  opportunity: "Pathways",
+  lab: "Research",
+  opportunity: "Opportunities",
   event: "Events",
   member: "Members",
   explainer: "Explainers",
@@ -84,11 +84,11 @@ export default function PortalSearch() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="hidden items-center gap-2 rounded-lg border border-white/10 bg-white/[0.04] px-3 py-1.5 text-sm text-white/45 transition hover:border-white/20 hover:bg-white/[0.07] hover:text-white/70 sm:flex"
+        className="portal-search-trigger hidden items-center gap-2 rounded-full border px-3 py-2 text-sm transition sm:flex"
       >
         <Search className="h-3.5 w-3.5" />
         <span>Search…</span>
-        <kbd className="ml-2 rounded border border-white/10 bg-white/5 px-1.5 py-0.5 text-[10px] text-white/35">
+        <kbd className="ml-2 rounded border border-border bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
           ⌘K
         </kbd>
       </button>
@@ -96,7 +96,7 @@ export default function PortalSearch() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="rounded-lg p-2 text-white/50 hover:bg-white/10 hover:text-white sm:hidden"
+        className="portal-icon-button rounded-full p-2 sm:hidden"
         aria-label="Search"
       >
         <Search className="h-4 w-4" />

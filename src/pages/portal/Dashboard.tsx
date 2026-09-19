@@ -1,31 +1,13 @@
 import { Link } from "react-router-dom";
-import {
-  ArrowRight,
-  Bookmark,
-  Briefcase,
-  Calendar,
-  FlaskConical,
-  Newspaper,
-  Search,
-  Users,
-} from "lucide-react";
+import { ArrowRight, BookOpenText, Briefcase, Calendar, FlaskConical, Newspaper, Sparkles, Users } from "lucide-react";
 import { useAuth } from "@/contexts/useAuth";
 import { useActivityFeed } from "@/hooks/portal/useActivityFeed";
 import { useNewsArticles } from "@/hooks/portal/useDebriefed";
 import { useResearchProjects, useMyLabApplications } from "@/hooks/portal/useLabs";
 import { useOpportunities } from "@/hooks/portal/usePathways";
 import { useEvents } from "@/hooks/portal/useEvents";
-import { portalNav, portalRoutes } from "@/routes/portal";
-import {
-  CategoryBadge,
-  PortalCard,
-  PortalHero,
-  PortalSection,
-  QueryStatus,
-  StatCard,
-} from "@/components/portal/PortalUI";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { portalRoutes } from "@/routes/portal";
+import { PortalCard, QueryStatus } from "@/components/portal/PortalUI";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 const ACTIVITY_ICONS = {
@@ -33,172 +15,117 @@ const ACTIVITY_ICONS = {
   lab_application: FlaskConical,
   connection: Users,
   event: Calendar,
-  saved_article: Bookmark,
+  saved_article: BookOpenText,
 } as const;
 
 export default function Dashboard() {
-  useDocumentTitle("Dashboard");
+  useDocumentTitle("Home");
   const { profile } = useAuth();
   const { data: news } = useNewsArticles();
   const { data: projects } = useResearchProjects("open");
   const { data: opportunities } = useOpportunities();
   const { data: events } = useEvents();
   const { data: myApps } = useMyLabApplications();
-  const { data: activity, isLoading: activityLoading, error: activityError, refetch } =
-    useActivityFeed(6);
+  const { data: activity, isLoading: activityLoading, error: activityError, refetch } = useActivityFeed(6);
+  const upcomingEvents = events?.filter((event) => event.status === "upcoming").length ?? 0;
 
-  const isAdmin = profile?.role === "admin";
-
-  const exploreNav = portalNav.filter(
-    (item) =>
-      item.label !== "Dashboard" &&
-      item.label !== "Saved" &&
-      (!item.adminOnly || isAdmin),
-  );
-
-  const upcomingEvents = events?.filter((e) => e.status === "upcoming").length ?? 0;
+  const nextActions = [
+    {
+      eyebrow: "Open lesson",
+      title: "Continue with Five Foundations",
+      copy: "A 35-minute introduction to interest, inflation, diversification, borrowing, and risk.",
+      to: "/learn/five-foundations",
+      icon: BookOpenText,
+      className: "portal-action-primary",
+    },
+    {
+      eyebrow: "FinanceMeta Labs",
+      title: projects?.length ? `${projects.length} research ${projects.length === 1 ? "project" : "projects"} open` : "Explore research",
+      copy: "Read the question, method, evidence boundary, and application requirements.",
+      to: portalRoutes.labs,
+      icon: FlaskConical,
+      className: "portal-action-dark",
+    },
+    {
+      eyebrow: "Opportunities",
+      title: opportunities?.length ? `${opportunities.length} ways to contribute` : "Find your next project",
+      copy: "Browse roles, industry work, programmes, and writing challenges.",
+      to: portalRoutes.pathways,
+      icon: Briefcase,
+      className: "portal-action-light",
+    },
+  ];
 
   return (
-    <div className="space-y-8">
-      <PortalHero
-        greeting="Welcome back"
-        name={profile?.displayName ?? "Member"}
-        badges={
-          <>
-            <Badge variant="outline" className="border-white/15 capitalize text-white/65">
-              {profile?.role?.replace("_", " ")}
-            </Badge>
-            {profile?.openToCollaborate && (
-              <Badge className="border-0 bg-emerald-500/15 text-emerald-300 hover:bg-emerald-500/20">
-                Open to collaborate
-              </Badge>
-            )}
-          </>
-        }
-      />
-
-      <div className="flex flex-wrap gap-2">
-        <Link to={portalRoutes.saved}>
-          <Button variant="outline" size="sm" className="border-white/20 bg-white/5 text-white">
-            <Bookmark className="mr-2 h-3.5 w-3.5" />
-            Saved items
-          </Button>
-        </Link>
-        <Button
-          variant="outline"
-          size="sm"
-          className="border-white/20 bg-white/5 text-white"
-          onClick={() => document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }))}
-        >
-          <Search className="mr-2 h-3.5 w-3.5" />
-          Search portal
-        </Button>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="News articles" value={news?.length ?? "—"} icon={Newspaper} accent="emerald" />
-        <StatCard label="Open lab projects" value={projects?.length ?? "—"} icon={FlaskConical} accent="blue" />
-        <StatCard label="Opportunities" value={opportunities?.length ?? "—"} icon={Briefcase} accent="amber" />
-        <StatCard label="Upcoming events" value={upcomingEvents} icon={Calendar} accent="purple" />
-      </div>
-
-      <PortalSection title="Recent activity">
-        <QueryStatus
-          isLoading={activityLoading}
-          error={activityError}
-          isEmpty={!activity?.length}
-          emptyMessage="Activity will appear here as you browse, save, and connect."
-          onRetry={() => refetch()}
-          skeletonCount={2}
-        >
-          <div className="space-y-2">
-            {activity?.map((item) => {
-              const Icon = ACTIVITY_ICONS[item.type];
-              return (
-                <Link key={item.id} to={item.link}>
-                  <PortalCard hover className="flex items-center gap-4 p-4">
-                    <div className="rounded-lg bg-emerald-500/10 p-2 text-emerald-300">
-                      <Icon className="h-4 w-4" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate font-medium text-white">{item.title}</p>
-                      <p className="text-xs text-white/45">{item.description}</p>
-                    </div>
-                    <span className="shrink-0 text-xs text-white/30">
-                      {new Date(item.timestamp).toLocaleDateString()}
-                    </span>
-                  </PortalCard>
-                </Link>
-              );
-            })}
-          </div>
-        </QueryStatus>
-      </PortalSection>
-
-      {myApps && myApps.length > 0 && (
-        <PortalSection title="Your lab applications">
-          <div className="space-y-2">
-            {myApps.slice(0, 3).map((app) => (
-              <PortalCard key={app.id} className="flex items-center justify-between p-4">
-                <span className="text-sm text-white/75">Application submitted</span>
-                <CategoryBadge>{app.status.replace("_", " ")}</CategoryBadge>
-              </PortalCard>
-            ))}
-          </div>
-        </PortalSection>
-      )}
-
-      <PortalSection title="Explore modules">
-        <div className="grid gap-3 md:grid-cols-2">
-          {exploreNav.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link key={item.path} to={item.path}>
-                <PortalCard hover className="group h-full p-5">
-                  <div className="flex items-center gap-4">
-                    <div className="rounded-xl border border-white/10 bg-gradient-to-br from-emerald-500/15 to-emerald-500/5 p-3 text-emerald-300 transition group-hover:from-emerald-500/25">
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <h3 className="font-semibold text-white">{item.label}</h3>
-                      <p className="mt-0.5 text-sm text-white/50">{item.description}</p>
-                    </div>
-                    <ArrowRight className="h-4 w-4 shrink-0 text-white/20 transition group-hover:translate-x-0.5 group-hover:text-emerald-400" />
-                  </div>
-                </PortalCard>
-              </Link>
-            );
-          })}
+    <div className="portal-dashboard">
+      <section className="portal-welcome">
+        <div>
+          <p className="portal-kicker"><Sparkles className="h-3.5 w-3.5" /> Your member space</p>
+          <h1>Good to see you, <em>{profile?.displayName?.split(" ")[0] ?? "Member"}.</em></h1>
+          <p>Pick up where you left off, find something useful, or contribute to the wider Finance Meta ecosystem.</p>
         </div>
-      </PortalSection>
+        <div className="portal-welcome-meta">
+          <span>Member since</span>
+          <strong>{profile?.createdAt ? new Date(profile.createdAt).toLocaleDateString(undefined, { month: "short", year: "numeric" }) : "Recently"}</strong>
+        </div>
+      </section>
 
-      {news && news.length > 0 && (
-        <PortalSection
-          title="Latest from Debriefed"
-          action={
-            <Link
-              to={portalRoutes.debriefed}
-              className="text-sm font-medium text-emerald-400 hover:text-emerald-300"
-            >
-              View all →
+      <section aria-labelledby="next-heading">
+        <div className="portal-section-title"><div><span>Start here</span><h2 id="next-heading">What would you like to do?</h2></div></div>
+        <div className="portal-action-grid">
+          {nextActions.map(({ eyebrow, title, copy, to, icon: Icon, className }) => (
+            <Link to={to} key={title} className={`portal-action-card ${className}`}>
+              <div className="portal-action-top"><span>{eyebrow}</span><Icon className="h-5 w-5" /></div>
+              <div><h3>{title}</h3><p>{copy}</p></div>
+              <span className="portal-action-link">Open <ArrowRight className="h-4 w-4" /></span>
             </Link>
-          }
-        >
-          <div className="space-y-3">
-            {news.slice(0, 3).map((article) => (
-              <PortalCard key={article.id} hover className="p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="font-medium leading-snug text-white">{article.title}</p>
-                    <p className="mt-1.5 line-clamp-2 text-sm text-white/50">{article.summary}</p>
-                  </div>
-                  <CategoryBadge>{article.category}</CategoryBadge>
-                </div>
-              </PortalCard>
-            ))}
-          </div>
-        </PortalSection>
-      )}
+          ))}
+        </div>
+      </section>
+
+      <section className="portal-overview" aria-label="Your portal overview">
+        {[
+          ["Research applications", myApps?.length ?? 0, "Submitted to Labs"],
+          ["Upcoming events", upcomingEvents, "Across events and clubs"],
+          ["Debriefs", news?.length ?? 0, "Published in your feed"],
+          ["Opportunities", opportunities?.length ?? 0, "Currently discoverable"],
+        ].map(([label, value, detail], index) => (
+          <div key={String(label)}><span>0{index + 1}</span><strong>{value}</strong><p>{label}</p><small>{detail}</small></div>
+        ))}
+      </section>
+
+      <div className="portal-dashboard-columns">
+        <section>
+          <div className="portal-section-title"><div><span>Your week</span><h2>Recent activity</h2></div></div>
+          <QueryStatus isLoading={activityLoading} error={activityError} isEmpty={!activity?.length} emptyMessage="Your activity will appear here as you learn, save, apply, and connect." onRetry={() => refetch()} skeletonCount={2}>
+            <div className="portal-activity-list">
+              {activity?.map((item) => {
+                const Icon = ACTIVITY_ICONS[item.type];
+                return (
+                  <Link key={item.id} to={item.link} className="portal-activity-row">
+                    <span className="portal-activity-icon"><Icon className="h-4 w-4" /></span>
+                    <span><strong>{item.title}</strong><small>{item.description}</small></span>
+                    <time>{new Date(item.timestamp).toLocaleDateString(undefined, { month: "short", day: "numeric" })}</time>
+                  </Link>
+                );
+              })}
+            </div>
+          </QueryStatus>
+        </section>
+
+        <aside>
+          <div className="portal-section-title"><div><span>Discover</span><h2>Inside Finance Meta</h2></div></div>
+          <PortalCard className="portal-discover-card">
+            <p>Finance for All is the education and outreach initiative inside the wider Finance Meta ecosystem.</p>
+            {[
+              ["Finance Debriefs", portalRoutes.debriefed],
+              ["FinanceMeta Labs", portalRoutes.labs],
+              ["Industry projects", portalRoutes.pathwaysStudios],
+              ["Events & school clubs", portalRoutes.events],
+            ].map(([label, to]) => <Link key={label} to={to}><span>{label}</span><ArrowRight className="h-4 w-4" /></Link>)}
+          </PortalCard>
+        </aside>
+      </div>
     </div>
   );
 }

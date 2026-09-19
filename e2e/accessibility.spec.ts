@@ -4,11 +4,11 @@ import { expect, test } from "../playwright-fixture";
 const PUBLIC_ROUTES = [
   {
     route: "/",
-    heading: /Study financial systems\.\s*Build what the evidence supports\./i,
+    heading: /Your learning, projects, and people\.\s*One member space\./i,
   },
   { route: "/evidence", heading: "What is verified today" },
   { route: "/login", heading: "Welcome back" },
-  { route: "/signup", heading: "Join FinanceMeta" },
+  { route: "/signup", heading: "Join Finance for All" },
   { route: "/forgot-password", heading: "Reset your password" },
   { route: "/reset-password", heading: "Choose a new password" },
 ] as const;

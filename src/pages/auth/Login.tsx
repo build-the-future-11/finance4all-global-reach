@@ -46,7 +46,7 @@ export default function Login() {
   return (
     <AuthLayout
       title="Welcome back"
-      subtitle="Sign in to access the Finance4All member portal."
+      subtitle="Sign in to access your Finance for All member space."
       footer={
         <>
           No account?{" "}

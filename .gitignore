@@ -30,6 +30,7 @@ supabase/.temp/
 
 *storybook.log
 storybook-static
+.provenance/
 
 # Vercel-generated build output and project metadata, never application source.
 .vercel/

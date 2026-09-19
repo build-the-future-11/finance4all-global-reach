@@ -84,8 +84,8 @@ export default function Signup() {
 
   return (
     <AuthLayout
-      title="Join FinanceMeta"
-      subtitle="Create your member account to unlock the full portal."
+      title="Join Finance for All"
+      subtitle="Create your member account to learn, contribute, and collaborate."
       footer={
         <>
           Already have an account?{" "}
