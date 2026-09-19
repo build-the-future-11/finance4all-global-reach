@@ -14,8 +14,15 @@ updates:
         update-types:
           - minor
           - patch
+        exclude-patterns:
+          - "class-variance-authority"
+          - "lucide-react"
+          - "next-themes"
       development-dependencies:
         dependency-type: development
         update-types:
           - minor
           - patch
+        exclude-patterns:
+          - "@tailwindcss/typography"
+          - "eslint-plugin-react-refresh"
