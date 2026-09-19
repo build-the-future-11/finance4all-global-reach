@@ -4,7 +4,6 @@ import { loadEnv } from "vite";
 
 const mode = process.env.NODE_ENV === "development" ? "development" : "production";
 const fileEnv = loadEnv(mode, process.cwd(), "");
-const env = { ...fileEnv, ...process.env };
 
 const FINANCEMETA_SUPABASE_PROJECT_REF = "pnemeegkwyaicsbnbnmg";
 const FINANCEMETA_SUPABASE_HOST = `${FINANCEMETA_SUPABASE_PROJECT_REF}.supabase.co`;
@@ -12,9 +11,24 @@ const FINANCEMETA_PORTAL_ORIGIN = "https://finance4all-global-reach.vercel.app";
 const PUBLISHABLE_KEY_PATTERN = /^sb_publishable_[A-Za-z0-9_-]+$/;
 const allowLocal = mode === "development";
 
-const supabaseUrl = String(env.VITE_SUPABASE_URL || "").trim();
-const supabaseKey = String(env.VITE_SUPABASE_PUBLISHABLE_KEY || "").trim();
-const authRedirectOrigin = String(env.VITE_AUTH_REDIRECT_ORIGIN || "").trim();
+/**
+ * Resolve a public env var.
+ * In production, only process.env is authoritative so a local .env* file cannot
+ * silently satisfy (or hide) missing CI/Vercel keys — including legacy anon JWTs.
+ */
+function resolvePublicEnv(name) {
+  if (Object.prototype.hasOwnProperty.call(process.env, name)) {
+    return String(process.env[name] ?? "").trim();
+  }
+  if (mode === "production") {
+    return "";
+  }
+  return String(fileEnv[name] ?? "").trim();
+}
+
+const supabaseUrl = resolvePublicEnv("VITE_SUPABASE_URL");
+const supabaseKey = resolvePublicEnv("VITE_SUPABASE_PUBLISHABLE_KEY");
+const authRedirectOrigin = resolvePublicEnv("VITE_AUTH_REDIRECT_ORIGIN");
 
 const failures = [];
 
