@@ -19,6 +19,16 @@ jobs:
       EXPECTED_SOURCE_SHA: ${{ github.sha }}
       FINANCEMETA_DATABASE_URL: ${{ secrets.FINANCEMETA_DATABASE_URL }}
     steps:
+      - name: Initialize redacted certification evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p production-rls-evidence
+          {
+            printf 'checked_at=%s\n' "$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            printf 'source_sha=%s\n' "$EXPECTED_SOURCE_SHA"
+            printf 'result=PRECHECK_PENDING\n'
+          } > production-rls-evidence/preflight.txt
       - name: Checkout exact source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -45,7 +55,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p production-rls-evidence
           {
             printf 'checked_at=%s\n' "$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
             printf 'source_sha=%s\n' "$EXPECTED_SOURCE_SHA"
@@ -57,7 +66,9 @@ jobs:
               --file supabase/tests/account_lifecycle_rls_certification.sql
             printf 'result=PASS\n'
           } 2>&1 | tee production-rls-evidence/rls-certification.log
-          sha256sum production-rls-evidence/rls-certification.log \
+          sha256sum \
+            production-rls-evidence/preflight.txt \
+            production-rls-evidence/rls-certification.log \
             > production-rls-evidence/SHA256SUMS
       - name: Retain production RLS evidence
         if: always()

@@ -157,6 +157,18 @@ describe("production completion contracts", () => {
     expect(rlsWorkflow).toContain("retention-days: 30");
   });
 
+  it("retains redacted RLS preflight evidence even when credential or target validation fails", () => {
+    const initializeIndex = rlsWorkflow.indexOf("Initialize redacted certification evidence");
+    const targetValidationIndex = rlsWorkflow.indexOf("Require the canonical FinanceMeta database connection");
+
+    expect(initializeIndex).toBeGreaterThanOrEqual(0);
+    expect(targetValidationIndex).toBeGreaterThan(initializeIndex);
+    expect(rlsWorkflow).toContain("production-rls-evidence/preflight.txt");
+    expect(rlsWorkflow).toContain("result=PRECHECK_PENDING");
+    expect(rlsWorkflow).toContain("if: always()");
+    expect(rlsWorkflow).toContain("if-no-files-found: error");
+  });
+
   it("certifies that member activity survives reload and reauthentication", () => {
     expect(credentialedJourney).toContain("FinanceMeta production certification");
     expect(credentialedJourney).toContain("await pageA.reload()");
