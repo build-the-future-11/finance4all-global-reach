@@ -12,9 +12,12 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { useSavedExplainers } from "@/hooks/portal/useSavedExplainers";
+import SaveExplainer from "@/components/portal/SaveExplainer";
 
 export default function Saved() {
   useDocumentTitle("Saved");
+  const { articles: guides } = useSavedExplainers();
   const {
     data: articles,
     isLoading: articlesLoading,
@@ -39,11 +42,13 @@ export default function Saved() {
         description="Articles and lab projects you've bookmarked for later."
       />
 
+      {guides.length > 0 && <section className="mb-10"><h2 className="mb-4 font-serif text-2xl text-foreground">Saved guides</h2><div className="grid gap-4 md:grid-cols-2">{guides.map(guide => <PortalCard key={guide.slug} className="p-5"><span className="text-xs text-muted-foreground">{guide.readMinutes} min read</span><Link to={`${portalRoutes.debriefedExplainers}/${guide.slug}`} className="block"><h3 className="my-3 font-serif text-2xl text-foreground">{guide.title}</h3><p className="mb-5 text-sm leading-relaxed text-muted-foreground">{guide.summary}</p></Link><SaveExplainer slug={guide.slug} /></PortalCard>)}</div></section>}
+
       <QueryStatus
         isLoading={isLoading}
         error={articlesError ?? projectsError}
         isEmpty={isEmpty}
-        emptyMessage="Nothing saved yet. Bookmark news articles or lab projects as you browse."
+        emptyMessage={guides.length ? "No news articles or lab projects saved yet." : "Nothing saved yet. Save a guide, news article, or lab project as you browse."}
         onRetry={() => {
           refetchArticles();
           refetchProjects();

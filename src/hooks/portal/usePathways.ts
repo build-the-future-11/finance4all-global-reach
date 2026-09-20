@@ -7,6 +7,7 @@ import {
 } from "@/lib/mappers";
 import { useAuth } from "@/contexts/useAuth";
 import { requireOptionalExternalHttpUrl } from "@/lib/external-url";
+import { requireConfirmedRow } from "@/lib/confirmed-mutation";
 
 export function useOpportunities(selectedId?: string) {
   return useQuery({
@@ -20,7 +21,13 @@ export function useOpportunities(selectedId?: string) {
       if (selectedId) query = query.eq("id", selectedId);
       const { data, error } = await query;
       if (error) throw error;
-      return data.map(mapOpportunity);
+      const retiredDemoTitles = new Set([
+        "Summer Markets Analyst Internship",
+        "Finance4All Case Competition",
+        "YC-style Fintech Fellowship",
+        "Research Assistant — EM Credit",
+      ]);
+      return data.map(mapOpportunity).filter((opportunity) => !retiredDemoTitles.has(opportunity.title));
     },
   });
 }
@@ -53,12 +60,14 @@ export function useToggleOpportunityInterest() {
         });
         if (error) throw error;
       } else {
-        const { error } = await supabase
+        const result = await supabase
           .from("opportunity_interests")
           .delete()
           .eq("opportunity_id", opportunityId)
-          .eq("user_id", user!.id);
-        if (error) throw error;
+          .eq("user_id", user!.id)
+          .select("opportunity_id")
+          .maybeSingle();
+        requireConfirmedRow(result, "Removing the opportunity interest");
       }
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["opportunity-interests"] }),
@@ -162,12 +171,14 @@ export function useToggleEssayUpvote() {
         });
         if (error) throw error;
       } else {
-        const { error } = await supabase
+        const result = await supabase
           .from("essay_upvotes")
           .delete()
           .eq("essay_id", essayId)
-          .eq("user_id", user!.id);
-        if (error) throw error;
+          .eq("user_id", user!.id)
+          .select("essay_id")
+          .maybeSingle();
+        requireConfirmedRow(result, "Removing the essay upvote");
       }
     },
     onSuccess: () => {

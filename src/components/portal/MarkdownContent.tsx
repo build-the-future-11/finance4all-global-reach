@@ -4,6 +4,7 @@ import { normalizeExternalHttpUrl } from "@/lib/external-url";
 interface MarkdownContentProps {
   content: string;
   className?: string;
+  titleAlreadyRendered?: boolean;
 }
 
 function inlineFormat(text: string): React.ReactNode[] {
@@ -18,13 +19,13 @@ function inlineFormat(text: string): React.ReactNode[] {
     const token = match[0];
     if (token.startsWith("**")) {
       parts.push(
-        <strong key={key++} className="font-semibold text-white">
+        <strong key={key++} className="font-semibold text-foreground">
           {token.slice(2, -2)}
         </strong>,
       );
     } else if (token.startsWith("`")) {
       parts.push(
-        <code key={key++} className="rounded bg-white/10 px-1.5 py-0.5 text-emerald-300">
+        <code key={key++} className="rounded bg-muted px-1.5 py-0.5 text-emerald-500">
           {token.slice(1, -1)}
         </code>,
       );
@@ -38,7 +39,7 @@ function inlineFormat(text: string): React.ReactNode[] {
             href={href}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-emerald-300 underline underline-offset-2 hover:text-emerald-200"
+            className="text-emerald-500 underline underline-offset-2 hover:text-emerald-400"
           >
             {linkMatch[1]}
           </a>
@@ -51,32 +52,35 @@ function inlineFormat(text: string): React.ReactNode[] {
   return parts;
 }
 
-export default function MarkdownContent({ content, className }: MarkdownContentProps) {
+export default function MarkdownContent({ content, className, titleAlreadyRendered = false }: MarkdownContentProps) {
   const blocks = content.split(/\n\n+/);
 
   return (
-    <div className={cn("prose prose-invert max-w-none text-sm leading-relaxed text-white/80", className)}>
+    <div className={cn("max-w-none text-sm leading-relaxed text-foreground/80", className)}>
       {blocks.map((block, i) => {
         const trimmed = block.trim();
         if (!trimmed) return null;
+        if (titleAlreadyRendered && i === 0 && trimmed.startsWith("# ")) return null;
 
         if (trimmed.startsWith("### ")) {
+          const Heading = titleAlreadyRendered ? "h3" : "h4";
           return (
-            <h4 key={i} className="mb-2 mt-4 text-base font-semibold text-white">
+            <Heading key={i} className="mb-2 mt-6 text-base font-semibold text-foreground">
               {inlineFormat(trimmed.slice(4))}
-            </h4>
+            </Heading>
           );
         }
         if (trimmed.startsWith("## ")) {
+          const Heading = titleAlreadyRendered ? "h2" : "h3";
           return (
-            <h3 key={i} className="mb-2 mt-5 text-lg font-semibold text-white">
+            <Heading key={i} className="mb-3 mt-8 font-serif text-2xl font-semibold text-foreground">
               {inlineFormat(trimmed.slice(3))}
-            </h3>
+            </Heading>
           );
         }
         if (trimmed.startsWith("# ")) {
           return (
-            <h2 key={i} className="mb-3 mt-6 text-xl font-bold text-white">
+            <h2 key={i} className="mb-4 mt-10 font-serif text-3xl font-semibold text-foreground">
               {inlineFormat(trimmed.slice(2))}
             </h2>
           );
@@ -107,7 +111,7 @@ export default function MarkdownContent({ content, className }: MarkdownContentP
           return (
             <blockquote
               key={i}
-              className="my-4 border-l-2 border-emerald-400/40 pl-4 italic text-white/65"
+              className="my-6 border-l-2 border-emerald-400/50 pl-5 font-serif text-lg italic text-muted-foreground"
             >
               {inlineFormat(trimmed.replace(/^> /gm, ""))}
             </blockquote>

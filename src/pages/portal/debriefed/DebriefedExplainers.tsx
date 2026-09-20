@@ -1,5 +1,5 @@
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, BookOpenText, CalendarDays, Clock3 } from "lucide-react";
 import { useExplainerBySlug, useExplainers } from "@/hooks/portal/useDebriefed";
 import { portalRoutes } from "@/routes/portal";
 import MarkdownContent from "@/components/portal/MarkdownContent";
@@ -11,6 +11,8 @@ import {
 } from "@/components/portal/PortalUI";
 import { Badge } from "@/components/ui/badge";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import SaveExplainer from "@/components/portal/SaveExplainer";
+import { findEditorialExplainer } from "@/content/editorial";
 
 function ExplainerDetail({ slug }: { slug: string }) {
   const { data: explainer, isLoading, error, refetch } = useExplainerBySlug(slug);
@@ -33,17 +35,27 @@ function ExplainerDetail({ slug }: { slug: string }) {
           >
             <ArrowLeft className="h-4 w-4" /> All explainers
           </Link>
-          <Badge variant="outline" className="border-white/20 capitalize text-white/60">
-            {explainer.difficulty}
-          </Badge>
-          <h1 className="mt-3 text-3xl font-bold text-white">{explainer.title}</h1>
-          <p className="mt-2 text-white/60">{explainer.summary}</p>
-          <PortalCard className="mt-6 p-6">
-            <MarkdownContent content={explainer.body} />
+          <div className="max-w-4xl">
+            <Badge variant="outline" className="border-border capitalize text-muted-foreground">
+              {explainer.difficulty}
+            </Badge>
+            <h1 className="mt-4 font-serif text-4xl font-semibold leading-[1.05] tracking-tight text-foreground sm:text-6xl">{explainer.title}</h1>
+            <p className="portal-muted mt-5 max-w-3xl text-lg leading-relaxed">{explainer.summary}</p>
+            {"readMinutes" in explainer && (
+              <div className="portal-muted mt-5 flex flex-wrap gap-4 text-xs">
+                <span className="inline-flex items-center gap-1.5"><Clock3 className="h-3.5 w-3.5" /> {explainer.readMinutes} minute read</span>
+                <span className="inline-flex items-center gap-1.5"><CalendarDays className="h-3.5 w-3.5" /> Reviewed {new Date(`${explainer.reviewedAt}T00:00:00`).toLocaleDateString()}</span>
+                <span className="inline-flex items-center gap-1.5"><BookOpenText className="h-3.5 w-3.5" /> {explainer.sourceLabel}</span>
+              </div>
+            )}
+          </div>
+          {findEditorialExplainer(slug) && <div className="mt-5"><SaveExplainer slug={findEditorialExplainer(slug)!.slug} /></div>}
+          <PortalCard className="mt-8 p-6 sm:p-10">
+            <MarkdownContent content={explainer.body} titleAlreadyRendered className="editorial-prose mx-auto max-w-3xl text-base" />
             {explainer.relatedTerms.length > 0 && (
               <div className="mt-6 flex flex-wrap gap-2 border-t border-white/10 pt-4">
                 {explainer.relatedTerms.map((term) => (
-                  <span key={term} className="rounded-full bg-white/5 px-3 py-1 text-xs text-white/50">
+                    <span key={term} className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">
                     {term}
                   </span>
                 ))}
@@ -67,8 +79,8 @@ export default function DebriefedExplainers() {
     <div>
       <PortalPageHeader
         eyebrow="Finance Debriefed"
-        title="Explain This"
-        description="Beginner-friendly cards that decode finance buzzwords and current narratives."
+        title="The explainer library"
+        description="Built to take you from a headline to the actual mechanism. Every editorial guide includes assumptions, primary reading, and a clear advice boundary."
       />
 
       <QueryStatus
@@ -81,12 +93,16 @@ export default function DebriefedExplainers() {
         <div className="grid gap-4 md:grid-cols-2">
           {explainers?.map((card) => (
             <Link key={card.id} to={`${portalRoutes.debriefedExplainers}/${card.slug}`}>
-              <PortalCard className="h-full p-5 transition hover:border-white/30 hover:bg-white/[0.07]">
-                <Badge variant="outline" className="border-white/20 capitalize text-white/60">
+              <PortalCard hover className="group flex h-full min-h-64 flex-col p-6">
+                <div className="flex items-center justify-between gap-3">
+                <Badge variant="outline" className="border-border capitalize text-muted-foreground">
                   {card.difficulty}
                 </Badge>
-                <h3 className="mt-3 text-lg font-semibold text-white">{card.title}</h3>
-                <p className="mt-2 text-sm text-white/60">{card.summary}</p>
+                {"readMinutes" in card && <span className="portal-muted inline-flex items-center gap-1 text-xs"><Clock3 className="h-3.5 w-3.5" /> {card.readMinutes} min</span>}
+                </div>
+                <h3 className="mt-8 font-serif text-2xl font-semibold leading-tight text-foreground transition group-hover:text-emerald-500">{card.title}</h3>
+                <p className="portal-muted mt-3 text-sm leading-relaxed">{card.summary}</p>
+                <span className="mt-auto pt-6 text-sm font-semibold text-emerald-500">Read guide →</span>
               </PortalCard>
             </Link>
           ))}

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/useAuth";
 import { portalNav, portalRoutes } from "@/routes/portal";
 import ThemeToggle from "@/components/ThemeToggle";
+import { BrandMark } from "@/components/Brand";
 import MobileBottomNav from "@/components/portal/MobileBottomNav";
 import NotificationsCenter from "@/components/portal/NotificationsCenter";
 import PortalSearch from "@/components/portal/PortalSearch";
@@ -18,7 +19,7 @@ function initials(name: string) {
 function PortalBrand({ compact = false }: { compact?: boolean }) {
   return (
     <span className="portal-brand">
-      <span className="portal-brand-mark" aria-hidden="true"><i /><i /><i /></span>
+      <BrandMark className="h-10 w-10 text-[#153d30] dark:text-[#d9ff8a] dark:[--brand-ink:#153d30]" />
       {!compact && <span><strong>Finance for All</strong><small>Member space</small></span>}
     </span>
   );

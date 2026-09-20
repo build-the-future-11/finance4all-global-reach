@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { AlertTriangle, CheckCircle2, MailCheck } from "lucide-react";
 import { useAuth } from "@/contexts/useAuth";
 import AuthLayout from "@/components/portal/AuthLayout";
@@ -8,16 +8,19 @@ import { portalInputClass } from "@/components/portal/PortalUI";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { getPublicAuthSettings, type PublicAuthSettings } from "@/lib/supabase";
+import { getPublicAuthSettings, isSupabaseConfigured, type PublicAuthSettings } from "@/lib/supabase";
 import {
   getPasswordValidationError,
   MIN_PASSWORD_LENGTH,
   PASSWORD_REQUIREMENT,
 } from "@/lib/password-policy";
+import { rememberPostAuthPath, sanitizePostAuthPath } from "@/lib/auth-navigation";
 
 export default function Signup() {
   const { signUp, signInWithGoogle, user, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = sanitizePostAuthPath((location.state as { from?: string } | null)?.from);
 
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
@@ -49,6 +52,7 @@ export default function Signup() {
       return;
     }
     setSubmitting(true);
+    rememberPostAuthPath(from);
     const { error: err, emailConfirmationRequired } = await signUp(
       email.trim(),
       password,
@@ -75,7 +79,7 @@ export default function Signup() {
   const handleGoogle = async () => {
     setError("");
     setGoogleLoading(true);
-    const { error: err } = await signInWithGoogle();
+    const { error: err } = await signInWithGoogle(from);
     if (err) {
       setError(err);
       setGoogleLoading(false);
@@ -89,7 +93,7 @@ export default function Signup() {
       footer={
         <>
           Already have an account?{" "}
-          <Link to="/login" className="font-medium text-emerald-400 hover:underline">
+          <Link to="/login" state={{ from }} className="font-medium text-emerald-400 hover:underline">
             Sign in
           </Link>
         </>
@@ -109,7 +113,7 @@ export default function Signup() {
           </p>
           {success === "confirmation" && (
             <Button asChild variant="outline" className="mt-2 border-white/15 bg-white/[0.04] text-white hover:bg-white/[0.08]">
-              <Link to="/login">Go to sign in</Link>
+              <Link to="/login" state={{ from }}>Go to sign in</Link>
             </Button>
           )}
         </div>
@@ -125,7 +129,7 @@ export default function Signup() {
             onClick={handleGoogle}
             loading={googleLoading}
             label="Sign up with Google"
-            disabled={authSettings?.signupsEnabled === false || authSettings?.googleEnabled === false}
+            disabled={!isSupabaseConfigured || authSettings?.signupsEnabled === false || authSettings?.googleEnabled === false}
           />
           <AuthDivider />
 
@@ -136,6 +140,7 @@ export default function Signup() {
               </Label>
               <Input
                 id="name"
+                autoComplete="name"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 required
@@ -149,6 +154,7 @@ export default function Signup() {
               <Input
                 id="email"
                 type="email"
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -162,6 +168,7 @@ export default function Signup() {
               <Input
                 id="password"
                 type="password"
+                autoComplete="new-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -174,14 +181,14 @@ export default function Signup() {
               </p>
             </div>
             {error && (
-              <p className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+              <p role="alert" className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300">
                 {error}
               </p>
             )}
             <Button
               type="submit"
               className="w-full bg-emerald-500 hover:bg-emerald-400"
-              disabled={submitting || authSettings?.signupsEnabled === false || authSettings?.emailEnabled === false}
+              disabled={!isSupabaseConfigured || submitting || authSettings?.signupsEnabled === false || authSettings?.emailEnabled === false}
             >
               {submitting ? "Creating account…" : "Create account with email"}
             </Button>

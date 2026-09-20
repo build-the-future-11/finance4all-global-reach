@@ -50,9 +50,9 @@ describe("router auth compatibility contract", () => {
   });
 
   it("redirects unauthenticated users to login and preserves the attempted path", () => {
-    renderProtected();
+    renderProtected("/portal/pathways?track=research#open-roles");
 
-    expect(screen.getByTestId("login-probe")).toHaveTextContent("/portal/pathways");
+    expect(screen.getByTestId("login-probe")).toHaveTextContent("/portal/pathways?track=research#open-roles");
     expect(screen.queryByText("protected-content")).not.toBeInTheDocument();
   });
 

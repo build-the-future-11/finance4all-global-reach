@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus } from "lucide-react";
+import { ArrowUpRight, MapPin, Plus, UserRound } from "lucide-react";
 import { useAuth } from "@/contexts/useAuth";
 import {
   useConnectionRequests,
@@ -33,6 +33,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useChapters } from "@/hooks/portal/useEvents";
 
 export default function Networking() {
   useDocumentTitle("Network");
@@ -40,6 +42,7 @@ export default function Networking() {
   const { data: members, isLoading, error, refetch } = useMemberProfiles();
   const { data: connections } = useConnectionRequests();
   const { data: introductions } = useIntroductionPosts();
+  const { data: chapters } = useChapters();
   const respond = useRespondToConnection();
   const createIntro = useCreateIntroduction();
   const updateMyProfile = useUpdateMyProfile();
@@ -91,6 +94,7 @@ export default function Networking() {
   );
 
   const memberNameMap = Object.fromEntries(members?.map((m) => [m.id, m.displayName]) ?? []);
+  const chapterNameMap = Object.fromEntries(chapters?.map((chapter) => [chapter.id, chapter.name]) ?? []);
 
   const filteredMembers = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -110,8 +114,9 @@ export default function Networking() {
   return (
     <div>
       <PortalPageHeader
-        title="Network"
-        description="Discover members, send connect requests, and post introductions. No DMs in v1."
+        eyebrow="Member directory"
+        title="People behind the work"
+        description="Find members by interests, read what they are working on, and request a connection. Profiles only show information members have chosen to publish. Direct messages are coming soon."
         action={
           <Dialog open={introOpen} onOpenChange={setIntroOpen}>
             <DialogTrigger asChild>
@@ -156,17 +161,17 @@ export default function Networking() {
         }
       />
 
-      <PortalCard className="mb-8 flex items-center justify-between p-5">
+      <PortalCard className="mb-8 flex flex-col justify-between gap-5 p-5 sm:flex-row sm:items-center">
         <div>
-          <Label htmlFor="network-profile-visibility" className="font-medium text-white">Your profile visibility</Label>
-          <p id="network-profile-visibility-description" className="text-sm text-white/50">Let others know you're open to collaborate</p>
+          <Label htmlFor="network-profile-visibility" className="font-medium text-foreground">Make your profile useful</Label>
+          <p id="network-profile-visibility-description" className="portal-muted mt-1 text-sm">Add a bio and interests in Settings, then choose whether you are open to collaboration.</p>
         </div>
-        <Switch
+        <div className="flex items-center gap-4"><Link to={portalRoutes.settings} className="inline-flex items-center gap-1 text-sm font-semibold text-emerald-500">Edit profile <ArrowUpRight className="h-3.5 w-3.5" /></Link><Switch
           id="network-profile-visibility"
           aria-describedby="network-profile-visibility-description"
           checked={profile?.openToCollaborate ?? false}
           onCheckedChange={handleCollaborateToggle}
-        />
+        /></div>
       </PortalCard>
 
       {pendingIncoming && pendingIncoming.length > 0 && (
@@ -242,22 +247,27 @@ export default function Networking() {
           emptyMessage="No members match your filters."
           onRetry={() => refetch()}
         >
-          <div className="grid gap-3 sm:grid-cols-2">
-            {filteredMembers.map((member) => (
-              <Link key={member.id} to={`${portalRoutes.networkProfile}/${member.id}`}>
-                <PortalCard className="p-4 transition hover:border-white/30 hover:bg-white/[0.07]">
-                  <p className="font-medium text-white">{member.displayName}</p>
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {filteredMembers.map((member) => {
+              const initials = member.displayName.split(" ").map((part) => part[0]).join("").slice(0, 2).toUpperCase();
+              return <Link key={member.id} to={`${portalRoutes.networkProfile}/${member.id}`}>
+                <PortalCard hover className="group flex h-full min-h-64 flex-col p-5">
+                  <div className="flex items-start justify-between gap-4"><Avatar className="h-12 w-12 border border-border"><AvatarImage src={member.avatarUrl} /><AvatarFallback className="bg-emerald-500/10 font-semibold text-emerald-600 dark:text-emerald-300">{initials || <UserRound className="h-5 w-5" />}</AvatarFallback></Avatar><ArrowUpRight className="h-4 w-4 text-muted-foreground transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" /></div>
+                  <p className="mt-5 font-serif text-xl font-semibold text-foreground">{member.displayName}</p>
+                  <p className="portal-muted mt-1 text-xs capitalize">{member.role.replace("_", " ")}</p>
                   {member.openToCollaborate && (
                     <Badge className="mt-2 bg-emerald-400/15 text-xs text-emerald-300">
                       Open to collaborate
                     </Badge>
                   )}
+                  <p className="portal-muted mt-3 line-clamp-3 text-sm leading-relaxed">{member.bio || "Bio coming soon — this member has not published an introduction yet."}</p>
                   {member.interests.length > 0 && (
-                    <p className="mt-2 text-xs text-white/40">{member.interests.join(" · ")}</p>
+                    <p className="portal-muted mt-3 line-clamp-2 text-xs">{member.interests.join(" · ")}</p>
                   )}
+                  {member.chapterId && chapterNameMap[member.chapterId] && <p className="portal-muted mt-auto flex items-center gap-1 pt-5 text-xs"><MapPin className="h-3 w-3" /> {chapterNameMap[member.chapterId]}</p>}
                 </PortalCard>
               </Link>
-            ))}
+            })}
           </div>
         </QueryStatus>
       </section>

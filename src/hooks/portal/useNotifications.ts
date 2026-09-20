@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { mapNotification } from "@/lib/mappers";
 import { useAuth } from "@/contexts/useAuth";
+import { requireConfirmedRow } from "@/lib/confirmed-mutation";
 
 export function useNotifications() {
   const { user } = useAuth();
@@ -31,8 +32,13 @@ export function useMarkNotificationRead() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("notifications").update({ read: true }).eq("id", id);
-      if (error) throw error;
+      const result = await supabase
+        .from("notifications")
+        .update({ read: true })
+        .eq("id", id)
+        .select("id")
+        .maybeSingle();
+      requireConfirmedRow(result, "Marking the notification as read");
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["notifications"] }),
   });

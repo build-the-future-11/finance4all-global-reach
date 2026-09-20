@@ -8,6 +8,7 @@ import {
 } from "@/lib/mappers";
 import type { ConnectionStatus } from "@/types/domain";
 import { useAuth } from "@/contexts/useAuth";
+import { requireConfirmedRow } from "@/lib/confirmed-mutation";
 
 export function useMemberProfiles() {
   return useQuery({
@@ -91,11 +92,13 @@ export function useRespondToConnection() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, status }: { id: string; status: ConnectionStatus }) => {
-      const { error } = await supabase
+      const result = await supabase
         .from("connection_requests")
         .update({ status })
-        .eq("id", id);
-      if (error) throw error;
+        .eq("id", id)
+        .select("id")
+        .maybeSingle();
+      requireConfirmedRow(result, "Updating the connection request");
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["connections"] }),
   });
@@ -122,7 +125,11 @@ export function useUpdateMyProfile() {
   const { updateProfile } = useAuth();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: updateProfile,
+    mutationFn: async (updates: Parameters<typeof updateProfile>[0]) => {
+      const result = await updateProfile(updates);
+      if (result.error) throw new Error(result.error);
+      return result;
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["member-profiles"] });
       qc.invalidateQueries({ queryKey: ["profile"] });

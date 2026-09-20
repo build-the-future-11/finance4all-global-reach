@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import type { EventStatus, NewsCategory, OpportunityType } from "@/types/domain";
 import { requireOptionalExternalHttpUrl } from "@/lib/external-url";
+import { requireConfirmedRow } from "@/lib/confirmed-mutation";
 
 export function useCreateNewsArticle() {
   const qc = useQueryClient();
@@ -106,8 +107,13 @@ export function useDeleteNewsArticle() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("news_articles").delete().eq("id", id);
-      if (error) throw error;
+      const result = await supabase
+        .from("news_articles")
+        .delete()
+        .eq("id", id)
+        .select("id")
+        .maybeSingle();
+      requireConfirmedRow(result, "Deleting the news article");
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["news"] }),
   });

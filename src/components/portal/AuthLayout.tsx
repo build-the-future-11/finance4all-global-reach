@@ -1,6 +1,11 @@
 import { Link } from "react-router-dom";
 import { BookOpenText, Briefcase, FlaskConical } from "lucide-react";
 import { isSupabaseConfigured } from "@/lib/supabase";
+import Brand from "@/components/Brand";
+import ThemeToggle from "@/components/ThemeToggle";
+import { BoxReveal, NeuralBackground } from "@/components/experience/Interactions";
+import "@/styles/landing.css";
+import "@/styles/auth-refresh.css";
 
 interface AuthLayoutProps {
   title: string;
@@ -13,11 +18,17 @@ export default function AuthLayout({ title, subtitle, children, footer }: AuthLa
   return (
     <div className="auth-shell">
       <aside className="auth-story">
-        <Link to="/" className="auth-back">← Back to member home</Link>
+        <NeuralBackground />
+        <Link to="/" className="auth-back"><Brand /></Link>
         <div className="auth-story-copy">
           <p>Finance for All · Member space</p>
-          <h2>Keep learning.<br /><em>Make the work visible.</em></h2>
-          <span>Courses, research, opportunities, events, and the people building alongside you.</span>
+          <h2><BoxReveal>Your curiosity.</BoxReveal><br /><em><BoxReveal delay={150}>A world of<br />possibility.</BoxReveal></em></h2>
+          <span>Finance is for everyone. Find clear explanations, meaningful research, and people who share your questions.</span>
+          <div className="auth-reach">
+            <strong>100,000+</strong>
+            <span>students reached · six continents</span>
+            <small>Organisation-reported as of September 2026; not independently audited.</small>
+          </div>
         </div>
         <div className="auth-story-grid">
           <div><BookOpenText className="h-4 w-4" /><span>Learn</span><small>Lessons and debriefs</small></div>
@@ -27,8 +38,9 @@ export default function AuthLayout({ title, subtitle, children, footer }: AuthLa
       </aside>
 
       <main className="auth-form-panel">
+        <div className="auth-theme"><ThemeToggle /></div>
         <div className="auth-form-wrap">
-          <Link to="/" className="auth-mobile-brand">Finance for All <span>Member space</span></Link>
+          <Link to="/" className="auth-mobile-brand"><Brand /></Link>
           <div className="auth-form-heading"><p>Member access</p><h1>{title}</h1><span>{subtitle}</span></div>
 
           {!isSupabaseConfigured && (

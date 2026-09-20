@@ -28,6 +28,8 @@ export default function Dashboard() {
   const { data: myApps } = useMyLabApplications();
   const { data: activity, isLoading: activityLoading, error: activityError, refetch } = useActivityFeed(6);
   const upcomingEvents = events?.filter((event) => event.status === "upcoming").length ?? 0;
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
 
   const nextActions = [
     {
@@ -61,7 +63,7 @@ export default function Dashboard() {
       <section className="portal-welcome">
         <div>
           <p className="portal-kicker"><Sparkles className="h-3.5 w-3.5" /> Your member space</p>
-          <h1>Good to see you, <em>{profile?.displayName?.split(" ")[0] ?? "Member"}.</em></h1>
+          <h1>{greeting}, <em>{profile?.displayName?.split(" ")[0] ?? "Member"}.</em></h1>
           <p>Pick up where you left off, find something useful, or contribute to the wider Finance Meta ecosystem.</p>
         </div>
         <div className="portal-welcome-meta">
@@ -80,6 +82,19 @@ export default function Dashboard() {
               <span className="portal-action-link">Open <ArrowRight className="h-4 w-4" /></span>
             </Link>
           ))}
+        </div>
+      </section>
+
+      <section className="my-8 rounded-2xl border border-border bg-card p-6" aria-labelledby="contribute-heading">
+        <h2 id="contribute-heading" className="font-serif text-2xl text-foreground">Make something happen.</h2>
+        <p className="mt-2 text-sm text-muted-foreground">Lead a local session, share an opportunity, or help grow the community.</p>
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            ["Open a chapter", "https://tally.so/r/XxaB1j"],
+            ["Run a learning session", "mailto:financeforalledu@gmail.com?subject=Propose%20a%20learning%20session"],
+            ["Share an opportunity", "mailto:financeforalledu@gmail.com?subject=Opportunity%20submission&body=Title%3A%0AOrganization%3A%0AOfficial%20link%3A%0AEligibility%3A%0ADeadline%3A%0ADescription%3A"],
+            ["Submit your work", "mailto:financeforalledu@gmail.com?subject=Work%20submission"],
+          ].map(([label,href]) => <a href={href} key={label} className="flex items-center justify-between gap-3 rounded-xl border border-border px-4 py-4 text-sm text-foreground transition hover:bg-muted" {...(href.startsWith("https") ? {target:"_blank",rel:"noreferrer"} : {})}>{label}<ArrowRight size={15} /></a>)}
         </div>
       </section>
 

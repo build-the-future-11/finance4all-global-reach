@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { sanitizePostAuthPath } from "@/lib/auth-navigation";
+import { isSupabaseConfigured } from "@/lib/supabase";
 
 export default function Login() {
   const { signIn, signInWithGoogle, user, loading } = useAuth();
@@ -50,13 +51,13 @@ export default function Login() {
       footer={
         <>
           No account?{" "}
-          <Link to="/signup" className="font-medium text-emerald-400 hover:underline">
+          <Link to="/signup" state={{ from }} className="font-medium text-emerald-400 hover:underline">
             Create one
           </Link>
         </>
       }
     >
-      <GoogleSignInButton onClick={handleGoogle} loading={googleLoading} />
+      <GoogleSignInButton onClick={handleGoogle} loading={googleLoading} disabled={!isSupabaseConfigured} />
       <AuthDivider />
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -67,6 +68,7 @@ export default function Login() {
           <Input
             id="email"
             type="email"
+            autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -83,6 +85,7 @@ export default function Login() {
           <Input
             id="password"
             type="password"
+            autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -90,11 +93,11 @@ export default function Login() {
           />
         </div>
         {error && (
-          <p className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+          <p role="alert" className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300">
             {error}
           </p>
         )}
-        <Button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-400" disabled={submitting}>
+        <Button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-400" disabled={submitting || !isSupabaseConfigured}>
           {submitting ? "Signing in…" : "Sign in with email"}
         </Button>
       </form>

@@ -1,5 +1,12 @@
 import "@testing-library/jest-dom";
 
+// jsdom has no canvas renderer. Exercise the component's no-canvas fallback;
+// the animated canvas is checked separately in the real browser.
+Object.defineProperty(HTMLCanvasElement.prototype, "getContext", {
+  configurable: true,
+  value: () => null,
+});
+
 Object.defineProperty(window, "matchMedia", {
   writable: true,
   value: (query: string) => ({

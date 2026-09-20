@@ -14,6 +14,7 @@ import { withDeadline } from "@/lib/asyncDeadline";
 import type { UserProfile } from "@/types/domain";
 import { useQueryClient } from "@tanstack/react-query";
 import { AuthContext } from "@/contexts/auth-context";
+import { isOnboardingComplete } from "@/lib/onboarding";
 const AUTH_OPERATION_TIMEOUT_MS = 15_000;
 
 function googleDisplayName(user: User) {
@@ -293,13 +294,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (updates.chapterId !== undefined) payload.chapter_id = updates.chapterId ?? null;
 
       try {
-        const { error } = await withDeadline(
-          () => supabase.from("profiles").update(payload).eq("id", session.user.id),
+        const { data, error } = await withDeadline(
+          () => supabase.from("profiles").update(payload).eq("id", session.user.id).select("id").single(),
           AUTH_OPERATION_TIMEOUT_MS,
           "Profile update",
         );
-        if (!error) await fetchProfile(session.user);
-        return { error: error?.message ?? null };
+        if (error) return { error: error.message };
+        if (data?.id !== session.user.id) return { error: "Your profile update could not be confirmed. Please try again." };
+        await fetchProfile(session.user);
+        return { error: null };
       } catch (error) {
         return {
           error:
@@ -310,7 +313,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [session?.user, fetchProfile],
   );
 
-  const needsOnboarding = Boolean(profile && !profile.displayName?.trim());
+  // This controls profile setup only. Authorization continues to use the database role.
+  const needsOnboarding = Boolean(profile && (!profile.displayName?.trim() || !isOnboardingComplete(session?.user.user_metadata)));
 
   const value = useMemo(
     () => ({

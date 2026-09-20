@@ -3,14 +3,14 @@ import { expect, test } from "../playwright-fixture";
 test("public claims stay inside the evidence boundary", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.getByRole("heading", { name: /Your learning, projects, and people\.\s*One member space\./i })).toBeVisible();
-  await expect(page.getByText("Finance for All", { exact: true }).first()).toBeVisible();
-  await expect(page.getByText("Finance for All is a Finance Meta initiative.", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /Money shapes\s*every life\.\s*Let's open it up\./i })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Finance for All home" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Start with a free lesson" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Founder" })).toHaveCount(0);
+  await expect(page.getByText(/organisation-reported as of September 2026/i)).toBeVisible();
+  await expect(page.getByText(/not claims of investment performance/i)).toBeVisible();
+  await expect(page.getByText(/not institutional endorsements or partnerships/i)).toBeVisible();
   await expect(page.getByText(/global nonprofit building/i)).toHaveCount(0);
   await expect(page.getByText(/growing network of students/i)).toHaveCount(0);
-  await expect(page.getByText(/students reached/i)).toHaveCount(0);
 });
 
 test("public learning hub and Five Foundations lesson are reachable without authentication", async ({ page }) => {

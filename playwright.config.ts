@@ -1,5 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
+const e2ePort = process.env.FINANCEMETA_E2E_PORT ?? "4187";
+const e2eOrigin = `http://127.0.0.1:${e2ePort}`;
+
 export default defineConfig({
   testDir: "./e2e",
   timeout: 45_000,
@@ -9,7 +12,7 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: "list",
   use: {
-    baseURL: "http://127.0.0.1:4173",
+    baseURL: e2eOrigin,
     trace: "retain-on-failure",
   },
   projects: [
@@ -19,9 +22,10 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "npm run dev -- --host 127.0.0.1 --port 4173",
-    url: "http://127.0.0.1:4173",
-    reuseExistingServer: !process.env.CI,
+    command: `npm run dev -- --host 127.0.0.1 --port ${e2ePort}`,
+    url: e2eOrigin,
+    reuseExistingServer: false,
+    gracefulShutdown: { signal: "SIGTERM", timeout: 5_000 },
     env: {
       VITE_SUPABASE_URL: "https://pnemeegkwyaicsbnbnmg.supabase.co",
       VITE_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_ci_browser_contract",

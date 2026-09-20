@@ -52,6 +52,8 @@ describe("FinanceMeta auth operation deadline contract", () => {
     expect(updateSection).toContain("await withDeadline(");
     expect(updateSection).toContain('.update(payload).eq("id", session.user.id)');
     expect(updateSection).toContain('"Profile update"');
-    expect(updateSection).toContain("if (!error) await fetchProfile(session.user);");
+    expect(updateSection).toContain('.select("id").single()');
+    expect(updateSection).toContain("if (data?.id !== session.user.id)");
+    expect(updateSection).toContain("await fetchProfile(session.user);");
   });
 });

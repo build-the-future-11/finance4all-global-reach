@@ -31,6 +31,7 @@ const Settings = lazy(() => import("@/pages/portal/Settings"));
 const Evidence = lazy(() => import("@/pages/Evidence"));
 const Learn = lazy(() => import("@/pages/learn/Learn"));
 const FiveFoundations = lazy(() => import("@/pages/learn/FiveFoundations"));
+const Debriefs = lazy(() => import("@/pages/learn/Debriefs"));
 
 function PortalFallback() {
   return (
@@ -54,6 +55,8 @@ function AppRoutes() {
           <Route path="/evidence" element={<Evidence />} />
           <Route path="/learn" element={<Learn />} />
           <Route path="/learn/five-foundations" element={<FiveFoundations />} />
+          <Route path="/learn/debriefs" element={<Debriefs />} />
+          <Route path="/learn/debriefs/:slug" element={<Debriefs />} />
 
           <Route
             path="/onboarding"

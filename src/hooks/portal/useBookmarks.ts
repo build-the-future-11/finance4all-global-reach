@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { mapNewsArticle, mapResearchProject } from "@/lib/mappers";
 import { useAuth } from "@/contexts/useAuth";
+import { requireConfirmedRow } from "@/lib/confirmed-mutation";
 
 export function useNewsBookmarks() {
   const { user } = useAuth();
@@ -25,12 +26,14 @@ export function useToggleNewsBookmark() {
   return useMutation({
     mutationFn: async ({ articleId, saved }: { articleId: string; saved: boolean }) => {
       if (saved) {
-        const { error } = await supabase
+        const result = await supabase
           .from("news_bookmarks")
           .delete()
           .eq("user_id", user!.id)
-          .eq("article_id", articleId);
-        if (error) throw error;
+          .eq("article_id", articleId)
+          .select("article_id")
+          .maybeSingle();
+        requireConfirmedRow(result, "Removing the saved article");
       } else {
         const { error } = await supabase.from("news_bookmarks").insert({
           user_id: user!.id,
@@ -90,12 +93,14 @@ export function useToggleProjectBookmark() {
   return useMutation({
     mutationFn: async ({ projectId, saved }: { projectId: string; saved: boolean }) => {
       if (saved) {
-        const { error } = await supabase
+        const result = await supabase
           .from("project_bookmarks")
           .delete()
           .eq("user_id", user!.id)
-          .eq("project_id", projectId);
-        if (error) throw error;
+          .eq("project_id", projectId)
+          .select("project_id")
+          .maybeSingle();
+        requireConfirmedRow(result, "Removing the saved project");
       } else {
         const { error } = await supabase.from("project_bookmarks").insert({
           user_id: user!.id,

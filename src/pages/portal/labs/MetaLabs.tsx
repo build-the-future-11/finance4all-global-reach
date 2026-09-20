@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, Plus } from "lucide-react";
+import { ArrowLeft, ExternalLink, FlaskConical, Lightbulb, Plus } from "lucide-react";
 import { useAuth } from "@/contexts/useAuth";
 import {
   useCreateResearchProject,
@@ -36,6 +36,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { portfolioProjects } from "@/content/catalog";
 
 const STATUSES: { value: ResearchProjectStatus | "all"; label: string }[] = [
   { value: "all", label: "All" },
@@ -226,7 +227,7 @@ export default function MetaLabs() {
       <PortalPageHeader
         eyebrow="Research"
         title="Finance Meta Labs"
-        description="Research projects with verified lead researchers and open applications."
+        description="Explore the public repository portfolio, inspect evidence boundaries, and join member-led research with verified owners. Proposed work is never presented as completed research."
         action={
           canCreate ? (
             <Dialog open={open} onOpenChange={setOpen}>
@@ -280,6 +281,41 @@ export default function MetaLabs() {
           ) : undefined
         }
       />
+
+      <section className="mb-12">
+        <div className="mb-5 flex items-end justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-500">Public portfolio + next wave</p>
+            <h2 className="mt-1 font-serif text-2xl font-semibold text-foreground">What exists, and what still has to be built</h2>
+          </div>
+          <a className="portal-muted hidden items-center gap-1 text-xs font-semibold sm:flex" href="https://github.com/build-the-future-11/FinanceMeta-Global" target="_blank" rel="noreferrer">Open evidence workspace <ExternalLink className="h-3.5 w-3.5" /></a>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          {portfolioProjects.map((project) => (
+            <PortalCard key={project.id} hover className="flex min-h-72 flex-col p-6">
+              <div className="flex items-start justify-between gap-4">
+                <div className={`grid h-10 w-10 place-items-center rounded-xl ${project.status === "Proposed" ? "bg-amber-500/10 text-amber-500" : "bg-emerald-500/10 text-emerald-500"}`}>
+                  {project.status === "Proposed" ? <Lightbulb className="h-5 w-5" /> : <FlaskConical className="h-5 w-5" />}
+                </div>
+                <Badge variant="outline" className="border-border text-muted-foreground">{project.status}</Badge>
+              </div>
+              <p className="mt-7 text-xs font-semibold uppercase tracking-[0.14em] text-emerald-500">{project.domain}</p>
+              <h3 className="mt-2 font-serif text-2xl font-semibold leading-tight text-foreground">{project.title}</h3>
+              <p className="portal-muted mt-3 text-sm leading-relaxed">{project.description}</p>
+              <div className="mt-4 flex flex-wrap gap-2">{project.tags.map((tag) => <span key={tag} className="rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">{tag}</span>)}</div>
+              <div className="mt-auto border-t border-border pt-5">
+                <p className="portal-muted text-xs leading-relaxed">{project.evidence}</p>
+                {project.href && <a href={project.href} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-500">Inspect repository <ExternalLink className="h-3.5 w-3.5" /></a>}
+              </div>
+            </PortalCard>
+          ))}
+        </div>
+      </section>
+
+      <div className="mb-5">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-500">Member workspace</p>
+        <h2 className="mt-1 font-serif text-2xl font-semibold text-foreground">Projects accepting collaboration</h2>
+      </div>
 
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <Tabs

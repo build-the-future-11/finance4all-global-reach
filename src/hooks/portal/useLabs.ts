@@ -8,6 +8,7 @@ import {
 } from "@/lib/mappers";
 import type { LabApplicationStatus, ResearchProjectStatus } from "@/types/domain";
 import { useAuth } from "@/contexts/useAuth";
+import { requireConfirmedRow } from "@/lib/confirmed-mutation";
 
 export function useResearchProjects(status?: ResearchProjectStatus | "all") {
   return useQuery({
@@ -145,15 +146,17 @@ export function useUpdateApplicationStatus() {
       applicationId: string;
       status: LabApplicationStatus;
     }) => {
-      const { error } = await supabase
+      const result = await supabase
         .from("lab_applications")
         .update({
           status,
           reviewed_at: new Date().toISOString(),
           reviewer_id: user!.id,
         })
-        .eq("id", applicationId);
-      if (error) throw error;
+        .eq("id", applicationId)
+        .select("id")
+        .maybeSingle();
+      requireConfirmedRow(result, "Updating the lab application");
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["review-queue"] });

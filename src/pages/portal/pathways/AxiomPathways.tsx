@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ExternalLink, Star } from "lucide-react";
+import { ArrowUpRight, CheckCircle2, ExternalLink, ShieldCheck, Star } from "lucide-react";
 import {
   useOpportunities,
   useOpportunityInterests,
@@ -20,6 +20,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { useSelectedRecord } from "@/hooks/useSelectedRecord";
+import { applicationPaths } from "@/content/catalog";
 
 const TYPES: { value: OpportunityType | "all"; label: string }[] = [
   { value: "all", label: "All" },
@@ -65,10 +66,41 @@ export default function AxiomPathways() {
     <div>
       {notice}
       <PortalPageHeader
-        eyebrow="Careers"
-        title="Axiom Pathways"
-        description="Internships, programs, challenges, and project-based roles."
+        eyebrow="Opportunities"
+        title="Real paths into the work"
+        description="Current FinanceMeta applications and collaboration routes are separated from member-posted opportunities. Every public path below links to the canonical form and states what the form does — never a guaranteed place."
       />
+
+      <section className="mb-12">
+        <div className="mb-5 flex items-end justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-500">Verified organization routes</p>
+            <h2 className="mt-1 font-serif text-2xl font-semibold text-foreground">Applications and collaboration</h2>
+          </div>
+          <span className="portal-muted hidden items-center gap-1.5 text-xs sm:flex"><ShieldCheck className="h-3.5 w-3.5" /> Reviewed 19 Sep 2026</span>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {applicationPaths.map((path) => (
+            <PortalCard key={path.title} hover className="group flex min-h-72 flex-col p-6">
+              <div className="flex items-center justify-between gap-3">
+                <Badge className="border-0 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300"><CheckCircle2 className="mr-1 h-3 w-3" /> {path.status}</Badge>
+                <span className="portal-muted text-xs">{path.kind}</span>
+              </div>
+              <h3 className="mt-8 font-serif text-2xl font-semibold leading-tight text-foreground">{path.title}</h3>
+              <p className="portal-muted mt-3 text-sm leading-relaxed">{path.description}</p>
+              <a href={path.href} target="_blank" rel="noreferrer" className="mt-auto flex items-center justify-between border-t border-border pt-5 text-sm font-semibold text-emerald-500">
+                Open canonical form <ArrowUpRight className="h-4 w-4 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+              </a>
+            </PortalCard>
+          ))}
+        </div>
+        <p className="portal-muted mt-4 text-xs">Submitting a form records interest or an application for review. It does not imply selection, placement, partnership, or employment.</p>
+      </section>
+
+      <div className="mb-5">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-500">Member board</p>
+        <h2 className="mt-1 font-serif text-2xl font-semibold text-foreground">Published opportunities</h2>
+      </div>
 
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <Tabs value={typeFilter} onValueChange={(v) => setTypeFilter(v as OpportunityType | "all")}>

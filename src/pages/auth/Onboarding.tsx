@@ -10,6 +10,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { supabase } from "@/lib/supabase";
+import { withDeadline } from "@/lib/asyncDeadline";
+import { AGE_BANDS, ONBOARDING_VERSION, validateEducation } from "@/lib/onboarding";
+import { takePostAuthPath } from "@/lib/auth-navigation";
+import { MultiStepLoader } from "@/components/experience/Interactions";
 import {
   Select,
   SelectContent,
@@ -32,6 +37,10 @@ export default function Onboarding() {
   const [chapterId, setChapterId] = useState(profile?.chapterId ?? "");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [step, setStep] = useState(0);
+  const [saveStep, setSaveStep] = useState(0);
+  const [school, setSchool] = useState(String(user?.user_metadata?.school ?? ""));
+  const [ageBand, setAgeBand] = useState(String(user?.user_metadata?.age_band ?? ""));
 
   const toggleInterest = (tag: string) => {
     setInterests((prev) =>
@@ -41,21 +50,38 @@ export default function Onboarding() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+    if (step === 0) {
+      const educationError = validateEducation(school, ageBand);
+      if (educationError) { setError(educationError); return; }
+      setStep(1);
+      return;
+    }
     if (!displayName.trim()) {
       setError("Display name is required");
       return;
     }
     setSubmitting(true);
-    const { error: err } = await updateProfile({
+    setSaveStep(0);
+    try {
+      const { error: err } = await updateProfile({
       displayName: displayName.trim(),
       bio: bio.trim() || undefined,
       interests,
       openToCollaborate,
       chapterId: chapterId || undefined,
-    });
-    setSubmitting(false);
-    if (err) setError(err);
-    else navigate("/portal");
+      });
+      if (err) throw new Error(err);
+      setSaveStep(1);
+      // Keep education and age group in the member's private Auth metadata, not the directory.
+      const { data, error: detailsError } = await withDeadline(() => supabase.auth.updateUser({ data: { school: school.trim(), age_band: ageBand, onboarding_version: ONBOARDING_VERSION } }), 15000, "Saving member details");
+      if (detailsError) throw detailsError;
+      if (data.user?.user_metadata?.onboarding_version !== ONBOARDING_VERSION) throw new Error("We could not confirm your details were saved. Please try again.");
+      setSaveStep(2);
+      navigate(takePostAuthPath(), { replace: true });
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "We couldn't save your profile. Please try again.");
+    } finally { setSubmitting(false); }
   };
 
   const avatarUrl =
@@ -65,11 +91,12 @@ export default function Onboarding() {
 
   return (
     <AuthLayout
-      title="Complete your profile"
-      subtitle="A few details so the community can find and connect with you."
-      footer={<span className="text-white/35">You can update this anytime in Network.</span>}
+      title={step === 0 ? "A little about you" : "Make yourself at home"}
+      subtitle={step === 0 ? "Where are you learning? Let's make this space feel like yours." : "Introduce yourself to the people you'll be learning and building with."}
+      footer={<span className="text-white/35">Your public bio and interests can be edited in Network. Your school and age group stay private.</span>}
     >
-      {avatarUrl && (
+      <div className="auth-step-nav" aria-label={`Profile setup, step ${step + 1} of 2`}><span data-active="true" /><span data-active={step === 1} /></div>
+      {step === 1 && avatarUrl && (
         <div className="mb-6 flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-4">
           <Avatar className="h-12 w-12 border border-white/15">
             <AvatarImage src={avatarUrl} />
@@ -85,6 +112,11 @@ export default function Onboarding() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
+        {step === 0 ? <>
+          <p className="auth-private-note">Your school and age group help us understand our community. They are kept out of your public member profile. You do not need to share your date of birth.</p>
+          <div><Label htmlFor="onboarding-school">School, university, or learning community</Label><Input id="onboarding-school" value={school} onChange={e => setSchool(e.target.value)} maxLength={160} required placeholder="Where do you study or learn?" className={portalInputClass} /><p className="mt-2 text-xs text-muted-foreground">Not in school? You can enter Independent learner or your current organization.</p></div>
+          <div><Label htmlFor="onboarding-age">Age group</Label><select id="onboarding-age" className="auth-field-select" value={ageBand} onChange={e => setAgeBand(e.target.value)} required><option value="">Select an age group</option>{AGE_BANDS.map(age => <option key={age}>{age}</option>)}</select></div>
+        </> : <>
         <div>
           <Label htmlFor="onboarding-display-name" className="text-white/70">
             Display name
@@ -93,6 +125,8 @@ export default function Onboarding() {
             id="onboarding-display-name"
             name="displayName"
             value={displayName}
+            maxLength={80}
+            autoComplete="name"
             onChange={(e) => setDisplayName(e.target.value)}
             required
             className={portalInputClass}
@@ -108,6 +142,7 @@ export default function Onboarding() {
             value={bio}
             onChange={(e) => setBio(e.target.value)}
             rows={3}
+            maxLength={1200}
             placeholder="What are you working on or interested in?"
             className={portalInputClass}
           />
@@ -167,14 +202,14 @@ export default function Onboarding() {
             aria-describedby="onboarding-open-to-collaborate-description"
           />
         </div>
+        </>}
         {error && (
           <p role="alert" className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300">
             {error}
           </p>
         )}
-        <Button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-400" disabled={submitting}>
-          {submitting ? "Saving…" : "Enter portal"}
-        </Button>
+        {submitting && <MultiStepLoader steps={["Saving your public profile", "Saving your private member details", "Opening your member space"]} current={saveStep} />}
+        <div className="auth-step-actions">{step === 1 && <Button type="button" variant="outline" onClick={() => { setStep(0); setError(""); }} disabled={submitting}>Back</Button>}<Button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-400" disabled={submitting}>{submitting ? "Saving…" : step === 0 ? "Continue" : "Enter portal"}</Button></div>
       </form>
     </AuthLayout>
   );

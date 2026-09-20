@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { mapChapter, mapEvent } from "@/lib/mappers";
 import { useAuth } from "@/contexts/useAuth";
+import { requireConfirmedRow } from "@/lib/confirmed-mutation";
 
 export function useChapters() {
   return useQuery({
@@ -9,7 +10,7 @@ export function useChapters() {
     queryFn: async () => {
       const { data, error } = await supabase.from("chapters").select("*").order("name");
       if (error) throw error;
-      return data.map(mapChapter);
+      return data.map(mapChapter).filter((chapter) => !chapter.id.startsWith("70000000-0000-4000-8000-00000000000"));
     },
   });
 }
@@ -23,7 +24,8 @@ export function useEvents(chapterId?: string, selectedId?: string) {
       else if (chapterId) q = q.eq("chapter_id", chapterId);
       const { data, error } = await q;
       if (error) throw error;
-      return data.map(mapEvent);
+      const retiredDemoTitles = new Set(["IIT Finance Case Night", "London Markets 101 Workshop"]);
+      return data.map(mapEvent).filter((event) => !retiredDemoTitles.has(event.title));
     },
   });
 }
@@ -56,12 +58,14 @@ export function useToggleEventRegistration() {
         });
         if (error) throw error;
       } else {
-        const { error } = await supabase
+        const result = await supabase
           .from("event_registrations")
           .delete()
           .eq("event_id", eventId)
-          .eq("user_id", user!.id);
-        if (error) throw error;
+          .eq("user_id", user!.id)
+          .select("event_id")
+          .maybeSingle();
+        requireConfirmedRow(result, "Cancelling the event registration");
       }
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["event-registrations"] }),

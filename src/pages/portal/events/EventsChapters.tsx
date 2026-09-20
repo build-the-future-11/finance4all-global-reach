@@ -7,6 +7,8 @@ import {
   useToggleEventRegistration,
 } from "@/hooks/portal/useEvents";
 import ChapterMap from "@/components/portal/ChapterMap";
+import WorldMap from "@/components/experience/WorldMap";
+import { communityLocations } from "@/content/community";
 import {
   PortalCard,
   PortalPageHeader,
@@ -77,14 +79,19 @@ export default function EventsChapters() {
       <PortalPageHeader
         eyebrow="Global reach"
         title="Events + Chapters"
-        description="Explore chapters worldwide, discover local events, and register your interest."
+        description="Find your community, discover events, and build something local. Explore the network or start a club at your school."
       />
+
+      <section className="mb-8 space-y-4">
+        <WorldMap locations={communityLocations} />
+        <a href="https://tally.so/r/XxaB1j" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-sm text-primary">Start a school club or chapter <ExternalLink size={15} /></a>
+      </section>
 
       <QueryStatus
         isLoading={chaptersLoading}
         error={chaptersError}
         isEmpty={!chapters?.length}
-        emptyMessage="No chapters yet. Admins can add chapters in Supabase."
+        emptyMessage="The chapter directory is growing. Apply to start a club in your school or city."
         onRetry={() => refetchChapters()}
         skeletonCount={2}
       >
@@ -94,6 +101,7 @@ export default function EventsChapters() {
               chapters={chapters}
               selectedId={selectedChapter === "all" ? undefined : selectedChapter}
               onSelect={handleChapterSelect}
+              onReset={() => setSelectedChapter("all")}
             />
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
