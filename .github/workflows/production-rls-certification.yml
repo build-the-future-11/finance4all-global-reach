@@ -20,14 +20,16 @@ jobs:
     steps:
       - name: Initialize redacted certification evidence
         shell: bash
+        env:
+          EVIDENCE_DIR: ${{ runner.temp }}/production-rls-evidence
         run: |
           set -euo pipefail
-          mkdir -p production-rls-evidence
+          mkdir -p "$EVIDENCE_DIR"
           {
             printf 'checked_at=%s\n' "$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
             printf 'source_sha=%s\n' "$EXPECTED_SOURCE_SHA"
             printf 'result=PRECHECK_PENDING\n'
-          } > production-rls-evidence/preflight.txt
+          } > "$EVIDENCE_DIR/preflight.txt"
       - name: Checkout exact source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -56,6 +58,7 @@ jobs:
         shell: bash
         env:
           FINANCEMETA_DATABASE_URL: ${{ secrets.FINANCEMETA_DATABASE_URL }}
+          EVIDENCE_DIR: ${{ runner.temp }}/production-rls-evidence
         run: |
           set -euo pipefail
           {
@@ -68,31 +71,32 @@ jobs:
               "$FINANCEMETA_DATABASE_URL" \
               --file supabase/tests/account_lifecycle_rls_certification.sql
             printf 'result=PASS\n'
-          } 2>&1 | tee production-rls-evidence/rls-certification.log
+          } 2>&1 | tee "$EVIDENCE_DIR/rls-certification.log"
       - name: Finalize redacted certification evidence
         if: always()
         shell: bash
         env:
           CERTIFICATION_JOB_STATUS: ${{ job.status }}
+          EVIDENCE_DIR: ${{ runner.temp }}/production-rls-evidence
         run: |
           set -euo pipefail
-          test -f production-rls-evidence/preflight.txt
+          test -f "$EVIDENCE_DIR/preflight.txt"
           printf 'terminal_job_status=%s\n' "$CERTIFICATION_JOB_STATUS" \
-            >> production-rls-evidence/preflight.txt
-          if test -f production-rls-evidence/rls-certification.log; then
+            >> "$EVIDENCE_DIR/preflight.txt"
+          if test -f "$EVIDENCE_DIR/rls-certification.log"; then
             sha256sum \
-              production-rls-evidence/preflight.txt \
-              production-rls-evidence/rls-certification.log \
-              > production-rls-evidence/SHA256SUMS
+              "$EVIDENCE_DIR/preflight.txt" \
+              "$EVIDENCE_DIR/rls-certification.log" \
+              > "$EVIDENCE_DIR/SHA256SUMS"
           else
-            sha256sum production-rls-evidence/preflight.txt \
-              > production-rls-evidence/SHA256SUMS
+            sha256sum "$EVIDENCE_DIR/preflight.txt" \
+              > "$EVIDENCE_DIR/SHA256SUMS"
           fi
       - name: Retain production RLS evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: production-rls-${{ env.EXPECTED_SOURCE_SHA }}
-          path: production-rls-evidence
+          path: ${{ runner.temp }}/production-rls-evidence
           if-no-files-found: error
           retention-days: 30
