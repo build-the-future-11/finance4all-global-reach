@@ -17,7 +17,6 @@ jobs:
     env:
       PGSSLMODE: require
       EXPECTED_SOURCE_SHA: ${{ github.sha }}
-      FINANCEMETA_DATABASE_URL: ${{ secrets.FINANCEMETA_DATABASE_URL }}
     steps:
       - name: Initialize redacted certification evidence
         shell: bash
@@ -44,6 +43,8 @@ jobs:
           printf 'verified_source_sha=%s\n' "$actual" >> "$GITHUB_STEP_SUMMARY"
       - name: Require the canonical FinanceMeta database connection
         shell: bash
+        env:
+          FINANCEMETA_DATABASE_URL: ${{ secrets.FINANCEMETA_DATABASE_URL }}
         run: |
           set -euo pipefail
           test -n "$FINANCEMETA_DATABASE_URL"
@@ -53,6 +54,8 @@ jobs:
         run: psql --version
       - name: Run rollback-only two-identity authorization matrix
         shell: bash
+        env:
+          FINANCEMETA_DATABASE_URL: ${{ secrets.FINANCEMETA_DATABASE_URL }}
         run: |
           set -euo pipefail
           {
