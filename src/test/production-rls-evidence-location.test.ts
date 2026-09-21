@@ -23,17 +23,15 @@ describe("production RLS evidence location", () => {
     expect(uploadIndex).toBeGreaterThan(finalizeIndex);
 
     const preCheckout = workflow.slice(initializeIndex, checkoutIndex);
-    expect(preCheckout).toContain(
-      "EVIDENCE_DIR: ${{ runner.temp }}/production-rls-evidence",
-    );
-    expect(preCheckout).toContain('mkdir -p "$EVIDENCE_DIR"');
-    expect(preCheckout).toContain('> "$EVIDENCE_DIR/preflight.txt"');
-    expect(preCheckout).not.toContain("mkdir -p production-rls-evidence");
-    expect(preCheckout).not.toContain("> production-rls-evidence/preflight.txt");
+    expect(preCheckout).toContain('cd "$RUNNER_TEMP"');
+    expect(preCheckout).toContain("mkdir -p production-rls-evidence");
+    expect(preCheckout).toContain("> production-rls-evidence/preflight.txt");
 
-    expect(workflow).toContain('tee "$EVIDENCE_DIR/rls-certification.log"');
-    expect(workflow).toContain('test -f "$EVIDENCE_DIR/preflight.txt"');
-    expect(workflow).toContain('> "$EVIDENCE_DIR/SHA256SUMS"');
+    expect(workflow).toContain(
+      'tee "$RUNNER_TEMP/production-rls-evidence/rls-certification.log"',
+    );
+    expect(workflow).toContain("if test -f production-rls-evidence/rls-certification.log");
+    expect(workflow).toContain("production-rls-evidence/SHA256SUMS");
     expect(workflow).toContain(
       "path: ${{ runner.temp }}/production-rls-evidence",
     );
