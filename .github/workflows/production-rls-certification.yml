@@ -11,8 +11,23 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  validate-dispatch:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    env:
+      TARGET_REF: ${{ github.ref }}
+    steps:
+      - name: Require canonical production ref
+        shell: bash
+        run: |
+          set -euo pipefail
+          if test "$TARGET_REF" != "refs/heads/main"; then
+            printf 'Production RLS certification only runs from refs/heads/main; got %s\n' "$TARGET_REF" >&2
+            exit 1
+          fi
+
   two-identity-rls:
-    if: github.ref == 'refs/heads/main'
+    needs: validate-dispatch
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:
