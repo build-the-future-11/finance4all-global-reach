@@ -59,9 +59,12 @@ describe("FinanceMeta explicit membership authority", () => {
     );
   });
 
-  it("keeps enrollment and status mutation service-role only", () => {
+  it("keeps grant, reactivation, and status mutation service-role only", () => {
     expect(enrollmentMigration).toContain(
       "CREATE OR REPLACE FUNCTION public.financemeta_grant_membership(",
+    );
+    expect(enrollmentMigration).toContain(
+      "CREATE OR REPLACE FUNCTION public.financemeta_reactivate_membership(",
     );
     expect(enrollmentMigration).toContain(
       "CREATE OR REPLACE FUNCTION public.financemeta_set_membership_status(",
@@ -70,32 +73,55 @@ describe("FinanceMeta explicit membership authority", () => {
       "REVOKE ALL ON FUNCTION public.financemeta_grant_membership(uuid, text, uuid)",
     );
     expect(enrollmentMigration).toContain(
-      "REVOKE ALL ON FUNCTION public.financemeta_set_membership_status(uuid, text, uuid)",
+      "REVOKE ALL ON FUNCTION public.financemeta_reactivate_membership(uuid, text, bigint, uuid)",
+    );
+    expect(enrollmentMigration).toContain(
+      "REVOKE ALL ON FUNCTION public.financemeta_set_membership_status(uuid, text, bigint, uuid)",
     );
     expect(enrollmentMigration).toContain(
       "GRANT EXECUTE ON FUNCTION public.financemeta_grant_membership(uuid, text, uuid)\n  TO service_role",
     );
     expect(enrollmentMigration).toContain(
-      "GRANT EXECUTE ON FUNCTION public.financemeta_set_membership_status(uuid, text, uuid)\n  TO service_role",
+      "GRANT EXECUTE ON FUNCTION public.financemeta_reactivate_membership(uuid, text, bigint, uuid)\n  TO service_role",
+    );
+    expect(enrollmentMigration).toContain(
+      "GRANT EXECUTE ON FUNCTION public.financemeta_set_membership_status(uuid, text, bigint, uuid)\n  TO service_role",
     );
     expect(enrollmentMigration).not.toMatch(
-      /GRANT\s+EXECUTE\s+ON\s+FUNCTION\s+public\.financemeta_(?:grant_membership|set_membership_status)[\s\S]*?TO\s+authenticated/i,
+      /GRANT\s+EXECUTE\s+ON\s+FUNCTION\s+public\.financemeta_(?:grant_membership|reactivate_membership|set_membership_status)[\s\S]*?TO\s+authenticated/i,
     );
   });
 
-  it("requires explicit provenance for activation and keeps reactivation separate from status mutation", () => {
+  it("separates initial grant from revision-checked reactivation", () => {
+    expect(enrollmentMigration).toContain(
+      "ADD COLUMN IF NOT EXISTS revision bigint NOT NULL DEFAULT 1 CHECK (revision > 0)",
+    );
+    expect(enrollmentMigration).toContain(
+      "membership already exists; use revision-checked reactivation",
+    );
+    expect(enrollmentMigration).toContain(
+      "AND status IN ('suspended', 'revoked')",
+    );
+    expect(enrollmentMigration).toContain("AND revision = expected_revision");
+    expect(enrollmentMigration).toContain("revision = revision + 1");
+    expect(enrollmentMigration).toContain(
+      "membership changed since it was read or is not inactive",
+    );
+    expect(enrollmentMigration).not.toContain("ON CONFLICT (user_id) DO UPDATE SET");
+  });
+
+  it("requires explicit provenance for activation and keeps activation out of status mutation", () => {
     expect(enrollmentMigration).toContain(
       "normalized_source text := NULLIF(pg_catalog.btrim(enrollment_source), '')",
     );
     expect(enrollmentMigration).toContain(
       "membership source must be between 1 and 120 characters",
     );
-    expect(enrollmentMigration).toContain("status = 'active'");
     expect(enrollmentMigration).toContain(
       "IF target_status NOT IN ('suspended', 'revoked') THEN",
     );
     expect(enrollmentMigration).toContain(
-      "RAISE EXCEPTION 'membership not found' USING ERRCODE = 'P0002'",
+      "expected membership revision must be a positive integer",
     );
     expect(enrollmentMigration).not.toMatch(/raw_user_meta_data|raw_app_meta_data/i);
     expect(enrollmentMigration).toContain(
@@ -103,19 +129,19 @@ describe("FinanceMeta explicit membership authority", () => {
     );
   });
 
-  it("preserves the original grant provenance across later reactivation", () => {
+  it("preserves original grant provenance and records later activation separately", () => {
     expect(enrollmentMigration).toContain("last_activated_at timestamptz");
     expect(enrollmentMigration).toContain("last_activation_source text");
-    const conflictClause = enrollmentMigration.split(
-      "ON CONFLICT (user_id) DO UPDATE SET",
-    )[1];
-    expect(conflictClause).toBeTruthy();
-    expect(conflictClause).toContain("last_activated_at = pg_catalog.now()");
-    expect(conflictClause).toContain(
-      "last_activation_source = EXCLUDED.last_activation_source",
+    const reactivationFunction = enrollmentMigration.split(
+      "CREATE OR REPLACE FUNCTION public.financemeta_reactivate_membership(",
+    )[1]?.split("CREATE OR REPLACE FUNCTION public.financemeta_set_membership_status(")[0];
+    expect(reactivationFunction).toBeTruthy();
+    expect(reactivationFunction).toContain("last_activated_at = pg_catalog.now()");
+    expect(reactivationFunction).toContain(
+      "last_activation_source = normalized_source",
     );
-    expect(conflictClause).not.toMatch(/\bgranted_at\s*=/);
-    expect(conflictClause).not.toMatch(/\bgranted_by\s*=/);
-    expect(conflictClause).not.toMatch(/\bsource\s*=/);
+    expect(reactivationFunction).not.toMatch(/\bgranted_at\s*=/);
+    expect(reactivationFunction).not.toMatch(/\bgranted_by\s*=/);
+    expect(reactivationFunction).not.toMatch(/\bsource\s*=/);
   });
 });
