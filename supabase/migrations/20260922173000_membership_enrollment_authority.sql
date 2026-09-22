@@ -46,7 +46,15 @@ SECURITY DEFINER
 SET search_path = ''
 AS $$
 DECLARE
-  normalized_source text := NULLIF(pg_catalog.btrim(enrollment_source), '');
+  normalized_source text := NULLIF(
+    pg_catalog.regexp_replace(
+      enrollment_source,
+      '^[[:space:]]+|[[:space:]]+$',
+      '',
+      'g'
+    ),
+    ''
+  );
 BEGIN
   IF target_user_id IS NULL THEN
     RAISE EXCEPTION 'target user is required' USING ERRCODE = '22004';
@@ -94,7 +102,15 @@ SECURITY DEFINER
 SET search_path = ''
 AS $$
 DECLARE
-  normalized_source text := NULLIF(pg_catalog.btrim(enrollment_source), '');
+  normalized_source text := NULLIF(
+    pg_catalog.regexp_replace(
+      enrollment_source,
+      '^[[:space:]]+|[[:space:]]+$',
+      '',
+      'g'
+    ),
+    ''
+  );
 BEGIN
   IF target_user_id IS NULL THEN
     RAISE EXCEPTION 'target user is required' USING ERRCODE = '22004';
