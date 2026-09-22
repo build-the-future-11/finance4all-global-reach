@@ -129,6 +129,21 @@ describe("FinanceMeta explicit membership authority", () => {
     );
   });
 
+  it("keeps inactive-state changes monotonic and requires explicit reactivation", () => {
+    expect(enrollmentMigration).toContain(
+      "(status = 'active' AND target_status IN ('suspended', 'revoked'))",
+    );
+    expect(enrollmentMigration).toContain(
+      "OR (status = 'suspended' AND target_status = 'revoked')",
+    );
+    expect(enrollmentMigration).toContain(
+      "membership changed since it was read or transition is not allowed",
+    );
+    expect(enrollmentMigration).not.toContain(
+      "AND status <> target_status;",
+    );
+  });
+
   it("preserves original grant provenance and records later activation separately", () => {
     expect(enrollmentMigration).toContain("last_activated_at timestamptz");
     expect(enrollmentMigration).toContain("last_activation_source text");
