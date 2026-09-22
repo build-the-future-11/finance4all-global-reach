@@ -131,9 +131,15 @@ describe("FinanceMeta explicit membership authority", () => {
     expect(enrollmentMigration).not.toContain("ON CONFLICT (user_id) DO UPDATE SET");
   });
 
-  it("requires explicit provenance for activation and keeps activation out of status mutation", () => {
-    expect(enrollmentMigration).toContain(
-      "normalized_source text := NULLIF(pg_catalog.btrim(enrollment_source), '')",
+  it("requires canonical provenance for activation and keeps activation out of status mutation", () => {
+    expect(
+      enrollmentMigration.match(
+        /\^\[\[:space:\]\]\+\|\[\[:space:\]\]\+\$/g,
+      ),
+    ).toHaveLength(2);
+    expect(enrollmentMigration).toContain("pg_catalog.regexp_replace(");
+    expect(enrollmentMigration).not.toContain(
+      "NULLIF(pg_catalog.btrim(enrollment_source), '')",
     );
     expect(enrollmentMigration).toContain(
       "membership source must be between 1 and 120 characters",
