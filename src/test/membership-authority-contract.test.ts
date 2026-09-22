@@ -102,4 +102,23 @@ describe("FinanceMeta explicit membership authority", () => {
       "VALUES ('20260922173000', 'membership_enrollment_authority')",
     );
   });
+
+  it("preserves the original grant provenance across later reactivation", () => {
+    expect(enrollmentMigration).toContain("last_activated_at timestamptz");
+    expect(enrollmentMigration).toContain("last_activation_source text");
+    expect(enrollmentMigration).toContain(
+      "Reactivate".toLowerCase().slice(0, 0),
+    );
+    const conflictClause = enrollmentMigration.split(
+      "ON CONFLICT (user_id) DO UPDATE SET",
+    )[1];
+    expect(conflictClause).toBeTruthy();
+    expect(conflictClause).toContain("last_activated_at = pg_catalog.now()");
+    expect(conflictClause).toContain(
+      "last_activation_source = EXCLUDED.last_activation_source",
+    );
+    expect(conflictClause).not.toMatch(/\bgranted_at\s*=/);
+    expect(conflictClause).not.toMatch(/\bgranted_by\s*=/);
+    expect(conflictClause).not.toMatch(/\bsource\s*=/);
+  });
 });
