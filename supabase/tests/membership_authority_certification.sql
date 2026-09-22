@@ -1,7 +1,7 @@
 BEGIN;
 
 CREATE EXTENSION IF NOT EXISTS pgtap WITH SCHEMA extensions;
-SELECT plan(34);
+SELECT plan(35);
 
 SELECT ok(
   NOT has_table_privilege('authenticated', 'private.financemeta_memberships', 'select'),
@@ -90,6 +90,16 @@ SET LOCAL ROLE service_role;
 SELECT throws_ok(
   $$SELECT public.financemeta_grant_membership(
     '20000000-0000-0000-0000-000000000001',
+    E' \t\r\n ',
+    '20000000-0000-0000-0000-000000000002'
+  )$$,
+  '22023',
+  'membership source must be between 1 and 120 characters',
+  'initial grant rejects provenance made only of non-space whitespace'
+);
+SELECT throws_ok(
+  $$SELECT public.financemeta_grant_membership(
+    '20000000-0000-0000-0000-000000000001',
     'test:invalid-actor',
     '29999999-9999-9999-9999-999999999999'
   )$$,
@@ -100,10 +110,10 @@ SELECT throws_ok(
 SELECT lives_ok(
   $$SELECT public.financemeta_grant_membership(
     '20000000-0000-0000-0000-000000000001',
-    'test:controlled-enrollment',
+    E' \ttest:controlled-enrollment\r\n ',
     '20000000-0000-0000-0000-000000000002'
   )$$,
-  'service-owned enrollment can explicitly grant membership with provenance'
+  'service-owned enrollment can explicitly grant membership with canonical provenance'
 );
 RESET ROLE;
 
@@ -182,13 +192,13 @@ SET LOCAL ROLE service_role;
 SELECT throws_ok(
   $$SELECT public.financemeta_reactivate_membership(
     '20000000-0000-0000-0000-000000000001',
-    '   ',
+    E' \t\r\n ',
     2,
     '20000000-0000-0000-0000-000000000003'
   )$$,
   '22023',
   'membership source must be between 1 and 120 characters',
-  'reactivation fails closed without bounded provenance'
+  'reactivation fails closed without canonical bounded provenance'
 );
 SELECT throws_ok(
   $$SELECT public.financemeta_reactivate_membership(
@@ -215,11 +225,11 @@ SELECT throws_ok(
 SELECT lives_ok(
   $$SELECT public.financemeta_reactivate_membership(
     '20000000-0000-0000-0000-000000000001',
-    'test:controlled-reactivation',
+    E'\ttest:controlled-reactivation\r\n',
     2,
     '20000000-0000-0000-0000-000000000003'
   )$$,
-  'reactivation succeeds only against the exact inactive revision'
+  'reactivation succeeds only against the exact inactive revision with canonical provenance'
 );
 RESET ROLE;
 
@@ -234,7 +244,7 @@ SELECT is(
   (SELECT source FROM private.financemeta_memberships
    WHERE user_id = '20000000-0000-0000-0000-000000000001'),
   'test:controlled-enrollment',
-  'reactivation preserves the original grant source'
+  'initial grant stores trimmed canonical provenance'
 );
 SELECT is(
   (SELECT granted_by::text FROM private.financemeta_memberships
@@ -246,7 +256,7 @@ SELECT is(
   (SELECT last_activation_source FROM private.financemeta_memberships
    WHERE user_id = '20000000-0000-0000-0000-000000000001'),
   'test:controlled-reactivation',
-  'reactivation records its own bounded provenance separately'
+  'reactivation stores trimmed canonical provenance separately'
 );
 SELECT is(
   (SELECT last_activated_by::text FROM private.financemeta_memberships
