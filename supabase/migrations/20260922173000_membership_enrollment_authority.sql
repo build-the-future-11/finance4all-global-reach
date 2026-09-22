@@ -10,7 +10,23 @@ BEGIN;
 
 ALTER TABLE private.financemeta_memberships
   ADD COLUMN IF NOT EXISTS updated_at timestamptz NOT NULL DEFAULT pg_catalog.now(),
-  ADD COLUMN IF NOT EXISTS updated_by uuid REFERENCES auth.users(id) ON DELETE SET NULL;
+  ADD COLUMN IF NOT EXISTS updated_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  ADD COLUMN IF NOT EXISTS last_activated_at timestamptz,
+  ADD COLUMN IF NOT EXISTS last_activated_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  ADD COLUMN IF NOT EXISTS last_activation_source text
+    CHECK (
+      last_activation_source IS NULL
+      OR pg_catalog.char_length(pg_catalog.btrim(last_activation_source)) BETWEEN 1 AND 120
+    );
+
+COMMENT ON COLUMN private.financemeta_memberships.granted_at IS
+  'Timestamp of the original membership grant. Reactivation must not rewrite it.';
+COMMENT ON COLUMN private.financemeta_memberships.granted_by IS
+  'Actor associated with the original membership grant. Reactivation must not rewrite it.';
+COMMENT ON COLUMN private.financemeta_memberships.source IS
+  'Original bounded enrollment provenance. Reactivation provenance is stored separately.';
+COMMENT ON COLUMN private.financemeta_memberships.last_activation_source IS
+  'Most recent explicit activation/reactivation provenance; null only for legacy rows predating this authority.';
 
 CREATE OR REPLACE FUNCTION public.financemeta_grant_membership(
   target_user_id uuid,
@@ -35,19 +51,22 @@ BEGIN
   END IF;
 
   INSERT INTO private.financemeta_memberships (
-    user_id, status, granted_at, granted_by, source, updated_at, updated_by
+    user_id, status, granted_at, granted_by, source,
+    updated_at, updated_by,
+    last_activated_at, last_activated_by, last_activation_source
   )
   VALUES (
-    target_user_id, 'active', pg_catalog.now(), actor_user_id,
-    normalized_source, pg_catalog.now(), actor_user_id
+    target_user_id, 'active', pg_catalog.now(), actor_user_id, normalized_source,
+    pg_catalog.now(), actor_user_id,
+    pg_catalog.now(), actor_user_id, normalized_source
   )
   ON CONFLICT (user_id) DO UPDATE SET
     status = 'active',
-    granted_at = pg_catalog.now(),
-    granted_by = EXCLUDED.granted_by,
-    source = EXCLUDED.source,
     updated_at = pg_catalog.now(),
-    updated_by = EXCLUDED.updated_by;
+    updated_by = EXCLUDED.updated_by,
+    last_activated_at = pg_catalog.now(),
+    last_activated_by = EXCLUDED.last_activated_by,
+    last_activation_source = EXCLUDED.last_activation_source;
 END;
 $$;
 
