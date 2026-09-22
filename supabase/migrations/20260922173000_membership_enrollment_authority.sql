@@ -10,10 +10,10 @@ BEGIN;
 
 ALTER TABLE private.financemeta_memberships
   ADD COLUMN IF NOT EXISTS updated_at timestamptz NOT NULL DEFAULT pg_catalog.now(),
-  ADD COLUMN IF NOT EXISTS updated_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  ADD COLUMN IF NOT EXISTS updated_by uuid,
   ADD COLUMN IF NOT EXISTS revision bigint NOT NULL DEFAULT 1 CHECK (revision > 0),
   ADD COLUMN IF NOT EXISTS last_activated_at timestamptz,
-  ADD COLUMN IF NOT EXISTS last_activated_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  ADD COLUMN IF NOT EXISTS last_activated_by uuid,
   ADD COLUMN IF NOT EXISTS last_activation_source text
     CHECK (
       last_activation_source IS NULL
@@ -23,11 +23,15 @@ ALTER TABLE private.financemeta_memberships
 COMMENT ON COLUMN private.financemeta_memberships.granted_at IS
   'Timestamp of the original membership grant. Reactivation must not rewrite it.';
 COMMENT ON COLUMN private.financemeta_memberships.granted_by IS
-  'Actor associated with the original membership grant. Reactivation must not rewrite it.';
+  'Original grant actor UUID validated when recorded and retained if that auth identity is later deleted.';
 COMMENT ON COLUMN private.financemeta_memberships.source IS
   'Original bounded enrollment provenance. Reactivation provenance is stored separately.';
+COMMENT ON COLUMN private.financemeta_memberships.updated_by IS
+  'Latest mutation actor UUID validated when recorded and retained if that auth identity is later deleted.';
 COMMENT ON COLUMN private.financemeta_memberships.revision IS
   'Monotonic optimistic-concurrency token for server-owned membership mutations.';
+COMMENT ON COLUMN private.financemeta_memberships.last_activated_by IS
+  'Most recent activation actor UUID validated when recorded and retained if that auth identity is later deleted.';
 COMMENT ON COLUMN private.financemeta_memberships.last_activation_source IS
   'Most recent explicit activation/reactivation provenance; null only for legacy rows predating this authority.';
 
@@ -46,6 +50,13 @@ DECLARE
 BEGIN
   IF target_user_id IS NULL THEN
     RAISE EXCEPTION 'target user is required' USING ERRCODE = '22004';
+  END IF;
+
+  IF actor_user_id IS NOT NULL AND NOT EXISTS (
+    SELECT 1 FROM auth.users AS actor WHERE actor.id = actor_user_id
+  ) THEN
+    RAISE EXCEPTION 'membership actor must reference an existing auth user'
+      USING ERRCODE = '22023';
   END IF;
 
   IF normalized_source IS NULL OR pg_catalog.char_length(normalized_source) > 120 THEN
@@ -91,6 +102,13 @@ BEGIN
 
   IF expected_revision IS NULL OR expected_revision <= 0 THEN
     RAISE EXCEPTION 'expected membership revision must be a positive integer'
+      USING ERRCODE = '22023';
+  END IF;
+
+  IF actor_user_id IS NOT NULL AND NOT EXISTS (
+    SELECT 1 FROM auth.users AS actor WHERE actor.id = actor_user_id
+  ) THEN
+    RAISE EXCEPTION 'membership actor must reference an existing auth user'
       USING ERRCODE = '22023';
   END IF;
 
@@ -141,6 +159,13 @@ BEGIN
 
   IF expected_revision IS NULL OR expected_revision <= 0 THEN
     RAISE EXCEPTION 'expected membership revision must be a positive integer'
+      USING ERRCODE = '22023';
+  END IF;
+
+  IF actor_user_id IS NOT NULL AND NOT EXISTS (
+    SELECT 1 FROM auth.users AS actor WHERE actor.id = actor_user_id
+  ) THEN
+    RAISE EXCEPTION 'membership actor must reference an existing auth user'
       USING ERRCODE = '22023';
   END IF;
 
