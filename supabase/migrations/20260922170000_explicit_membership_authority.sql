@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS private.financemeta_memberships (
   status text NOT NULL DEFAULT 'active'
     CHECK (status IN ('active', 'suspended', 'revoked')),
   granted_at timestamptz NOT NULL DEFAULT pg_catalog.now(),
-  granted_by uuid REFERENCES auth.users(id) ON DELETE SET NULL,
+  granted_by uuid,
   source text NOT NULL
     CHECK (pg_catalog.char_length(pg_catalog.btrim(source)) BETWEEN 1 AND 120)
 );
@@ -27,6 +27,8 @@ REVOKE ALL ON TABLE private.financemeta_memberships FROM PUBLIC, anon, authentic
 
 COMMENT ON TABLE private.financemeta_memberships IS
   'Server-owned FinanceMeta authorization records. Profile existence is not membership.';
+COMMENT ON COLUMN private.financemeta_memberships.granted_by IS
+  'Original grant actor UUID captured at mutation time and retained even if that auth identity is later deleted.';
 COMMENT ON COLUMN private.financemeta_memberships.source IS
   'Bounded enrollment provenance such as invite/program/admin workflow; never user-editable metadata.';
 
