@@ -1,7 +1,7 @@
 BEGIN;
 
 CREATE EXTENSION IF NOT EXISTS pgtap WITH SCHEMA extensions;
-SELECT plan(17);
+SELECT plan(27);
 
 SELECT ok(
   NOT has_table_privilege('authenticated', 'private.financemeta_memberships', 'select'),
@@ -13,12 +13,20 @@ SELECT ok(
     'public.financemeta_grant_membership(uuid,text,uuid)',
     'execute'
   ),
-  'authenticated browser users cannot grant or reactivate membership'
+  'authenticated browser users cannot grant membership'
 );
 SELECT ok(
   NOT has_function_privilege(
     'authenticated',
-    'public.financemeta_set_membership_status(uuid,text,uuid)',
+    'public.financemeta_reactivate_membership(uuid,text,bigint,uuid)',
+    'execute'
+  ),
+  'authenticated browser users cannot reactivate membership'
+);
+SELECT ok(
+  NOT has_function_privilege(
+    'authenticated',
+    'public.financemeta_set_membership_status(uuid,text,bigint,uuid)',
     'execute'
   ),
   'authenticated browser users cannot suspend or revoke membership'
@@ -29,15 +37,23 @@ SELECT ok(
     'public.financemeta_grant_membership(uuid,text,uuid)',
     'execute'
   ),
-  'service role owns the bounded membership grant path'
+  'service role owns the bounded initial membership grant path'
 );
 SELECT ok(
   has_function_privilege(
     'service_role',
-    'public.financemeta_set_membership_status(uuid,text,uuid)',
+    'public.financemeta_reactivate_membership(uuid,text,bigint,uuid)',
     'execute'
   ),
-  'service role owns the bounded membership status path'
+  'service role owns the revision-checked membership reactivation path'
+);
+SELECT ok(
+  has_function_privilege(
+    'service_role',
+    'public.financemeta_set_membership_status(uuid,text,bigint,uuid)',
+    'execute'
+  ),
+  'service role owns the revision-checked membership status path'
 );
 
 INSERT INTO auth.users (
@@ -88,22 +104,34 @@ RESET ROLE;
 
 SET LOCAL ROLE service_role;
 SELECT throws_ok(
+  $$SELECT public.financemeta_grant_membership(
+    '20000000-0000-0000-0000-000000000001',
+    'test:blind-regrant',
+    '20000000-0000-0000-0000-000000000002'
+  )$$,
+  'P0003',
+  'membership already exists; use revision-checked reactivation',
+  'blind grant retries cannot overwrite an existing membership'
+);
+SELECT throws_ok(
   $$SELECT public.financemeta_set_membership_status(
     '20000000-0000-0000-0000-000000000001',
     'active',
+    1,
     '20000000-0000-0000-0000-000000000001'
   )$$,
   '22023',
   'status changes must suspend or revoke membership',
-  'status mutation cannot reactivate membership without the provenance-bearing grant path'
+  'status mutation cannot reactivate membership'
 );
 SELECT lives_ok(
   $$SELECT public.financemeta_set_membership_status(
     '20000000-0000-0000-0000-000000000001',
     'suspended',
+    1,
     '20000000-0000-0000-0000-000000000001'
   )$$,
-  'service role can suspend an existing membership'
+  'service role can suspend the exact membership revision it reviewed'
 );
 RESET ROLE;
 
@@ -114,31 +142,51 @@ SELECT ok(
 );
 RESET ROLE;
 
+SELECT is(
+  (SELECT revision FROM private.financemeta_memberships
+   WHERE user_id = '20000000-0000-0000-0000-000000000001'),
+  2::bigint,
+  'suspension advances the optimistic-concurrency revision'
+);
+
 SET LOCAL ROLE service_role;
 SELECT throws_ok(
-  $$SELECT public.financemeta_grant_membership(
+  $$SELECT public.financemeta_reactivate_membership(
     '20000000-0000-0000-0000-000000000001',
     '   ',
+    2,
     '20000000-0000-0000-0000-000000000002'
   )$$,
   '22023',
   'membership source must be between 1 and 120 characters',
-  'activation fails closed without bounded enrollment provenance'
+  'reactivation fails closed without bounded provenance'
 );
-SELECT lives_ok(
-  $$SELECT public.financemeta_grant_membership(
+SELECT throws_ok(
+  $$SELECT public.financemeta_reactivate_membership(
     '20000000-0000-0000-0000-000000000001',
-    'test:controlled-reactivation',
+    'test:stale-reactivation',
+    1,
     '20000000-0000-0000-0000-000000000002'
   )$$,
-  'reactivation must return through the explicit provenance-bearing grant path'
+  'P0003',
+  'membership changed since it was read or is not inactive',
+  'stale reactivation cannot overwrite a newer suspension'
+);
+SELECT lives_ok(
+  $$SELECT public.financemeta_reactivate_membership(
+    '20000000-0000-0000-0000-000000000001',
+    'test:controlled-reactivation',
+    2,
+    '20000000-0000-0000-0000-000000000002'
+  )$$,
+  'reactivation succeeds only against the exact inactive revision'
 );
 RESET ROLE;
 
 SET LOCAL ROLE authenticated;
 SELECT ok(
   public.financemeta_is_member(),
-  'explicit reactivation restores the active-member predicate'
+  'revision-checked reactivation restores the active-member predicate'
 );
 RESET ROLE;
 
@@ -165,6 +213,49 @@ SELECT is(
    WHERE user_id = '20000000-0000-0000-0000-000000000001'),
   '20000000-0000-0000-0000-000000000002',
   'reactivation records its own actor separately'
+);
+SELECT is(
+  (SELECT revision FROM private.financemeta_memberships
+   WHERE user_id = '20000000-0000-0000-0000-000000000001'),
+  3::bigint,
+  'reactivation advances the optimistic-concurrency revision'
+);
+
+SET LOCAL ROLE service_role;
+SELECT throws_ok(
+  $$SELECT public.financemeta_set_membership_status(
+    '20000000-0000-0000-0000-000000000001',
+    'revoked',
+    2,
+    '20000000-0000-0000-0000-000000000001'
+  )$$,
+  'P0003',
+  'membership changed since it was read or already has that status',
+  'stale status mutation cannot overwrite a newer reactivation'
+);
+SELECT lives_ok(
+  $$SELECT public.financemeta_set_membership_status(
+    '20000000-0000-0000-0000-000000000001',
+    'revoked',
+    3,
+    '20000000-0000-0000-0000-000000000001'
+  )$$,
+  'current revision can be revoked explicitly'
+);
+RESET ROLE;
+
+SET LOCAL ROLE authenticated;
+SELECT ok(
+  NOT public.financemeta_is_member(),
+  'revoked membership fails the active-member predicate'
+);
+RESET ROLE;
+
+SELECT is(
+  (SELECT revision FROM private.financemeta_memberships
+   WHERE user_id = '20000000-0000-0000-0000-000000000001'),
+  4::bigint,
+  'revocation advances the optimistic-concurrency revision'
 );
 
 CREATE TEMP TABLE membership_authority_tap_finish (failure text);
