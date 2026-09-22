@@ -106,9 +106,6 @@ describe("FinanceMeta explicit membership authority", () => {
   it("preserves the original grant provenance across later reactivation", () => {
     expect(enrollmentMigration).toContain("last_activated_at timestamptz");
     expect(enrollmentMigration).toContain("last_activation_source text");
-    expect(enrollmentMigration).toContain(
-      "Reactivate".toLowerCase().slice(0, 0),
-    );
     const conflictClause = enrollmentMigration.split(
       "ON CONFLICT (user_id) DO UPDATE SET",
     )[1];
