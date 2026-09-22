@@ -92,6 +92,27 @@ describe("FinanceMeta explicit membership authority", () => {
     );
   });
 
+  it("retains validated actor audit ids independently of auth-user lifetime", () => {
+    expect(membershipMigration).toContain("granted_by uuid,");
+    expect(membershipMigration).not.toContain(
+      "granted_by uuid REFERENCES auth.users(id)",
+    );
+    expect(enrollmentMigration).toContain(
+      "ADD COLUMN IF NOT EXISTS updated_by uuid,",
+    );
+    expect(enrollmentMigration).toContain(
+      "ADD COLUMN IF NOT EXISTS last_activated_by uuid,",
+    );
+    expect(enrollmentMigration).not.toMatch(
+      /(?:updated_by|last_activated_by)\s+uuid\s+REFERENCES\s+auth\.users/i,
+    );
+    expect(
+      enrollmentMigration.match(
+        /membership actor must reference an existing auth user/g,
+      ),
+    ).toHaveLength(3);
+  });
+
   it("separates initial grant from revision-checked reactivation", () => {
     expect(enrollmentMigration).toContain(
       "ADD COLUMN IF NOT EXISTS revision bigint NOT NULL DEFAULT 1 CHECK (revision > 0)",
