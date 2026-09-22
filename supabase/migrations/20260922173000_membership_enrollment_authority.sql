@@ -156,7 +156,10 @@ BEGIN
       revision = revision + 1
   WHERE user_id = target_user_id
     AND revision = expected_revision
-    AND status <> target_status;
+    AND (
+      (status = 'active' AND target_status IN ('suspended', 'revoked'))
+      OR (status = 'suspended' AND target_status = 'revoked')
+    );
 
   IF NOT FOUND THEN
     IF NOT EXISTS (
@@ -164,7 +167,7 @@ BEGIN
     ) THEN
       RAISE EXCEPTION 'membership not found' USING ERRCODE = 'P0002';
     END IF;
-    RAISE EXCEPTION 'membership changed since it was read or already has that status'
+    RAISE EXCEPTION 'membership changed since it was read or transition is not allowed'
       USING ERRCODE = 'P0003';
   END IF;
 END;
