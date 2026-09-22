@@ -1,7 +1,7 @@
 BEGIN;
 
 CREATE EXTENSION IF NOT EXISTS pgtap WITH SCHEMA extensions;
-SELECT plan(32);
+SELECT plan(34);
 
 SELECT ok(
   NOT has_table_privilege('anon', 'public.account_deletion_requests', 'select'),
@@ -178,6 +178,20 @@ SELECT ok(
    FROM public.account_deletion_requests
    WHERE user_id = '10000000-0000-0000-0000-000000000003'),
   'admin self-resubmission returns to pending without fabricated review metadata'
+);
+SELECT lives_ok(
+  $$UPDATE public.account_deletion_requests
+    SET status = 'in_progress', review_note = 'Admin own request entered review'
+    WHERE user_id = '10000000-0000-0000-0000-000000000003'$$,
+  'an administrator can place their own pending request into review'
+);
+SELECT throws_ok(
+  $$UPDATE public.account_deletion_requests
+    SET status = 'pending'
+    WHERE user_id = '10000000-0000-0000-0000-000000000003'$$,
+  'P0003',
+  'reviewed deletion requests cannot be moved back to pending',
+  'an administrator cannot bypass the lifecycle RPC by reopening their own in-review request'
 );
 SELECT lives_ok(
   $$UPDATE public.account_deletion_requests
