@@ -33,6 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getAdministrativeReviewStatuses } from "@/lib/accountDeletionReview";
 import type { NewsCategory, OpportunityType } from "@/types/domain";
 import type { AccountDeletionStatus } from "@/types/database";
 import { toast } from "sonner";
@@ -84,7 +85,7 @@ export default function Admin() {
     difficulty: "beginner" as "beginner" | "intermediate",
   });
   const [deletionReviews, setDeletionReviews] = useState<
-    Record<string, { status: AccountDeletionStatus; reviewNote: string }>
+    Record<string, { status: AccountDeletionStatus; reviewNote: string; expectedUpdatedAt: string }>
   >({});
 
   const parseTags = (s: string) =>
@@ -352,7 +353,9 @@ export default function Admin() {
             const review = deletionReviews[request.id] ?? {
               status: request.status,
               reviewNote: request.review_note ?? "",
+              expectedUpdatedAt: request.updated_at,
             };
+            const reviewStatuses = getAdministrativeReviewStatuses(request.status);
             return (
               <PortalCard key={request.id} className="p-5">
                 <div className="flex flex-wrap items-start justify-between gap-3">
@@ -381,7 +384,7 @@ export default function Admin() {
                   >
                     <SelectTrigger aria-label={`Review status for ${request.contact_email}`} className={portalInputClass}><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      {(["pending", "in_progress", "rejected", "cancelled"] as const).map((status) => (
+                      {reviewStatuses.map((status) => (
                         <SelectItem key={status} value={status}>{status.replace("_", " ")}</SelectItem>
                       ))}
                     </SelectContent>
@@ -406,6 +409,12 @@ export default function Admin() {
                           id: request.id,
                           status: review.status,
                           reviewNote: review.reviewNote,
+                          expectedUpdatedAt: review.expectedUpdatedAt,
+                        });
+                        setDeletionReviews((current) => {
+                          const next = { ...current };
+                          delete next[request.id];
+                          return next;
                         });
                         toast.success("Account request updated");
                       } catch (e) {
