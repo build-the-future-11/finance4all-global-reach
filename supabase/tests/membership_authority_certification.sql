@@ -1,7 +1,7 @@
 BEGIN;
 
 CREATE EXTENSION IF NOT EXISTS pgtap WITH SCHEMA extensions;
-SELECT plan(27);
+SELECT plan(28);
 
 SELECT ok(
   NOT has_table_privilege('authenticated', 'private.financemeta_memberships', 'select'),
@@ -230,7 +230,7 @@ SELECT throws_ok(
     '20000000-0000-0000-0000-000000000001'
   )$$,
   'P0003',
-  'membership changed since it was read or already has that status',
+  'membership changed since it was read or transition is not allowed',
   'stale status mutation cannot overwrite a newer reactivation'
 );
 SELECT lives_ok(
@@ -241,6 +241,17 @@ SELECT lives_ok(
     '20000000-0000-0000-0000-000000000001'
   )$$,
   'current revision can be revoked explicitly'
+);
+SELECT throws_ok(
+  $$SELECT public.financemeta_set_membership_status(
+    '20000000-0000-0000-0000-000000000001',
+    'suspended',
+    4,
+    '20000000-0000-0000-0000-000000000001'
+  )$$,
+  'P0003',
+  'membership changed since it was read or transition is not allowed',
+  'revoked membership cannot be downgraded to suspended without explicit reactivation'
 );
 RESET ROLE;
 
