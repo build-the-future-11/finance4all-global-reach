@@ -58,12 +58,16 @@ jobs:
           test -n "$repo_digests"
           test "$repo_digests" != "null"
           test "$repo_digests" != "[]"
+          expected_digest="${EXPECTED_POSTGRES_IMAGE_REF##*@}"
+          test -n "$expected_digest"
+          printf '%s' "$repo_digests" | grep -Fq "@${expected_digest}"
           postgres_version="$(docker exec "$POSTGRES_CONTAINER" postgres --version)"
           test -n "$postgres_version"
           {
             printf 'configured_postgres_image=%s\n' "$EXPECTED_POSTGRES_IMAGE_REF"
             printf 'resolved_postgres_image_id=%s\n' "$image_id"
             printf 'resolved_postgres_repo_digests=%s\n' "$repo_digests"
+            printf 'resolved_postgres_matches_configured=true\n'
             printf 'postgres_server_version=%s\n' "$postgres_version"
           } > "$evidence_dir/postgres-image.txt"
           printf 'resolved_postgres_image_id=%s\n' "$image_id" >> "$GITHUB_STEP_SUMMARY"
