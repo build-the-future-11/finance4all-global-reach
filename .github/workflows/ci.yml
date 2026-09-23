@@ -42,6 +42,27 @@ jobs:
           actual="$(git rev-parse HEAD)"
           test "$actual" = "$EXPECTED_SOURCE_SHA"
           printf 'verified_database_authorization_source_sha=%s\n' "$actual" >> "$GITHUB_STEP_SUMMARY"
+      - name: Record database authorization provenance
+        shell: bash
+        run: |
+          set -euo pipefail
+          evidence_dir="$RUNNER_TEMP/database-authorization-evidence"
+          mkdir -p "$evidence_dir"
+          {
+            printf 'source_sha=%s\n' "$EXPECTED_SOURCE_SHA"
+            printf 'event_sha=%s\n' "$GITHUB_SHA"
+            printf 'workflow_sha=%s\n' "$GITHUB_WORKFLOW_SHA"
+            printf 'workflow_ref=%s\n' "$GITHUB_WORKFLOW_REF"
+            printf 'runner_os=%s\n' "$RUNNER_OS"
+            printf 'runner_arch=%s\n' "$RUNNER_ARCH"
+          } > "$evidence_dir/provenance.txt"
+          {
+            sha256sum .github/workflows/ci.yml
+            find supabase/migrations -maxdepth 1 -type f -name '*.sql' -print0 | sort -z | xargs -0 -r sha256sum
+            sha256sum supabase/tests/bare_postgres_bootstrap.sql
+            sha256sum supabase/tests/two_identity_rls_certification.sql
+            sha256sum supabase/tests/account_lifecycle_rls_certification.sql
+          } > "$evidence_dir/input-sha256.txt"
       - name: Replay migrations and certify account lifecycle RLS
         shell: bash
         env:
@@ -49,14 +70,26 @@ jobs:
         run: |
           set -euo pipefail
           test -n "$POSTGRES_CONTAINER"
-          docker cp supabase/tests/bare_postgres_bootstrap.sql "$POSTGRES_CONTAINER:/tmp/bare_postgres_bootstrap.sql"
-          docker cp supabase/migrations/. "$POSTGRES_CONTAINER:/tmp/portal-migrations/"
-          docker cp supabase/tests/two_identity_rls_certification.sql "$POSTGRES_CONTAINER:/tmp/two_identity_rls_certification.sql"
-          docker cp supabase/tests/account_lifecycle_rls_certification.sql "$POSTGRES_CONTAINER:/tmp/account_lifecycle_rls_certification.sql"
-          docker exec "$POSTGRES_CONTAINER" psql -v ON_ERROR_STOP=1 -U supabase_admin -d postgres -f /tmp/bare_postgres_bootstrap.sql
-          docker exec "$POSTGRES_CONTAINER" sh -lc 'set -eu; for migration in /tmp/portal-migrations/*.sql; do psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f "$migration"; done'
-          docker exec "$POSTGRES_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/two_identity_rls_certification.sql
-          docker exec "$POSTGRES_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/account_lifecycle_rls_certification.sql
+          evidence_dir="$RUNNER_TEMP/database-authorization-evidence"
+          mkdir -p "$evidence_dir"
+          {
+            docker cp supabase/tests/bare_postgres_bootstrap.sql "$POSTGRES_CONTAINER:/tmp/bare_postgres_bootstrap.sql"
+            docker cp supabase/migrations/. "$POSTGRES_CONTAINER:/tmp/portal-migrations/"
+            docker cp supabase/tests/two_identity_rls_certification.sql "$POSTGRES_CONTAINER:/tmp/two_identity_rls_certification.sql"
+            docker cp supabase/tests/account_lifecycle_rls_certification.sql "$POSTGRES_CONTAINER:/tmp/account_lifecycle_rls_certification.sql"
+            docker exec "$POSTGRES_CONTAINER" psql -v ON_ERROR_STOP=1 -U supabase_admin -d postgres -f /tmp/bare_postgres_bootstrap.sql
+            docker exec "$POSTGRES_CONTAINER" sh -lc 'set -eu; for migration in /tmp/portal-migrations/*.sql; do psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f "$migration"; done'
+            docker exec "$POSTGRES_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/two_identity_rls_certification.sql
+            docker exec "$POSTGRES_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/account_lifecycle_rls_certification.sql
+          } 2>&1 | tee "$evidence_dir/certification.log"
+      - name: Upload database authorization evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: database-authorization-${{ env.EXPECTED_SOURCE_SHA }}
+          path: ${{ runner.temp }}/database-authorization-evidence
+          if-no-files-found: error
+          retention-days: 14
 
   verify:
     needs: database-authorization
@@ -188,12 +221,15 @@ jobs:
           mkdir -p ${{ runner.temp }}/portal-ci-evidence
           {
             printf 'source_sha=%s\n' "$EXPECTED_SOURCE_SHA"
-            printf 'workflow_sha=%s\n' "$GITHUB_SHA"
+            printf 'event_sha=%s\n' "$GITHUB_SHA"
+            printf 'workflow_sha=%s\n' "$GITHUB_WORKFLOW_SHA"
             printf 'workflow_ref=%s\n' "$GITHUB_WORKFLOW_REF"
             printf 'runner_os=%s\n' "$RUNNER_OS"
             printf 'runner_arch=%s\n' "$RUNNER_ARCH"
             printf 'node=%s\n' "$(node --version)"
             printf 'npm=%s\n' "$(npm --version)"
+            printf 'workflow_sha256='
+            sha256sum .github/workflows/ci.yml | awk '{print $1}'
             printf 'package_lock_sha256='
             sha256sum package-lock.json | awk '{print $1}'
             if [ -s ${{ runner.temp }}/portal-ci-evidence/npm-audit-prod.json ]; then
