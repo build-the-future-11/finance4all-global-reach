@@ -50,6 +50,8 @@ jobs:
           docker exec "$POSTGRES_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/account_lifecycle_rls_certification.sql
 
   verify:
+    needs: database-authorization
+    if: always()
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
@@ -58,6 +60,11 @@ jobs:
       VITE_SUPABASE_PUBLISHABLE_KEY: sb_publishable_ci_contract_fixture
       VITE_AUTH_REDIRECT_ORIGIN: https://finance4all-global-reach.vercel.app
     steps:
+      - name: Require database authorization
+        shell: bash
+        run: |
+          set -euo pipefail
+          test '${{ needs.database-authorization.result }}' = 'success'
       - name: Checkout exact source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
