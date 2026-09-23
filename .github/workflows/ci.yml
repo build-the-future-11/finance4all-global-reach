@@ -18,6 +18,7 @@ jobs:
     timeout-minutes: 10
     env:
       EXPECTED_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      EXPECTED_POSTGRES_IMAGE_REF: public.ecr.aws/supabase/postgres:17.6.1.165
     services:
       postgres:
         image: public.ecr.aws/supabase/postgres:17.6.1.165
@@ -42,6 +43,30 @@ jobs:
           actual="$(git rev-parse HEAD)"
           test "$actual" = "$EXPECTED_SOURCE_SHA"
           printf 'verified_database_authorization_source_sha=%s\n' "$actual" >> "$GITHUB_STEP_SUMMARY"
+      - name: Record resolved database service image
+        shell: bash
+        env:
+          POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+        run: |
+          set -euo pipefail
+          test -n "$POSTGRES_CONTAINER"
+          evidence_dir="$RUNNER_TEMP/database-authorization-evidence"
+          mkdir -p "$evidence_dir"
+          image_id="$(docker inspect --format '{{.Image}}' "$POSTGRES_CONTAINER")"
+          test -n "$image_id"
+          repo_digests="$(docker image inspect "$image_id" --format '{{json .RepoDigests}}')"
+          test -n "$repo_digests"
+          test "$repo_digests" != "null"
+          test "$repo_digests" != "[]"
+          postgres_version="$(docker exec "$POSTGRES_CONTAINER" postgres --version)"
+          test -n "$postgres_version"
+          {
+            printf 'configured_postgres_image=%s\n' "$EXPECTED_POSTGRES_IMAGE_REF"
+            printf 'resolved_postgres_image_id=%s\n' "$image_id"
+            printf 'resolved_postgres_repo_digests=%s\n' "$repo_digests"
+            printf 'postgres_server_version=%s\n' "$postgres_version"
+          } > "$evidence_dir/postgres-image.txt"
+          printf 'resolved_postgres_image_id=%s\n' "$image_id" >> "$GITHUB_STEP_SUMMARY"
       - name: Record database authorization provenance
         shell: bash
         run: |
