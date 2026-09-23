@@ -55,3 +55,17 @@ test('remote GitHub Actions are immutable SHA-pinned', () => {
     }
   }
 });
+
+test('required verify gate fails closed unless database authorization succeeds', () => {
+  const source = readWorkflow('.github/workflows/ci.yml');
+  const marker = '\n  verify:\n';
+  const index = source.indexOf(marker);
+  assert.notEqual(index, -1, 'CI must declare the verify job');
+  const verify = source.slice(index);
+
+  assert.match(verify, /\n    needs: database-authorization\n/);
+  assert.match(verify, /\n    if: always\(\)\n/);
+  assert.match(verify, /name: Require database authorization/);
+  assert.match(verify, /needs\.database-authorization\.result/);
+  assert.match(verify, /test '\$\{\{ needs\.database-authorization\.result \}\}' = 'success'/);
+});
