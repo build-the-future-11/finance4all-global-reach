@@ -56,6 +56,22 @@ test('remote GitHub Actions are immutable SHA-pinned', () => {
   }
 });
 
+test('database authorization verifies the exact checked-out source before certification', () => {
+  const source = readWorkflow('.github/workflows/ci.yml');
+  const start = source.indexOf('\n  database-authorization:\n');
+  const end = source.indexOf('\n  verify:\n');
+  assert.notEqual(start, -1, 'CI must declare the database-authorization job');
+  assert.notEqual(end, -1, 'CI must declare the verify job');
+  assert.ok(end > start, 'database-authorization must precede verify');
+  const databaseAuthorization = source.slice(start, end);
+
+  assert.match(databaseAuthorization, /EXPECTED_SOURCE_SHA:\s*\$\{\{ github\.event\.pull_request\.head\.sha \|\| github\.sha \}\}/);
+  assert.match(databaseAuthorization, /ref:\s*\$\{\{ env\.EXPECTED_SOURCE_SHA \}\}/);
+  assert.match(databaseAuthorization, /name: Verify exact database authorization source binding/);
+  assert.match(databaseAuthorization, /actual="\$\(git rev-parse HEAD\)"/);
+  assert.match(databaseAuthorization, /test "\$actual" = "\$EXPECTED_SOURCE_SHA"/);
+});
+
 test('required verify gate fails closed unless database authorization succeeds', () => {
   const source = readWorkflow('.github/workflows/ci.yml');
   const marker = '\n  verify:\n';
