@@ -141,7 +141,7 @@ test('database authorization digest-pins and records the resolved Postgres servi
   assert.match(databaseAuthorization, /name: Record resolved database service image/);
   assert.match(databaseAuthorization, /docker inspect --format '\{\{\.Image\}\}'/);
   assert.match(databaseAuthorization, /docker image inspect "\$image_id" --format '\{\{json \.RepoDigests\}\}'/);
-  assert.match(databaseAuthorization, /expected_digest="\$\{EXPECTED_POSTGRES_IMAGE_REF##@\}"/);
+  assert.match(databaseAuthorization, /expected_digest="\$\{EXPECTED_POSTGRES_IMAGE_REF##\*@\}"/);
   assert.match(databaseAuthorization, /grep -Fq "@\$\{expected_digest\}"/);
   assert.match(databaseAuthorization, /docker exec "\$POSTGRES_CONTAINER" postgres --version/);
   assert.match(databaseAuthorization, /printf 'configured_postgres_image=%s\\n' "\$EXPECTED_POSTGRES_IMAGE_REF"/);
