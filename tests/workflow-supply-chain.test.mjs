@@ -124,3 +124,24 @@ test('application CI provenance distinguishes event and workflow source identiti
   assert.match(verify, /sha256sum \.github\/workflows\/ci\.yml \| awk/);
   assert.doesNotMatch(verify, /printf 'workflow_sha=%s\\n' "\$GITHUB_SHA"/);
 });
+
+test('database authorization digest-pins and records the resolved Postgres service image', () => {
+  const source = readWorkflow('.github/workflows/ci.yml');
+  const start = source.indexOf('\n  database-authorization:\n');
+  const end = source.indexOf('\n  verify:\n');
+  assert.notEqual(start, -1, 'CI must declare the database-authorization job');
+  assert.notEqual(end, -1, 'CI must declare the verify job');
+  const databaseAuthorization = source.slice(start, end);
+
+  const digestRef = /public\.ecr\.aws\/supabase\/postgres@sha256:[0-9a-f]{64}/i;
+  assert.match(databaseAuthorization, /EXPECTED_POSTGRES_IMAGE_REF:\s*public\.ecr\.aws\/supabase\/postgres@sha256:[0-9a-f]{64}/i);
+  assert.match(databaseAuthorization, /image:\s*public\.ecr\.aws\/supabase\/postgres@sha256:[0-9a-f]{64}/i);
+  assert.ok((databaseAuthorization.match(new RegExp(digestRef.source, 'gi')) ?? []).length >= 2);
+  assert.doesNotMatch(databaseAuthorization, /image:\s*public\.ecr\.aws\/supabase\/postgres:[^@\s]+/i);
+  assert.match(databaseAuthorization, /name: Record resolved database service image/);
+  assert.match(databaseAuthorization, /docker inspect --format '\{\{\.Image\}\}'/);
+  assert.match(databaseAuthorization, /docker image inspect "\$image_id" --format '\{\{json \.RepoDigests\}\}'/);
+  assert.match(databaseAuthorization, /docker exec "\$POSTGRES_CONTAINER" postgres --version/);
+  assert.match(databaseAuthorization, /printf 'configured_postgres_image=%s\\n' "\$EXPECTED_POSTGRES_IMAGE_REF"/);
+  assert.match(databaseAuthorization, /printf 'resolved_postgres_repo_digests=%s\\n' "\$repo_digests"/);
+});
