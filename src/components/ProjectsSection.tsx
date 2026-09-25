@@ -8,51 +8,75 @@ const FINANCEMETA_APPLICATION_URL =
 
 const directApplications = [
   {
-    label: "Quantitative Markets & Microstructure Lab",
+    label: "Research & FinanceMeta Labs",
     description:
-      "Fall 2026 research cohort for market structure, volatility, forecasting, execution, risk, robust backtesting, and reproducible financial ML.",
-    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=quant_markets_lab",
+      "Quantitative finance, financial ML, econometrics, macro, market microstructure, alternative data, financial systems, AI × finance, replications, benchmarks, papers, and faculty collaboration.",
+    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=research_labs",
   },
   {
-    label: "Financial Systems, Access & Policy Lab",
+    label: "International Youth Research Initiative",
     description:
-      "Research credit, digital payments, financial inclusion, consumer protection, policy evaluation, fairness, and financial infrastructure.",
-    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=financial_systems_lab",
+      "Join the journal, preprint and working-paper forum, youth research cohorts, reviewer network, editorial board, research showcases, and faculty mentorship pathways.",
+    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=youth_research_initiative",
   },
   {
-    label: "Finance4All India — School & Community Pilots",
+    label: "The Union",
     description:
-      "For schools, educators, student leaders, and community organizations interested in practical financial-systems workshops, digital-payments and consumer-protection sessions, or student project sprints.",
-    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=finance4all_india_pilots",
+      "For finance, economics, investing, research, and financial-literacy organizations that want shared programs, speakers, competitions, research, chapters, and cross-network distribution.",
+    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=the_union",
   },
   {
-    label: "Universal FinanceMeta application",
+    label: "Women in Finance",
     description:
-      "One intake for research, The Union, youth research and publishing, FinTech, programs, chapters, Women in Finance, leadership, mentors, and partners.",
-    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=general_application",
+      "Mentorship, research, speaker programming, education, chapters, career access, partnerships, and leadership for women interested in finance and economics.",
+    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=women_in_finance",
   },
   {
-    label: "Start a FinanceMeta chapter",
+    label: "Fellowships, analyst programs & cohorts",
     description:
-      "Apply to lead a local chapter with a named owner, operating cadence, and first qualifying output. Approval comes before public chapter status.",
-    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=chapter_registration",
+      "FinanceMeta Research Fellowship, Global Fellowship, Analyst Program, Financial Foundations, Axiom Pathways, Youth Economy Lab, and structured research or learning cohorts.",
+    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=fellowships_cohorts",
   },
   {
-    label: "Financial Foundations Cohort",
+    label: "FinTech Studio & builders",
     description:
-      "Build foundations across finance, economics, markets, financial systems, and evidence-based decision-making.",
-    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=financial_foundations",
+      "Build financial applications, data products, research tools, experiments, and scoped prototypes with technical, product, design, and finance contributors.",
+    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=fintech_builders",
   },
   {
-    label: "FinTech & builder interest",
+    label: "Finance4All education & school pilots",
     description:
-      "Interested in building a finance tool or prototype? Use the general intake; new build teams activate only when a scoped problem, owner, milestones, and review path are ready.",
-    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=fintech_builder_interest",
+      "Financial-literacy programs, school visits, workshops, Take Charge Today facilitation, Catalyst, curriculum collaborations, student pilots, and educator partnerships.",
+    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=education_pilots",
   },
   {
-    label: "Partners, speakers & collaborators",
+    label: "Competitions & challenges",
     description:
-      "For schools, researchers, institutions, educators, speakers, data providers, and potential program or research collaborators.",
+      "Investment and economics competitions, monthly research challenges, quantitative research challenges, global research challenges, and reproducibility projects.",
+    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=competitions_challenges",
+  },
+  {
+    label: "Chapters & leadership",
+    description:
+      "Found or lead a school chapter, regional network, research program, fellowship, competition, Union node, Women in Finance program, operations function, or community.",
+    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=chapters_leadership",
+  },
+  {
+    label: "FinanceDebriefed & media",
+    description:
+      "Write, research, edit, explain markets and economics, build financial-news formats, work on podcasts, or help grow distribution.",
+    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=media_editorial",
+  },
+  {
+    label: "Mentors, professors, speakers & reviewers",
+    description:
+      "Mentor research, review methodology and papers, speak at workshops, judge competitions, advise teams, or collaborate with student and professional researchers.",
+    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=mentors_faculty",
+  },
+  {
+    label: "Partners, data providers & sponsors",
+    description:
+      "University, school, nonprofit, financial-institution, data, API, recruiting, sponsorship, prize, research, and distribution partnerships.",
     url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=partnerships",
   },
 ] as const;
