@@ -18,7 +18,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 SPLITS = ("train", "validation", "test")
 TIMES = ("feature_observed_at", "feature_available_at", "prediction_at",
          "label_end_at", "label_available_at")
@@ -38,6 +38,51 @@ def timestamp(value: Any) -> datetime:
     if dt.tzinfo is None or dt.utcoffset() is None:
         raise ValueError("Timezone is required.")
     return dt.astimezone(timezone.utc)
+
+
+def finite_number(value: Any) -> bool:
+    """Reject booleans and enormous integers without leaking OverflowError."""
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        return False
+    try:
+        return math.isfinite(value)
+    except OverflowError:
+        return False
+
+
+def strict_manifest(raw: bytes) -> Any:
+    """Reject ambiguous keys and non-JSON numeric values, including overflow."""
+    def pairs(items: list[tuple[str, Any]]) -> dict[str, Any]:
+        result: dict[str, Any] = {}
+        for key, value in items:
+            if key in result:
+                raise ValueError("Duplicate JSON object key.")
+            result[key] = value
+        return result
+
+    def constant(_value: str) -> Any:
+        raise ValueError("Non-finite JSON constants are not accepted.")
+
+    def number(value: str) -> float:
+        parsed = float(value)
+        if not math.isfinite(parsed):
+            raise ValueError("JSON number exceeds the finite numeric range.")
+        return parsed
+
+    parsed = json.loads(raw, object_pairs_hook=pairs, parse_constant=constant,
+                        parse_float=number)
+    if not isinstance(parsed, dict):
+        raise ValueError("Manifest root must be a JSON object.")
+    stack = [(parsed, 0)]
+    while stack:
+        value, depth = stack.pop()
+        if depth > 64:
+            raise ValueError("Manifest nesting exceeds 64 levels.")
+        if isinstance(value, dict):
+            stack.extend((v, depth + 1) for v in value.values())
+        elif isinstance(value, list):
+            stack.extend((v, depth + 1) for v in value)
+    return parsed
 
 
 def digest(data: bytes) -> str:
@@ -62,7 +107,7 @@ def audit(rows: list[dict[str, Any]], manifest: dict[str, Any],
     if not isinstance(manifest, dict):
         manifest = {}
         fail("MANIFEST_TYPE", "Manifest must be an object.")
-    if manifest.get("version") != 1 or isinstance(manifest.get("version"), bool):
+    if type(manifest.get("version")) is not int or manifest.get("version") != 1:
         fail("VERSION", "Only manifest version 1 is supported.")
     if manifest.get("evaluation_mode") != "fixed_holdout":
         fail("MODE", "This gate supports fixed holdout only; rolling studies need a separate audited contract.")
@@ -80,10 +125,10 @@ def audit(rows: list[dict[str, Any]], manifest: dict[str, Any],
         fail("COSTS", "Explicit base and stress transaction-cost assumptions are required.")
     for field in ("one_way_bps", "stress_one_way_bps"):
         v = costs.get(field)
-        if isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v) or v < 0:
+        if not finite_number(v) or v < 0:
             fail("COST_VALUE", f"{field} must be a finite nonnegative number in basis points.")
     base, stress = costs.get("one_way_bps"), costs.get("stress_one_way_bps")
-    if all(isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v) for v in (base, stress)):
+    if all(finite_number(v) for v in (base, stress)):
         if stress <= base:
             fail("COST_STRESS", "Stress cost must be greater than base cost.")
         if base == 0 and (not isinstance(costs.get("zero_cost_reason"), str) or len(costs["zero_cost_reason"].strip()) < 10):
@@ -175,11 +220,16 @@ def main(argv: list[str] | None = None) -> int:
     try:
         raw = read_bounded(args.data)
         protocol = read_bounded(args.protocol)
+        protocol_text = protocol.decode("utf-8-sig")
+        if not protocol_text.strip() or "\x00" in protocol_text:
+            raise ValueError("Protocol must be nonempty UTF-8 text without NUL bytes.")
         manifest_raw = read_bounded(args.manifest, 1024 * 1024)
-        manifest = json.loads(manifest_raw)
-        reader = csv.DictReader(io.StringIO(raw.decode("utf-8-sig")))
-        if not reader.fieldnames or len(set(reader.fieldnames)) != len(reader.fieldnames):
-            raise ValueError("CSV requires a unique, nonempty header.")
+        manifest = strict_manifest(manifest_raw)
+        reader = csv.DictReader(io.StringIO(raw.decode("utf-8-sig")), strict=True)
+        if (not reader.fieldnames or any(not h.strip() for h in reader.fieldnames)
+                or len(set(reader.fieldnames)) != len(reader.fieldnames)
+                or not set(REQUIRED).issubset(reader.fieldnames)):
+            raise ValueError("CSV requires unique nonblank headers and every required column.")
         rows = []
         for row in reader:
             if None in row:
@@ -196,7 +246,7 @@ def main(argv: list[str] | None = None) -> int:
                 handle.write(output)
         print(output, end="")
         return 0 if receipt["status"] == "PASS" else 1
-    except (OSError, ValueError, TypeError, csv.Error) as exc:
+    except (OSError, ValueError, TypeError, csv.Error, RecursionError, OverflowError) as exc:
         print(json.dumps({"status": "ERROR", "error": str(exc)}), file=sys.stderr)
         return 2
 
