@@ -147,7 +147,7 @@ export const applicationPaths: ApplicationPath[] = [
     description: "Apply for the evidence-led research cohort covering market structure, volatility, forecasting, execution, risk, and robust backtesting.",
     kind: "Application",
     status: "Active intake",
-    href: "https://tally.so/r/0Q9qZy?utm_source=member_portal&utm_medium=opportunity",
+    href: "https://tally.so/r/obWxvN?utm_source=member_portal&utm_medium=opportunity",
     verifiedAt: "19 Sep 2026",
   },
   {
@@ -155,7 +155,7 @@ export const applicationPaths: ApplicationPath[] = [
     description: "Apply to research credit, digital payments, inclusion, consumer protection, policy evaluation, fairness, and infrastructure.",
     kind: "Application",
     status: "Active intake",
-    href: "https://tally.so/r/lbG8Yk?utm_source=member_portal&utm_medium=opportunity",
+    href: "https://tally.so/r/obWxvN?utm_source=member_portal&utm_medium=opportunity",
     verifiedAt: "19 Sep 2026",
   },
   {
@@ -163,7 +163,7 @@ export const applicationPaths: ApplicationPath[] = [
     description: "For schools, educators, student leaders, and community organizations exploring a scoped practical financial-education pilot.",
     kind: "Pilot interest",
     status: "Active intake",
-    href: "https://tally.so/r/q4rlKd?utm_source=member_portal&utm_medium=opportunity",
+    href: "https://tally.so/r/obWxvN?utm_source=member_portal&utm_medium=opportunity",
     verifiedAt: "19 Sep 2026",
   },
   {
@@ -171,7 +171,7 @@ export const applicationPaths: ApplicationPath[] = [
     description: "Apply to build finance, economics, markets, systems, and evidence foundations around a concrete final output.",
     kind: "Application",
     status: "Active intake",
-    href: "https://tally.so/r/q4rLG9?utm_source=member_portal&utm_medium=opportunity",
+    href: "https://tally.so/r/obWxvN?utm_source=member_portal&utm_medium=opportunity",
     verifiedAt: "19 Sep 2026",
   },
   {
@@ -179,7 +179,7 @@ export const applicationPaths: ApplicationPath[] = [
     description: "Propose a school, university, or city chapter. Public active status follows approval, an operating cadence, and a qualifying output.",
     kind: "Application",
     status: "Active intake",
-    href: "https://tally.so/r/XxaB1j?utm_source=member_portal&utm_medium=opportunity",
+    href: "https://tally.so/r/obWxvN?utm_source=member_portal&utm_medium=opportunity",
     verifiedAt: "19 Sep 2026",
   },
   {
@@ -187,7 +187,7 @@ export const applicationPaths: ApplicationPath[] = [
     description: "For institutions, educators, researchers, speakers, data providers, and bounded program or research collaborations.",
     kind: "Collaboration",
     status: "Interest route",
-    href: "https://tally.so/r/2EWxzb?utm_source=member_portal&utm_medium=opportunity",
+    href: "https://tally.so/r/obWxvN?utm_source=member_portal&utm_medium=opportunity",
     verifiedAt: "19 Sep 2026",
   },
 ];
