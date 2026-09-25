@@ -4,56 +4,56 @@ import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { portalRoutes } from "@/routes/portal";
 
 const FINANCEMETA_APPLICATION_URL =
-  "https://tally.so/r/5B7blP?utm_source=website&utm_medium=cta&utm_campaign=general_application";
+  "https://tally.so/r/obWxvN?utm_source=website&utm_medium=cta&utm_campaign=general_application";
 
 const directApplications = [
   {
     label: "Quantitative Markets & Microstructure Lab",
     description:
       "Fall 2026 research cohort for market structure, volatility, forecasting, execution, risk, robust backtesting, and reproducible financial ML.",
-    url: "https://tally.so/r/0Q9qZy?utm_source=website&utm_medium=opportunity_card&utm_campaign=quant_markets_lab",
+    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=quant_markets_lab",
   },
   {
     label: "Financial Systems, Access & Policy Lab",
     description:
       "Research credit, digital payments, financial inclusion, consumer protection, policy evaluation, fairness, and financial infrastructure.",
-    url: "https://tally.so/r/lbG8Yk?utm_source=website&utm_medium=opportunity_card&utm_campaign=financial_systems_lab",
+    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=financial_systems_lab",
   },
   {
     label: "Finance4All India — School & Community Pilots",
     description:
       "For schools, educators, student leaders, and community organizations interested in practical financial-systems workshops, digital-payments and consumer-protection sessions, or student project sprints.",
-    url: "https://tally.so/r/q4rlKd?utm_source=website&utm_medium=opportunity_card&utm_campaign=finance4all_india_pilots",
+    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=finance4all_india_pilots",
   },
   {
-    label: "General application",
+    label: "Universal FinanceMeta application",
     description:
-      "Get routed to the FinanceMeta team or active program that best matches your interests, skills, and availability.",
-    url: "https://tally.so/r/5B7blP?utm_source=website&utm_medium=opportunity_card&utm_campaign=general_application",
+      "One intake for research, The Union, youth research and publishing, FinTech, programs, chapters, Women in Finance, leadership, mentors, and partners.",
+    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=general_application",
   },
   {
     label: "Start a FinanceMeta chapter",
     description:
       "Apply to lead a local chapter with a named owner, operating cadence, and first qualifying output. Approval comes before public chapter status.",
-    url: "https://tally.so/r/XxaB1j?utm_source=website&utm_medium=opportunity_card&utm_campaign=chapter_registration",
+    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=chapter_registration",
   },
   {
     label: "Financial Foundations Cohort",
     description:
       "Build foundations across finance, economics, markets, financial systems, and evidence-based decision-making.",
-    url: "https://tally.so/r/q4rLG9?utm_source=website&utm_medium=opportunity_card&utm_campaign=financial_foundations",
+    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=financial_foundations",
   },
   {
     label: "FinTech & builder interest",
     description:
       "Interested in building a finance tool or prototype? Use the general intake; new build teams activate only when a scoped problem, owner, milestones, and review path are ready.",
-    url: "https://tally.so/r/5B7blP?utm_source=website&utm_medium=opportunity_card&utm_campaign=fintech_builder_interest",
+    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=fintech_builder_interest",
   },
   {
     label: "Partners, speakers & collaborators",
     description:
       "For schools, researchers, institutions, educators, speakers, data providers, and potential program or research collaborators.",
-    url: "https://tally.so/r/2EWxzb?utm_source=website&utm_medium=opportunity_card&utm_campaign=partnerships",
+    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=partnerships",
   },
 ] as const;
 
@@ -187,7 +187,7 @@ export default function ProjectsSection() {
               <h3 className="mt-2 text-2xl font-semibold text-white">Choose the path that matches what you want to do.</h3>
             </div>
             <p className="max-w-xl text-sm text-white/60">
-              Use the general application if you are unsure. Dedicated forms collect the evidence and logistics needed to review each active path.
+              Every route now uses the same universal intake, so you can select every research, program, chapter, Union, Women in Finance, build, or partnership path that fits.
             </p>
           </div>
 
