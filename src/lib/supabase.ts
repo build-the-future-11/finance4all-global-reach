@@ -1,5 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
+import { fetchPublicAuthSettings, type PublicAuthSettings } from "@/lib/publicAuthSettings";
+export type { PublicAuthSettings } from "@/lib/publicAuthSettings";
 import {
   assertFinanceMetaAuthRedirectOrigin,
   assertFinanceMetaSupabaseProject,
@@ -8,12 +10,6 @@ import {
 
 const supabaseUrl = String(import.meta.env.VITE_SUPABASE_URL ?? "").trim();
 const supabaseKey = String(import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ?? "").trim();
-
-export interface PublicAuthSettings {
-  signupsEnabled: boolean;
-  emailEnabled: boolean;
-  googleEnabled: boolean;
-}
 
 export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseKey);
 
@@ -52,21 +48,5 @@ export function getAuthRedirectUrl(path = "/auth/callback") {
 
 export async function getPublicAuthSettings(): Promise<PublicAuthSettings | null> {
   if (!isSupabaseConfigured) return null;
-  try {
-    const response = await fetch(`${supabaseUrl}/auth/v1/settings`, {
-      headers: { apikey: supabaseKey },
-    });
-    if (!response.ok) return null;
-    const settings = (await response.json()) as {
-      disable_signup?: boolean;
-      external?: { email?: boolean; google?: boolean };
-    };
-    return {
-      signupsEnabled: settings.disable_signup !== true,
-      emailEnabled: settings.external?.email === true,
-      googleEnabled: settings.external?.google === true,
-    };
-  } catch {
-    return null;
-  }
+  return fetchPublicAuthSettings(supabaseUrl, supabaseKey);
 }
