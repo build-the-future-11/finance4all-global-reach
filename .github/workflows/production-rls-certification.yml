@@ -11,14 +11,40 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  validate-dispatch:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    env:
+      TARGET_REF: ${{ github.ref }}
+    steps:
+      - name: Require canonical production ref
+        shell: bash
+        run: |
+          set -euo pipefail
+          if test "$TARGET_REF" != "refs/heads/main"; then
+            printf 'Production RLS certification only runs from refs/heads/main; got %s\n' "$TARGET_REF" >&2
+            exit 1
+          fi
+
   two-identity-rls:
+    needs: validate-dispatch
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:
       PGSSLMODE: require
       EXPECTED_SOURCE_SHA: ${{ github.sha }}
-      FINANCEMETA_DATABASE_URL: ${{ secrets.FINANCEMETA_DATABASE_URL }}
     steps:
+      - name: Initialize redacted certification evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP"
+          mkdir -p production-rls-evidence
+          {
+            printf 'checked_at=%s\n' "$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            printf 'source_sha=%s\n' "$EXPECTED_SOURCE_SHA"
+            printf 'result=PRECHECK_PENDING\n'
+          } > production-rls-evidence/preflight.txt
       - name: Checkout exact source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
@@ -34,6 +60,8 @@ jobs:
           printf 'verified_source_sha=%s\n' "$actual" >> "$GITHUB_STEP_SUMMARY"
       - name: Require the canonical FinanceMeta database connection
         shell: bash
+        env:
+          FINANCEMETA_DATABASE_URL: ${{ secrets.FINANCEMETA_DATABASE_URL }}
         run: |
           set -euo pipefail
           test -n "$FINANCEMETA_DATABASE_URL"
@@ -43,9 +71,10 @@ jobs:
         run: psql --version
       - name: Run rollback-only two-identity authorization matrix
         shell: bash
+        env:
+          FINANCEMETA_DATABASE_URL: ${{ secrets.FINANCEMETA_DATABASE_URL }}
         run: |
           set -euo pipefail
-          mkdir -p production-rls-evidence
           {
             printf 'checked_at=%s\n' "$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
             printf 'source_sha=%s\n' "$EXPECTED_SOURCE_SHA"
@@ -56,14 +85,32 @@ jobs:
               "$FINANCEMETA_DATABASE_URL" \
               --file supabase/tests/account_lifecycle_rls_certification.sql
             printf 'result=PASS\n'
-          } 2>&1 | tee production-rls-evidence/rls-certification.log
-          sha256sum production-rls-evidence/rls-certification.log \
-            > production-rls-evidence/SHA256SUMS
+          } 2>&1 | tee "$RUNNER_TEMP/production-rls-evidence/rls-certification.log"
+      - name: Finalize redacted certification evidence
+        if: always()
+        shell: bash
+        env:
+          CERTIFICATION_JOB_STATUS: ${{ job.status }}
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP"
+          test -f production-rls-evidence/preflight.txt
+          printf 'terminal_job_status=%s\n' "$CERTIFICATION_JOB_STATUS" \
+            >> production-rls-evidence/preflight.txt
+          if test -f production-rls-evidence/rls-certification.log; then
+            sha256sum \
+              production-rls-evidence/preflight.txt \
+              production-rls-evidence/rls-certification.log \
+              > production-rls-evidence/SHA256SUMS
+          else
+            sha256sum production-rls-evidence/preflight.txt \
+              > production-rls-evidence/SHA256SUMS
+          fi
       - name: Retain production RLS evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: production-rls-${{ env.EXPECTED_SOURCE_SHA }}
-          path: production-rls-evidence
+          path: ${{ runner.temp }}/production-rls-evidence
           if-no-files-found: error
           retention-days: 30
