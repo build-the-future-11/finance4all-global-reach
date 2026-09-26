@@ -1,7 +1,7 @@
 BEGIN;
 
 CREATE EXTENSION IF NOT EXISTS pgtap WITH SCHEMA extensions;
-SELECT plan(23);
+SELECT plan(34);
 
 SELECT ok(
   NOT has_table_privilege('anon', 'public.account_deletion_requests', 'select'),
@@ -43,6 +43,10 @@ INSERT INTO auth.users (
     '{"display_name":"Admin"}'::jsonb, pg_catalog.now(), pg_catalog.now()
   );
 
+INSERT INTO public.education_lesson_progress (user_id, lesson_id, completed_at) VALUES
+  ('10000000-0000-0000-0000-000000000001', 'member-a-lesson', '2026-09-01T10:00:00Z'),
+  ('10000000-0000-0000-0000-000000000002', 'member-b-lesson', '2026-09-01T11:00:00Z');
+
 UPDATE public.profiles
 SET role = 'admin'::public.user_role
 WHERE id = '10000000-0000-0000-0000-000000000003';
@@ -83,6 +87,21 @@ SELECT is(
   pg_catalog.jsonb_array_length(public.export_my_data() -> 'notifications'),
   0,
   'member export represents absent collections as arrays'
+);
+SELECT is(
+  pg_catalog.jsonb_array_length(public.export_my_data() -> 'education_lesson_progress'),
+  1,
+  'member export includes only the authenticated member lesson progress'
+);
+SELECT is(
+  (public.export_my_data() -> 'education_lesson_progress' -> 0 ->> 'lesson_id'),
+  'member-a-lesson',
+  'member export includes the authenticated member lesson progress row'
+);
+SELECT is(
+  (public.export_my_data() -> 'education_lesson_progress' -> 0 ->> 'user_id'),
+  '10000000-0000-0000-0000-000000000001',
+  'member export does not leak another member lesson progress identity'
 );
 
 DO $member_cannot_review$
@@ -137,6 +156,44 @@ SELECT is(
   'an admin can review the complete request queue'
 );
 SELECT lives_ok(
+  $$SELECT public.request_account_deletion('Admin self-service request')$$,
+  'an administrator can request deletion for their own account through the member RPC'
+);
+SELECT lives_ok(
+  $$SELECT public.cancel_account_deletion()$$,
+  'an administrator can cancel their own pending deletion request through the member RPC'
+);
+SELECT ok(
+  (SELECT status = 'cancelled' AND reviewed_at IS NULL AND reviewed_by IS NULL
+   FROM public.account_deletion_requests
+   WHERE user_id = '10000000-0000-0000-0000-000000000003'),
+  'admin self-cancellation stays a member action and does not fabricate review metadata'
+);
+SELECT lives_ok(
+  $$SELECT public.request_account_deletion('Admin self-service resubmission')$$,
+  'an administrator can resubmit their own cancelled deletion request through the member RPC'
+);
+SELECT ok(
+  (SELECT status = 'pending' AND reviewed_at IS NULL AND reviewed_by IS NULL
+   FROM public.account_deletion_requests
+   WHERE user_id = '10000000-0000-0000-0000-000000000003'),
+  'admin self-resubmission returns to pending without fabricated review metadata'
+);
+SELECT lives_ok(
+  $$UPDATE public.account_deletion_requests
+    SET status = 'in_progress', review_note = 'Admin own request entered review'
+    WHERE user_id = '10000000-0000-0000-0000-000000000003'$$,
+  'an administrator can place their own pending request into review'
+);
+SELECT throws_ok(
+  $$UPDATE public.account_deletion_requests
+    SET status = 'pending'
+    WHERE user_id = '10000000-0000-0000-0000-000000000003'$$,
+  'P0003',
+  'reviewed deletion requests cannot be moved back to pending',
+  'an administrator cannot bypass the lifecycle RPC by reopening their own in-review request'
+);
+SELECT lives_ok(
   $$UPDATE public.account_deletion_requests
     SET status = 'in_progress', review_note = 'Identity confirmed'
     WHERE user_id = '10000000-0000-0000-0000-000000000002'$$,
@@ -147,6 +204,14 @@ SELECT is(
    WHERE user_id = '10000000-0000-0000-0000-000000000002'),
   '10000000-0000-0000-0000-000000000003',
   'the database records the reviewing admin identity'
+);
+SELECT throws_ok(
+  $$UPDATE public.account_deletion_requests
+    SET status = 'pending'
+    WHERE user_id = '10000000-0000-0000-0000-000000000002'$$,
+  'P0003',
+  'reviewed deletion requests cannot be moved back to pending',
+  'an admin cannot reopen another member reviewed request into member-cancellable pending state'
 );
 
 SELECT pg_catalog.set_config('request.jwt.claim.sub', '10000000-0000-0000-0000-000000000002', true);
