@@ -1,0 +1,47 @@
+name: Finance Evidence Gate
+
+on:
+  pull_request:
+    paths:
+      - 'tools/finance4all-evidence/**'
+      - '.github/workflows/finance-evidence.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'tools/finance4all-evidence/**'
+      - '.github/workflows/finance-evidence.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: finance-evidence-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  synthetic-evidence-checks:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    env:
+      EXPECTED_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - name: Checkout exact source without retained credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ env.EXPECTED_SOURCE_SHA }}
+          persist-credentials: false
+      - name: Verify source and Python runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SOURCE_SHA"
+          python3 -c 'import sys; print(sys.version); assert sys.version_info >= (3, 10)'
+          printf 'evidence_gate_source_sha=%s\n' "$EXPECTED_SOURCE_SHA" >> "$GITHUB_STEP_SUMMARY"
+      - name: Run bounded synthetic unit and CLI tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover \
+            -s tools/finance4all-evidence/tests \
+            -p 'test_*.py' -v
