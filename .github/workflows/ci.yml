@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, "release/**"]
   pull_request:
 
 permissions:
@@ -48,6 +48,11 @@ jobs:
           docker exec "$POSTGRES_CONTAINER" sh -lc 'set -eu; for migration in /tmp/portal-migrations/*.sql; do psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f "$migration"; done'
           docker exec "$POSTGRES_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/two_identity_rls_certification.sql
           docker exec "$POSTGRES_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/account_lifecycle_rls_certification.sql
+          docker cp supabase/tests/intake_rls_certification.sql "$POSTGRES_CONTAINER:/tmp/intake_rls_certification.sql"
+          docker exec "$POSTGRES_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/intake_rls_certification.sql
+
+          docker cp supabase/tests/collaboration_rls_certification.sql "$POSTGRES_CONTAINER:/tmp/collaboration_rls_certification.sql"
+          docker exec "$POSTGRES_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/collaboration_rls_certification.sql
 
   verify:
     runs-on: ubuntu-24.04

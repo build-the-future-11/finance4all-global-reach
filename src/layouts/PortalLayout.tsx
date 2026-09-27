@@ -1,6 +1,7 @@
+import "@/styles/workspace.css";
 import { Link, NavLink, Outlet } from "react-router-dom";
 import { ChevronRight, LogOut, Menu, PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@/contexts/useAuth";
 import { portalNav, portalRoutes } from "@/routes/portal";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -20,13 +21,14 @@ function PortalBrand({ compact = false }: { compact?: boolean }) {
   return (
     <span className="portal-brand">
       <BrandMark className="h-10 w-10 text-[#153d30] dark:text-[#d9ff8a] dark:[--brand-ink:#153d30]" />
-      {!compact && <span><strong>Finance for All</strong><small>Member space</small></span>}
+      {!compact && <span><strong>Finance for All</strong><small>Research workspace</small></span>}
     </span>
   );
 }
 
 export default function PortalLayout() {
   const { profile, signOut } = useAuth();
+  const mobileTrigger = useRef<HTMLButtonElement>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(() => {
     try { return window.localStorage.getItem("finance-portal-sidebar") === "collapsed"; } catch { return false; }
@@ -42,9 +44,9 @@ export default function PortalLayout() {
   const navItems = portalNav.filter((item) => !item.adminOnly || isAdmin);
 
   return (
-    <div className={`portal-shell ${collapsed ? "portal-sidebar-collapsed" : ""}`}>
+    <div onKeyDown={e => { if(e.key === "Escape" && mobileOpen) { setMobileOpen(false); mobileTrigger.current?.focus(); } }} className={`portal-shell ${collapsed ? "portal-sidebar-collapsed" : ""}`}>
       <header className="portal-mobile-header">
-        <button type="button" className="portal-icon-button lg:hidden" onClick={() => setMobileOpen((value) => !value)} aria-label="Toggle menu">
+        <button ref={mobileTrigger} aria-expanded={mobileOpen} aria-controls="workspace-sidebar" type="button" className="portal-icon-button lg:hidden" onClick={() => setMobileOpen((value) => !value)} aria-label="Toggle menu">
           {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
         <Link to={portalRoutes.dashboard}><PortalBrand /></Link>
@@ -63,7 +65,7 @@ export default function PortalLayout() {
         </div>
       </header>
 
-      <aside className={`portal-sidebar ${mobileOpen ? "is-open" : ""}`}>
+      <aside id="workspace-sidebar" className={`portal-sidebar ${mobileOpen ? "is-open" : ""}`}>
         <div className="portal-sidebar-head">
           <Link to={portalRoutes.dashboard} onClick={() => setMobileOpen(false)}><PortalBrand compact={collapsed} /></Link>
           <button type="button" className="portal-collapse-button hidden lg:grid" onClick={() => setCollapsed((value) => !value)} aria-label={collapsed ? "Expand navigation" : "Collapse navigation"}>
@@ -74,7 +76,7 @@ export default function PortalLayout() {
         {!collapsed && (
           <div className="portal-context-card">
             <span>Your member space</span>
-            <strong>Learn. Build. Contribute.</strong>
+            <strong>Questions. Methods. Evidence.</strong>
             <p>Everything you are part of, in one place.</p>
           </div>
         )}

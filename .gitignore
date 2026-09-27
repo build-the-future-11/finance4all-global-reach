@@ -34,3 +34,6 @@ storybook-static
 
 # Vercel-generated build output and project metadata, never application source.
 .vercel/
+
+.env*
+!.env.example

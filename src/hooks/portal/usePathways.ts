@@ -1,3 +1,4 @@
+import { isVisibleContent } from "@/lib/content-visibility";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import {
@@ -21,13 +22,7 @@ export function useOpportunities(selectedId?: string) {
       if (selectedId) query = query.eq("id", selectedId);
       const { data, error } = await query;
       if (error) throw error;
-      const retiredDemoTitles = new Set([
-        "Summer Markets Analyst Internship",
-        "Finance4All Case Competition",
-        "YC-style Fintech Fellowship",
-        "Research Assistant — EM Credit",
-      ]);
-      return data.map(mapOpportunity).filter((opportunity) => !retiredDemoTitles.has(opportunity.title));
+      return data.filter((row) => isVisibleContent("opportunity", row)).map(mapOpportunity);
     },
   });
 }

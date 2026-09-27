@@ -453,7 +453,7 @@ html:not(.dark) .portal-shell [class*="bg-\[\#060a12\]"] { background-color: hsl
 .immersive-program-grid h3 { margin-top: auto; font-family: "Iowan Old Style", Georgia, serif; font-size: 1.45rem; line-height: 1.05; }
 .immersive-program-grid p { margin-top: .7rem; color: hsl(var(--muted-foreground)); font-size: .72rem; line-height: 1.55; }
 .immersive-program-grid strong { margin-top: 1rem; color: hsl(var(--primary)); font-size: .59rem; letter-spacing: .08em; text-transform: uppercase; }
-.immersive-program-grid strong[data-state="Coming soon"] { color: hsl(var(--muted-foreground)); }
+.immersive-program-grid strong[data-state="Proposed"] { color: hsl(var(--muted-foreground)); }
 .immersive-research { display: grid; grid-template-columns: .75fr 1.25fr; gap: clamp(3rem, 8vw, 9rem); border-top: 1px solid hsl(var(--border)); }
 .immersive-research-intro { position: sticky; top: 4rem; align-self: start; }
 .immersive-research-intro > span, .immersive-members-copy > span { display: block; margin-top: 1.5rem; color: hsl(var(--muted-foreground)); line-height: 1.7; }

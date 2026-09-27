@@ -1,3 +1,4 @@
+import { isVisibleContent } from "@/lib/content-visibility";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { portalRoutes } from "@/routes/portal";
@@ -47,7 +48,8 @@ export function usePortalSearch(query: string) {
       }
 
       news.data
-        ?.filter((r) => r.title.toLowerCase().includes(q) || r.summary.toLowerCase().includes(q))
+        ?.filter((row) => isVisibleContent("news", row))
+        .filter((r) => r.title.toLowerCase().includes(q) || r.summary.toLowerCase().includes(q))
         .forEach((r) =>
           results.push({
             id: r.id,
@@ -71,7 +73,8 @@ export function usePortalSearch(query: string) {
         );
 
       opps.data
-        ?.filter((r) => r.title.toLowerCase().includes(q) || r.organization.toLowerCase().includes(q))
+        ?.filter((row) => isVisibleContent("opportunity", row))
+        .filter((r) => r.title.toLowerCase().includes(q) || r.organization.toLowerCase().includes(q))
         .forEach((r) =>
           results.push({
             id: r.id,
@@ -83,7 +86,8 @@ export function usePortalSearch(query: string) {
         );
 
       events.data
-        ?.filter((r) => r.title.toLowerCase().includes(q) || r.description.toLowerCase().includes(q))
+        ?.filter((row) => isVisibleContent("event", row))
+        .filter((r) => r.title.toLowerCase().includes(q) || r.description.toLowerCase().includes(q))
         .forEach((r) =>
           results.push({
             id: r.id,
@@ -111,7 +115,8 @@ export function usePortalSearch(query: string) {
         );
 
       explainers.data
-        ?.filter((r) => r.title.toLowerCase().includes(q) || r.summary.toLowerCase().includes(q))
+        ?.filter((row) => isVisibleContent("explainer", row))
+        .filter((r) => r.title.toLowerCase().includes(q) || r.summary.toLowerCase().includes(q))
         .forEach((r) =>
           results.push({
             id: r.id,

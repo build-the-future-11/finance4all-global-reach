@@ -1,3 +1,4 @@
+import { isVisibleContent } from "@/lib/content-visibility";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import {
@@ -7,7 +8,7 @@ import {
 } from "@/lib/mappers";
 import type { NewsCategory } from "@/types/domain";
 import { useAuth } from "@/contexts/useAuth";
-import { editorialExplainers, findEditorialExplainer } from "@/content/editorial";
+import { editorialExplainers, findEditorialExplainer, type EditorialExplainer } from "@/content/editorial";
 
 export function useNewsArticles(category?: NewsCategory | "all", selectedId?: string) {
   return useQuery({
@@ -18,25 +19,18 @@ export function useNewsArticles(category?: NewsCategory | "all", selectedId?: st
       else if (category && category !== "all") q = q.eq("category", category);
       const { data, error } = await q;
       if (error) throw error;
-      const retiredDemoTitles = new Set([
-        "Fed signals patience on rate cuts amid sticky inflation",
-        "Tech IPO pipeline heats up for Q3",
-        "S&P 500 hits new high as megacap earnings beat",
-        "NVIDIA supplier raises guidance on data center demand",
-      ]);
-      return data.map(mapNewsArticle).filter((article) => !retiredDemoTitles.has(article.title));
+      return data.filter((row) => isVisibleContent("news", row)).map(mapNewsArticle);
     },
   });
 }
 
 export function useExplainers() {
-  return useQuery({
+  return useQuery<Array<ReturnType<typeof mapExplainer> | EditorialExplainer>>({
     queryKey: ["explainers"],
     queryFn: async () => {
       const { data, error } = await supabase.from("explainer_cards").select("*").order("title");
       if (error) throw error;
-      const retiredDemoSlugs = new Set(["what-is-an-ipo", "rate-cuts-explained", "sector-rotation"]);
-      const databaseCards = data.map(mapExplainer).filter((card) => !retiredDemoSlugs.has(card.slug));
+      const databaseCards = data.filter((row) => isVisibleContent("explainer", row)).map(mapExplainer);
       return [
         ...editorialExplainers,
         ...databaseCards.filter((card) => !findEditorialExplainer(card.slug)),
@@ -48,7 +42,7 @@ export function useExplainers() {
 
 export function useExplainerBySlug(slug: string | undefined) {
   const editorial = findEditorialExplainer(slug);
-  return useQuery({
+  return useQuery<ReturnType<typeof mapExplainer> | EditorialExplainer>({
     queryKey: ["explainer", slug],
     enabled: Boolean(slug),
     queryFn: async () => {
@@ -59,6 +53,7 @@ export function useExplainerBySlug(slug: string | undefined) {
         .eq("slug", slug!)
         .single();
       if (error) throw error;
+      if (!isVisibleContent("explainer", data)) throw new Error("This explainer is no longer available.");
       return mapExplainer(data);
     },
     initialData: editorial,

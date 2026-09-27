@@ -1,3 +1,4 @@
+import type { Database } from "@/types/database";
 import {
   useCallback,
   useEffect,
@@ -39,6 +40,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [initializationError, setInitializationError] = useState<string | null>(null);
+  const [initializationAttempt, setInitializationAttempt] = useState(0);
+  const retryInitialization = useCallback(() => {
+    setInitializationError(null);
+    setLoading(true);
+    setInitializationAttempt((attempt) => attempt + 1);
+  }, []);
 
   const ensureProfile = useCallback(async (user: User) => {
     const { data: existing, error: existingError } = await supabase
@@ -109,12 +117,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (error) {
         console.error("Profile fetch failed:", error.message);
         applyProfile(null);
-        return;
+        throw new Error("Your member profile could not be loaded. Please retry.");
       }
 
       if (!data) {
         const ensured = await ensureProfile(user);
         applyProfile(ensured);
+        if (!ensured) throw new Error("Your member profile could not be initialized. Please retry.");
         return;
       }
 
@@ -140,7 +149,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const refreshProfile = useCallback(async () => {
-    if (session?.user) await fetchProfile(session.user);
+    if (!session?.user) return;
+    const generation = authGeneration.current;
+    setLoading(true);
+    try {
+      await withDeadline(() => fetchProfile(session.user), AUTH_OPERATION_TIMEOUT_MS, "Profile reload");
+      if (authGeneration.current === generation) setInitializationError(null);
+    } catch {
+      if (authGeneration.current === generation) {
+        authGeneration.current += 1;
+        setProfile(null);
+        setInitializationError("Your member profile could not be loaded. Please retry.");
+      }
+    } finally {
+      if (activeUser.current === session.user.id) setLoading(false);
+    }
   }, [session?.user, fetchProfile]);
 
   useEffect(() => {
@@ -154,6 +177,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         queryClient.clear();
         setProfile(null);
       }
+      setInitializationError(null);
       setSession(nextSession);
     };
     void withDeadline(
@@ -170,7 +194,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .catch((error: unknown) => {
         if (disposed || receivedAuthEvent) return;
         console.error("Session initialization failed", error);
-        applySession(null);
+        authGeneration.current += 1;
+        setProfile(null);
+        setInitializationError("We could not load your account. Check your connection and retry.");
       })
       .finally(() => { if (!disposed && !receivedAuthEvent) setLoading(false); });
 
@@ -184,6 +210,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (!disposed && authGeneration.current === generation) {
             authGeneration.current += 1;
             setProfile(null);
+            setInitializationError("Your member profile could not be loaded. Please retry.");
           }
         }).finally(() => {
           if (!disposed && activeUser.current === nextSession.user.id) setLoading(false);
@@ -195,7 +222,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     return () => { disposed = true; authGeneration.current += 1; sub.subscription.unsubscribe(); };
-  }, [fetchProfile, queryClient]);
+  }, [fetchProfile, queryClient, initializationAttempt]);
 
   const signIn = useCallback(async (email: string, password: string) => {
     try {
@@ -286,7 +313,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     ) => {
       if (!session?.user) return { error: "Not authenticated" };
 
-      const payload: Record<string, unknown> = {};
+      const payload: Database["public"]["Tables"]["profiles"]["Update"] = {};
       if (updates.displayName !== undefined) payload.display_name = updates.displayName;
       if (updates.bio !== undefined) payload.bio = updates.bio;
       if (updates.interests !== undefined) payload.interests = updates.interests;
@@ -322,6 +349,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user: session?.user ?? null,
       profile,
       loading,
+      initializationError,
+      retryInitialization,
       needsOnboarding,
       signIn,
       signUp,
@@ -330,7 +359,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       refreshProfile,
       updateProfile,
     }),
-    [session, profile, loading, needsOnboarding, signIn, signUp, signInWithGoogle, signOut, refreshProfile, updateProfile],
+    [session, profile, loading, initializationError, retryInitialization, needsOnboarding, signIn, signUp, signInWithGoogle, signOut, refreshProfile, updateProfile],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

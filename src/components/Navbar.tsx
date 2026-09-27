@@ -93,7 +93,7 @@ export default function Navbar() {
             <div className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-inset ring-white/25" />
 
             <div className="relative z-10 flex items-center justify-between">
-              <a href="#" className="flex items-center gap-2 text-lg tracking-tight">
+              <a href="/" className="flex items-center gap-2 text-lg tracking-tight">
                 <span className="font-semibold text-white">Finance4All</span>
                 <span className="text-white/50">Meta</span>
               </a>
