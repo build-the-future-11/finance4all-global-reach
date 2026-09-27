@@ -90,7 +90,7 @@ export default function Dashboard() {
         <p className="mt-2 text-sm text-muted-foreground">Lead a local session, share an opportunity, or help grow the community.</p>
         <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            ["Open a chapter", "https://tally.so/r/XxaB1j"],
+            ["Open a chapter", "https://tally.so/r/obWxvN"],
             ["Run a learning session", "mailto:financeforalledu@gmail.com?subject=Propose%20a%20learning%20session"],
             ["Share an opportunity", "mailto:financeforalledu@gmail.com?subject=Opportunity%20submission&body=Title%3A%0AOrganization%3A%0AOfficial%20link%3A%0AEligibility%3A%0ADeadline%3A%0ADescription%3A"],
             ["Submit your work", "mailto:financeforalledu@gmail.com?subject=Work%20submission"],
