@@ -1,3 +1,4 @@
+import { isVisibleContent } from "@/lib/content-visibility";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { mapChapter, mapEvent } from "@/lib/mappers";
@@ -10,7 +11,7 @@ export function useChapters() {
     queryFn: async () => {
       const { data, error } = await supabase.from("chapters").select("*").order("name");
       if (error) throw error;
-      return data.map(mapChapter).filter((chapter) => !chapter.id.startsWith("70000000-0000-4000-8000-00000000000"));
+      return data.filter((row) => isVisibleContent("chapter", row)).map(mapChapter);
     },
   });
 }
@@ -24,8 +25,7 @@ export function useEvents(chapterId?: string, selectedId?: string) {
       else if (chapterId) q = q.eq("chapter_id", chapterId);
       const { data, error } = await q;
       if (error) throw error;
-      const retiredDemoTitles = new Set(["IIT Finance Case Night", "London Markets 101 Workshop"]);
-      return data.map(mapEvent).filter((event) => !retiredDemoTitles.has(event.title));
+      return data.filter((row) => isVisibleContent("event", row)).map(mapEvent);
     },
   });
 }

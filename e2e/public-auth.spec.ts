@@ -6,9 +6,9 @@ test("public claims stay inside the evidence boundary", async ({ page }) => {
   await expect(page.getByRole("heading", { name: /Money shapes\s*every life\.\s*Let's open it up\./i })).toBeVisible();
   await expect(page.getByRole("link", { name: "Finance for All home" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Start with a free lesson" })).toBeVisible();
-  await expect(page.getByText(/organisation-reported as of September 2026/i)).toBeVisible();
+  await expect(page.getByText(/No audience or impact totals are asserted/i)).toBeVisible();
   await expect(page.getByText(/not claims of investment performance/i)).toBeVisible();
-  await expect(page.getByText(/not institutional endorsements or partnerships/i)).toBeVisible();
+  await expect(page.getByText(/100,000|1M\+|Program partners & collaborators/)).toHaveCount(0);
   await expect(page.getByText(/global nonprofit building/i)).toHaveCount(0);
   await expect(page.getByText(/growing network of students/i)).toHaveCount(0);
 });

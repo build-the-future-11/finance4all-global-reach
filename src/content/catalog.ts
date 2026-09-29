@@ -12,7 +12,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
-export type CatalogStatus = "Verified repository" | "Active intake" | "Proposed" | "Coming soon";
+export type CatalogStatus = "Verified repository" | "Active intake" | "Proposed" | "Proposed";
 
 export type PortfolioProject = {
   id: string;
@@ -64,15 +64,15 @@ export const portfolioProjects: PortfolioProject[] = [
     id: "lgwm",
     title: "LGWM: Liquidation Graph World Models",
     description: "Study systemic risk as a connected process: how leverage, liquidity, and liquidation links can propagate a shock across institutions and assets. Contact the team to discuss participation.",
-    status: "Coming soon", domain: "Systemic risk", tags: ["networks", "liquidity", "stress testing"],
-    evidence: "Member project brief coming soon; repository is not public",
+    status: "Proposed", domain: "Systemic risk", tags: ["networks", "liquidity", "stress testing"],
+    evidence: "No member project brief is attached; repository is not public",
   },
   {
     id: "finimmunity",
     title: "Finimmunity: financial resilience and recovery",
     description: "An exploratory financial-immunology framework studying how markets respond to shocks, recover, and develop persistent feedback loops. A research direction, not a demonstrated trading strategy.",
-    status: "Coming soon", domain: "Financial resilience", tags: ["market shocks", "recovery", "feedback loops"],
-    evidence: "Repository description confirmed 20 Sep 2026; member brief coming soon, repository is private",
+    status: "Proposed", domain: "Financial resilience", tags: ["market shocks", "recovery", "feedback loops"],
+    evidence: "Repository description confirmed 20 Sep 2026; no member brief is attached; repository is private",
   },
   {
     id: "iy-ern",
@@ -195,19 +195,19 @@ export const applicationPaths: ApplicationPath[] = [
 export type ProgramFamily = {
   title: string;
   description: string;
-  state: "Live surface" | "Active intake" | "Coming soon";
+  state: "Live surface" | "Active intake" | "Proposed";
   icon: LucideIcon;
 };
 
 export const programFamilies: ProgramFamily[] = [
   { title: "Global literacy outreach", description: "Practical financial-systems education for schools and communities, with scoped outcomes and safeguarding.", state: "Active intake", icon: Globe2 },
-  { title: "Economics journal", description: "Student research notes, explainers, replication work, and reviewed economic arguments.", state: "Coming soon", icon: BookOpenText },
+  { title: "Economics journal", description: "Student research notes, explainers, replication work, and reviewed economic arguments.", state: "Proposed", icon: BookOpenText },
   { title: "Finance Meta Labs", description: "Bounded questions, fair baselines, traceable data, reproducible analysis, and preserved negative results.", state: "Live surface", icon: FlaskConical },
-  { title: "Student podcast", description: "Source-led conversations with researchers, builders, policymakers, and practitioners.", state: "Coming soon", icon: Mic2 },
+  { title: "Student podcast", description: "Source-led conversations with researchers, builders, policymakers, and practitioners.", state: "Proposed", icon: Mic2 },
   { title: "School visits", description: "Locally adapted workshops on payments, scams, consumer protection, decisions, and access.", state: "Active intake", icon: School },
   { title: "Clubs and chapters", description: "Local teams earn active status through a cadence, an accountable lead, and evidenced outputs.", state: "Active intake", icon: Network },
-  { title: "Live industry projects", description: "Bounded partner problems with a real owner, acceptance criteria, privacy boundary, and final artifact.", state: "Coming soon", icon: Building2 },
-  { title: "Economics Olympiad pathway", description: "Concept preparation, applied reasoning, data interpretation, and evidence-aware competition practice.", state: "Coming soon", icon: Landmark },
+  { title: "Live industry projects", description: "Bounded partner problems with a real owner, acceptance criteria, privacy boundary, and final artifact.", state: "Proposed", icon: Building2 },
+  { title: "Economics Olympiad pathway", description: "Concept preparation, applied reasoning, data interpretation, and evidence-aware competition practice.", state: "Proposed", icon: Landmark },
   { title: "Digital courses", description: "Open foundations plus deeper guided sequences that end in an explainer, analysis, or build.", state: "Live surface", icon: ShieldCheck },
   { title: "Finance Debriefs", description: "Long-form, sourced explanations of markets, macroeconomics, companies, and financial systems.", state: "Live surface", icon: ChartNoAxesCombined },
 ];

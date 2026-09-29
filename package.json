@@ -13,7 +13,7 @@
     "build": "npm run typecheck && node scripts/validate-public-env.mjs && vite build && node scripts/write-release-revision.mjs",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json",
     "audit:prod": "npm audit --omit=dev --audit-level=high",
     "validate:env": "node scripts/validate-public-env.mjs",
     "preview": "vite preview",

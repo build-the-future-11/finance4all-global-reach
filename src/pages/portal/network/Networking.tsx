@@ -116,7 +116,7 @@ export default function Networking() {
       <PortalPageHeader
         eyebrow="Member directory"
         title="People behind the work"
-        description="Find members by interests, read what they are working on, and request a connection. Profiles only show information members have chosen to publish. Direct messages are coming soon."
+        description="Find members by interests, read what they are working on, and request a connection. Profiles only show information members have chosen to publish. Use connection requests to express interest in collaborating."
         action={
           <Dialog open={introOpen} onOpenChange={setIntroOpen}>
             <DialogTrigger asChild>
@@ -260,7 +260,7 @@ export default function Networking() {
                       Open to collaborate
                     </Badge>
                   )}
-                  <p className="portal-muted mt-3 line-clamp-3 text-sm leading-relaxed">{member.bio || "Bio coming soon — this member has not published an introduction yet."}</p>
+                  <p className="portal-muted mt-3 line-clamp-3 text-sm leading-relaxed">{member.bio || "This member has not published an introduction."}</p>
                   {member.interests.length > 0 && (
                     <p className="portal-muted mt-3 line-clamp-2 text-xs">{member.interests.join(" · ")}</p>
                   )}

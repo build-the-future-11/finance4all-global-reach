@@ -207,6 +207,7 @@ export type IntroductionPost = z.infer<typeof IntroductionPostSchema>;
 // ─── Bookmarks & Notifications ──────────────────────────────────────────────
 
 export const NotificationTypeSchema = z.enum([
+  "project_task", "intake_status",
   "connection_request",
   "connection_accepted",
   "lab_application_status",

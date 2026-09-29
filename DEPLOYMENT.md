@@ -188,7 +188,6 @@ Then open `/portal/admin` and verify the intended admin path. Never expose role 
 ```bash
 curl -s -o /dev/null -w "%{http_code}\n" \
   -H "apikey: YOUR_ANON_JWT" \
-  -H "Authorization: Bearer YOUR_ANON_JWT" \
   "https://pnemeegkwyaicsbnbnmg.supabase.co/rest/v1/"
 ```
 

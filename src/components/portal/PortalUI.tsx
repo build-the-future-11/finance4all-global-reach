@@ -150,11 +150,11 @@ export function LoadingState({ label = "Loading…" }: { label?: string }) {
 
 export function SkeletonCard({ lines = 3 }: { lines?: number }) {
   return (
-    <PortalCard className="animate-pulse p-5">
-      <div className="mb-3 h-4 w-20 rounded bg-white/10" />
-      <div className="mb-2 h-6 w-3/4 rounded bg-white/10" />
+    <PortalCard className="animate-pulse p-5" role="status" aria-label="Loading content">
+      <div className="mb-3 h-4 w-20 rounded bg-muted" />
+      <div className="mb-2 h-6 w-3/4 rounded bg-muted" />
       {Array.from({ length: lines }).map((_, i) => (
-        <div key={i} className="mb-2 h-3 rounded bg-white/[0.06]" style={{ width: `${90 - i * 15}%` }} />
+        <div key={i} className="mb-2 h-3 rounded bg-muted" style={{ width: `${90 - i * 15}%` }} />
       ))}
     </PortalCard>
   );
@@ -198,7 +198,7 @@ export function ErrorState({
   return (
     <PortalCard className="flex flex-col items-center gap-4 p-10 text-center">
       <AlertCircle className="h-10 w-10 text-red-400/60" />
-      <p className="max-w-md text-sm text-white/55">{message}</p>
+      <p className="max-w-md text-sm text-muted-foreground">{message}</p>
       {onRetry && (
         <Button
           variant="outline"
