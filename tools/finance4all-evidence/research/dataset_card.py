@@ -124,7 +124,8 @@ def validate(card: dict[str, Any], data_sha256: str) -> dict[str, Any]:
     if card.get("availability_time_field") == card.get("observation_time_field"):
         errors.append("availability_time_field must be distinct from observation_time_field")
 
-    if card.get("redistribution_rule", "").strip().lower() in {"allowed", "yes"}:
+    redistribution_rule = card.get("redistribution_rule")
+    if isinstance(redistribution_rule, str) and redistribution_rule.strip().lower() in {"allowed", "yes"}:
         errors.append("redistribution_rule must state the actual bounded rule/terms, not a bare yes/allowed")
 
     return {
