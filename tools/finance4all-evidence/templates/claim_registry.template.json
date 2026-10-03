@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "claims": [
+    {
+      "claim_id": "EXAMPLE-DRAFT-ONLY",
+      "project_id": "F4A-04",
+      "claim_text": "Replace with a precise factual or quantitative claim before review.",
+      "status": "DRAFT",
+      "protocol_id": "",
+      "evidence_refs": [],
+      "reviewer": "UNASSIGNED",
+      "reviewed_at": null,
+      "public_wording": ""
+    }
+  ]
+}
