@@ -9,13 +9,15 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import re
 import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-VERSION = "1.0.0"
+VERSION = "1.0.1"
+MAX_REGISTRY_BYTES = 1024 * 1024
 STATUSES = {"DRAFT", "ALLOWED", "WITHDRAWN", "CORRECTED"}
 PROJECT_RE = re.compile(r"^F4A-(0[1-9]|[1-3][0-9]|4[0-8])$")
 HASH_RE = re.compile(r"^[0-9a-f]{40,64}$")
@@ -40,8 +42,36 @@ def substantive(value: Any, minimum: int = 3) -> bool:
     )
 
 
-def validate(registry: dict[str, Any]) -> dict[str, Any]:
+def strict_json(raw: bytes) -> dict[str, Any]:
+    """Reject ambiguous keys and non-finite numbers at every nesting level."""
+    def pairs(items: list[tuple[str, Any]]) -> dict[str, Any]:
+        out: dict[str, Any] = {}
+        for key, value in items:
+            if key in out:
+                raise ValueError(f"duplicate JSON key: {key}")
+            out[key] = value
+        return out
+
+    def constant(_value: str) -> Any:
+        raise ValueError("non-finite JSON constants are not allowed")
+
+    def parse_float(value: str) -> float:
+        parsed = float(value)
+        if not math.isfinite(parsed):
+            raise ValueError("JSON number outside finite range")
+        return parsed
+
+    value = json.loads(raw, object_pairs_hook=pairs, parse_constant=constant, parse_float=parse_float)
+    if not isinstance(value, dict):
+        raise ValueError("registry root must be an object")
+    return value
+
+
+def validate(registry: Any) -> dict[str, Any]:
     errors: list[str] = []
+    if not isinstance(registry, dict):
+        errors.append("registry root must be an object")
+        registry = {}
     claims = registry.get("claims")
     if type(registry.get("version")) is not int or registry.get("version") != 1:
         errors.append("registry version must be integer 1")
@@ -74,7 +104,7 @@ def validate(registry: dict[str, Any]) -> dict[str, Any]:
             errors.append(f"{claim_id}: claim_text must be substantive")
 
         status = claim.get("status")
-        if status not in STATUSES:
+        if not isinstance(status, str) or status not in STATUSES:
             errors.append(f"{claim_id}: invalid status")
             continue
 
@@ -84,7 +114,8 @@ def validate(registry: dict[str, Any]) -> dict[str, Any]:
             evidence_refs = []
 
         if status == "DRAFT":
-            if substantive(claim.get("public_wording"), 3):
+            wording = claim.get("public_wording")
+            if wording is not None and (not isinstance(wording, str) or bool(wording.strip())):
                 errors.append(f"{claim_id}: DRAFT must not contain releasable public_wording")
             continue
 
@@ -125,11 +156,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("registry", type=Path)
     args = parser.parse_args(argv)
     try:
-        value = json.loads(args.registry.read_text(encoding="utf-8"))
-        if not isinstance(value, dict):
-            raise ValueError("registry root must be an object")
-        result = validate(value)
-    except (OSError, ValueError, TypeError, json.JSONDecodeError) as exc:
+        with args.registry.open("rb") as handle:
+            raw = handle.read(MAX_REGISTRY_BYTES + 1)
+        if len(raw) > MAX_REGISTRY_BYTES:
+            raise ValueError(f"registry exceeds {MAX_REGISTRY_BYTES} bytes")
+        result = validate(strict_json(raw))
+    except (OSError, ValueError, TypeError, RecursionError, OverflowError) as exc:
         print(json.dumps({"status": "ERROR", "error": str(exc)}), file=sys.stderr)
         return 2
 
