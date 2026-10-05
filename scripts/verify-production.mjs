@@ -2,10 +2,14 @@
 
 import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 
 const DEFAULT_PORTAL_URL = "https://finance4all-global-reach.vercel.app";
 const SERVICE = "financemeta-member-portal";
 const REVISION = /^[0-9a-f]{40}$/;
+const DEFAULT_REQUEST_TIMEOUT_MS = 10_000;
+const MAX_REVISION_BYTES = 16 * 1024;
+const MAX_HTML_BYTES = 1024 * 1024;
 
 function fail(message) {
   throw new Error(`[production-health] ${message}`);
@@ -13,20 +17,73 @@ function fail(message) {
 
 function argumentValue(name) {
   const index = process.argv.indexOf(name);
-  return index >= 0 ? process.argv[index + 1] : null;
+  if (index < 0) return null;
+  const value = process.argv[index + 1];
+  if (!value || value.startsWith("--") || process.argv.indexOf(name, index + 1) >= 0) {
+    fail(`${name} requires exactly one value`);
+  }
+  return value;
 }
 
-async function checkedFetch(fetchImpl, url, init, label) {
-  const response = await fetchImpl(url, {
-    redirect: "follow",
-    ...init,
-    headers: {
-      "cache-control": "no-cache",
-      ...(init?.headers ?? {}),
-    },
+function mediaType(response) {
+  return (response.headers.get("content-type") ?? "").split(";", 1)[0].trim().toLowerCase();
+}
+
+async function readBoundedText(response, limit, label) {
+  if (!response.body) return "";
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder("utf-8", { fatal: true });
+  let bytes = 0;
+  let text = "";
+  try {
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      bytes += value.byteLength;
+      if (bytes > limit) fail(`${label} exceeds ${limit} bytes`);
+      text += decoder.decode(value, { stream: true });
+    }
+    return text + decoder.decode();
+  } finally {
+    // Cancel on a failed read/limit check; release on success as well.
+    try { await reader.cancel(); } finally { reader.releaseLock(); }
+  }
+}
+
+async function checkedFetch(fetchImpl, url, init, label, timeoutMs, consume) {
+  const controller = new AbortController();
+  let timer;
+  const deadline = new Promise((_, reject) => {
+    timer = setTimeout(() => {
+      const error = new Error(`[production-health] ${label} timed out after ${timeoutMs} ms`);
+      controller.abort(error);
+      reject(error);
+    }, timeoutMs);
   });
-  if (!response.ok) fail(`${label} returned HTTP ${response.status}`);
-  return response;
+  try {
+    return await Promise.race([
+      deadline,
+      (async () => {
+        const response = await fetchImpl(url, {
+          ...init,
+          // A redirect must not certify a different origin or login destination.
+          redirect: "error",
+          signal: controller.signal,
+          headers: {
+            "cache-control": "no-cache",
+            ...(init?.headers ?? {}),
+          },
+        });
+        if (!response.ok) fail(`${label} returned HTTP ${response.status}`);
+        if (response.redirected || (response.url && new URL(response.url).origin !== url.origin)) {
+          fail(`${label} returned a redirected or foreign-origin response`);
+        }
+        return consume ? await consume(response) : response;
+      })(),
+    ]);
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 function requireHeader(headers, name, expected) {
@@ -38,8 +95,16 @@ function requireHeader(headers, name, expected) {
 export async function verifyProduction({
   portalUrl = DEFAULT_PORTAL_URL,
   fetchImpl = globalThis.fetch,
+  expectedRevision = null,
+  requestTimeoutMs = DEFAULT_REQUEST_TIMEOUT_MS,
 } = {}) {
   if (typeof fetchImpl !== "function") fail("fetch implementation is required");
+  if (expectedRevision !== null && (typeof expectedRevision !== "string" || !REVISION.test(expectedRevision))) {
+    fail("expected revision must be an immutable lowercase Git SHA");
+  }
+  if (!Number.isInteger(requestTimeoutMs) || requestTimeoutMs < 1 || requestTimeoutMs > 60_000) {
+    fail("request timeout must be an integer from 1 to 60000 ms");
+  }
 
   const baseUrl = new URL(portalUrl);
   if (baseUrl.protocol !== "https:" || baseUrl.username || baseUrl.password) {
@@ -49,18 +114,29 @@ export async function verifyProduction({
     fail("portal URL must not include a path, query, or fragment");
   }
 
-  const revisionResponse = await checkedFetch(
+  const revisionPayload = await checkedFetch(
     fetchImpl,
     new URL("/release-revision.json", baseUrl),
     undefined,
     "release revision",
+    requestTimeoutMs,
+    async (response) => {
+      if (mediaType(response) !== "application/json") fail("release revision did not return JSON");
+      return JSON.parse(await readBoundedText(response, MAX_REVISION_BYTES, "release revision"));
+    },
   );
-  const revisionPayload = await revisionResponse.json();
+  if (revisionPayload === null || typeof revisionPayload !== "object" || Array.isArray(revisionPayload)) {
+    fail("release revision payload must be an object");
+  }
   if (revisionPayload?.service !== SERVICE) {
     fail(`release service must be ${SERVICE}`);
   }
-  if (!REVISION.test(revisionPayload?.revision ?? "")) {
+  if (typeof revisionPayload.revision !== "string" || !REVISION.test(revisionPayload.revision)) {
     fail("release revision must be an immutable lowercase Git SHA");
+  }
+
+  if (expectedRevision !== null && revisionPayload.revision !== expectedRevision) {
+    fail(`release revision mismatch: expected ${expectedRevision}, received ${revisionPayload.revision}`);
   }
 
   const headResponse = await checkedFetch(
@@ -68,6 +144,7 @@ export async function verifyProduction({
     new URL("/login", baseUrl),
     { method: "HEAD" },
     "login headers",
+    requestTimeoutMs,
   );
   const csp = requireHeader(headResponse.headers, "content-security-policy", /default-src 'self'/);
   for (const directive of [
@@ -94,12 +171,13 @@ export async function verifyProduction({
     "/auth/callback?error=access_denied&error_code=health_check",
   ];
   for (const route of routes) {
-    const response = await checkedFetch(fetchImpl, new URL(route, baseUrl), undefined, route);
-    const contentType = response.headers.get("content-type") ?? "";
-    if (!contentType.toLowerCase().includes("text/html")) {
-      fail(`${route} did not return HTML`);
-    }
-    const html = await response.text();
+    const html = await checkedFetch(
+      fetchImpl, new URL(route, baseUrl), undefined, route, requestTimeoutMs,
+      async (response) => {
+        if (mediaType(response) !== "text/html") fail(`${route} did not return HTML`);
+        return readBoundedText(response, MAX_HTML_BYTES, route);
+      },
+    );
     if (!html.includes('<div id="root"></div>')) {
       fail(`${route} did not return the portal application shell`);
     }
@@ -111,6 +189,8 @@ export async function verifyProduction({
     portalUrl: baseUrl.origin,
     service: SERVICE,
     revision: revisionPayload.revision,
+    revisionVerification: expectedRevision === null ? "observed-only" : "exact-match",
+    expectedRevision,
     routes,
     securityHeaders: {
       contentSecurityPolicy: csp,
@@ -123,12 +203,17 @@ export async function verifyProduction({
   };
 }
 
-if (import.meta.url === new URL(`file://${process.argv[1]}`).href) {
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   try {
+    // Parse before making a request, so malformed arguments fail without I/O.
+    const receiptPath = argumentValue("--receipt");
+    const expectedRevision = argumentValue("--expected-revision") ?? process.env.EXPECTED_DEPLOYED_REVISION ?? null;
+    const timeoutValue = argumentValue("--timeout-ms");
     const receipt = await verifyProduction({
       portalUrl: process.env.PORTAL_URL || DEFAULT_PORTAL_URL,
+      expectedRevision,
+      requestTimeoutMs: timeoutValue === null ? DEFAULT_REQUEST_TIMEOUT_MS : Number(timeoutValue),
     });
-    const receiptPath = argumentValue("--receipt");
     if (receiptPath) {
       writeFileSync(resolve(receiptPath), `${JSON.stringify(receipt, null, 2)}\n`, "utf8");
     }
