@@ -108,4 +108,21 @@ describe("member settings", () => {
     });
     expect(mocks.success).toHaveBeenCalledWith("Profile updated");
   });
+
+  it.each(["", "   \\t  "])("persists an explicitly cleared bio: %j", async (clearedBio) => {
+    render(<MemoryRouter><Settings /></MemoryRouter>);
+
+    const bio = screen.getByLabelText("Bio");
+    expect(bio).toHaveValue("Original bio");
+    fireEvent.change(bio, { target: { value: clearedBio } });
+    fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+
+    await waitFor(() => {
+      expect(mocks.mutateAsync).toHaveBeenCalledWith(
+        expect.objectContaining({ bio: "" }),
+      );
+    });
+    expect(mocks.success).toHaveBeenCalledWith("Profile updated");
+    expect(mocks.error).not.toHaveBeenCalled();
+  });
 });
