@@ -98,8 +98,8 @@ export default function NotificationsCenter() {
             <div
               key={n.id}
               className={cn(
-                "border-b border-white/[0.06] px-4 py-3 transition last:border-0",
-                !n.read && "bg-emerald-500/[0.04]",
+                "border-b border-white/6 px-4 py-3 transition last:border-0",
+                !n.read && "bg-emerald-500/4",
               )}
             >
               <div className="flex items-start justify-between gap-2">

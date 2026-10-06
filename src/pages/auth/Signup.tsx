@@ -112,7 +112,7 @@ export default function Signup() {
               : "Account created. Opening your member profile..."}
           </p>
           {success === "confirmation" && (
-            <Button asChild variant="outline" className="mt-2 border-white/15 bg-white/[0.04] text-white hover:bg-white/[0.08]">
+            <Button asChild variant="outline" className="mt-2 border-white/15 bg-white/4 text-white hover:bg-white/8">
               <Link to="/login" state={{ from }}>Go to sign in</Link>
             </Button>
           )}

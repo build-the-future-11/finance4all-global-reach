@@ -141,7 +141,7 @@ export default function ProjectsSection() {
               <Link
                 key={module.title}
                 to={module.href}
-                className="block rounded-3xl border border-white/20 bg-white/[0.05] p-6 backdrop-blur-xl transition hover:-translate-y-1 hover:border-white/35"
+                className="block rounded-3xl border border-white/20 bg-white/5 p-6 backdrop-blur-xl transition hover:-translate-y-1 hover:border-white/35"
               >
                 <div className="mb-5 flex items-center gap-3">
                   <div className="rounded-xl border border-white/20 bg-white/10 p-3 text-emerald-300">
@@ -167,7 +167,7 @@ export default function ProjectsSection() {
 
         <div
           id="join"
-          className="mt-10 flex flex-col items-start justify-between gap-4 rounded-3xl border border-white/20 bg-gradient-to-r from-white/10 to-white/[0.04] p-6 sm:flex-row sm:items-center"
+          className="mt-10 flex flex-col items-start justify-between gap-4 rounded-3xl border border-white/20 bg-linear-to-r from-white/10 to-white/4 p-6 sm:flex-row sm:items-center"
         >
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-emerald-200/90">
@@ -222,7 +222,7 @@ export default function ProjectsSection() {
                 href={application.url}
                 target="_blank"
                 rel="noreferrer"
-                className="group rounded-2xl border border-white/15 bg-white/[0.035] p-5 transition hover:-translate-y-0.5 hover:border-emerald-300/50 hover:bg-white/[0.06]"
+                className="group rounded-2xl border border-white/15 bg-white/[0.035] p-5 transition hover:-translate-y-0.5 hover:border-emerald-300/50 hover:bg-white/6"
               >
                 <div className="flex items-start justify-between gap-3">
                   <h4 className="font-semibold text-white">{application.label}</h4>
