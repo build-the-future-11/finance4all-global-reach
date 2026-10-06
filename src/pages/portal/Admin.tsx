@@ -99,7 +99,7 @@ export default function Admin() {
       />
 
       <Tabs defaultValue="news" className="space-y-6">
-        <TabsList className="flex h-auto flex-wrap gap-1 bg-white/[0.04] p-1">
+        <TabsList className="flex h-auto flex-wrap gap-1 bg-white/4 p-1">
           <TabsTrigger value="news" className="data-[state=active]:bg-emerald-500/20 data-[state=active]:text-emerald-300">
             News ({news?.length ?? 0})
           </TabsTrigger>
@@ -362,12 +362,12 @@ export default function Admin() {
                       Requested {new Date(request.requested_at).toLocaleString()} · {request.user_id}
                     </p>
                   </div>
-                  <span className="rounded-full bg-white/[0.06] px-3 py-1 text-xs capitalize text-white/70">
+                  <span className="rounded-full bg-white/6 px-3 py-1 text-xs capitalize text-white/70">
                     {request.status.replace("_", " ")}
                   </span>
                 </div>
                 {request.reason && (
-                  <p className="mt-4 rounded-lg border border-white/10 bg-white/[0.03] p-3 text-sm text-white/65">
+                  <p className="mt-4 rounded-lg border border-white/10 bg-white/3 p-3 text-sm text-white/65">
                     {request.reason}
                   </p>
                 )}

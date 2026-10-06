@@ -97,7 +97,7 @@ export default function Onboarding() {
     >
       <div className="auth-step-nav" aria-label={`Profile setup, step ${step + 1} of 2`}><span data-active="true" /><span data-active={step === 1} /></div>
       {step === 1 && avatarUrl && (
-        <div className="mb-6 flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+        <div className="mb-6 flex items-center gap-3 rounded-xl border border-white/10 bg-white/3 p-4">
           <Avatar className="h-12 w-12 border border-white/15">
             <AvatarImage src={avatarUrl} />
             <AvatarFallback className="bg-emerald-500/20 text-emerald-300">
@@ -159,7 +159,7 @@ export default function Onboarding() {
                 className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
                   interests.includes(tag)
                     ? "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-400/30"
-                    : "bg-white/[0.05] text-white/55 ring-1 ring-white/10 hover:bg-white/10"
+                    : "bg-white/5 text-white/55 ring-1 ring-white/10 hover:bg-white/10"
                 }`}
               >
                 {tag}
@@ -186,7 +186,7 @@ export default function Onboarding() {
             </Select>
           </div>
         )}
-        <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] p-4">
+        <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/3 p-4">
           <div>
             <Label htmlFor="onboarding-open-to-collaborate" className="text-sm font-medium text-white">
               Open to collaborate

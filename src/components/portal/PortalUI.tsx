@@ -103,7 +103,7 @@ export function StatCard({
     <PortalCard className="group relative overflow-hidden p-5">
       <div
         className={cn(
-          "absolute -right-4 -top-4 h-24 w-24 rounded-full bg-gradient-to-br opacity-60 blur-2xl transition group-hover:opacity-100",
+          "absolute -right-4 -top-4 h-24 w-24 rounded-full bg-linear-to-br opacity-60 blur-2xl transition group-hover:opacity-100",
           accents[accent],
         )}
       />
@@ -112,7 +112,7 @@ export function StatCard({
           <p className="portal-muted text-xs font-medium uppercase tracking-wider">{label}</p>
           <p className="mt-2 text-3xl font-bold tabular-nums text-foreground">{value}</p>
         </div>
-        <div className={cn("rounded-xl bg-gradient-to-br p-2.5", accents[accent])}>
+        <div className={cn("rounded-xl bg-linear-to-br p-2.5", accents[accent])}>
           <Icon className="h-5 w-5" />
         </div>
       </div>
@@ -154,7 +154,7 @@ export function SkeletonCard({ lines = 3 }: { lines?: number }) {
       <div className="mb-3 h-4 w-20 rounded bg-white/10" />
       <div className="mb-2 h-6 w-3/4 rounded bg-white/10" />
       {Array.from({ length: lines }).map((_, i) => (
-        <div key={i} className="mb-2 h-3 rounded bg-white/[0.06]" style={{ width: `${90 - i * 15}%` }} />
+        <div key={i} className="mb-2 h-3 rounded bg-white/6" style={{ width: `${90 - i * 15}%` }} />
       ))}
     </PortalCard>
   );
@@ -260,7 +260,7 @@ export function PortalHero({
 }) {
   return (
     <PortalCard className="relative overflow-hidden p-6 sm:p-8">
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-transparent to-blue-500/10" />
+      <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-emerald-500/10 via-transparent to-blue-500/10" />
       <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-emerald-400/10 blur-3xl" />
       <div className="relative">
         {greeting && (

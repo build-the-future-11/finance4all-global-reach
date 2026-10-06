@@ -56,7 +56,7 @@ export default function FiveFoundations() {
           <button
             type="button"
             onClick={() => window.print()}
-            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.05] px-4 py-2 text-sm text-white/75 transition hover:bg-white/[0.09] hover:text-white"
+            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm text-white/75 transition hover:bg-white/9 hover:text-white"
           >
             <Printer className="h-4 w-4" aria-hidden="true" />
             Print lesson
@@ -87,7 +87,7 @@ export default function FiveFoundations() {
             ))}
           </dl>
 
-          <div className="mt-6 flex gap-3 rounded-2xl border border-emerald-300/15 bg-emerald-300/[0.04] p-4 print:border-black/20 print:bg-transparent">
+          <div className="mt-6 flex gap-3 rounded-2xl border border-emerald-300/15 bg-emerald-300/4 p-4 print:border-black/20 print:bg-transparent">
             <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-emerald-300 print:text-black" aria-hidden="true" />
             <p className="text-sm leading-6 text-white/70 print:text-black/75">
               <strong className="font-semibold text-white print:text-black">Education boundary:</strong> this lesson is general financial education, not financial advice. It uses hypothetical examples and does not recommend a security, lender, broker, account, portfolio, or individualized financial action.
@@ -105,7 +105,7 @@ export default function FiveFoundations() {
               ["Standards", "#standards"],
               ["Sources", "#sources"],
             ].map(([label, href]) => (
-              <a key={href} href={href} className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-white/60 hover:bg-white/[0.08] hover:text-white">
+              <a key={href} href={href} className="rounded-full border border-white/10 bg-white/4 px-3 py-1.5 text-white/60 hover:bg-white/8 hover:text-white">
                 {label}
               </a>
             ))}
@@ -178,7 +178,7 @@ export default function FiveFoundations() {
         </LessonSection>
 
         <LessonSection id="student-handout" eyebrow="Student handout" title="Five questions">
-          <p className="rounded-xl border border-white/10 bg-white/[0.025] p-4 print:border-black/15 print:bg-transparent">All situations are hypothetical. Do not include personal financial information.</p>
+          <p className="rounded-xl border border-white/10 bg-white/2.5 p-4 print:border-black/15 print:bg-transparent">All situations are hypothetical. Do not include personal financial information.</p>
 
           <div className="space-y-8">
             <div>
@@ -254,7 +254,7 @@ export default function FiveFoundations() {
 
           <div className="overflow-x-auto rounded-2xl border border-white/10 print:border-black/15">
             <table className="min-w-[720px] w-full text-left text-sm">
-              <thead className="bg-white/[0.05] text-white/55 print:bg-black/[0.03] print:text-black/65">
+              <thead className="bg-white/5 text-white/55 print:bg-black/3 print:text-black/65">
                 <tr><th className="px-4 py-3 font-medium">Concept</th><th className="px-4 py-3 font-medium">Standard</th><th className="px-4 py-3 font-medium">Evidence in lesson</th></tr>
               </thead>
               <tbody className="divide-y divide-white/10 print:divide-black/10">
@@ -289,7 +289,7 @@ export default function FiveFoundations() {
             </div>
           </div>
 
-          <div className="mt-7 flex gap-3 rounded-2xl border border-amber-300/20 bg-amber-300/[0.04] p-4 print:border-black/20 print:bg-transparent">
+          <div className="mt-7 flex gap-3 rounded-2xl border border-amber-300/20 bg-amber-300/4 p-4 print:border-black/20 print:bg-transparent">
             <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-300 print:text-black" aria-hidden="true" />
             <p className="text-sm leading-6">
               Publication here does not mean Jump$tart, the CFPB, the SEC, a school, or any other external body has endorsed Finance for All or this lesson. Standards alignment and source use are factual references; any external review or listing is named only after it actually occurs.

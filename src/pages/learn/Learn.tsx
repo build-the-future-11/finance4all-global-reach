@@ -43,7 +43,7 @@ export default function Learn() {
               A compact lesson on compound interest, inflation and purchasing power, diversification, borrowing cost and APR, and the relationship between risk and expected return.
             </p>
 
-            <div className="mt-5 flex items-start gap-2 rounded-2xl border border-emerald-300/15 bg-emerald-300/[0.04] p-4 text-sm leading-6 text-white/70">
+            <div className="mt-5 flex items-start gap-2 rounded-2xl border border-emerald-300/15 bg-emerald-300/4 p-4 text-sm leading-6 text-white/70">
               <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-300" aria-hidden="true" />
               <p>
                 Uses hypothetical examples only. No security, lender, account, broker, or individualized financial action is recommended.

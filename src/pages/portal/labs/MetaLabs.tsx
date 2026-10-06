@@ -322,7 +322,7 @@ export default function MetaLabs() {
           value={statusFilter}
           onValueChange={(v) => setStatusFilter(v as ResearchProjectStatus | "all")}
         >
-          <TabsList className="h-auto flex-wrap gap-1 bg-white/[0.04] p-1">
+          <TabsList className="h-auto flex-wrap gap-1 bg-white/4 p-1">
             {STATUSES.map((s) => (
               <TabsTrigger
                 key={s.value}
