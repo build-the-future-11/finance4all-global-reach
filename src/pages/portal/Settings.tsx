@@ -61,7 +61,7 @@ export default function Settings() {
     try {
       const { error } = await updateProfile.mutateAsync({
         displayName: displayName.trim(),
-        bio: bio.trim() || undefined,
+        bio: bio.trim(),
         interests,
         openToCollaborate,
         chapterId: chapterId || undefined,
