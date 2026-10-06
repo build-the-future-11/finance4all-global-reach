@@ -33,7 +33,7 @@ export default function BookmarkButton({
     <Button
       type="button"
       size="sm"
-      variant={saved ? "default" : "outline"}
+      variant={saved ? "default" : "outline-solid"}
       disabled={loading}
       className={cn(
         saved ? "bg-emerald-500 hover:bg-emerald-400" : "border-white/20 text-white hover:bg-white/10",

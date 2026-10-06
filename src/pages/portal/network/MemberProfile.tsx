@@ -63,7 +63,7 @@ export default function MemberProfile() {
       </Link>
 
       <PortalCard className="overflow-hidden">
-        <div className="h-24 bg-gradient-to-r from-emerald-500/20 via-blue-500/10 to-purple-500/20" />
+        <div className="h-24 bg-linear-to-r from-emerald-500/20 via-blue-500/10 to-purple-500/20" />
         <div className="relative px-6 pb-6">
           <Avatar className="-mt-10 h-20 w-20 border-4 border-[#060a12]">
             <AvatarImage src={profile.avatarUrl} />

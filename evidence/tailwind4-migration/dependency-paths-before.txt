@@ -1,0 +1,13 @@
+financemeta-member-portal@0.0.0 /workspace/scratch/3dc1b76eecb3/finance4all-work
+├─┬ @tailwindcss/typography@0.5.16
+│ └── tailwindcss@3.4.19 deduped
+├─┬ tailwindcss-animate@1.0.7
+│ └── tailwindcss@3.4.19 deduped
+└─┬ tailwindcss@3.4.19
+  ├─┬ chokidar@3.6.0
+  │ └── braces@3.0.3
+  ├─┬ fast-glob@3.3.2
+  │ └── micromatch@4.0.8 deduped
+  └─┬ micromatch@4.0.8
+    └── braces@3.0.3 deduped
+

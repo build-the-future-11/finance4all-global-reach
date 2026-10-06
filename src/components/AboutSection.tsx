@@ -50,7 +50,7 @@ export default function AboutSection() {
             return (
               <article
                 key={pillar.title}
-                className="rounded-3xl border border-white/20 bg-white/[0.05] p-6 backdrop-blur-xl"
+                className="rounded-3xl border border-white/20 bg-white/5 p-6 backdrop-blur-xl"
               >
                 <div className="mb-4 inline-flex rounded-xl border border-white/20 bg-white/10 p-3 text-emerald-300">
                   <Icon className="h-5 w-5" />

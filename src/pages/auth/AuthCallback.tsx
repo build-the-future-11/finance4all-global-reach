@@ -27,7 +27,7 @@ export default function AuthCallback() {
   if (authError) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#060a12] px-4 text-white">
-        <section className="w-full max-w-md border border-amber-400/25 bg-white/[0.04] p-6 text-center">
+        <section className="w-full max-w-md border border-amber-400/25 bg-white/4 p-6 text-center">
           <AlertTriangle className="mx-auto h-9 w-9 text-amber-300" />
           <h1 className="mt-4 text-xl font-semibold">Sign in was not completed</h1>
           <p role="alert" className="mt-2 text-sm leading-6 text-white/65">

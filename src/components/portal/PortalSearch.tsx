@@ -132,7 +132,7 @@ export default function PortalSearch() {
                 <CommandGroup
                   key={type}
                   heading={TYPE_LABELS[type as SearchResult["type"]]}
-                  className="text-white/50 [&_[cmdk-group-heading]]:text-white/40"
+                  className="text-white/50 **:[[cmdk-group-heading]]:text-white/40"
                 >
                   {items?.map((item) => (
                     <CommandItem

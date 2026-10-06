@@ -144,7 +144,7 @@ export default function EventsChapters() {
       <section>
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-lg font-semibold text-white">Events</h2>
-          <div className="flex gap-1 rounded-lg bg-white/[0.04] p-1">
+          <div className="flex gap-1 rounded-lg bg-white/4 p-1">
             <Button
               size="sm"
               variant={viewMode === "list" ? "default" : "ghost"}
@@ -166,7 +166,7 @@ export default function EventsChapters() {
 
         {chapters && chapters.length > 0 && (
           <Tabs value={selectedChapter} onValueChange={setSelectedChapter} className="mb-6">
-            <TabsList className="h-auto flex-wrap gap-1 bg-white/[0.04] p-1">
+            <TabsList className="h-auto flex-wrap gap-1 bg-white/4 p-1">
               <TabsTrigger
                 value="all"
                 className="data-[state=active]:bg-emerald-500/20 data-[state=active]:text-emerald-300"
@@ -259,7 +259,7 @@ export default function EventsChapters() {
                     <div className="flex flex-col gap-2">
                       <Button
                         size="sm"
-                        variant={registered ? "default" : "outline"}
+                        variant={registered ? "default" : "outline-solid"}
                         className={registered ? "bg-emerald-500 hover:bg-emerald-400" : "border-white/20 text-white"}
                         onClick={() => handleRegister(event.id, registered)}
                       >
