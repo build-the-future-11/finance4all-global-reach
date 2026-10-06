@@ -157,6 +157,26 @@ describe("production completion contracts", () => {
     expect(rlsWorkflow).toContain("retention-days: 30");
   });
 
+  it("retains terminal redacted RLS evidence even when credential or target validation fails", () => {
+    const initializeIndex = rlsWorkflow.indexOf("Initialize redacted certification evidence");
+    const targetValidationIndex = rlsWorkflow.indexOf("Require the canonical FinanceMeta database connection");
+    const finalizeIndex = rlsWorkflow.indexOf("Finalize redacted certification evidence");
+    const uploadIndex = rlsWorkflow.indexOf("Retain production RLS evidence");
+
+    expect(initializeIndex).toBeGreaterThanOrEqual(0);
+    expect(targetValidationIndex).toBeGreaterThan(initializeIndex);
+    expect(finalizeIndex).toBeGreaterThan(targetValidationIndex);
+    expect(uploadIndex).toBeGreaterThan(finalizeIndex);
+    expect(rlsWorkflow).toContain("production-rls-evidence/preflight.txt");
+    expect(rlsWorkflow).toContain("result=PRECHECK_PENDING");
+    expect(rlsWorkflow).toContain("CERTIFICATION_JOB_STATUS: ${{ job.status }}");
+    expect(rlsWorkflow).toContain("terminal_job_status=%s");
+    expect(rlsWorkflow).toContain("if test -f production-rls-evidence/rls-certification.log");
+    expect(rlsWorkflow).toContain("production-rls-evidence/SHA256SUMS");
+    expect(rlsWorkflow.match(/if: always\(\)/g)?.length).toBeGreaterThanOrEqual(2);
+    expect(rlsWorkflow).toContain("if-no-files-found: error");
+  });
+
   it("certifies that member activity survives reload and reauthentication", () => {
     expect(credentialedJourney).toContain("FinanceMeta production certification");
     expect(credentialedJourney).toContain("await pageA.reload()");
