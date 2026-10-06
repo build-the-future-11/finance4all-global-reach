@@ -58,9 +58,14 @@ export default function Settings() {
 
   const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const normalizedDisplayName = displayName.trim();
+    if (!normalizedDisplayName) {
+      toast.error("Display name is required");
+      return;
+    }
     try {
       const { error } = await updateProfile.mutateAsync({
-        displayName: displayName.trim(),
+        displayName: normalizedDisplayName,
         bio: bio.trim(),
         interests,
         openToCollaborate,
@@ -135,6 +140,7 @@ export default function Settings() {
               <Input
                 id="settings-display-name"
                 name="displayName"
+                required
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 className={portalInputClass}
