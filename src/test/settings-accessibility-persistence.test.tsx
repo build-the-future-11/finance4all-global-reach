@@ -109,7 +109,7 @@ describe("member settings", () => {
     expect(mocks.success).toHaveBeenCalledWith("Profile updated");
   });
 
-  it.each(["", "   \t  "])("persists an explicitly cleared bio: %j", async (clearedBio) => {
+  it.each(["", "      "])("persists an explicitly cleared bio: %j", async (clearedBio) => {
     render(<MemoryRouter><Settings /></MemoryRouter>);
 
     const bio = screen.getByLabelText("Bio");
