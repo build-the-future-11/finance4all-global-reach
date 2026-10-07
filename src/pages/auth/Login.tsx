@@ -97,7 +97,7 @@ export default function Login() {
             {error}
           </p>
         )}
-        <Button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-400" disabled={submitting || !isSupabaseConfigured}>
+        <Button type="submit" className="w-full bg-emerald-500 text-slate-950 hover:bg-emerald-400" disabled={submitting || !isSupabaseConfigured}>
           {submitting ? "Signing in…" : "Sign in with email"}
         </Button>
       </form>

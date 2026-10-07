@@ -120,7 +120,7 @@ export default function Networking() {
         action={
           <Dialog open={introOpen} onOpenChange={setIntroOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-emerald-500 hover:bg-emerald-400">
+              <Button className="bg-emerald-500 text-slate-950 hover:bg-emerald-400">
                 <Plus className="h-4 w-4" /> Post introduction
               </Button>
             </DialogTrigger>
@@ -152,7 +152,7 @@ export default function Networking() {
                     className={portalInputClass}
                   />
                 </div>
-                <Button type="submit" disabled={createIntro.isPending} className="bg-emerald-500 hover:bg-emerald-400">
+                <Button type="submit" disabled={createIntro.isPending} className="bg-emerald-500 text-slate-950 hover:bg-emerald-400">
                   Post
                 </Button>
               </form>

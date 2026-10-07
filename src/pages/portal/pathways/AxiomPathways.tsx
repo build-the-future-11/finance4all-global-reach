@@ -162,7 +162,7 @@ export default function AxiomPathways() {
                     <Button
                       size="sm"
                       variant={saved ? "default" : "outline"}
-                      className={saved ? "bg-emerald-500 hover:bg-emerald-400" : "border-white/20 text-white"}
+                      className={saved ? "bg-emerald-500 text-slate-950 hover:bg-emerald-400" : "border-white/20 text-white"}
                       onClick={() => handleToggle(opp.id, saved)}
                     >
                       <Star className={`h-3.5 w-3.5 ${saved ? "fill-current" : ""}`} />

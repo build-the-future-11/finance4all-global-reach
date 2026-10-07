@@ -187,7 +187,7 @@ export default function Signup() {
             )}
             <Button
               type="submit"
-              className="w-full bg-emerald-500 hover:bg-emerald-400"
+              className="w-full bg-emerald-500 text-slate-950 hover:bg-emerald-400"
               disabled={!isSupabaseConfigured || submitting || authSettings?.signupsEnabled === false || authSettings?.emailEnabled === false}
             >
               {submitting ? "Creating account…" : "Create account with email"}

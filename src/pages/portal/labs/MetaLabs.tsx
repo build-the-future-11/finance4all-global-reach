@@ -130,7 +130,7 @@ function ProjectDetail({ id }: { id: string }) {
           ) : (
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-emerald-500 hover:bg-emerald-400">Apply to this project</Button>
+                <Button className="bg-emerald-500 text-slate-950 hover:bg-emerald-400">Apply to this project</Button>
               </DialogTrigger>
               <DialogContent className="border-white/15 bg-[#0c1220] text-white">
                 <DialogHeader>
@@ -152,7 +152,7 @@ function ProjectDetail({ id }: { id: string }) {
                   <Button
                     type="submit"
                     disabled={submitApp.isPending}
-                    className="bg-emerald-500 hover:bg-emerald-400"
+                    className="bg-emerald-500 text-slate-950 hover:bg-emerald-400"
                   >
                     Submit application
                   </Button>
@@ -232,7 +232,7 @@ export default function MetaLabs() {
           canCreate ? (
             <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
-                <Button className="bg-emerald-500 hover:bg-emerald-400">
+                <Button className="bg-emerald-500 text-slate-950 hover:bg-emerald-400">
                   <Plus className="h-4 w-4" /> New project
                 </Button>
               </DialogTrigger>
@@ -271,7 +271,7 @@ export default function MetaLabs() {
                   <Button
                     type="submit"
                     disabled={createProject.isPending}
-                    className="bg-emerald-500 hover:bg-emerald-400"
+                    className="bg-emerald-500 text-slate-950 hover:bg-emerald-400"
                   >
                     Publish
                   </Button>

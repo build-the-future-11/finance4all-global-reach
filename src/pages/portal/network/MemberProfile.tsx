@@ -96,7 +96,7 @@ export default function MemberProfile() {
                   Connection: {existing.status}
                 </Badge>
               ) : (
-                <Button onClick={handleConnect} disabled={sendRequest.isPending} className="bg-emerald-500 hover:bg-emerald-400">
+                <Button onClick={handleConnect} disabled={sendRequest.isPending} className="bg-emerald-500 text-slate-950 hover:bg-emerald-400">
                   <UserPlus className="mr-2 h-4 w-4" />
                   Connect
                 </Button>

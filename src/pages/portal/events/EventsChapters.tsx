@@ -286,7 +286,7 @@ export default function EventsChapters() {
                       <Button
                         size="sm"
                         variant={registered ? "default" : "outline"}
-                        className={registered ? "bg-emerald-500 hover:bg-emerald-400" : "border-white/20 text-white"}
+                        className={registered ? "bg-emerald-500 text-slate-950 hover:bg-emerald-400" : "border-white/20 text-white"}
                         disabled={!canChangeRegistration || registrationPending || toggleReg.isPending}
                         onClick={() => handleRegister(event.id, registered)}
                       >

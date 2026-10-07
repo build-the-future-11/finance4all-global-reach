@@ -11,10 +11,11 @@ Eight seeded calls record **expressions of interest**, including quantitative, f
 - Authenticated applicants can read only their own records. Only trusted database-admin profiles can review all records.
 - The insert column grant prevents spoofing applicant, review state, timestamps and review notes. Ownership comes from `auth.uid()`.
 - A private trigger enforces open/deadline state, serializes submissions per account and caps accepted inserts at five in a rolling 24-hour window. Withdrawals retain quota consumption. A unique applicant/call constraint prevents duplicate intake.
-- A browser-generated UUID is reused after uncertain network responses. Only an existing receipt for that same UUID and applicant can convert a retry into success.
+- A browser-generated UUID is reused after uncertain network responses. Only an existing receipt for that same UUID and applicant can convert a retry into success. If an applicant edits their answers before that retry recovers an earlier receipt, the form identifies the unsent edits and preserves them for download. The receipt download contains the stored submission; the current-answers download contains the form's current values.
 - Server constraints enforce answer lengths, consent/version and HTTPS work links. The browser additionally rejects credential-bearing links. Submitted answers are immutable. Applicants can withdraw; they cannot self-accept or edit review notes. Withdrawn records cannot be reopened through review.
 - Database export includes intake records scoped to the requesting account. Account deletion cascades to submissions. Withdrawal retains data; there is no automatic retention deadline. Operators must approve a retention/deletion process before broad onboarding.
-- No private application answers enter analytics, URLs, public directories, localStorage or logs. The form's unsent answers live only in component memory. Downloaded JSON contains the user's answers; treat it as private.
+- No private application answers enter analytics, URLs, public directories, localStorage or logs. When draft storage is available, a new draft or an explicitly resumed draft autosaves to the account's private `application_drafts` record after a one-second pause. Existing drafts are offered for restoration before autosaving starts. Drafts are not submitted applications and do not carry submission consent. Changes awaiting confirmation remain in component memory; downloaded JSON contains private answers.
+- Draft updates and deletions require the saved revision and a confirmed returned row. Clearing every answer in an existing draft is persisted. Saving and deletion cannot overlap. A confirmed deletion removes the cached draft, keeps the current form answers available, and pauses autosaving until reload. A failed or conflicting deletion never reports success.
 
 ## Deployment contract
 
@@ -29,6 +30,6 @@ The contact mailbox and existing Tally forms are preserved; no transactional ema
 
 ## Verification
 
-`npm run typecheck` now checks the actual application and Vite config; the former empty-wrapper check did not do so. `npm test` covers input normalization, failure states, confirmations, duplicate clicks, retry identity and existing functionality. CI replays all migrations and runs `intake_rls_certification.sql` alongside the two existing RLS suites. All SQL fixtures roll back.
+`npm run typecheck` now checks the actual application and Vite config; the former empty-wrapper check did not do so. `npm test` covers input normalization, failure states, confirmations, duplicate clicks, retry identity, draft persistence and existing functionality. Browser fixtures verify that recovered receipts and unsent current answers remain distinguishable in the interface and in their downloaded files. They do not certify live authentication or production authorization. CI replays all migrations and runs the intake and collaboration authorization suites alongside the two existing RLS suites. All SQL fixtures roll back.
 
 Authorization implementation follows the [Supabase RLS documentation](https://supabase.com/docs/guides/database/postgres/row-level-security) and [function security guidance](https://supabase.com/docs/guides/database/functions). Browser role guards are navigation aids; database rules enforce access.

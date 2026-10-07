@@ -149,7 +149,7 @@ export default function Admin() {
               </div>
             </div>
             <Button
-              className="mt-4 bg-emerald-500 hover:bg-emerald-400"
+              className="mt-4 bg-emerald-500 text-slate-950 hover:bg-emerald-400"
               disabled={createNews.isPending}
               onClick={async () => {
                 try {
@@ -226,7 +226,7 @@ export default function Admin() {
                 <Input id="admin-opportunity-tags" name="tags" value={oppForm.tags} onChange={(e) => setOppForm({ ...oppForm, tags: e.target.value })} className={portalInputClass} />
               </div>
             </div>
-            <Button disabled={createOpp.isPending} className="mt-4 bg-emerald-500 hover:bg-emerald-400" onClick={async () => {
+            <Button disabled={createOpp.isPending} className="mt-4 bg-emerald-500 text-slate-950 hover:bg-emerald-400" onClick={async () => {
               try {
                 await createOpp.mutateAsync({ ...oppForm, tags: parseTags(oppForm.tags), applicationUrl: oppForm.applicationUrl || undefined });
                 toast.success("Opportunity added");
@@ -272,7 +272,7 @@ export default function Admin() {
                 <Input id="admin-event-registration-url" name="registrationUrl" type="url" value={eventForm.registrationUrl} onChange={(e) => setEventForm({ ...eventForm, registrationUrl: e.target.value })} className={portalInputClass} />
               </div>
             </div>
-            <Button disabled={createEvent.isPending} className="mt-4 bg-emerald-500 hover:bg-emerald-400" onClick={async () => {
+            <Button disabled={createEvent.isPending} className="mt-4 bg-emerald-500 text-slate-950 hover:bg-emerald-400" onClick={async () => {
               try {
                 await createEvent.mutateAsync({
                   ...eventForm,
@@ -314,7 +314,7 @@ export default function Admin() {
                 <Textarea id="admin-explainer-body" name="body" value={explainerForm.body} onChange={(e) => setExplainerForm({ ...explainerForm, body: e.target.value })} rows={8} className={portalInputClass} />
               </div>
             </div>
-            <Button disabled={createExplainer.isPending} className="mt-4 bg-emerald-500 hover:bg-emerald-400" onClick={async () => {
+            <Button disabled={createExplainer.isPending} className="mt-4 bg-emerald-500 text-slate-950 hover:bg-emerald-400" onClick={async () => {
               try {
                 await createExplainer.mutateAsync(explainerForm);
                 toast.success("Explainer published");
@@ -397,7 +397,7 @@ export default function Admin() {
                     }))}
                   />
                   <Button
-                    className="bg-emerald-500 hover:bg-emerald-400"
+                    className="bg-emerald-500 text-slate-950 hover:bg-emerald-400"
                     disabled={reviewDeletion.isPending}
                     onClick={async () => {
                       try {
