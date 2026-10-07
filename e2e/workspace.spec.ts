@@ -151,3 +151,49 @@ test('existing bright save controls retain readable text in both themes', async 
     }
   }
 });
+
+test('collaboration preserves unsent evidence across another update and a failed reload', async ({ page }) => {
+  const taskId = '30000000-0000-4000-8000-000000000091';
+  const original = { id: taskId, project_id: projectId, title: 'Evaluate the baseline', description: 'Check chronological evaluation.', kind: 'task', assignee_id: memberId, due_date: null, status: 'in_progress', evidence_url: 'https://example.com/saved', revision: 6, created_at: timestamp, updated_at: timestamp };
+  let tasks = [original];
+  let unavailable = false;
+  let updateFilters: Record<string, string | null> | null = null;
+  await page.route('**/rest/v1/project_tasks*', route => {
+    const request = route.request();
+    if (request.method() === 'POST') {
+      const created = { ...original, ...request.postDataJSON(), id: '30000000-0000-4000-8000-000000000092', revision: 1, status: 'todo', evidence_url: '' };
+      tasks = [{ ...original, evidence_url: 'https://example.com/another-session', revision: 7 }, created];
+      return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(created) });
+    }
+    if (request.method() === 'PATCH') {
+      const params = new URL(request.url()).searchParams;
+      updateFilters = Object.fromEntries(['project_id', 'id', 'revision'].map(key => [key, params.get(key)]));
+      return route.fulfill({ status: 200, contentType: 'application/json', body: 'null' });
+    }
+    return route.fulfill({ status: unavailable ? 503 : 200, contentType: 'application/json', body: JSON.stringify(unavailable ? { message: 'Task refresh unavailable' } : tasks) });
+  });
+  await page.setViewportSize({ width: 375, height: 950 });
+  await page.goto('/portal/collaboration?project=' + projectId);
+  const editor = page.locator('.portal-card').filter({ has: page.getByRole('heading', { name: original.title, exact: true }) });
+  const evidence = editor.getByRole('textbox', { name: 'HTTPS evidence link', exact: true });
+  await evidence.fill('https://example.com/my-unsent-evidence');
+  await page.getByRole('textbox', { name: 'Title', exact: true }).fill('Another work item');
+  await page.getByRole('button', { name: 'Create work item', exact: true }).click();
+  await expect(editor.getByRole('link', { name: 'Open submitted evidence' })).toHaveAttribute('href', 'https://example.com/another-session');
+  await expect(evidence).toHaveValue('https://example.com/my-unsent-evidence');
+  await editor.getByRole('button', { name: 'Save task', exact: true }).click();
+  await expect(editor.getByText('This task changed or access was removed. Reload before retrying.')).toBeVisible();
+  expect(updateFilters).toEqual({ project_id: 'eq.' + projectId, id: 'eq.' + taskId, revision: 'eq.6' });
+  unavailable = true;
+  page.once('dialog', dialog => dialog.accept());
+  await editor.getByRole('button', { name: 'Reload saved task' }).click();
+  await expect(page.getByText(/Work items could not be refreshed/)).toBeVisible({ timeout: 20000 });
+  await expect(evidence).toHaveValue('https://example.com/my-unsent-evidence');
+  unavailable = false;
+  page.once('dialog', dialog => dialog.accept());
+  await editor.getByRole('button', { name: 'Reload saved task' }).click();
+  await expect(evidence).toHaveValue('https://example.com/another-session');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1)).toBe(false);
+  const audit = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
+  expect(audit.violations.map(violation => ({ id: violation.id, nodes: violation.nodes.map(node => node.target) }))).toEqual([]);
+});
