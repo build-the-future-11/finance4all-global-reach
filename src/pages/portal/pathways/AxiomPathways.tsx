@@ -161,7 +161,7 @@ export default function AxiomPathways() {
                   <div className="flex flex-col gap-2">
                     <Button
                       size="sm"
-                      variant={saved ? "default" : "outline-solid"}
+                      variant={saved ? "default" : "outline"}
                       className={saved ? "bg-emerald-500 hover:bg-emerald-400" : "border-white/20 text-white"}
                       onClick={() => handleToggle(opp.id, saved)}
                     >

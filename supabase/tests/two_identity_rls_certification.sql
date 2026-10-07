@@ -55,6 +55,7 @@ BEGIN
   INTO missing_tables
   FROM (
     VALUES
+      ('project_memberships'), ('project_tasks'), ('intake_calls'), ('intake_submissions'), ('member_learning'), ('application_drafts'), ('intake_history'),
       ('account_deletion_requests'),
       ('chapters'),
       ('connection_requests'),
@@ -90,7 +91,7 @@ BEGIN
   WHERE n.nspname = 'public'
     AND c.relkind IN ('r', 'p')
     AND c.relname <> ALL (ARRAY[
-      'account_deletion_requests',
+      'project_memberships', 'project_tasks', 'intake_calls', 'intake_submissions', 'member_learning', 'application_drafts', 'intake_history', 'account_deletion_requests',
       'chapters', 'connection_requests', 'digest_preferences',
       'education_lesson_progress', 'essay_submissions', 'essay_upvotes',
       'event_registrations', 'events', 'explainer_cards',

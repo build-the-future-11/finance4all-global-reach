@@ -89,6 +89,8 @@ test('database authorization retains source- and workflow-bound certification ev
   assert.match(databaseAuthorization, /find supabase\/migrations .*sha256sum/);
   assert.match(databaseAuthorization, /sha256sum supabase\/tests\/two_identity_rls_certification\.sql/);
   assert.match(databaseAuthorization, /sha256sum supabase\/tests\/account_lifecycle_rls_certification\.sql/);
+  assert.match(databaseAuthorization, /sha256sum supabase\/tests\/intake_rls_certification\.sql/);
+  assert.match(databaseAuthorization, /sha256sum supabase\/tests\/collaboration_rls_certification\.sql/);
   assert.match(databaseAuthorization, /2>&1 \| tee "\$evidence_dir\/certification\.log"/);
   assert.match(databaseAuthorization, /name: Upload database authorization evidence/);
   assert.match(databaseAuthorization, /name: database-authorization-\$\{\{ env\.EXPECTED_SOURCE_SHA \}\}/);

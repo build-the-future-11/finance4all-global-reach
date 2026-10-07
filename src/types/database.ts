@@ -1,3 +1,4 @@
+import type { IntakeCall, IntakeSubmission } from "@/lib/intake";
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export type UserRole = "member" | "lead_researcher" | "admin";
@@ -10,14 +11,51 @@ export type ConnectionStatus = "pending" | "accepted" | "declined";
 export type ExplainerDifficulty = "beginner" | "intermediate";
 export type AccountDeletionStatus = "pending" | "in_progress" | "cancelled" | "rejected";
 export type NotificationType =
+  | "project_task"
+  | "intake_status"
   | "connection_request"
   | "connection_accepted"
   | "lab_application_status"
   | "lab_application_received";
 
-export interface Database {
+interface DatabaseDefinition {
   public: {
     Tables: {
+      project_memberships: {
+        Row: {project_id:string;user_id:string;invited_by:string;status:'invited'|'active'|'declined'|'left'|'removed';updated_at:string};
+        Insert: {project_id:string;user_id:string};
+        Update: {status:'invited'|'active'|'declined'|'left'|'removed'};
+      };
+      project_tasks: {
+        Row: {id:string;project_id:string;title:string;description:string;assignee_id:string|null;due_date:string|null;kind:'task'|'milestone';status:'todo'|'in_progress'|'submitted'|'done';evidence_url:string;revision:number;updated_at:string};
+        Insert: {project_id:string;title:string;description?:string;assignee_id?:string|null;due_date?:string|null;kind?:'task'|'milestone'};
+        Update: {title?:string;description?:string;assignee_id?:string|null;due_date?:string|null;status?:'todo'|'in_progress'|'submitted'|'done';evidence_url?:string};
+      };
+      member_learning: {
+        Row: {user_id:string;lesson_id:string;completed:boolean;notes:string;revision:number;updated_at:string};
+        Insert: {lesson_id:string;completed?:boolean;notes?:string};
+        Update: {completed?:boolean;notes?:string};
+      };
+      application_drafts: {
+        Row: {user_id:string;call_id:string;motivation:string;preparation:string;availability:string;work_url:string;revision:number;updated_at:string};
+        Insert: {call_id:string;motivation:string;preparation:string;availability:string;work_url:string};
+        Update: {motivation?:string;preparation?:string;availability?:string;work_url?:string};
+      };
+      intake_history: {
+        Row: {id:number;submission_id:string;status:string;note:string;recorded_at:string};
+        Insert: never;
+        Update: never;
+      };
+      intake_calls: {
+        Row: IntakeCall;
+        Insert: Omit<IntakeCall, "created_at">;
+        Update: Partial<Omit<IntakeCall, "id" | "created_at">>;
+      };
+      intake_submissions: {
+        Row: IntakeSubmission;
+        Insert: Pick<IntakeSubmission, "id" | "call_id" | "motivation" | "preparation" | "availability" | "work_url" | "privacy_version" | "consent">;
+        Update: Partial<Pick<IntakeSubmission, "status" | "review_note">>;
+      };
       profiles: {
         Row: {
           id: string;
@@ -72,7 +110,7 @@ export interface Database {
           tags: string[];
           created_at: string;
         };
-        Insert: Omit<Database["public"]["Tables"]["news_articles"]["Row"], "id" | "created_at"> & {
+        Insert: Omit<Database["public"]["Tables"]["news_articles"]["Row"], "id" | "created_at" | "published_at"> & Partial<Pick<Database["public"]["Tables"]["news_articles"]["Row"], "published_at">> & {
           id?: string;
           created_at?: string;
         };
@@ -89,7 +127,7 @@ export interface Database {
           related_terms: string[];
           created_at: string;
         };
-        Insert: Omit<Database["public"]["Tables"]["explainer_cards"]["Row"], "id" | "created_at"> & {
+        Insert: Omit<Database["public"]["Tables"]["explainer_cards"]["Row"], "id" | "created_at" | "related_terms"> & Partial<Pick<Database["public"]["Tables"]["explainer_cards"]["Row"], "related_terms">> & {
           id?: string;
           created_at?: string;
         };
@@ -107,6 +145,7 @@ export interface Database {
           user_id: string;
           weekly_digest_enabled?: boolean;
           substack_subscribed?: boolean;
+          updated_at?: string;
           preferred_categories?: NewsCategory[];
         };
         Update: Partial<Database["public"]["Tables"]["digest_preferences"]["Insert"]>;
@@ -139,7 +178,7 @@ export interface Database {
           reviewed_at: string | null;
           reviewer_id: string | null;
         };
-        Insert: Omit<Database["public"]["Tables"]["lab_applications"]["Row"], "id" | "submitted_at"> & {
+        Insert: Omit<Database["public"]["Tables"]["lab_applications"]["Row"], "id" | "submitted_at" | "status" | "reviewed_at" | "reviewer_id"> & Partial<Pick<Database["public"]["Tables"]["lab_applications"]["Row"], "status" | "reviewed_at" | "reviewer_id">> & {
           id?: string;
           submitted_at?: string;
         };
@@ -158,7 +197,7 @@ export interface Database {
           is_active: boolean;
           created_at: string;
         };
-        Insert: Omit<Database["public"]["Tables"]["opportunities"]["Row"], "id" | "created_at"> & {
+        Insert: Omit<Database["public"]["Tables"]["opportunities"]["Row"], "id" | "created_at" | "deadline" | "is_active"> & Partial<Pick<Database["public"]["Tables"]["opportunities"]["Row"], "deadline" | "is_active">> & {
           id?: string;
         };
         Update: Partial<Database["public"]["Tables"]["opportunities"]["Insert"]>;
@@ -192,7 +231,7 @@ export interface Database {
           is_editorial_pick: boolean;
           submitted_at: string;
         };
-        Insert: Omit<Database["public"]["Tables"]["essay_submissions"]["Row"], "id" | "submitted_at"> & {
+        Insert: Omit<Database["public"]["Tables"]["essay_submissions"]["Row"], "id" | "submitted_at" | "is_editorial_pick"> & Partial<Pick<Database["public"]["Tables"]["essay_submissions"]["Row"], "is_editorial_pick">> & {
           id?: string;
         };
         Update: Partial<Database["public"]["Tables"]["essay_submissions"]["Insert"]>;
@@ -215,7 +254,7 @@ export interface Database {
           program_links: Json;
           created_at: string;
         };
-        Insert: Omit<Database["public"]["Tables"]["events"]["Row"], "id" | "created_at"> & {
+        Insert: Omit<Database["public"]["Tables"]["events"]["Row"], "id" | "created_at" | "ends_at" | "program_links"> & Partial<Pick<Database["public"]["Tables"]["events"]["Row"], "ends_at" | "program_links">> & {
           id?: string;
         };
         Update: Partial<Database["public"]["Tables"]["events"]["Insert"]>;
@@ -234,7 +273,7 @@ export interface Database {
           message: string | null;
           created_at: string;
         };
-        Insert: Omit<Database["public"]["Tables"]["connection_requests"]["Row"], "id" | "created_at"> & {
+        Insert: Omit<Database["public"]["Tables"]["connection_requests"]["Row"], "id" | "created_at" | "status"> & Partial<Pick<Database["public"]["Tables"]["connection_requests"]["Row"], "status">> & {
           id?: string;
         };
         Update: Partial<Database["public"]["Tables"]["connection_requests"]["Insert"]>;
@@ -325,3 +364,14 @@ export interface Database {
 }
 
 export type Tables<T extends keyof Database["public"]["Tables"]> = Database["public"]["Tables"][T]["Row"];
+
+// Supabase requires relationship metadata in every table/view contract.
+type Relations = {
+ lab_applications: [{ foreignKeyName: 'lab_applications_project_id_fkey'; columns: ['project_id']; isOneToOne: false; referencedRelation: 'research_projects'; referencedColumns: ['id'] }];
+ news_bookmarks: [{ foreignKeyName: 'news_bookmarks_article_id_fkey'; columns: ['article_id']; isOneToOne: false; referencedRelation: 'news_articles'; referencedColumns: ['id'] }];
+ project_bookmarks: [{ foreignKeyName: 'project_bookmarks_project_id_fkey'; columns: ['project_id']; isOneToOne: false; referencedRelation: 'research_projects'; referencedColumns: ['id'] }];
+};
+export type Database = { public: Omit<DatabaseDefinition['public'], 'Tables' | 'Views'> & {
+ Tables: { [K in keyof DatabaseDefinition['public']['Tables']]: DatabaseDefinition['public']['Tables'][K] & { Relationships: K extends keyof Relations ? Relations[K] : [] } };
+ Views: { [K in keyof DatabaseDefinition['public']['Views']]: DatabaseDefinition['public']['Views'][K] & { Relationships: [] } };
+} };

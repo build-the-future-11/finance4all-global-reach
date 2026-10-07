@@ -14,7 +14,10 @@ import ForgotPassword from "@/pages/auth/ForgotPassword";
 import ResetPassword from "@/pages/auth/ResetPassword";
 import PortalLayout from "@/layouts/PortalLayout";
 
-const Dashboard = lazy(() => import("@/pages/portal/Dashboard"));
+const Collaboration = lazy(() => import("@/pages/portal/Collaboration"));
+const LearningWorkspace = lazy(() => import("@/pages/portal/LearningWorkspace"));
+const Dashboard = lazy(() => import("@/pages/portal/ResearchWorkspace"));
+const MyResearch = lazy(() => import("@/pages/portal/ResearchWorkspace").then(module => ({ default: module.MyResearch })));
 const DebriefedHub = lazy(() => import("@/pages/portal/debriefed/DebriefedHub"));
 const DebriefedExplainers = lazy(() => import("@/pages/portal/debriefed/DebriefedExplainers"));
 const MetaLabs = lazy(() => import("@/pages/portal/labs/MetaLabs"));
@@ -28,6 +31,8 @@ const MemberProfile = lazy(() => import("@/pages/portal/network/MemberProfile"))
 const Admin = lazy(() => import("@/pages/portal/Admin"));
 const Saved = lazy(() => import("@/pages/portal/Saved"));
 const Settings = lazy(() => import("@/pages/portal/Settings"));
+const Intake = lazy(() => import("@/pages/portal/Intake"));
+const IntakeReview = lazy(() => import("@/pages/portal/IntakeReview"));
 const Evidence = lazy(() => import("@/pages/Evidence"));
 const Learn = lazy(() => import("@/pages/learn/Learn"));
 const FiveFoundations = lazy(() => import("@/pages/learn/FiveFoundations"));
@@ -76,6 +81,9 @@ function AppRoutes() {
             }
           >
             <Route index element={<Dashboard />} />
+            <Route path="collaboration" element={<Collaboration />} />
+            <Route path="learning" element={<LearningWorkspace />} />
+            <Route path="my-research" element={<MyResearch />} />
             <Route path="debriefed" element={<DebriefedHub />} />
             <Route path="debriefed/explainers" element={<DebriefedExplainers />} />
             <Route path="debriefed/explainers/:slug" element={<DebriefedExplainers />} />
@@ -105,6 +113,8 @@ function AppRoutes() {
             />
             <Route path="settings" element={<Settings />} />
             <Route path="saved" element={<Saved />} />
+            <Route path="apply" element={<Intake />} />
+            <Route path="intake-review" element={<RoleGuard allowed={["admin"]}><IntakeReview /></RoleGuard>} />
           </Route>
 
           <Route path="*" element={<NotFound />} />

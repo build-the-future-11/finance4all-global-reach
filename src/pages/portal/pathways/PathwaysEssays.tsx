@@ -106,7 +106,7 @@ export default function PathwaysEssays() {
                 </div>
                 <Button
                   size="sm"
-                  variant={upvoted ? "default" : "outline-solid"}
+                  variant={upvoted ? "default" : "outline"}
                   className={upvoted ? "" : "shrink-0 border-white/20 text-white"}
                   onClick={() => handleUpvote(essay.id, upvoted)}
                 >
