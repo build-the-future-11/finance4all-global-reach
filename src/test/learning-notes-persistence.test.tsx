@@ -118,4 +118,41 @@ describe("learning notes persistence", () => {
     await waitFor(() => expect(screen.getByLabelText("Private notes")).toHaveValue("Confirmed saved version"));
     expect(screen.getByLabelText("I have read this lesson")).toBeChecked();
   });
+
+  it("serializes reloads and holds the current editor until the saved read is confirmed", async () => {
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+    let finish: (result: unknown) => void = () => {};
+    state.read.mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+    workspace();
+    fireEvent.change(screen.getByLabelText("Private notes"), { target: { value: "Edits awaiting a confirmed reload" } });
+    const reload = screen.getByRole("button", { name: "Reload saved version" });
+    const save = screen.getByRole("button", { name: "Save progress & notes" });
+    act(() => { fireEvent.click(reload); fireEvent.click(reload); fireEvent.click(save); });
+    await waitFor(() => expect(state.read).toHaveBeenCalledTimes(1));
+    expect(state.write).not.toHaveBeenCalled();
+    expect(screen.getByLabelText("Private notes")).toBeDisabled();
+    expect(screen.getByLabelText("I have read this lesson")).toBeDisabled();
+    expect(reload).toBeDisabled();
+    expect(save).toBeDisabled();
+    expect(screen.getByLabelText("Private notes")).toHaveValue("Edits awaiting a confirmed reload");
+    await act(async () => { finish({ data: [{ ...saved, notes: "Fresh saved version", revision: 6 }], error: null }); });
+    await waitFor(() => expect(screen.getByLabelText("Private notes")).toBeEnabled());
+    expect(screen.getByLabelText("Private notes")).toHaveValue("Fresh saved version");
+    fireEvent.click(save);
+    await waitFor(() => expect(state.write).toHaveBeenCalledWith("update", { completed: false, notes: "Fresh saved version" }, { user_id: "member-a", lesson_id: lesson.slug, revision: 6 }));
+  });
+
+  it("does not let a previous lesson's pending reload discard new lesson notes", async () => {
+    vi.spyOn(window, "confirm").mockReturnValue(true);
+    let finish: (result: unknown) => void = () => {};
+    state.read.mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+    workspace();
+    fireEvent.click(screen.getByRole("button", { name: "Reload saved version" }));
+    await waitFor(() => expect(state.read).toHaveBeenCalledTimes(1));
+    fireEvent.change(screen.getByLabelText("Lesson"), { target: { value: editorialExplainers[1].slug } });
+    fireEvent.change(screen.getByLabelText("Private notes"), { target: { value: "New lesson notes, unrelated to the earlier reload" } });
+    await act(async () => { finish({ data: [{ ...saved, notes: "Fresh earlier lesson version", revision: 5 }], error: null }); });
+    await waitFor(() => expect(screen.getByLabelText("Private notes")).toHaveValue("New lesson notes, unrelated to the earlier reload"));
+    expect(screen.getByRole("status")).toHaveTextContent("Unsaved changes");
+  });
 });

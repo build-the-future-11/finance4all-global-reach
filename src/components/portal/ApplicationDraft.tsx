@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 
 export type DraftAnswers = { motivation: string; preparation: string; availability: string; work_url: string };
+const savedMessage = "Private draft saved to your account. Consent must be confirmed when submitting.";
 
 export default function ApplicationDraft({
   callId, answers, onRestore, disabled = false,
@@ -27,8 +28,9 @@ export default function ApplicationDraft({
   // One lock covers both mutations, including the interval before React rerenders.
   const busy = useRef(false);
   const alive = useRef(true);
-  const lastSaved = useRef("");
+  const [lastSaved, setLastSaved] = useState("");
   const serialized = JSON.stringify(answers);
+  const statusMessage = message === savedMessage && lastSaved !== serialized ? "Current answers have unsaved changes." : message;
 
   const draft = useQuery({
     queryKey: ["application-draft", user?.id, callId],
@@ -53,7 +55,7 @@ export default function ApplicationDraft({
 
   useEffect(() => {
     if (!user || !ready || paused || disabled || error || busy.current || operation !== "idle"
-      || lastSaved.current === serialized) return;
+      || lastSaved === serialized) return;
     // Avoid creating an empty draft, but persist an intentional clear of an existing one.
     if (revision === null && !Object.values(answers).some(Boolean)) return;
 
@@ -78,10 +80,10 @@ export default function ApplicationDraft({
             : "Draft save failed. Your answers remain on this page. Retry saving when connected.");
           setMessage("");
         } else {
-          lastSaved.current = serialized;
+          setLastSaved(serialized);
           setRevision(result.data.revision);
           client.setQueryData(["application-draft", user.id, callId], result.data);
-          setMessage("Private draft saved to your account. Consent must be confirmed when submitting.");
+          setMessage(savedMessage);
         }
       }, () => {
         if (alive.current) {
@@ -98,7 +100,7 @@ export default function ApplicationDraft({
       });
     }, 1_000);
     return () => clearTimeout(timer);
-  }, [serialized, answers, ready, paused, disabled, error, revision, user, callId, retry, client, operation]);
+  }, [serialized, answers, ready, paused, disabled, error, revision, user, callId, retry, client, operation, lastSaved]);
 
   async function deleteDraft() {
     const savedRevision = revision ?? draft.data?.revision;
@@ -157,7 +159,7 @@ export default function ApplicationDraft({
     {draft.data && !ready && !paused && <Button type="button" variant="outline" disabled={disabled || operation !== "idle"} onClick={() => {
       const { motivation, preparation, availability, work_url } = draft.data!;
       const saved = { motivation, preparation, availability, work_url };
-      lastSaved.current = JSON.stringify(saved);
+      setLastSaved(JSON.stringify(saved));
       setRevision(draft.data!.revision);
       onRestore(saved);
       setReady(true);
@@ -169,7 +171,7 @@ export default function ApplicationDraft({
       </Button>}
       {error && canRetrySave && <Button type="button" variant="outline" disabled={disabled || operation !== "idle"} onClick={() => { setError(""); setRetry(n => n + 1); }}>Retry draft save</Button>}
     </div>
-    <p role="status">{message}</p>
+    <p role="status">{statusMessage}</p>
     {error && <p role="alert">{error}</p>}
   </div>;
 }

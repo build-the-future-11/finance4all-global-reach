@@ -137,4 +137,29 @@ describe("private application draft persistence", () => {
     expect(screen.getByRole("status")).not.toHaveTextContent("Draft deleted");
     expect(screen.getByRole("button", { name: "Delete saved draft" })).toBeEnabled();
   });
+
+  it("acknowledges only the answers confirmed by the latest completed autosave", async () => {
+    let finish: (result: unknown) => void = () => {};
+    state.write.mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+    const view = draftView();
+    fireEvent.click(screen.getByRole("button", { name: "Resume saved draft" }));
+    const first = { ...savedAnswers, motivation: "First autosave payload" };
+    const newer = { ...savedAnswers, motivation: "Newer answers typed while the first autosave is pending" };
+    view.updateAnswers(first);
+    await advanceAutosave();
+    expect(state.write).toHaveBeenCalledTimes(1);
+    view.updateAnswers(newer);
+    await act(async () => { finish({ data: { ...savedDraft, ...first, revision: 8 }, error: null }); });
+    expect(state.write.mock.calls[0][1]).toEqual(first);
+    expect(state.write).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("status")).not.toHaveTextContent("Private draft saved to your account");
+    expect(screen.getByRole("status")).toHaveTextContent("unsaved changes");
+    state.write.mockResolvedValue({ data: { ...savedDraft, ...newer, revision: 9 }, error: null });
+    await advanceAutosave();
+    expect(state.write).toHaveBeenLastCalledWith("update", newer, { user_id: "member-a", call_id: "quant-research", revision: 8 });
+    expect(screen.getByRole("status")).toHaveTextContent("Private draft saved to your account");
+    view.updateAnswers({ ...newer, preparation: "Another edit after the confirmed save" });
+    expect(screen.getByRole("status")).not.toHaveTextContent("Private draft saved to your account");
+    expect(screen.getByRole("status")).toHaveTextContent("unsaved changes");
+  });
 });

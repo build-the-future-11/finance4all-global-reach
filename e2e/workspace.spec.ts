@@ -100,6 +100,39 @@ test('learning refresh failure keeps unsaved notes usable on mobile', async ({ p
   expect(hoverAudit.violations.map(violation => ({ id: violation.id, nodes: violation.nodes.map(node => node.target) }))).toEqual([]);
 });
 
+test('a delayed learning reload holds its editor and preserves notes in a later lesson', async ({ page }) => {
+  const firstLesson = 'ipo-from-private-company-to-public-market';
+  const nextLesson = 'how-interest-rates-move-through-the-economy';
+  const saved = { user_id: memberId, lesson_id: firstLesson, completed: false, notes: 'Earlier saved notes', revision: 3, updated_at: timestamp };
+  let holdReload = false;
+  let finishReload: () => void = () => {};
+  await page.route('**/rest/v1/member_learning*', async route => {
+    if (holdReload) await new Promise<void>(resolve => { finishReload = resolve; });
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([{ ...saved, completed: holdReload }]) });
+  });
+  await page.goto('/portal/learning');
+  const lesson = page.getByRole('combobox', { name: 'Lesson', exact: true });
+  const notes = page.getByRole('textbox', { name: 'Private notes', exact: true });
+  await lesson.selectOption(firstLesson);
+  await notes.fill('Earlier lesson edits I chose to reload.');
+  holdReload = true;
+  page.once('dialog', dialog => dialog.accept());
+  const started = page.waitForRequest(request => request.url().includes('/rest/v1/member_learning'));
+  await page.getByRole('button', { name: 'Reload saved version', exact: true }).click();
+  await started;
+  await expect(notes).toBeDisabled();
+  await expect(page.getByLabel('I have read this lesson')).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Save progress & notes', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Reloading saved version…', exact: true })).toBeDisabled();
+  await lesson.selectOption(nextLesson);
+  await notes.fill('New notes in the later lesson must remain unsaved and intact.');
+  finishReload();
+  await expect(page.getByText('1 of 4 lessons marked read.', { exact: true })).toBeVisible();
+  await expect(lesson).toHaveValue(nextLesson);
+  await expect(notes).toHaveValue('New notes in the later lesson must remain unsaved and intact.');
+  await expect(page.getByRole('status').filter({ hasText: 'Unsaved changes.' })).toBeVisible();
+});
+
 test('recovered intake receipt and unsent current answers download separately', async ({ page }) => {
   const callId = 'quant-research';
   let receipt: Record<string, unknown> | null = null;

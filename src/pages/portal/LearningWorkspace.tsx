@@ -11,8 +11,8 @@ import { useAuth } from "@/contexts/useAuth";
 function LessonRecord({ lesson, saved, onReload, onSave, pending }: {
   lesson: typeof editorialExplainers[number];
   saved?: Tables<"member_learning">;
-  onReload: () => void;
-  onSave: (value: { lessonId: string; completed: boolean; notes: string; revision: number | null }) => Promise<unknown>;
+  onReload: () => Promise<{ record?: Tables<"member_learning"> } | null>;
+  onSave: (value: { lessonId: string; completed: boolean; notes: string; revision: number | null }) => Promise<Tables<"member_learning">>;
   pending: boolean;
 }) {
   const [notes, setNotes] = useState(saved?.notes ?? "");
@@ -20,38 +20,54 @@ function LessonRecord({ lesson, saved, onReload, onSave, pending }: {
   const [revision, setRevision] = useState(saved?.revision ?? null);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [operation, setOperation] = useState<"idle" | "saving" | "reloading">("idle");
   const busy = useRef(false);
+  const disabled = pending || operation !== "idle";
 
-  async function save() {
+  async function persist(action: "save" | "reload") {
     if (busy.current || pending) return;
+    if (action === "reload" && !window.confirm("Discard unsaved edits and reload this lesson from your account?")) return;
     busy.current = true;
+    setOperation(action === "save" ? "saving" : "reloading");
     setError("");
     setMessage("");
     try {
-      const row = await onSave({ lessonId: lesson.slug, completed, notes, revision }) as Tables<"member_learning">;
-      setRevision(row.revision);
-      setMessage("Saved to your account.");
+      if (action === "save") {
+        const row = await onSave({ lessonId: lesson.slug, completed, notes, revision });
+        setRevision(row.revision);
+        setMessage("Saved to your account.");
+      } else {
+        const result = await onReload();
+        // A failed query keeps the editor intact and is reported by the page.
+        // Successful absence is distinct: the saved record was removed.
+        if (!result) return;
+        setNotes(result.record?.notes ?? "");
+        setCompleted(result.record?.completed ?? false);
+        setRevision(result.record?.revision ?? null);
+        setMessage("Saved version reloaded.");
+      }
     } catch (error) {
-      setError(error instanceof Error ? error.message : "Saving failed. Your notes remain here.");
+      setError(error instanceof Error ? error.message : "The action could not be confirmed. Your notes remain here.");
     } finally {
       busy.current = false;
+      setOperation("idle");
     }
   }
 
   return <PortalCard className="space-y-3 p-5">
     <h2 className="text-xl font-semibold"><Link to={"/portal/debriefed/explainers/" + lesson.slug}>{lesson.title}</Link></h2>
     <p>{lesson.dek}</p><p>{lesson.readMinutes} minutes · Self-reported reading progress</p>
-    <label className="flex items-center gap-3"><input type="checkbox" disabled={pending} checked={completed} onChange={event => {
+    <label className="flex items-center gap-3"><input type="checkbox" disabled={disabled} checked={completed} onChange={event => {
+      if (busy.current || pending) return;
       setCompleted(event.target.checked); setMessage("Unsaved changes.");
     }} />I have read this lesson</label>
-    <label className="block">Private notes<Textarea disabled={pending} value={notes} maxLength={12000} onChange={event => {
+    <label className="block">Private notes<Textarea disabled={disabled} value={notes} maxLength={12000} onChange={event => {
+      if (busy.current || pending) return;
       setNotes(event.target.value); setMessage("Unsaved changes.");
     }} rows={5} /></label>
     <div className="flex flex-wrap gap-3">
-      <Button disabled={pending} onClick={() => void save()}>Save progress & notes</Button>
-      <Button variant="outline" disabled={pending} onClick={() => {
-        if (window.confirm("Discard unsaved edits and reload this lesson from your account?")) onReload();
-      }}>Reload saved version</Button>
+      <Button disabled={disabled} onClick={() => void persist("save")}>{operation === "saving" ? "Saving progress…" : "Save progress & notes"}</Button>
+      <Button variant="outline" disabled={disabled} onClick={() => void persist("reload")}>{operation === "reloading" ? "Reloading saved version…" : "Reload saved version"}</Button>
     </div>
     <p role="status">{message}</p>{error && <p role="alert">{error}</p>}
   </PortalCard>;
@@ -61,7 +77,6 @@ export default function LearningWorkspace() {
   const { user } = useAuth();
   const { records, save } = useMemberLearning();
   const [selected, setSelected] = useState("");
-  const [generation, setGeneration] = useState(0);
   const completed = records.data?.filter(record => record.completed && editorialExplainers.some(lesson => lesson.slug === record.lesson_id)) ?? [];
   const next = editorialExplainers.find(lesson => !completed.some(record => record.lesson_id === lesson.slug));
   const hasLoadedRecords = records.data !== undefined;
@@ -90,10 +105,13 @@ export default function LearningWorkspace() {
         <option value="">Choose a lesson</option>{editorialExplainers.map(lesson => <option key={lesson.slug} value={lesson.slug}>{lesson.title}</option>)}
       </select></label>
       {editorialExplainers.filter(lesson => lesson.slug === selected).map(lesson => <LessonRecord
-        key={`${user?.id}-${lesson.slug}-${generation}`} lesson={lesson}
+        key={`${user?.id}-${lesson.slug}`} lesson={lesson}
         saved={records.data?.find(record => record.lesson_id === lesson.slug)}
         pending={save.isPending} onSave={save.mutateAsync}
-        onReload={() => { void records.refetch().then(result => { if (!result.error) setGeneration(value => value + 1); }); }}
+        onReload={async () => {
+          const result = await records.refetch();
+          return result.error || result.data === undefined ? null : { record: result.data.find(record => record.lesson_id === lesson.slug) };
+        }}
       />)}
     </QueryStatus>
   </div>;
