@@ -27,6 +27,11 @@ export default function Intake() {
   const [error, setError] = useState(""); const [receipt, setReceipt] = useState<IntakeSubmission | null>(null);
   const requestId = useRef(crypto.randomUUID()); const submitting = useRef(false);
   const selected = calls.data?.find(c => c.id === callId); const rows = submissions.data?.pages.flat() || [];
+  const receiptHasUnsentEdits = receipt !== null && (
+    receipt.call_id !== callId || receipt.motivation !== motivation.trim()
+    || receipt.preparation !== preparation.trim() || receipt.availability !== availability.trim()
+    || (receipt.work_url ?? "") !== workUrl.trim()
+  );
   return <div className="space-y-6"><PortalPageHeader title="Applications & research submissions" description="Share a question, relevant preparation, and a realistic commitment. Each submission receives a private record you can revisit." />
     {calls.isLoading && <LoadingState />}
     {calls.error && <PortalCard className="p-6"><p role="alert">{intakeError(calls.error)}</p><a href="https://tally.so/r/5B7blP" className="underline">Existing application form</a><Button type="button" variant="outline" onClick={() => calls.refetch()}>Retry</Button></PortalCard>}
@@ -51,7 +56,7 @@ export default function Intake() {
       </fieldset>
       <p role="alert" className="text-destructive">{error}</p>
       {!receipt && <Button type="submit" disabled={submit.isPending || !selected || !callAcceptsSubmissions(selected)}>{submit.isPending ? "Saving submission…" : "Submit for review"}</Button>}
-      {receipt && <div role="status" className="border border-primary p-4"><h2 className="font-semibold">Submission saved</h2><p>Receipt: {receipt.id}</p><p>Status: {receipt.status.replaceAll("_", " ")}. No acceptance or response date is promised.</p><Button type="button" variant="outline" onClick={() => exportReceipt(receipt)}>Download receipt</Button><Button type="button" variant="ghost" onClick={() => { setReceipt(null); setCallId(""); setMotivation(""); setPreparation(""); setAvailability(""); setWorkUrl(""); setConsent(false); requestId.current = crypto.randomUUID(); }}>Start another submission</Button></div>}
+      {receipt && <div role="status" className="space-y-2 border border-primary p-4"><h2 className="font-semibold">Submission saved</h2><p>Receipt: {receipt.id}</p><p>Status: {receipt.status.replaceAll("_", " ")}. No acceptance or response date is promised.</p>{receiptHasUnsentEdits && <p className="font-medium">Your earlier submission was already saved. The edits currently shown in the form were not submitted. Download your current answers before starting another submission. The receipt contains the saved answers.</p>}<Button type="button" variant="outline" onClick={() => exportReceipt(receipt)}>Download receipt</Button><Button type="button" variant="ghost" onClick={() => { setReceipt(null); setCallId(""); setMotivation(""); setPreparation(""); setAvailability(""); setWorkUrl(""); setConsent(false); requestId.current = crypto.randomUUID(); }}>Start another submission</Button></div>}
     </form></PortalCard>}
     <section className="space-y-4"><h2 className="text-xl font-semibold">Your submissions</h2><Button type="button" variant="outline" onClick={() => submissions.refetch()}>Refresh submissions</Button>
       {submissions.isLoading && <LoadingState />}{submissions.error && <p role="alert">{intakeError(submissions.error)}</p>}
