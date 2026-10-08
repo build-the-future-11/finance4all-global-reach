@@ -122,13 +122,22 @@ export function useCollaboration(projectId: string) {
     },
     onSuccess: refresh,
   });
-  const createTask = useMutation({
-    mutationFn: async (input: NewTaskInput) => {
-      const result = await supabase.from("project_tasks").insert(normalizeTaskInput(projectId, input)).select("*").single();
+  const createTaskMutation = useMutation({
+    mutationFn: async (input: StoredTaskInput) => {
+      const result = await supabase.from("project_tasks").insert(input).select("*").single();
       return requireConfirmedRow(result, "Creating task");
     },
     onSuccess: refresh,
   });
+  const createTask = {
+    isPending: createTaskMutation.isPending,
+    mutateAsync: async (input: NewTaskInput) => {
+      // Bind and copy all fields before TanStack can pause this mutation. A
+      // resumed mutation must not use the project selected in a later render.
+      const boundInput = normalizeTaskInput(projectId, input);
+      return createTaskMutation.mutateAsync(boundInput);
+    },
+  };
   const updateTask = useMutation({
     mutationFn: async ({ id, revision, status, evidence_url }: { id: string; revision: number; status: TaskStatus; evidence_url: string }) => {
       const selectedProject = requireUuid(projectId, "project");
