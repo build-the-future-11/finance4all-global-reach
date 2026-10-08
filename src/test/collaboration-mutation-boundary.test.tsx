@@ -72,6 +72,17 @@ describe("collaboration mutation boundaries", () => {
     });
   });
 
+  it("rejects invalid task input through the async creation API before sending it", async () => {
+    const { result } = renderHook(() => useCollaboration(selectedProject), { wrapper });
+    await act(async () => {
+      await expect(result.current.createTask.mutateAsync({
+        title: "Check the held evaluation",
+        due_date: "2026-02-30",
+      })).rejects.toThrow("Choose a valid due date");
+    });
+    expect(mock.inserts.filter(entry => entry.table === "project_tasks")).toHaveLength(0);
+  });
+
   it("scopes task updates to the selected project as well as the task revision", async () => {
     const { result } = renderHook(() => useCollaboration(selectedProject), { wrapper });
     mock.filters.length = 0;
