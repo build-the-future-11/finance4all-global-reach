@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -51,6 +51,17 @@ test('identical committed inputs are equivalent', (t) => {
   assert.equal(result.sourceRevision, repo.deployedRevision);
 });
 
+test('different commits with identical complete trees remain equivalent', (t) => {
+  const repo = repository(t);
+  repo.git('-c', 'user.name=Local regression', '-c', 'user.email=regression@local.invalid',
+    '-c', 'commit.gpgsign=false', 'commit', '--allow-empty', '-qm', 'New identity, same inputs');
+  const sourceRevision = repo.git('rev-parse', 'HEAD');
+  assert.notEqual(sourceRevision, repo.deployedRevision);
+  const result = verifyRuntimeEquivalence({ ...repo, sourceRevision });
+  assert.equal(result.runtimeEquivalent, true);
+  assert.deepEqual(result.changedPaths, []);
+});
+
 test('changes to production and build inputs require a new deployment', async (t) => {
   for (const path of [
     'src/app.ts', 'public/icon.svg', 'index.html', 'package-lock.json', 'vercel.json',
@@ -89,17 +100,73 @@ test('package build, lifecycle, runtime, and package-manager changes are include
   }
 });
 
-test('documentation and dedicated test changes remain source-equivalent', (t) => {
+test('documentation and dedicated test paths are included as possible build inputs', (t) => {
   const repo = repository(t);
-  for (const path of [
+  const paths = [
     'README.md', 'DEPLOYMENT.md', 'AGENTS.md', 'docs/release.md',
     'evidence/review.json', 'tests/regression.mjs', 'src/test/component.tsx',
     'e2e/journey.ts', 'e2e-credentialed/isolated.ts', '.storybook/main.ts',
     '.github/workflows/ci.yml', 'tools/finance4all-evidence/tests/test_gate.py',
-  ]) repo.write(path, 'documentation or dedicated test input\n');
+  ];
+  for (const path of paths) repo.write(path, 'documentation or dedicated test input\n');
   const result = verifyRuntimeEquivalence({ ...repo, sourceRevision: repo.commit('Only review inputs') });
-  assert.equal(result.runtimeEquivalent, true);
-  assert.deepEqual(result.changedPaths, []);
+  assert.equal(result.runtimeEquivalent, false);
+  assert.deepEqual(result.changedPaths, [...paths].sort());
+  assert.deepEqual(result.excludedPaths, []);
+});
+
+test('a docs-only commit that changes the actual Tailwind CSS stage is rejected', (t) => {
+  const repo = repository(t);
+  for (const path of ['package.json', 'postcss.config.js', 'src/index.css']) {
+    repo.write(path, readFileSync(new URL(`../${path}`, import.meta.url), 'utf8'));
+  }
+  repo.write('.gitignore', 'node_modules/\n');
+  symlinkSync(fileURLToPath(new URL('../node_modules', import.meta.url)), join(repo.cwd, 'node_modules'), 'dir');
+  const deployedRevision = repo.commit('Current production CSS inputs');
+
+  // Compile in fresh processes rooted at the disposable repository so Tailwind
+  // uses its real automatic source detection without scanning this test itself.
+  const compile = `
+    import { createHash } from 'node:crypto';
+    import { readFileSync } from 'node:fs';
+    import { createRequire } from 'node:module';
+    import { resolve } from 'node:path';
+    import { pathToFileURL } from 'node:url';
+    const require = createRequire(resolve('package.json'));
+    const postcss = require('postcss');
+    const config = (await import(pathToFileURL(resolve('postcss.config.js')))).default;
+    const plugins = Object.entries(config.plugins).map(([name, options]) => require(name)(options));
+    const result = await postcss(plugins).process(readFileSync('src/index.css', 'utf8'), {
+      from: resolve('src/index.css'),
+    });
+    process.stdout.write(JSON.stringify({
+      sha256: createHash('sha256').update(result.css).digest('hex'),
+      sentinelRule: /z-index:\\s*194731(?:[;}])/.test(result.css),
+      dependencies: result.messages.filter(message => message.type === 'dependency').map(message => message.file),
+    }));
+  `;
+  function cssStage() {
+    return JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e', compile], {
+      cwd: repo.cwd,
+      encoding: 'utf8',
+      env: { ...process.env, NODE_ENV: 'production' },
+      stdio: ['ignore', 'pipe', 'pipe'],
+    }));
+  }
+
+  const before = cssStage();
+  const path = 'docs/runtime-css-example.md';
+  repo.write(path, 'Build example: <div class="z-[194731]">Example</div>\n');
+  const sourceRevision = repo.commit('Documentation candidate consumed by Tailwind');
+  const after = cssStage();
+  assert.equal(before.sentinelRule, false);
+  assert.equal(after.sentinelRule, true);
+  assert.notEqual(after.sha256, before.sha256);
+  assert.ok(after.dependencies.includes(join(repo.cwd, path)));
+
+  const result = verifyRuntimeEquivalence({ cwd: repo.cwd, deployedRevision, sourceRevision });
+  assert.equal(result.runtimeEquivalent, false);
+  assert.deepEqual(result.changedPaths, [path]);
 });
 
 test('a runtime deletion remains a mismatch', (t) => {
@@ -110,13 +177,13 @@ test('a runtime deletion remains a mismatch', (t) => {
   assert.deepEqual(result.changedPaths, ['src/app.ts']);
 });
 
-test('moving runtime input into an excluded directory remains a mismatch', (t) => {
+test('moving runtime input into documentation reports both tracked paths', (t) => {
   const repo = repository(t);
   mkdirSync(join(repo.cwd, 'docs'));
   renameSync(join(repo.cwd, 'src/app.ts'), join(repo.cwd, 'docs/app.ts'));
   const result = verifyRuntimeEquivalence({ ...repo, sourceRevision: repo.commit('Move runtime') });
   assert.equal(result.runtimeEquivalent, false);
-  assert.deepEqual(result.changedPaths, ['src/app.ts']);
+  assert.deepEqual(result.changedPaths, ['docs/app.ts', 'src/app.ts']);
 });
 
 test('similarly named production paths are not excluded', (t) => {

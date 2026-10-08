@@ -8,24 +8,10 @@ import { parseArgs } from 'node:util';
 
 const REVISION = /^[0-9a-f]{40}$/;
 
-// Include tracked inputs by default. A list of application paths silently misses
-// new build helpers, configuration formats, or package lifecycle scripts.
-// These paths are documentation, evidence, or dedicated test/development inputs
-// in the current portal; none is imported by the production build.
-const NON_RUNTIME_PATHS = Object.freeze([
-  '.github',
-  '.storybook',
-  'docs',
-  'evidence',
-  'e2e',
-  'e2e-credentialed',
-  'tests',
-  'src/test',
-  'tools/finance4all-evidence',
-  'README.md',
-  'DEPLOYMENT.md',
-  'AGENTS.md',
-]);
+// Compare every tracked path conservatively. Tailwind's automatic source
+// detection consumes text outside application imports, including documentation
+// and tests. Excluding those paths can certify changed CSS inputs as equivalent;
+// an application-only allowlist also misses new build helpers and configuration.
 
 function fail(message) {
   throw new Error(`[runtime-equivalence] ${message}`);
@@ -61,7 +47,6 @@ export function verifyRuntimeEquivalence({
     changed = execFileSync('git', [
       'diff', '--no-ext-diff', '--no-textconv', '--no-renames', '--no-relative', '--name-only', '-z',
       deployedRevision, sourceRevision, '--', ':(top)',
-      ...NON_RUNTIME_PATHS.map((path) => `:(top,literal,exclude)${path}`),
     ], {
       cwd,
       encoding: 'utf8',
@@ -78,8 +63,8 @@ export function verifyRuntimeEquivalence({
     sourceRevision,
     runtimeEquivalent: changedPaths.length === 0,
     changedPaths,
-    excludedPaths: [...NON_RUNTIME_PATHS],
-    scope: 'Committed portal source and build inputs. Hosted environment, provider state, database state, and output bytes require separate evidence.',
+    excludedPaths: [],
+    scope: 'All committed paths, conservatively including documentation and tests consumed by source scanning. Hosted environment, provider state, database state, and output bytes require separate evidence.',
   };
 }
 
