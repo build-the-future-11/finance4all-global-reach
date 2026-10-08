@@ -15,6 +15,18 @@ function readWorkflow(path) {
   return readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 }
 
+test('production health uses the tested committed-build-input comparison', () => {
+  const source = readWorkflow('.github/workflows/production-health.yml');
+  assert.match(source, /if node scripts\/verify-runtime-equivalence\.mjs/);
+  assert.match(source, /--deployed-revision "\$revision"/);
+  assert.match(source, /--source-revision "\$EXPECTED_SOURCE_SHA"/);
+  assert.match(source, /--receipt production-evidence\/runtime-equivalence\.json; then/);
+  assert.doesNotMatch(source, /git diff --quiet/);
+  assert.doesNotMatch(source, /current-dependencies\.json|deployed-dependencies\.json/);
+  const manifest = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+  assert.ok(manifest.scripts.test.includes('tests/runtime-equivalence.test.mjs'));
+});
+
 test('release-critical workflows pin Ubuntu 24.04', () => {
   for (const path of releaseCriticalWorkflows) {
     const source = readWorkflow(path);
