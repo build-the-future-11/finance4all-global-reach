@@ -100,6 +100,41 @@ test('learning refresh failure keeps unsaved notes usable on mobile', async ({ p
   expect(hoverAudit.violations.map(violation => ({ id: violation.id, nodes: violation.nodes.map(node => node.target) }))).toEqual([]);
 });
 
+test('switching lessons asks before discarding unsaved notes', async ({ page }) => {
+  const firstLesson = 'ipo-from-private-company-to-public-market';
+  const nextLesson = 'how-interest-rates-move-through-the-economy';
+  const saved = { user_id: memberId, lesson_id: firstLesson, completed: false, notes: 'Earlier saved notes', revision: 3, updated_at: timestamp };
+  await page.route('**/rest/v1/member_learning*', route => route.fulfill({
+    status: 200, contentType: 'application/json', body: JSON.stringify([saved]),
+  }));
+  await page.goto('/portal/learning');
+  const lesson = page.getByRole('combobox', { name: 'Lesson', exact: true });
+  const notes = page.getByRole('textbox', { name: 'Private notes', exact: true });
+  await lesson.selectOption(firstLesson);
+  await notes.fill('Unfinished notes I want to keep.');
+  await page.getByLabel('I have read this lesson').check();
+  let confirmations = 0;
+  page.once('dialog', async dialog => {
+    confirmations += 1;
+    expect(dialog.type()).toBe('confirm');
+    expect(dialog.message()).toContain('unsaved notes and reading progress');
+    await dialog.dismiss();
+  });
+  await lesson.selectOption(nextLesson);
+  await expect(lesson).toHaveValue(firstLesson);
+  await expect(notes).toHaveValue('Unfinished notes I want to keep.');
+  await expect(page.getByLabel('I have read this lesson')).toBeChecked();
+  expect(confirmations).toBe(1);
+
+  page.once('dialog', async dialog => { confirmations += 1; await dialog.accept(); });
+  await lesson.selectOption(nextLesson);
+  await expect(lesson).toHaveValue(nextLesson);
+  await expect(notes).toHaveValue('');
+  expect(confirmations).toBe(2);
+  await lesson.selectOption(firstLesson);
+  await expect(notes).toHaveValue(saved.notes);
+});
+
 test('a delayed learning reload holds its editor and preserves notes in a later lesson', async ({ page }) => {
   const firstLesson = 'ipo-from-private-company-to-public-market';
   const nextLesson = 'how-interest-rates-move-through-the-economy';
@@ -124,6 +159,7 @@ test('a delayed learning reload holds its editor and preserves notes in a later 
   await expect(page.getByLabel('I have read this lesson')).toBeDisabled();
   await expect(page.getByRole('button', { name: 'Save progress & notes', exact: true })).toBeDisabled();
   await expect(page.getByRole('button', { name: 'Reloading saved version…', exact: true })).toBeDisabled();
+  page.once('dialog', dialog => dialog.accept());
   await lesson.selectOption(nextLesson);
   await notes.fill('New notes in the later lesson must remain unsaved and intact.');
   finishReload();
