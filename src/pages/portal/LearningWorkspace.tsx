@@ -8,11 +8,12 @@ import { Textarea } from "@/components/ui/textarea";
 import type { Tables } from "@/types/database";
 import { useAuth } from "@/contexts/useAuth";
 
-function LessonRecord({ lesson, saved, onReload, onSave, pending }: {
+function LessonRecord({ lesson, saved, onReload, onSave, onUnsavedChange, pending }: {
   lesson: typeof editorialExplainers[number];
   saved?: Tables<"member_learning">;
   onReload: () => Promise<{ record?: Tables<"member_learning"> } | null>;
   onSave: (value: { lessonId: string; completed: boolean; notes: string; revision: number | null }) => Promise<Tables<"member_learning">>;
+  onUnsavedChange: (dirty: boolean) => void;
   pending: boolean;
 }) {
   const [notes, setNotes] = useState(saved?.notes ?? "");
@@ -35,6 +36,7 @@ function LessonRecord({ lesson, saved, onReload, onSave, pending }: {
       if (action === "save") {
         const row = await onSave({ lessonId: lesson.slug, completed, notes, revision });
         setRevision(row.revision);
+        onUnsavedChange(false);
         setMessage("Saved to your account.");
       } else {
         const result = await onReload();
@@ -44,6 +46,7 @@ function LessonRecord({ lesson, saved, onReload, onSave, pending }: {
         setNotes(result.record?.notes ?? "");
         setCompleted(result.record?.completed ?? false);
         setRevision(result.record?.revision ?? null);
+        onUnsavedChange(false);
         setMessage("Saved version reloaded.");
       }
     } catch (error) {
@@ -59,10 +62,12 @@ function LessonRecord({ lesson, saved, onReload, onSave, pending }: {
     <p>{lesson.dek}</p><p>{lesson.readMinutes} minutes · Self-reported reading progress</p>
     <label className="flex items-center gap-3"><input type="checkbox" disabled={disabled} checked={completed} onChange={event => {
       if (busy.current || pending) return;
+      onUnsavedChange(true);
       setCompleted(event.target.checked); setMessage("Unsaved changes.");
     }} />I have read this lesson</label>
     <label className="block">Private notes<Textarea disabled={disabled} value={notes} maxLength={12000} onChange={event => {
       if (busy.current || pending) return;
+      onUnsavedChange(true);
       setNotes(event.target.value); setMessage("Unsaved changes.");
     }} rows={5} /></label>
     <div className="flex flex-wrap gap-3">
@@ -75,11 +80,24 @@ function LessonRecord({ lesson, saved, onReload, onSave, pending }: {
 
 export default function LearningWorkspace() {
   const { user } = useAuth();
+  return <AccountLearningWorkspace key={user?.id ?? "signed-out"} userId={user?.id} />;
+}
+
+function AccountLearningWorkspace({ userId }: { userId: string | undefined }) {
   const { records, save } = useMemberLearning();
-  const [selected, setSelected] = useState("");
+  const [selected, setSelected] = useState({ slug: "", version: 0 });
+  const activeDraft = useRef({ version: 0, dirty: false });
   const completed = records.data?.filter(record => record.completed && editorialExplainers.some(lesson => lesson.slug === record.lesson_id)) ?? [];
   const next = editorialExplainers.find(lesson => !completed.some(record => record.lesson_id === lesson.slug));
   const hasLoadedRecords = records.data !== undefined;
+
+  function selectLesson(slug: string) {
+    if (slug === selected.slug) return;
+    if (activeDraft.current.dirty && !window.confirm("Discard unsaved notes and reading progress for this lesson?")) return;
+    const version = activeDraft.current.version + 1;
+    activeDraft.current = { version, dirty: false };
+    setSelected({ slug, version });
+  }
 
   function exportNotes() {
     const url = URL.createObjectURL(new Blob([JSON.stringify(records.data ?? [], null, 2)], { type: "application/json" }));
@@ -101,13 +119,18 @@ export default function LearningWorkspace() {
       {next && <Link className="underline" to={"/portal/debriefed/explainers/" + next.slug}>Continue learning: {next.title}</Link>}
       <p className="text-sm text-muted-foreground">Notes and reading records are private to your account and deleted with it. Changes are saved only when you choose Save.</p>
       <Button variant="outline" onClick={exportNotes}>Export learning records</Button>
-      <label className="block">Lesson<select className="block w-full border rounded-md bg-background p-3" value={selected} onChange={event => setSelected(event.target.value)}>
+      <label className="block">Lesson<select className="block w-full border rounded-md bg-background p-3" value={selected.slug} onChange={event => selectLesson(event.target.value)}>
         <option value="">Choose a lesson</option>{editorialExplainers.map(lesson => <option key={lesson.slug} value={lesson.slug}>{lesson.title}</option>)}
       </select></label>
-      {editorialExplainers.filter(lesson => lesson.slug === selected).map(lesson => <LessonRecord
-        key={`${user?.id}-${lesson.slug}`} lesson={lesson}
+      {editorialExplainers.filter(lesson => lesson.slug === selected.slug).map(lesson => <LessonRecord
+        key={`${userId}-${lesson.slug}-${selected.version}`} lesson={lesson}
         saved={records.data?.find(record => record.lesson_id === lesson.slug)}
         pending={save.isPending} onSave={save.mutateAsync}
+        onUnsavedChange={dirty => {
+          // A prior editor can finish reloading after the user changes lessons
+          // (including away and back). Only this exact selection owns the guard.
+          if (activeDraft.current.version === selected.version) activeDraft.current.dirty = dirty;
+        }}
         onReload={async () => {
           const result = await records.refetch();
           return result.error || result.data === undefined ? null : { record: result.data.find(record => record.lesson_id === lesson.slug) };
