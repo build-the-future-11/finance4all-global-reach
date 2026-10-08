@@ -5,8 +5,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import LearningWorkspace from "@/pages/portal/LearningWorkspace";
 import { editorialExplainers } from "@/content/editorial";
 
-const state = vi.hoisted(() => ({ read: vi.fn(), write: vi.fn() }));
-vi.mock("@/contexts/useAuth", () => ({ useAuth: () => ({ user: { id: "member-a" } }) }));
+const state = vi.hoisted(() => ({ read: vi.fn(), write: vi.fn(), userId: "member-a" }));
+vi.mock("@/contexts/useAuth", () => ({ useAuth: () => ({ user: { id: state.userId } }) }));
 vi.mock("@/lib/supabase", () => ({
   supabase: { from: () => {
     let operation = "read";
@@ -40,12 +40,136 @@ function workspace(withSavedData = true) {
 }
 
 beforeEach(() => {
+  state.userId = "member-a";
   state.read.mockReset().mockResolvedValue({ data: [saved], error: null });
   state.write.mockReset().mockResolvedValue({ data: { ...saved, revision: 5 }, error: null });
 });
 afterEach(() => { cleanup(); clients.splice(0).forEach(client => client.clear()); vi.restoreAllMocks(); });
 
 describe("learning notes persistence", () => {
+  it("keeps unsaved notes when switching lessons is cancelled", async () => {
+    const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
+    workspace();
+    fireEvent.change(screen.getByLabelText("Private notes"), { target: { value: "Keep my unfinished analysis" } });
+    fireEvent.change(screen.getByLabelText("Lesson"), { target: { value: editorialExplainers[1].slug } });
+    expect(confirm).toHaveBeenCalledOnce();
+    expect(screen.getByLabelText("Lesson")).toHaveValue(lesson.slug);
+    expect(screen.getByLabelText("Private notes")).toHaveValue("Keep my unfinished analysis");
+    expect(state.write).not.toHaveBeenCalled();
+  });
+
+  it("protects unsaved reading progress when clearing the lesson selection", () => {
+    const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
+    workspace();
+    fireEvent.click(screen.getByLabelText("I have read this lesson"));
+    fireEvent.change(screen.getByLabelText("Lesson"), { target: { value: "" } });
+    expect(confirm).toHaveBeenCalledOnce();
+    expect(screen.getByLabelText("Lesson")).toHaveValue(lesson.slug);
+    expect(screen.getByLabelText("I have read this lesson")).toBeChecked();
+  });
+
+  it("discards a lesson draft only after confirming the switch", () => {
+    const confirm = vi.spyOn(window, "confirm").mockReturnValue(true);
+    workspace();
+    fireEvent.change(screen.getByLabelText("Private notes"), { target: { value: "Draft I choose to discard" } });
+    fireEvent.change(screen.getByLabelText("Lesson"), { target: { value: editorialExplainers[1].slug } });
+    expect(confirm).toHaveBeenCalledOnce();
+    expect(screen.getByLabelText("Lesson")).toHaveValue(editorialExplainers[1].slug);
+    fireEvent.change(screen.getByLabelText("Lesson"), { target: { value: lesson.slug } });
+    expect(confirm).toHaveBeenCalledOnce();
+    expect(screen.getByLabelText("Private notes")).toHaveValue(saved.notes);
+  });
+
+  it("allows a confirmed saved lesson to change without a discard prompt", async () => {
+    const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
+    workspace();
+    fireEvent.change(screen.getByLabelText("Private notes"), { target: { value: "My confirmed notes" } });
+    state.write.mockResolvedValue({ data: { ...saved, notes: "My confirmed notes", revision: 5 }, error: null });
+    fireEvent.click(screen.getByRole("button", { name: "Save progress & notes" }));
+    await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Saved to your account"));
+    fireEvent.change(screen.getByLabelText("Lesson"), { target: { value: editorialExplainers[1].slug } });
+    expect(confirm).not.toHaveBeenCalled();
+    expect(screen.getByLabelText("Lesson")).toHaveValue(editorialExplainers[1].slug);
+  });
+
+  it("keeps the discard guard after a failed save", async () => {
+    const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
+    workspace();
+    fireEvent.change(screen.getByLabelText("Private notes"), { target: { value: "Unsaved after network failure" } });
+    state.write.mockResolvedValue({ data: null, error: new Error("Offline") });
+    fireEvent.click(screen.getByRole("button", { name: "Save progress & notes" }));
+    await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("Offline"));
+    fireEvent.change(screen.getByLabelText("Lesson"), { target: { value: editorialExplainers[1].slug } });
+    expect(confirm).toHaveBeenCalledOnce();
+    expect(screen.getByLabelText("Private notes")).toHaveValue("Unsaved after network failure");
+  });
+
+  it("does not let an earlier reload clear the current lesson's discard guard", async () => {
+    const confirm = vi.spyOn(window, "confirm").mockReturnValue(true);
+    let finish: (result: unknown) => void = () => {};
+    state.read.mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+    workspace();
+    fireEvent.click(screen.getByRole("button", { name: "Reload saved version" }));
+    await waitFor(() => expect(state.read).toHaveBeenCalledOnce());
+    fireEvent.change(screen.getByLabelText("Lesson"), { target: { value: editorialExplainers[1].slug } });
+    fireEvent.change(screen.getByLabelText("Private notes"), { target: { value: "The next lesson's unsaved notes" } });
+    await act(async () => { finish({ data: [{ ...saved, revision: 5 }], error: null }); });
+    confirm.mockClear().mockReturnValue(false);
+    fireEvent.change(screen.getByLabelText("Lesson"), { target: { value: lesson.slug } });
+    expect(confirm).toHaveBeenCalledOnce();
+    expect(screen.getByLabelText("Lesson")).toHaveValue(editorialExplainers[1].slug);
+    expect(screen.getByLabelText("Private notes")).toHaveValue("The next lesson's unsaved notes");
+  });
+
+  it("keeps the guard when an old reload finishes after returning to the same lesson", async () => {
+    const confirm = vi.spyOn(window, "confirm").mockReturnValue(true);
+    let finish: (result: unknown) => void = () => {};
+    state.read.mockImplementationOnce(() => new Promise(resolve => { finish = resolve; }));
+    workspace();
+    fireEvent.click(screen.getByRole("button", { name: "Reload saved version" }));
+    await waitFor(() => expect(state.read).toHaveBeenCalledOnce());
+    fireEvent.change(screen.getByLabelText("Lesson"), { target: { value: editorialExplainers[1].slug } });
+    fireEvent.change(screen.getByLabelText("Lesson"), { target: { value: lesson.slug } });
+    fireEvent.change(screen.getByLabelText("Private notes"), { target: { value: "New draft for the returned lesson" } });
+    await act(async () => { finish({ data: [{ ...saved, revision: 5 }], error: null }); });
+    confirm.mockClear().mockReturnValue(false);
+    fireEvent.change(screen.getByLabelText("Lesson"), { target: { value: editorialExplainers[1].slug } });
+    expect(confirm).toHaveBeenCalledOnce();
+    expect(screen.getByLabelText("Lesson")).toHaveValue(lesson.slug);
+    expect(screen.getByLabelText("Private notes")).toHaveValue("New draft for the returned lesson");
+  });
+
+  it("protects edits even when the lesson changes before a rerender", () => {
+    const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
+    workspace();
+    act(() => {
+      fireEvent.change(screen.getByLabelText("Private notes"), { target: { value: "Same-render notes" } });
+      fireEvent.change(screen.getByLabelText("Lesson"), { target: { value: editorialExplainers[1].slug } });
+    });
+    expect(confirm).toHaveBeenCalledOnce();
+    expect(screen.getByLabelText("Lesson")).toHaveValue(lesson.slug);
+    expect(screen.getByLabelText("Private notes")).toHaveValue("Same-render notes");
+  });
+
+  it("clears the selection and discard state when the signed-in account changes", () => {
+    const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: Infinity, gcTime: Infinity } } });
+    clients.push(client);
+    client.setQueryData(["member-learning", "member-a"], [saved]);
+    client.setQueryData(["member-learning", "member-b"], [{ ...saved, user_id: "member-b", notes: "Other account's saved notes" }]);
+    const tree = () => <QueryClientProvider client={client}><MemoryRouter><LearningWorkspace /></MemoryRouter></QueryClientProvider>;
+    const view = render(tree());
+    fireEvent.change(screen.getByLabelText("Lesson"), { target: { value: lesson.slug } });
+    fireEvent.change(screen.getByLabelText("Private notes"), { target: { value: "First account's unsaved notes" } });
+    state.userId = "member-b";
+    view.rerender(tree());
+    expect(screen.getByLabelText("Lesson")).toHaveValue("");
+    expect(screen.queryByLabelText("Private notes")).not.toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("Lesson"), { target: { value: lesson.slug } });
+    expect(screen.getByLabelText("Private notes")).toHaveValue("Other account's saved notes");
+    expect(confirm).not.toHaveBeenCalled();
+  });
+
   it("keeps unsaved notes through a refresh failure without overwriting a newer saved revision", async () => {
     const client = workspace();
     fireEvent.change(screen.getByLabelText("Private notes"), { target: { value: "My unsaved evaluation notes" } });
