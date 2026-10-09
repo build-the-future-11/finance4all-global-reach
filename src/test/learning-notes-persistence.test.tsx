@@ -8,7 +8,7 @@ import { editorialExplainers } from "@/content/editorial";
 const state = vi.hoisted(() => ({ read: vi.fn(), write: vi.fn(), userId: "member-a" }));
 vi.mock("@/contexts/useAuth", () => ({ useAuth: () => ({ user: { id: state.userId } }) }));
 vi.mock("@/lib/supabase", () => ({
-  supabase: { from: () => {
+  supabase: { auth: { getSession: async () => ({ data: { session: { user: { id: state.userId }, access_token: `fixture-${state.userId}` } }, error: null }) }, from: () => {
     let operation = "read";
     let payload: unknown;
     const filters: Record<string, unknown> = {};
@@ -19,8 +19,10 @@ vi.mock("@/lib/supabase", () => ({
       order: finish,
       insert: (value: unknown) => { operation = "insert"; payload = value; return chain; },
       update: (value: unknown) => { operation = "update"; payload = value; return chain; },
-      single: finish,
-      maybeSingle: finish,
+      single: () => chain,
+      maybeSingle: () => chain,
+      setHeader: () => chain,
+      then: (resolve: (value: unknown) => unknown, reject: (error: unknown) => unknown) => Promise.resolve(finish()).then(resolve, reject),
     };
     return chain;
   } },
