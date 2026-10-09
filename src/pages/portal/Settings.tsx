@@ -218,7 +218,7 @@ export default function Settings() {
               <Button
                 type="submit"
                 disabled={updateProfile.isPending}
-                className="bg-emerald-500 hover:bg-emerald-400"
+                className="bg-emerald-500 text-slate-950 hover:bg-emerald-400"
               >
                 {updateProfile.isPending ? "Saving…" : "Save changes"}
               </Button>

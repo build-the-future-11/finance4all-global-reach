@@ -46,3 +46,26 @@ test("deployment-provided source identities take precedence over repository HEAD
     /environment disagrees/,
   );
 });
+
+test("GitHub event SHAs cannot relabel an available source checkout", () => {
+  assert.equal(resolveReleaseRevision({ env: { GITHUB_SHA: SHA_B }, gitHead: () => SHA_A }), SHA_A);
+  assert.throws(
+    () => resolveReleaseRevision({ env: { GITHUB_SHA: SHA_B }, gitHead: () => "main" }),
+    /git HEAD must be an immutable lowercase 40-character Git SHA/,
+  );
+});
+
+test("source archives retain validated revision fallbacks without Git metadata", () => {
+  const noGit = () => { throw new Error("Git metadata unavailable"); };
+  assert.equal(resolveReleaseRevision({ env: { SOURCE_SHA: SHA_A }, gitHead: noGit }), SHA_A);
+  assert.equal(resolveReleaseRevision({ env: { VERCEL_GIT_COMMIT_SHA: SHA_B }, gitHead: noGit }), SHA_B);
+  assert.equal(resolveReleaseRevision({ env: { GITHUB_SHA: SHA_B }, gitHead: noGit }), SHA_B);
+  assert.throws(
+    () => resolveReleaseRevision({ env: { GITHUB_SHA: "main" }, gitHead: noGit }),
+    /GITHUB_SHA must be an immutable lowercase 40-character Git SHA/,
+  );
+  assert.throws(
+    () => resolveReleaseRevision({ env: {}, gitHead: noGit }),
+    /Git metadata unavailable/,
+  );
+});

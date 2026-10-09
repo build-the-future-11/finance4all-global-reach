@@ -1,0 +1,41 @@
+import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { useAuth } from '@/contexts/useAuth';
+import { useResearchProjects } from '@/hooks/portal/useLabs';
+import { useCollaboration } from '@/hooks/portal/useCollaboration';
+import { PortalCard,PortalPageHeader,QueryStatus } from '@/components/portal/PortalUI';
+import { Button } from '@/components/ui/button';
+import CollaborationTask from '@/components/portal/CollaborationTask';
+import CollaborationTaskForm from '@/components/portal/CollaborationTaskForm';
+import CollaborationInvitationForm from '@/components/portal/CollaborationInvitationForm';
+export default function Collaboration(){
+ const {user,profile}=useAuth();const [params,setParams]=useSearchParams();const projectId=params.get('project')??'';const projects=useResearchProjects();const work=useCollaboration(projectId);
+ const [error,setError]=useState(''),[message,setMessage]=useState('');
+ const project=projects.data?.find(p=>p.id===projectId);const manager=Boolean(project&&(project.leadResearcherId===user?.id||profile?.role==='admin'));const active=Boolean(manager||work.memberships.data?.some(m=>m.project_id===projectId&&m.user_id===user?.id&&m.status==='active'));
+ async function action(fn:()=>Promise<unknown>,success:string){setError('');setMessage('');try{await fn();setMessage(success);}catch(e){setError(e instanceof Error?e.message:'The action could not be confirmed. Refresh before retrying.');}}
+ return <div className="space-y-6"><PortalPageHeader title="Project collaboration" description="Accept a project invitation, agree the work and attach evidence to deliverables. Only the project lead or an administrator can accept completed work."/><QueryStatus isLoading={projects.isLoading} error={projects.error} onRetry={()=>void projects.refetch()}><label className="block">Project<select className="block w-full border rounded-md bg-background p-3" value={projectId} onChange={e=>{setParams(e.target.value?{project:e.target.value}:{});setError('');setMessage('');}}><option value="">Choose a project or review your invitations</option>{projects.data?.map(p=><option key={p.id} value={p.id}>{p.title}</option>)}</select></label></QueryStatus>
+ <QueryStatus isLoading={work.memberships.isLoading} error={work.memberships.error} onRetry={()=>void work.memberships.refetch()}><section className="space-y-3"><h2 className="font-semibold text-xl">Memberships & invitations</h2>{!work.memberships.data?.length&&<p>No invitations or memberships are visible in this view.</p>}{work.memberships.data?.map(m=><PortalCard className="p-4 space-y-2" key={m.project_id+m.user_id}><p>{projects.data?.find(p=>p.id===m.project_id)?.title??'Project invitation'} · {m.status}</p><p className="break-all text-sm">Member account: {m.user_id}</p><div className="flex flex-wrap gap-2">{m.user_id===user?.id&&m.status==='invited'&&(['active','declined'] as const).map(status=><Button key={status} type="button" disabled={work.respond.isPending} onClick={()=>void action(()=>work.respond.mutateAsync({...m,status,previous:m.status}),status==='active'?'Invitation accepted.':'Invitation declined.')}>{status==='active'?'Accept invitation':'Decline'}</Button>)}{m.user_id===user?.id&&m.status==='active'&&<Button type="button" variant="outline" disabled={work.respond.isPending} onClick={()=>{if(window.confirm('Leave this project? Access to its private tasks will end.'))void action(()=>work.respond.mutateAsync({...m,status:'left',previous:m.status}),'You have left the project.');}}>Leave project</Button>}{manager&&m.status!=='removed'&&<Button type="button" variant="outline" disabled={work.respond.isPending} onClick={()=>{if(window.confirm('Remove this member’s access?'))void action(()=>work.respond.mutateAsync({...m,status:'removed',previous:m.status}),'Project access removed.');}}>Remove access</Button>}{manager&&['left','declined','removed'].includes(m.status)&&<Button type="button" variant="outline" disabled={work.respond.isPending} onClick={()=>void action(()=>work.respond.mutateAsync({...m,status:'invited',previous:m.status}),'New invitation recorded.')}>Invite again</Button>}</div></PortalCard>)}</section></QueryStatus>
+ {manager&&<CollaborationInvitationForm key={`invitation-${user?.id}-${projectId}`} onInvite={work.invite.mutateAsync} pending={work.invite.isPending} />}
+ {manager&&<CollaborationTaskForm key={`${user?.id}-${projectId}`} leadResearcherId={project?.leadResearcherId}
+  activeMemberIds={work.memberships.data?.filter(m=>m.project_id===projectId&&m.status==='active').map(m=>m.user_id)??[]}
+  onCreate={work.createTask.mutateAsync} pending={work.createTask.isPending} />}
+ {projectId&&<section className="space-y-4"><h2 className="text-xl font-semibold">Tasks & milestones</h2>
+  <QueryStatus isLoading={work.tasks.isLoading} error={work.tasks.data !== undefined ? null : work.tasks.error} onRetry={()=>void work.tasks.refetch()}>
+   {work.tasks.data !== undefined && work.tasks.error && <PortalCard className="space-y-3 p-4">
+    <p role="alert">Work items could not be refreshed. Your current edits remain on this page. Saved task details may be out of date.</p>
+    <Button type="button" variant="outline" disabled={work.tasks.isFetching} onClick={()=>void work.tasks.refetch()}>Retry task refresh</Button>
+   </PortalCard>}
+   {!work.tasks.data?.length&&<p>{active?'No work items have been created.':'No private tasks are visible. Project participation requires an accepted invitation.'}</p>}
+   {work.tasks.data?.map(task=><CollaborationTask key={`${user?.id}-${projectId}-${task.id}`} task={task} manager={manager}
+    canEdit={manager||(active&&task.assignee_id===user?.id&&task.status!=='done')}
+    onSave={work.updateTask.mutateAsync} pending={work.updateTask.isPending}
+    onReload={async()=>{
+     const result=await work.tasks.refetch();
+     if(result.error)throw result.error;
+     const saved=result.data?.find(row=>row.id===task.id);
+     if(!saved)throw new Error('This task is no longer available or access was removed.');
+     return saved;
+    }} />)}
+  </QueryStatus>
+ </section>}{error&&<p role="alert">{error}</p>}<p role="status">{message}</p></div>;
+}

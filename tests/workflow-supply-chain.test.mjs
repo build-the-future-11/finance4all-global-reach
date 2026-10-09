@@ -15,6 +15,18 @@ function readWorkflow(path) {
   return readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 }
 
+test('production health uses the tested committed-build-input comparison', () => {
+  const source = readWorkflow('.github/workflows/production-health.yml');
+  assert.match(source, /if node scripts\/verify-runtime-equivalence\.mjs/);
+  assert.match(source, /--deployed-revision "\$revision"/);
+  assert.match(source, /--source-revision "\$EXPECTED_SOURCE_SHA"/);
+  assert.match(source, /--receipt production-evidence\/runtime-equivalence\.json; then/);
+  assert.doesNotMatch(source, /git diff --quiet/);
+  assert.doesNotMatch(source, /current-dependencies\.json|deployed-dependencies\.json/);
+  const manifest = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+  assert.ok(manifest.scripts.test.includes('tests/runtime-equivalence.test.mjs'));
+});
+
 test('release-critical workflows pin Ubuntu 24.04', () => {
   for (const path of releaseCriticalWorkflows) {
     const source = readWorkflow(path);
@@ -89,6 +101,8 @@ test('database authorization retains source- and workflow-bound certification ev
   assert.match(databaseAuthorization, /find supabase\/migrations .*sha256sum/);
   assert.match(databaseAuthorization, /sha256sum supabase\/tests\/two_identity_rls_certification\.sql/);
   assert.match(databaseAuthorization, /sha256sum supabase\/tests\/account_lifecycle_rls_certification\.sql/);
+  assert.match(databaseAuthorization, /sha256sum supabase\/tests\/intake_rls_certification\.sql/);
+  assert.match(databaseAuthorization, /sha256sum supabase\/tests\/collaboration_rls_certification\.sql/);
   assert.match(databaseAuthorization, /2>&1 \| tee "\$evidence_dir\/certification\.log"/);
   assert.match(databaseAuthorization, /name: Upload database authorization evidence/);
   assert.match(databaseAuthorization, /name: database-authorization-\$\{\{ env\.EXPECTED_SOURCE_SHA \}\}/);

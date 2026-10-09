@@ -29,10 +29,10 @@ describe("content depth and claim boundaries", () => {
     expect(JSON.stringify(applicationPaths)).not.toMatch(/Global Asset Partners|Summer Markets Analyst/);
   });
 
-  it("separates verified repositories, proposals, and coming-soon programs", () => {
+  it("separates verified repositories, proposals, and proposed programs", () => {
     expect(portfolioProjects.some((project) => project.status === "Verified repository" && project.href?.includes("github.com/build-the-future-11"))).toBe(true);
     expect(portfolioProjects.some((project) => project.status === "Proposed" && !project.href)).toBe(true);
-    expect(programFamilies.some((program) => program.state === "Coming soon")).toBe(true);
+    expect(programFamilies.some((program) => program.state === "Proposed")).toBe(true);
   });
 });
 

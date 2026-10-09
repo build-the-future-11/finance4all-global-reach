@@ -22,7 +22,7 @@ export default function NotFound() {
             Home
           </Link>
         </Button>
-        <Button asChild className="bg-emerald-500 hover:bg-emerald-400">
+        <Button asChild className="bg-emerald-500 text-slate-950 hover:bg-emerald-400">
           <Link to="/portal">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Portal

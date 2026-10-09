@@ -2,26 +2,22 @@ import { NavLink } from "react-router-dom";
 import {
   FlaskConical,
   LayoutDashboard,
-  Newspaper,
-  Route,
   Settings,
-  Users,
 } from "lucide-react";
 import { portalRoutes } from "@/routes/portal";
 import { cn } from "@/lib/utils";
 
 const items = [
   { to: portalRoutes.dashboard, icon: LayoutDashboard, label: "Home" },
-  { to: portalRoutes.debriefed, icon: Newspaper, label: "Learn" },
-  { to: portalRoutes.labs, icon: FlaskConical, label: "Research" },
-  { to: portalRoutes.pathways, icon: Route, label: "Work" },
-  { to: portalRoutes.network, icon: Users, label: "People" },
+  { to: portalRoutes.myResearch, icon: FlaskConical, label: "My work" },
+  { to: portalRoutes.labs, icon: FlaskConical, label: "Projects" },
+  { to: portalRoutes.apply, icon: FlaskConical, label: "Apply" },
   { to: portalRoutes.settings, icon: Settings, label: "Profile" },
 ];
 
 export default function MobileBottomNav() {
   return (
-    <nav className="portal-bottom-nav fixed inset-x-0 bottom-0 z-50 border-t backdrop-blur-2xl lg:hidden">
+    <nav aria-label="Workspace shortcuts" className="portal-bottom-nav fixed inset-x-0 bottom-0 z-50 border-t backdrop-blur-2xl lg:hidden">
       <div className="mx-auto flex max-w-lg items-center justify-around px-2 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
         {items.map(({ to, icon: Icon, label }) => (
           <NavLink
