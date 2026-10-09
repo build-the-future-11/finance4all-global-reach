@@ -8,6 +8,7 @@ type StoredTaskInput = Database["public"]["Tables"]["project_tasks"]["Insert"];
 type NewTaskInput = Omit<StoredTaskInput, "project_id"> & { project_id?: string };
 type MembershipStatus = Tables<"project_memberships">["status"];
 type TaskStatus = Tables<"project_tasks">["status"];
+type TaskUpdateInput = { id: string; revision: number; status: TaskStatus; evidence_url: string };
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -97,17 +98,28 @@ export function useCollaboration(projectId: string) {
       client.invalidateQueries({ queryKey: ["notifications"] }),
     ]);
   };
-  const invite = useMutation({
-    mutationFn: async (memberId: string) => {
+  const inviteMutation = useMutation({
+    mutationFn: async (input: { project_id: string; user_id: string }) => {
       const result = await supabase
         .from("project_memberships")
-        .insert({ project_id: requireUuid(projectId, "project"), user_id: requireUuid(memberId, "member account ID") })
+        .insert(input)
         .select("*")
         .single();
       return requireConfirmedRow(result, "Sending invitation");
     },
     onSuccess: refresh,
   });
+  const invite = {
+    isPending: inviteMutation.isPending,
+    mutateAsync: async (memberId: string) => {
+      // Capture the destination before a queued request can outlive this view.
+      const input = {
+        project_id: requireUuid(projectId, "project"),
+        user_id: requireUuid(memberId, "member account ID"),
+      };
+      return inviteMutation.mutateAsync(input);
+    },
+  };
   const respond = useMutation({
     mutationFn: async ({ project_id, user_id, status, previous }: { project_id: string; user_id: string; status: MembershipStatus; previous: MembershipStatus }) => {
       const result = await supabase
@@ -138,14 +150,12 @@ export function useCollaboration(projectId: string) {
       return createTaskMutation.mutateAsync(boundInput);
     },
   };
-  const updateTask = useMutation({
-    mutationFn: async ({ id, revision, status, evidence_url }: { id: string; revision: number; status: TaskStatus; evidence_url: string }) => {
-      const selectedProject = requireUuid(projectId, "project");
-      const evidence = normalizeEvidence(status, evidence_url);
+  const updateTaskMutation = useMutation({
+    mutationFn: async ({ project_id, id, revision, status, evidence_url }: TaskUpdateInput & { project_id: string }) => {
       const result = await supabase
         .from("project_tasks")
-        .update({ status, evidence_url: evidence })
-        .eq("project_id", selectedProject)
+        .update({ status, evidence_url })
+        .eq("project_id", project_id)
         .eq("id", id)
         .eq("revision", revision)
         .select("*")
@@ -155,5 +165,19 @@ export function useCollaboration(projectId: string) {
     },
     onSuccess: refresh,
   });
+  const updateTask = {
+    isPending: updateTaskMutation.isPending,
+    mutateAsync: async (input: TaskUpdateInput) => {
+      // Snapshot every submitted field before TanStack can pause execution.
+      const boundInput = {
+        project_id: requireUuid(projectId, "project"),
+        id: input.id,
+        revision: input.revision,
+        status: input.status,
+        evidence_url: normalizeEvidence(input.status, input.evidence_url),
+      };
+      return updateTaskMutation.mutateAsync(boundInput);
+    },
+  };
   return { memberships, tasks, invite, respond, createTask, updateTask };
 }
