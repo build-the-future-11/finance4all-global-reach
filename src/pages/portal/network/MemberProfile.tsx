@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { useChapters } from "@/hooks/portal/useEvents";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 export default function MemberProfile() {
   const { id } = useParams<{ id: string }>();
@@ -19,6 +20,7 @@ export default function MemberProfile() {
   const sendRequest = useSendConnectionRequest();
   const { data: chapters } = useChapters();
   const projects = useResearchProjects();
+  useDocumentTitle(profile?.displayName ?? "Member profile");
 
   if (!id) return <EmptyState message="Profile not found." />;
 

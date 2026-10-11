@@ -9,7 +9,6 @@ import { BrandMark } from "@/components/Brand";
 import MobileBottomNav from "@/components/portal/MobileBottomNav";
 import NotificationsCenter from "@/components/portal/NotificationsCenter";
 import PortalSearch from "@/components/portal/PortalSearch";
-import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -33,8 +32,6 @@ export default function PortalLayout() {
   const [collapsed, setCollapsed] = useState(() => {
     try { return window.localStorage.getItem("finance-portal-sidebar") === "collapsed"; } catch { return false; }
   });
-  useDocumentTitle("Portal");
-
   useEffect(() => {
     try { window.localStorage.setItem("finance-portal-sidebar", collapsed ? "collapsed" : "open"); } catch { /* noop */ }
   }, [collapsed]);
