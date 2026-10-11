@@ -109,6 +109,8 @@ export default function PathwaysEssays() {
                   size="sm"
                   variant={upvoted ? "default" : "outline"}
                   className={upvoted ? "" : "shrink-0 border-white/20 text-white"}
+                  disabled={toggleUpvote.isPending || (!upvoted && essay.publicationState !== "published")}
+                  aria-label={upvoted ? `Remove your upvote for ${essay.title}` : `Upvote ${essay.title}`}
                   onClick={() => handleUpvote(essay.id, upvoted)}
                 >
                   <ThumbsUp className={`h-3.5 w-3.5 ${upvoted ? "fill-current" : ""}`} />

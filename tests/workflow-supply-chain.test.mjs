@@ -117,7 +117,9 @@ test('required verify gate fails closed unless database authorization succeeds',
   const verify = source.slice(index);
 
   assert.match(verify, /\n    needs: database-authorization\n/);
-  assert.match(verify, /\n    if: always\(\)\n/);
+  // Run after a failed dependency so the required gate fails explicitly, but
+  // allow obsolete runs to stop when their replacement cancels them.
+  assert.match(verify, /\n    if: \$\{\{ !cancelled\(\) \}\}\n/);
   assert.match(verify, /name: Require database authorization/);
   assert.match(verify, /needs\.database-authorization\.result/);
   assert.match(verify, /test '\$\{\{ needs\.database-authorization\.result \}\}' = 'success'/);
