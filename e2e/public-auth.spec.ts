@@ -31,6 +31,8 @@ test("public learning hub and Five Foundations lesson are reachable without auth
 test("login and password recovery routes are reachable", async ({ page }) => {
   await page.goto("/login");
   await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible();
+  await expect(page.getByText("Open paths", { exact: true })).toBeVisible();
+  await expect(page.getByText(/100,000|1M\+|students reached|six continents/i)).toHaveCount(0);
 
   await page.getByRole("link", { name: "Forgot password?" }).click();
   await expect(page).toHaveURL(/\/forgot-password$/);

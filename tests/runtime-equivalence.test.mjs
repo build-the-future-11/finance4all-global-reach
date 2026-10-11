@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, readFileSync, renameSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, realpathSync, renameSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -162,7 +162,9 @@ test('a docs-only commit that changes the actual Tailwind CSS stage is rejected'
   assert.equal(before.sentinelRule, false);
   assert.equal(after.sentinelRule, true);
   assert.notEqual(after.sha256, before.sha256);
-  assert.ok(after.dependencies.includes(join(repo.cwd, path)));
+  // macOS may expose the same temporary directory through both `/var` and its
+  // canonical `/private/var` path, so compare real paths instead of aliases.
+  assert.ok(after.dependencies.some((dependency) => realpathSync(dependency) === realpathSync(join(repo.cwd, path))));
 
   const result = verifyRuntimeEquivalence({ cwd: repo.cwd, deployedRevision, sourceRevision });
   assert.equal(result.runtimeEquivalent, false);
