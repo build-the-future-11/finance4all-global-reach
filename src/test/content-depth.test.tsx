@@ -34,6 +34,16 @@ describe("content depth and claim boundaries", () => {
     expect(portfolioProjects.some((project) => project.status === "Proposed" && !project.href)).toBe(true);
     expect(programFamilies.some((program) => program.state === "Proposed")).toBe(true);
   });
+
+  it("links every portfolio record to its canonical public project page", () => {
+    expect(portfolioProjects).toHaveLength(12);
+    for (const project of portfolioProjects) {
+      expect(project.page).toBe(`https://finance-meta-landing.vercel.app/research/projects/${project.id}`);
+    }
+    expect(portfolioProjects.find((project) => project.id === "iy-ern")?.website).toBe("https://iy-ern.vercel.app/");
+    expect(portfolioProjects.find((project) => project.id === "portal")?.website).toBe("https://finance4all-global-reach.vercel.app/");
+  });
+
 });
 
 describe("chapter map interaction", () => {

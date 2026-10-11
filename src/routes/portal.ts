@@ -1,12 +1,17 @@
 import type { LucideIcon } from "lucide-react";
 import {
   Bookmark,
+  BookOpenText,
+  BriefcaseBusiness,
   CalendarDays,
+  FileText,
   FlaskConical,
+  GraduationCap,
   LayoutDashboard,
-  Route,
+  Newspaper,
   Settings,
   Shield,
+  UsersRound,
 } from "lucide-react";
 
 export const PORTAL_BASE = "/portal";
@@ -40,27 +45,28 @@ export interface PortalNavItem {
   path: string;
   icon: LucideIcon;
   description: string;
+  group: "Workspace" | "Explore" | "Account";
   adminOnly?: boolean;
   children?: { label: string; path: string }[];
 }
 
 export const portalNav: PortalNavItem[] = [
-  { label: "Home", path: portalRoutes.dashboard, icon: LayoutDashboard, description: "Your work and next commitments" },
-  { label: "Learning", path: portalRoutes.learning, icon: Route, description: "Reading progress and private notes" },
-  { label: "Collaboration", path: portalRoutes.collaboration, icon: FlaskConical, description: "Invitations, tasks and milestones" },
-  { label: "My Research", path: portalRoutes.myResearch, icon: FlaskConical, description: "Projects you lead or have joined" },
-  { label: "Projects", path: portalRoutes.labs, icon: FlaskConical, description: "Research questions and applications", children: [
-    { label: "Explore projects", path: portalRoutes.labs }, { label: "Review workspace", path: portalRoutes.labsReview },
+  { group: "Workspace", label: "Home", path: portalRoutes.dashboard, icon: LayoutDashboard, description: "Your priorities and recent activity" },
+  { group: "Workspace", label: "Learning", path: portalRoutes.learning, icon: GraduationCap, description: "Reading progress and private notes" },
+  { group: "Workspace", label: "My research", path: portalRoutes.myResearch, icon: FlaskConical, description: "Projects you lead or have joined" },
+  { group: "Workspace", label: "Collaboration", path: portalRoutes.collaboration, icon: UsersRound, description: "Invitations, tasks and milestones" },
+  { group: "Workspace", label: "Applications", path: portalRoutes.apply, icon: FileText, description: "Private submissions and receipts" },
+  { group: "Explore", label: "Projects", path: portalRoutes.labs, icon: BriefcaseBusiness, description: "Research questions and applications", children: [
+    { label: "All projects", path: portalRoutes.labs }, { label: "Review workspace", path: portalRoutes.labsReview },
   ] },
-  { label: "Programs", path: portalRoutes.pathways, icon: Route, description: "Programs, project opportunities and challenges", children: [
+  { group: "Explore", label: "Programs", path: portalRoutes.pathways, icon: BookOpenText, description: "Programs, opportunities and challenges", children: [
     { label: "Opportunity board", path: portalRoutes.pathways }, { label: "Project studio", path: portalRoutes.pathwaysStudios }, { label: "Writing challenges", path: portalRoutes.pathwaysEssays },
   ] },
-  { label: "Applications", path: portalRoutes.apply, icon: FlaskConical, description: "Private submissions and receipts" },
-  { label: "Events", path: portalRoutes.events, icon: CalendarDays, description: "Events and school chapters" },
-  { label: "Saved", path: portalRoutes.saved, icon: Bookmark, description: "Saved articles and research" },
-  { label: "Settings", path: portalRoutes.settings, icon: Settings, description: "Profile and account preferences", children: [
-    { label: "People", path: portalRoutes.network }, { label: "Learn & read", path: portalRoutes.debriefed },
-  ] },
-  { label: "Intake review", path: portalRoutes.intakeReview, icon: Shield, description: "Platform submissions and availability", adminOnly: true },
-  { label: "Admin", path: portalRoutes.admin, icon: Shield, description: "Content administration", adminOnly: true },
+  { group: "Explore", label: "News & explainers", path: portalRoutes.debriefed, icon: Newspaper, description: "Evidence-led finance reading" },
+  { group: "Explore", label: "Events", path: portalRoutes.events, icon: CalendarDays, description: "Events and school chapters" },
+  { group: "Explore", label: "People", path: portalRoutes.network, icon: UsersRound, description: "Members and introductions" },
+  { group: "Explore", label: "Saved", path: portalRoutes.saved, icon: Bookmark, description: "Saved articles and research" },
+  { group: "Account", label: "Settings", path: portalRoutes.settings, icon: Settings, description: "Profile and account preferences" },
+  { group: "Account", label: "Intake review", path: portalRoutes.intakeReview, icon: Shield, description: "Platform submissions and availability", adminOnly: true },
+  { group: "Account", label: "Admin", path: portalRoutes.admin, icon: Shield, description: "Content administration", adminOnly: true },
 ];

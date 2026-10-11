@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { AlertTriangle, CheckCircle2, MailCheck } from "lucide-react";
 import { useAuth } from "@/contexts/useAuth";
@@ -30,27 +30,43 @@ export default function Signup() {
   const [submitting, setSubmitting] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [authSettings, setAuthSettings] = useState<PublicAuthSettings | null>(null);
+  const [settingsLoading, setSettingsLoading] = useState(true);
+  const [settingsAttempt, setSettingsAttempt] = useState(0);
+  const operationPending = useRef(false);
 
   useEffect(() => {
     let active = true;
+    setSettingsLoading(true);
+    setAuthSettings(null);
     void getPublicAuthSettings().then((settings) => {
       if (active) setAuthSettings(settings);
+    }).catch(() => {
+      if (active) setAuthSettings(null);
+    }).finally(() => {
+      if (active) setSettingsLoading(false);
     });
     return () => {
       active = false;
     };
-  }, []);
+  }, [settingsAttempt]);
+
+  const emailAvailable = isSupabaseConfigured && !settingsLoading
+    && authSettings?.signupsEnabled === true && authSettings.emailEnabled;
+  const googleAvailable = isSupabaseConfigured && !settingsLoading
+    && authSettings?.signupsEnabled === true && authSettings.googleEnabled;
 
   if (!loading && user) return <Navigate to="/portal" replace />;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!emailAvailable || operationPending.current) return;
     setError("");
     const passwordError = getPasswordValidationError(password);
     if (passwordError) {
       setError(passwordError);
       return;
     }
+    operationPending.current = true;
     setSubmitting(true);
     rememberPostAuthPath(from);
     const { error: err, emailConfirmationRequired } = await signUp(
@@ -58,6 +74,7 @@ export default function Signup() {
       password,
       displayName.trim(),
     );
+    operationPending.current = false;
     setSubmitting(false);
     if (err) {
       setError(
@@ -77,10 +94,13 @@ export default function Signup() {
   };
 
   const handleGoogle = async () => {
+    if (!googleAvailable || operationPending.current) return;
+    operationPending.current = true;
     setError("");
     setGoogleLoading(true);
     const { error: err } = await signInWithGoogle(from);
     if (err) {
+      operationPending.current = false;
       setError(err);
       setGoogleLoading(false);
     }
@@ -119,6 +139,13 @@ export default function Signup() {
         </div>
       ) : (
         <>
+          {settingsLoading && <p role="status" className="mb-4 text-sm text-white/70">Checking available signup methods…</p>}
+          {!settingsLoading && !authSettings && isSupabaseConfigured && (
+            <div className="mb-4 rounded-lg border border-amber-400/25 bg-amber-400/10 px-3 py-3 text-sm text-amber-100">
+              <p role="alert">We couldn't check signup availability. Try again before creating an account.</p>
+              <Button type="button" variant="outline" className="mt-3" onClick={() => setSettingsAttempt(attempt => attempt + 1)}>Retry availability check</Button>
+            </div>
+          )}
           {authSettings && !authSettings.signupsEnabled && (
             <div role="alert" className="mb-4 flex gap-3 rounded-lg border border-amber-400/25 bg-amber-400/10 px-3 py-3 text-sm text-amber-100">
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
@@ -129,7 +156,7 @@ export default function Signup() {
             onClick={handleGoogle}
             loading={googleLoading}
             label="Sign up with Google"
-            disabled={!isSupabaseConfigured || authSettings?.signupsEnabled === false || authSettings?.googleEnabled === false}
+            disabled={!googleAvailable || submitting || googleLoading}
           />
           <AuthDivider />
 
@@ -141,6 +168,7 @@ export default function Signup() {
               <Input
                 id="name"
                 autoComplete="name"
+                maxLength={80}
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 required
@@ -188,7 +216,7 @@ export default function Signup() {
             <Button
               type="submit"
               className="w-full bg-emerald-500 text-slate-950 hover:bg-emerald-400"
-              disabled={!isSupabaseConfigured || submitting || authSettings?.signupsEnabled === false || authSettings?.emailEnabled === false}
+              disabled={!emailAvailable || submitting || googleLoading}
             >
               {submitting ? "Creating account…" : "Create account with email"}
             </Button>

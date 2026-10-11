@@ -1,5 +1,5 @@
 import "@/styles/workspace.css";
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { ChevronRight, LogOut, Menu, PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@/contexts/useAuth";
@@ -28,6 +28,7 @@ function PortalBrand({ compact = false }: { compact?: boolean }) {
 
 export default function PortalLayout() {
   const { profile, signOut } = useAuth();
+  const location = useLocation();
   const mobileTrigger = useRef<HTMLButtonElement>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(() => {
@@ -42,6 +43,9 @@ export default function PortalLayout() {
   const canReview = profile?.role === "lead_researcher" || profile?.role === "admin";
   const isAdmin = profile?.role === "admin";
   const navItems = portalNav.filter((item) => !item.adminOnly || isAdmin);
+  const currentItem = [...navItems]
+    .sort((a, b) => b.path.length - a.path.length)
+    .find((item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`));
 
   return (
     <div onKeyDown={e => { if(e.key === "Escape" && mobileOpen) { setMobileOpen(false); mobileTrigger.current?.focus(); } }} className={`portal-shell ${collapsed ? "portal-sidebar-collapsed" : ""}`}>
@@ -82,11 +86,14 @@ export default function PortalLayout() {
         )}
 
         <nav className="portal-navigation" aria-label="Member portal">
-          {navItems.map((item) => {
+          {navItems.map((item, index) => {
             const Icon = item.icon;
             const children = item.children?.filter((child) => child.path !== portalRoutes.labsReview || canReview);
             return (
               <div className="portal-nav-group" key={item.path}>
+                {!collapsed && (index === 0 || navItems[index - 1]?.group !== item.group) && (
+                  <p className="portal-nav-section-label">{item.group}</p>
+                )}
                 <NavLink
                   to={item.path}
                   end={item.path === portalRoutes.dashboard}
@@ -126,7 +133,7 @@ export default function PortalLayout() {
 
       <main className="portal-main">
         <div className="portal-desktop-bar">
-          <div><span>Member portal</span><strong>Finance for All</strong></div>
+          <div><span>Member portal / {currentItem?.group ?? "Workspace"}</span><strong>{currentItem?.label ?? "Finance for All"}</strong></div>
           <div className="portal-header-actions"><PortalSearch /><NotificationsCenter /><ThemeToggle /></div>
         </div>
         <div className="portal-content"><Outlet /></div>

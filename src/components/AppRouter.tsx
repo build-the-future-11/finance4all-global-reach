@@ -16,7 +16,7 @@ import PortalLayout from "@/layouts/PortalLayout";
 
 const Collaboration = lazy(() => import("@/pages/portal/Collaboration"));
 const LearningWorkspace = lazy(() => import("@/pages/portal/LearningWorkspace"));
-const Dashboard = lazy(() => import("@/pages/portal/ResearchWorkspace"));
+const Dashboard = lazy(() => import("@/pages/portal/Dashboard"));
 const MyResearch = lazy(() => import("@/pages/portal/ResearchWorkspace").then(module => ({ default: module.MyResearch })));
 const DebriefedHub = lazy(() => import("@/pages/portal/debriefed/DebriefedHub"));
 const DebriefedExplainers = lazy(() => import("@/pages/portal/debriefed/DebriefedExplainers"));

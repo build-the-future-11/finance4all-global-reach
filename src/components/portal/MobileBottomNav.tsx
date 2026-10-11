@@ -1,18 +1,20 @@
 import { NavLink } from "react-router-dom";
 import {
+  CircleUserRound,
   FlaskConical,
+  GraduationCap,
   LayoutDashboard,
-  Settings,
+  UsersRound,
 } from "lucide-react";
 import { portalRoutes } from "@/routes/portal";
 import { cn } from "@/lib/utils";
 
 const items = [
   { to: portalRoutes.dashboard, icon: LayoutDashboard, label: "Home" },
-  { to: portalRoutes.myResearch, icon: FlaskConical, label: "My work" },
-  { to: portalRoutes.labs, icon: FlaskConical, label: "Projects" },
-  { to: portalRoutes.apply, icon: FlaskConical, label: "Apply" },
-  { to: portalRoutes.settings, icon: Settings, label: "Profile" },
+  { to: portalRoutes.learning, icon: GraduationCap, label: "Learn" },
+  { to: portalRoutes.myResearch, icon: FlaskConical, label: "Research" },
+  { to: portalRoutes.network, icon: UsersRound, label: "People" },
+  { to: portalRoutes.settings, icon: CircleUserRound, label: "Profile" },
 ];
 
 export default function MobileBottomNav() {

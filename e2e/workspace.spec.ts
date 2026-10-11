@@ -31,9 +31,9 @@ for (const width of [320, 375, 768, 1024, 1440]) {
     page.on('pageerror', error => errors.push(error.message));
     await page.setViewportSize({ width, height: 950 });
     await page.goto('/portal');
-    await expect(page.getByRole('heading', { name: 'Welcome, Test.' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Welcome back, Test.' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'QA fixture research' })).toBeVisible();
-    await expect(page.getByText('No platform applications submitted yet.', { exact: false })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Needs attention' })).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1)).toBe(false);
     const audit = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
     expect(audit.violations.map(v => ({ id: v.id, nodes: v.nodes.map(n => n.target) }))).toEqual([]);

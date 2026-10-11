@@ -21,11 +21,13 @@ export type PortfolioProject = {
   status: CatalogStatus;
   domain: string;
   tags: string[];
+  page: string;
+  website?: string;
   href?: string;
   evidence?: string;
 };
 
-export const portfolioProjects: PortfolioProject[] = [
+const portfolioProjectRecords: Omit<PortfolioProject, "page">[] = [
   {
     id: "finance-meta-global",
     title: "FinanceMeta Global evidence workspace",
@@ -81,6 +83,7 @@ export const portfolioProjects: PortfolioProject[] = [
     status: "Verified repository",
     domain: "Research publishing",
     tags: ["economics", "preprints", "publishing"],
+    website: "https://iy-ern.vercel.app/",
     href: "https://github.com/build-the-future-11/Iy-ERN",
     evidence: "Public repository verified 19 Sep 2026",
   },
@@ -91,6 +94,7 @@ export const portfolioProjects: PortfolioProject[] = [
     status: "Verified repository",
     domain: "Community infrastructure",
     tags: ["education", "community", "open source"],
+    website: "https://finance4all-global-reach.vercel.app/",
     href: "https://github.com/build-the-future-11/finance4all-global-reach",
     evidence: "Public repository verified 19 Sep 2026",
   },
@@ -131,6 +135,13 @@ export const portfolioProjects: PortfolioProject[] = [
     evidence: "Needs common rubric, conflict policy, reviewers, and publication standard",
   },
 ];
+
+const PROJECT_PAGE_ORIGIN = "https://finance-meta-landing.vercel.app";
+
+export const portfolioProjects: PortfolioProject[] = portfolioProjectRecords.map((project) => ({
+  ...project,
+  page: `${PROJECT_PAGE_ORIGIN}/research/projects/${project.id}`,
+}));
 
 export type ApplicationPath = {
   title: string;

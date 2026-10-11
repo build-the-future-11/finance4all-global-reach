@@ -52,6 +52,13 @@ export default function AuthLayout({ title, subtitle, children, footer }: AuthLa
 
           <div className="auth-form-body">{children}</div>
           <div className="auth-form-footer">{footer}</div>
+          <nav aria-label="Member information" className="auth-form-footer">
+            <a href="https://finance-meta-landing.vercel.app/privacy">Privacy information</a>
+            {" · "}
+            <a href="https://finance-meta-landing.vercel.app/participation">Participation expectations</a>
+            {" · "}
+            <a href="mailto:financeforalledu@gmail.com">Contact support</a>
+          </nav>
         </div>
       </main>
     </div>

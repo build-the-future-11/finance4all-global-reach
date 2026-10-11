@@ -288,7 +288,10 @@ export default function MetaLabs() {
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-500">Public portfolio + next wave</p>
             <h2 className="mt-1 font-serif text-2xl font-semibold text-foreground">What exists, and what still has to be built</h2>
           </div>
-          <a className="portal-muted hidden items-center gap-1 text-xs font-semibold sm:flex" href="https://github.com/build-the-future-11/FinanceMeta-Global" target="_blank" rel="noreferrer">Open evidence workspace <ExternalLink className="h-3.5 w-3.5" /></a>
+          <div className="hidden flex-wrap items-center justify-end gap-4 sm:flex">
+            <a className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-500" href="https://finance-meta-landing.vercel.app/projects" target="_blank" rel="noreferrer">All 48 project records <ExternalLink className="h-3.5 w-3.5" /></a>
+            <a className="portal-muted inline-flex items-center gap-1 text-xs font-semibold" href="https://github.com/build-the-future-11/FinanceMeta-Global" target="_blank" rel="noreferrer">Evidence workspace <ExternalLink className="h-3.5 w-3.5" /></a>
+          </div>
         </div>
         <div className="grid gap-4 md:grid-cols-2">
           {portfolioProjects.map((project) => (
@@ -305,7 +308,11 @@ export default function MetaLabs() {
               <div className="mt-4 flex flex-wrap gap-2">{project.tags.map((tag) => <span key={tag} className="rounded-full bg-muted px-2.5 py-1 text-xs text-muted-foreground">{tag}</span>)}</div>
               <div className="mt-auto border-t border-border pt-5">
                 <p className="portal-muted text-xs leading-relaxed">{project.evidence}</p>
-                {project.href && <a href={project.href} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-500">Inspect repository <ExternalLink className="h-3.5 w-3.5" /></a>}
+                <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2">
+                  <a href={project.page} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-500">Open project page <ExternalLink className="h-3.5 w-3.5" /></a>
+                  {project.website && project.website !== project.page && <a href={project.website} target="_blank" rel="noreferrer" className="portal-muted inline-flex items-center gap-1.5 text-sm font-semibold">Open website <ExternalLink className="h-3.5 w-3.5" /></a>}
+                  {project.href && <a href={project.href} target="_blank" rel="noreferrer" className="portal-muted inline-flex items-center gap-1.5 text-sm font-semibold">Repository <ExternalLink className="h-3.5 w-3.5" /></a>}
+                </div>
               </div>
             </PortalCard>
           ))}
