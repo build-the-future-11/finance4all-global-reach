@@ -42,18 +42,35 @@ export default function PathwaysEssays() {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const draftRevision = useRef(0);
+  const submissionLock = useRef(false);
+  const [submissionPending, setSubmissionPending] = useState(false);
+  const [savedEarlierVersion, setSavedEarlierVersion] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!title.trim() || !body.trim()) return;
+    if (submissionLock.current || submitEssay.isPending || !title.trim() || !body.trim()) return;
+    submissionLock.current = true;
+    setSubmissionPending(true);
+    setSavedEarlierVersion(false);
+    const submittedRevision = draftRevision.current;
     try {
       await submitEssay.mutateAsync({ title: title.trim(), body: body.trim() });
-      toast.success("Essay saved for review");
-      setOpen(false);
-      setTitle("");
-      setBody("");
+      // A confirmed older submission must not clear edits made while it saved.
+      if (draftRevision.current === submittedRevision) {
+        toast.success("Essay saved for review");
+        setOpen(false);
+        setTitle("");
+        setBody("");
+      } else {
+        setSavedEarlierVersion(true);
+        toast.success("Earlier essay saved for review. Newer edits kept.");
+      }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to submit");
+    } finally {
+      submissionLock.current = false;
+      setSubmissionPending(false);
     }
   };
 
@@ -85,16 +102,17 @@ export default function PathwaysEssays() {
             </DialogTrigger>
             <DialogContent className="border-white/15 bg-[#0c1220] text-white">
               <DialogHeader><DialogTitle>Submit your take</DialogTitle></DialogHeader>
-              <form className="space-y-4" onSubmit={handleSubmit}>
+              <form className="space-y-4" aria-busy={submissionPending || submitEssay.isPending} onSubmit={handleSubmit}>
                 <div>
                   <Label htmlFor="essay-title">Title</Label>
-                  <Input id="essay-title" name="title" required value={title} onChange={(e) => setTitle(e.target.value)} className="mt-1 border-white/20 bg-white/5" />
+                  <Input id="essay-title" name="title" required value={title} onChange={(e) => { draftRevision.current += 1; setTitle(e.target.value); }} className="mt-1 border-white/20 bg-white/5" />
                 </div>
                 <div>
                   <Label htmlFor="essay-body">Essay</Label>
-                  <Textarea id="essay-body" name="body" required value={body} onChange={(e) => setBody(e.target.value)} rows={8} className="mt-1 border-white/20 bg-white/5" />
+                  <Textarea id="essay-body" name="body" required value={body} onChange={(e) => { draftRevision.current += 1; setBody(e.target.value); }} rows={8} className="mt-1 border-white/20 bg-white/5" />
                 </div>
-                <Button type="submit" disabled={submitEssay.isPending}>Submit for review</Button>
+                {savedEarlierVersion && <p role="status" className="text-sm">The earlier version was saved for review. Your newer edits are still here and have not been submitted.</p>}
+                <Button type="submit" disabled={submissionPending || submitEssay.isPending}>{submissionPending || submitEssay.isPending ? "Saving for review…" : "Submit for review"}</Button>
               </form>
             </DialogContent>
           </Dialog>

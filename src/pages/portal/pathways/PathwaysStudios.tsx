@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ExternalLink, Plus } from "lucide-react";
 import { useStudioSubmissions, useSubmitStudio } from "@/hooks/portal/usePathways";
 import { useProfilesByIds } from "@/hooks/portal/useLabs";
@@ -27,10 +27,18 @@ export default function PathwaysStudios() {
   const [writeup, setWriteup] = useState("");
   const [repoUrl, setRepoUrl] = useState("");
   const [demoUrl, setDemoUrl] = useState("");
+  const draftRevision = useRef(0);
+  const submissionLock = useRef(false);
+  const [submissionPending, setSubmissionPending] = useState(false);
+  const [savedEarlierVersion, setSavedEarlierVersion] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!title.trim() || !writeup.trim()) return;
+    if (submissionLock.current || submit.isPending || !title.trim() || !writeup.trim()) return;
+    submissionLock.current = true;
+    setSubmissionPending(true);
+    setSavedEarlierVersion(false);
+    const submittedRevision = draftRevision.current;
     try {
       await submit.mutateAsync({
         title: title.trim(),
@@ -38,14 +46,23 @@ export default function PathwaysStudios() {
         repoUrl: repoUrl.trim() || undefined,
         demoUrl: demoUrl.trim() || undefined,
       });
-      toast.success("Submission saved for review");
-      setOpen(false);
-      setTitle("");
-      setWriteup("");
-      setRepoUrl("");
-      setDemoUrl("");
+      // A confirmed older submission must not clear edits made while it saved.
+      if (draftRevision.current === submittedRevision) {
+        toast.success("Submission saved for review");
+        setOpen(false);
+        setTitle("");
+        setWriteup("");
+        setRepoUrl("");
+        setDemoUrl("");
+      } else {
+        setSavedEarlierVersion(true);
+        toast.success("Earlier submission saved for review. Newer edits kept.");
+      }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to submit");
+    } finally {
+      submissionLock.current = false;
+      setSubmissionPending(false);
     }
   };
 
@@ -61,24 +78,25 @@ export default function PathwaysStudios() {
             </DialogTrigger>
             <DialogContent className="border-white/15 bg-[#0c1220] text-white">
               <DialogHeader><DialogTitle>Submit to Studios</DialogTitle></DialogHeader>
-              <form className="space-y-4" onSubmit={handleSubmit}>
+              <form className="space-y-4" aria-busy={submissionPending || submit.isPending} onSubmit={handleSubmit}>
                 <div>
                   <Label htmlFor="studio-title">Title</Label>
-                  <Input id="studio-title" name="title" required value={title} onChange={(e) => setTitle(e.target.value)} className="mt-1 border-white/20 bg-white/5" />
+                  <Input id="studio-title" name="title" required value={title} onChange={(e) => { draftRevision.current += 1; setTitle(e.target.value); }} className="mt-1 border-white/20 bg-white/5" />
                 </div>
                 <div>
                   <Label htmlFor="studio-writeup">Writeup</Label>
-                  <Textarea id="studio-writeup" name="writeup" required value={writeup} onChange={(e) => setWriteup(e.target.value)} rows={4} className="mt-1 border-white/20 bg-white/5" />
+                  <Textarea id="studio-writeup" name="writeup" required value={writeup} onChange={(e) => { draftRevision.current += 1; setWriteup(e.target.value); }} rows={4} className="mt-1 border-white/20 bg-white/5" />
                 </div>
                 <div>
                   <Label htmlFor="studio-repo-url">Repo URL (optional)</Label>
-                  <Input id="studio-repo-url" name="repoUrl" type="url" value={repoUrl} onChange={(e) => setRepoUrl(e.target.value)} className="mt-1 border-white/20 bg-white/5" />
+                  <Input id="studio-repo-url" name="repoUrl" type="url" value={repoUrl} onChange={(e) => { draftRevision.current += 1; setRepoUrl(e.target.value); }} className="mt-1 border-white/20 bg-white/5" />
                 </div>
                 <div>
                   <Label htmlFor="studio-demo-url">Demo URL (optional)</Label>
-                  <Input id="studio-demo-url" name="demoUrl" type="url" value={demoUrl} onChange={(e) => setDemoUrl(e.target.value)} className="mt-1 border-white/20 bg-white/5" />
+                  <Input id="studio-demo-url" name="demoUrl" type="url" value={demoUrl} onChange={(e) => { draftRevision.current += 1; setDemoUrl(e.target.value); }} className="mt-1 border-white/20 bg-white/5" />
                 </div>
-                <Button type="submit" disabled={submit.isPending}>Submit for review</Button>
+                {savedEarlierVersion && <p role="status" className="text-sm">The earlier version was saved for review. Your newer edits are still here and have not been submitted.</p>}
+                <Button type="submit" disabled={submissionPending || submit.isPending}>{submissionPending || submit.isPending ? "Saving for review…" : "Submit for review"}</Button>
               </form>
             </DialogContent>
           </Dialog>
