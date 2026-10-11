@@ -75,6 +75,13 @@ BEGIN
   -- still deny anonymous writes; members cannot select their own exemption.
   IF auth.uid() IS NULL THEN RETURN NEW; END IF;
   IF TG_OP = 'UPDATE' AND NEW IS NOT DISTINCT FROM OLD THEN RETURN NEW; END IF;
+  -- The review RPC already meters publication transitions. These protected
+  -- metadata-only updates must not also consume a submission/edit allowance.
+  IF TG_OP = 'UPDATE' AND TG_TABLE_NAME IN ('introduction_posts','studio_submissions','essay_submissions')
+    AND (pg_catalog.to_jsonb(NEW) - ARRAY['publication_state','publication_revision','updated_at'])
+      IS NOT DISTINCT FROM
+      (pg_catalog.to_jsonb(OLD) - ARRAY['publication_state','publication_revision','updated_at'])
+    THEN RETURN NEW; END IF;
   -- Existing guards still authorize these transitions. A spent activity budget
   -- must not prevent withdrawal, cancellation or leaving a project.
   IF TG_OP = 'UPDATE' AND (

@@ -111,5 +111,14 @@ DO $$ BEGIN
  BEGIN PERFORM * FROM public.news_articles; RAISE EXCEPTION 'Anonymous member content read'; EXCEPTION WHEN insufficient_privilege THEN NULL; END;
 END $$;
 RESET ROLE;
+SELECT set_config('request.jwt.claim.sub','81000000-0000-4000-8000-000000000003',true);
+SET LOCAL ROLE authenticated;
+SELECT public.review_publication('essay_submissions','82000000-0000-4000-8000-000000000002',0,'published','Essay sources and permissions reviewed.');
+RESET ROLE;
+DO $$ BEGIN
+ IF EXISTS(SELECT 1 FROM private.member_write_budgets WHERE user_id='81000000-0000-4000-8000-000000000003' AND action='essay_submissions') THEN RAISE EXCEPTION 'Publication consumed a submission allowance'; END IF;
+ IF (SELECT used FROM private.member_write_budgets WHERE user_id='81000000-0000-4000-8000-000000000003' AND action='all_writes')<>3 THEN RAISE EXCEPTION 'Review aggregate budget was charged twice'; END IF;
+ IF (SELECT used FROM private.member_write_budgets WHERE user_id='81000000-0000-4000-8000-000000000003' AND action='publication_review')<>3 THEN RAISE EXCEPTION 'Review budget did not count every review'; END IF;
+END $$;
 ROLLBACK;
 \echo PASS publication states, all ten metadata grants/policies, actor isolation, stale reviews, audit, write limits, atomic rollback and rollover
