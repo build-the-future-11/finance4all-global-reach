@@ -66,6 +66,20 @@ afterEach(() => {
 });
 
 describe("private application draft persistence", () => {
+  it("preserves answers and pauses automatic writes after a server quota response", async () => {
+    state.write.mockResolvedValue({ data: null, error: { code: "PT429", message: "Hourly activity limit reached" } });
+    const view = draftView();
+    fireEvent.click(screen.getByRole("button", { name: "Resume saved draft" }));
+    view.updateAnswers({ ...savedAnswers, motivation: "My unsent answer must remain available" });
+    await advanceAutosave();
+    expect(screen.getByRole("alert")).toHaveTextContent("Hourly save limit reached");
+    expect(screen.getByRole("status")).not.toHaveTextContent("Private draft saved");
+    expect(view.client.getQueryData(["application-draft", "member-a", "quant-research"])).toEqual(savedDraft);
+    await advanceAutosave();
+    expect(state.write).toHaveBeenCalledTimes(1);
+    expect(view.onRestore).toHaveBeenCalledTimes(1);
+  });
+
   it("persists clearing every answer in an existing draft", async () => {
     const view = draftView();
     fireEvent.click(screen.getByRole("button", { name: "Resume saved draft" }));

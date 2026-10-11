@@ -63,6 +63,20 @@ UPDATE private.member_write_budgets SET window_started_at=now()-interval '2 hour
 SET LOCAL ROLE authenticated;
 SELECT set_config('request.jwt.claim.sub','81000000-0000-4000-8000-000000000001',true);
 INSERT INTO public.introduction_posts(author_id,headline,looking_for) VALUES(auth.uid(),'Next window','Test only');
+DO $$ BEGIN
+ BEGIN INSERT INTO public.introduction_posts(author_id,headline,looking_for) VALUES(auth.uid(),'Oversized fixture',repeat('x',65536)); RAISE EXCEPTION 'Oversized member record allowed'; EXCEPTION WHEN string_data_right_truncation THEN NULL; END;
+ FOR i IN 1..5 LOOP PERFORM public.export_my_data(); END LOOP;
+ BEGIN PERFORM public.export_my_data(); RAISE EXCEPTION 'Export quota bypass'; EXCEPTION WHEN SQLSTATE 'PT429' THEN NULL; END;
+ PERFORM public.request_account_deletion('Disposable cancellation test');
+END $$;
+RESET ROLE;
+UPDATE private.member_write_budgets SET used=600 WHERE user_id='81000000-0000-4000-8000-000000000001' AND action='all_writes';
+SET LOCAL ROLE authenticated;
+SELECT set_config('request.jwt.claim.sub','81000000-0000-4000-8000-000000000001',true);
+DO $$ BEGIN
+ PERFORM public.cancel_account_deletion();
+ IF NOT EXISTS(SELECT 1 FROM public.account_deletion_requests WHERE user_id=auth.uid() AND status='cancelled') THEN RAISE EXCEPTION 'Exhausted activity budget blocked cancellation'; END IF;
+END $$;
 SELECT set_config('request.jwt.claim.sub','81000000-0000-4000-8000-000000000003',true);
 DO $$ BEGIN
  BEGIN PERFORM public.review_publication('profiles','81000000-0000-4000-8000-000000000001',0,'published','Invalid target table'); RAISE EXCEPTION 'Arbitrary table review allowed'; EXCEPTION WHEN invalid_parameter_value THEN NULL; END;

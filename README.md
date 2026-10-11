@@ -110,3 +110,9 @@ Run `npm test`, `npm run typecheck` and `npm run lint` before committing; run `n
 ## License
 
 No standalone portal license is present. The rights holder must select reuse terms before an openly licensed distribution. Public GitHub visibility does not itself grant those rights.
+
+## Candidate publication and abuse controls
+
+The October candidate defaults database content to draft, adds an audited administrator review queue and enforces atomic per-account activity budgets. See [control limits, scope and rollout](docs/PUBLICATION_AND_ABUSE_CONTROLS.md). The canonical live database and controlled-account checks remain blocked; Draft PR #162 is not a production release.
+
+Hosted QA includes three browser engines, responsive publication review, read-only public route checks and constrained production-build mobile measurements. Fixtures certify UI behavior only. Use `npm run test:e2e`, `npm run test:performance` after a clean build, and `npm run test:public-qa` for the explicitly pinned public-site revision. Results and traces are retained as workflow artifacts.

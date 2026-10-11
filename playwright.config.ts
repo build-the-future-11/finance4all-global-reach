@@ -10,6 +10,7 @@ export default defineConfig({
   workers: 2,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
+  maxFailures: process.env.CI ? 8 : undefined,
   reporter: [["list"], ["json", { outputFile: "test-results/browser-results.json" }]],
   use: {
     baseURL: e2eOrigin,

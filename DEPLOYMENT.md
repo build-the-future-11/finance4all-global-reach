@@ -1,8 +1,10 @@
-# Deploy to Vercel (Production)
+# Member portal deployment
+
+Current decision (11 October 2026): **NO-GO for unrestricted onboarding.** Keep Draft PR #162 unpromoted while canonical live database, controlled-account, policy and operating gates are blocked. The candidate includes 17 migrations; passing disposable CI is not permission to apply them to production. See [readiness](docs/PRODUCTION_READINESS.md) and [publication/abuse rollout](docs/PUBLICATION_AND_ABUSE_CONTROLS.md).
 
 This is a **Vite** app. All client env vars must use the `VITE_` prefix so they are exposed at build time. Do **not** use `NEXT_PUBLIC_`.
 
-The supported release runtime is Node.js 22.12 or newer with npm 10.9.8. `npm ci` is the only
+Hosted release CI pins Node.js 22.23.2 with npm 10.9.8. Use the repository toolchain verifier before a release. `npm ci` is the only
 supported dependency installation path for CI and production builds.
 
 ## Current release gate
@@ -15,7 +17,7 @@ Before treating a Vercel deployment as production-ready, verify all of the follo
 - `VITE_SUPABASE_PUBLISHABLE_KEY` is present and uses the browser-safe `sb_publishable_...` format.
 - The variables are enabled for **Production and Preview** (and Development if Vercel development environments are used).
 - The deployment was rebuilt after any environment-variable change.
-- Database migrations through `20260907110357_trusted_profile_role_administration.sql`, including the member-account lifecycle migration, have been applied in order.
+- The live ledger and schema match every migration at the exact candidate revision, including the two October publication/abuse migrations. Verify before applying anything.
 - Google OAuth redirect URLs match the deployed production and preview domains.
 
 If a Vercel deployment starts failing after the fail-closed configuration gate was introduced, check the build log for `validate-public-env` output first. Do not weaken or bypass the validator to make a deployment green.
@@ -70,18 +72,17 @@ In [Supabase Dashboard](https://supabase.com/dashboard/project/pnemeegkwyaicsbnb
 **Site URL** (production):
 
 ```
-https://YOUR-PROJECT.vercel.app
+https://finance4all-global-reach.vercel.app
 ```
 
-**Redirect URLs** — add ALL of these:
+**Redirect URLs** — verify these exact routes against the intended environments:
 
 ```
 http://localhost:8080/auth/callback
-https://YOUR-PROJECT.vercel.app/auth/callback
-https://YOUR-PROJECT-*.vercel.app/auth/callback
+https://finance4all-global-reach.vercel.app/auth/callback
 ```
 
-Replace `YOUR-PROJECT` with your Vercel subdomain (e.g. `finance4all-global-reach`).
+Use exact reviewed preview callback URLs only when a preview needs authentication. Do not add an unbounded preview wildcard. Verify `/reset-password` recovery redirects on each intended origin as well.
 
 The app callback route is `/auth/callback` (`src/lib/supabase.ts` → `getAuthRedirectUrl()`).
 
@@ -115,6 +116,11 @@ Required migration order:
 10. `supabase/migrations/20260906171941_archive_abandoned_public_tables.sql` (reversibly move empty, unused tables from a partially applied branch into the private legacy namespace)
 11. `supabase/migrations/20260906172830_harden_recovered_profile_functions.sql` (pin recovered trigger functions to qualified objects and remove browser-role execution)
 12. `supabase/migrations/20260907110357_trusted_profile_role_administration.sql` (retain member role-change denial while allowing trusted database operators to provision the initial administrator)
+13. `supabase/migrations/20260921141333_platform_intake.sql` (private native intake)
+14. `supabase/migrations/20260924155017_member_learning_and_application_drafts.sql` (owner-scoped learning, drafts and intake history)
+15. `supabase/migrations/20260924160333_project_collaboration.sql` (membership, tasks and private evidence workflow)
+16. `supabase/migrations/20261011090000_member_abuse_budgets.sql` (atomic committed-activity budgets and metered export)
+17. `supabase/migrations/20261011091000_reviewed_publication.sql` (draft-by-default publication, review audit and dependent-write gates)
 
 The recovered migrations were traced to commit `9539faadecc5d5c564b33e7610e02cbe1789f97c` and matched against the live schema before being restored. See `docs/PRODUCTION_SCHEMA_RECONCILIATION.md` for the observed production state and the remaining ledger-repair boundary.
 
@@ -152,9 +158,9 @@ table. Then run `Production Auth Certification` with two dedicated ordinary-memb
 certify browser sign-in, persisted profile activity, session isolation, logout/login, and
 protected-route behavior. These checks prove different layers and neither substitutes for the other.
 
-## 5. Deploy
+## 5. Deploy after the release gates pass
 
-Push to `main` — Vercel auto-deploys. Or:
+The current portal candidate must remain a draft. After canonical backend and operational acceptance, use the protected-main release path; Vercel auto-deploys. The operator deployment command is:
 
 ```bash
 npx vercel --prod
@@ -164,7 +170,7 @@ npx vercel --prod
 
 Run this against the exact production deployment before sharing the portal publicly:
 
-1. Open `https://YOUR-PROJECT.vercel.app/login`.
+1. Open `https://finance4all-global-reach.vercel.app/login`.
 2. Confirm there are no placeholder/missing-env errors.
 3. Complete visitor → signup → onboarding → portal.
 4. Complete Google sign-in and confirm it lands on `/portal`.
@@ -187,11 +193,11 @@ Then open `/portal/admin` and verify the intended admin path. Never expose role 
 
 ```bash
 curl -s -o /dev/null -w "%{http_code}\n" \
-  -H "apikey: YOUR_ANON_JWT" \
+  -H "apikey: YOUR_BROWSER_PUBLISHABLE_KEY" \
   "https://pnemeegkwyaicsbnbnmg.supabase.co/rest/v1/"
 ```
 
-Expect `200` — confirms URL and public key are valid.
+Expect `200` — only confirms this HTTP endpoint responded; it does not certify Auth, RLS, publication state or schema compatibility.
 
 ## Release evidence to retain
 
@@ -200,7 +206,7 @@ For each production release, retain a compact record containing:
 - Git commit SHA;
 - Vercel deployment URL and successful build result;
 - environment-contract validation result (never the secret/public-key value itself);
-- migration state through `20260907110357_trusted_profile_role_administration.sql`, including `20260906150632_member_account_lifecycle.sql`;
+- complete migration ledger/schema equality at the candidate revision (17 migration files in this candidate);
 - auth/onboarding/protected-route smoke-test result;
 - ordinary-member authorization test result;
 - known failures or exceptions and their owner.

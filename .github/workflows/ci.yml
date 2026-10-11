@@ -330,6 +330,7 @@ jobs:
       - name: Full test suite
         run: npm test
       - name: Production build
+        id: production_build
         run: npm run build
       - name: Component catalog build
         run: npm run build-storybook
@@ -338,6 +339,7 @@ jobs:
       - name: Browser journey smoke tests
         run: npm run test:e2e
       - name: Constrained mobile production performance
+        if: ${{ !cancelled() && steps.production_build.outcome == 'success' }}
         run: npm run test:performance
       - name: Repository lint gate
         run: npm run lint

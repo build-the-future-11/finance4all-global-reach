@@ -54,3 +54,21 @@ test("a stale review preserves its note and reports the server conflict", async 
   await expect(page.getByRole("alert")).toContainText("Content changed");
   await expect(note).toHaveValue("This review note must survive a server conflict.");
 });
+
+test("a refreshed revision cannot reuse an unfinished review of older content", async ({ page }) => {
+  await installMemberFixture(page, "admin");
+  let revision = 1;
+  await page.route("**/rest/v1/news_articles*", route => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify([{ id: "record", title: `Article version ${revision}`, publication_state: "draft", publication_revision: revision }]) }));
+  await page.goto("/portal/admin");
+  const note = page.getByLabel(/Review evidence and decision/);
+  await note.fill("My unfinished review of version one.");
+  revision = 2;
+  await page.getByRole("button", { name: "Reload review queue" }).click();
+  await expect(page.getByRole("alert")).toContainText("This record changed");
+  await expect(note).toHaveValue("My unfinished review of version one.");
+  await expect(page.getByRole("heading", { name: "Article version 1" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Record review", exact: true })).toBeDisabled();
+  await page.getByRole("button", { name: "Review current version and clear this note" }).click();
+  await expect(page.getByRole("heading", { name: "Article version 2" })).toBeVisible();
+  await expect(note).toHaveValue("");
+});

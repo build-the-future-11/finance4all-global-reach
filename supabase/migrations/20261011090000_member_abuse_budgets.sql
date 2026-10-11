@@ -75,6 +75,13 @@ BEGIN
   -- still deny anonymous writes; members cannot select their own exemption.
   IF auth.uid() IS NULL THEN RETURN NEW; END IF;
   IF TG_OP = 'UPDATE' AND NEW IS NOT DISTINCT FROM OLD THEN RETURN NEW; END IF;
+  -- Existing guards still authorize these transitions. A spent activity budget
+  -- must not prevent withdrawal, cancellation or leaving a project.
+  IF TG_OP = 'UPDATE' AND (
+    (TG_TABLE_NAME = 'intake_submissions' AND to_jsonb(NEW)->>'status' = 'withdrawn') OR
+    (TG_TABLE_NAME = 'account_deletion_requests' AND to_jsonb(NEW)->>'status' = 'cancelled') OR
+    (TG_TABLE_NAME = 'project_memberships' AND to_jsonb(NEW)->>'status' IN ('left','declined','removed'))
+  ) THEN RETURN NEW; END IF;
   IF pg_catalog.octet_length(pg_catalog.to_jsonb(NEW)::text) > 65536 THEN
     RAISE EXCEPTION 'This record exceeds the 64 KiB content limit' USING ERRCODE = '22001';
   END IF;

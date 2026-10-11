@@ -22,7 +22,9 @@ for (const path of inventory.paths) {
     const response = await page.goto(inventory.origin + path, { waitUntil: "networkidle" });
     expect(response?.status()).toBe(200);
     await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
-    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", inventory.origin + path);
+    // A bare HTTPS origin and the same origin ending in / identify the same URL.
+    const canonical = await page.locator('link[rel="canonical"]').getAttribute("href");
+    expect(new URL(canonical!).href).toBe(new URL(inventory.origin + path).href);
     for (const width of [320, 375, 768, 1024, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       // Allow the observed responsive transition to settle before measuring.

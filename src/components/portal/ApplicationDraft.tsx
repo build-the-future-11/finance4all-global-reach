@@ -77,6 +77,8 @@ export default function ApplicationDraft({
           setCanRetrySave(!conflict);
           setError(conflict
             ? "Draft changed in another session. Download your answers, then reload this page to choose the saved version."
+            : result.error?.code === "PT429"
+            ? "Hourly save limit reached. Your answers remain on this page. Download them now or retry after the limit resets within one hour."
             : "Draft save failed. Your answers remain on this page. Retry saving when connected.");
           setMessage("");
         } else {

@@ -22,6 +22,8 @@ checks blocked. No live migrations, authorization tests or account mutations wer
 There are **17 current migration files**; the historical ten-migration references below describe
 the September baseline only. Certification must compare the complete current file set.
 
+The publication migration defaults all ten content categories to draft; publication requires an audited administrator review of the observed revision. Editing content invalidates its approval. Member activity is metered atomically in the database, with cancellation/withdrawal preserved. See [controls and rollout](PUBLICATION_AND_ABUSE_CONTROLS.md). The exact final source and expanded browser/performance results are recorded in Draft PR #162 and its current checks; earlier passing runs do not certify later changes.
+
 Remaining release gates:
 
 - [ ] Pass hosted CI on the final integrated candidate and retain its exact source identity.
@@ -29,7 +31,8 @@ Remaining release gates:
 - [ ] Reconcile the canonical live schema and migration ledger, then run rollback-only RLS certification.
 - [ ] Verify controlled email, OAuth, recovery, onboarding, persistence and cross-member journeys.
 - [ ] Resolve the age/consent, retention and support ownership decisions before broad enrollment.
-- [ ] Certify server-side abuse budgets and publication-state enforcement; historical demo quarantine is not an authorization policy.
+- [x] Implement server-side member activity budgets and explicit publication state. The first candidate passed all disposable database checks, concurrency certification, 400 source tests and 29 Chromium scenarios in [CI 38142140589](https://github.com/build-the-future-11/finance4all-global-reach/actions/runs/38142140589).
+- [ ] Apply and certify those controls on the canonical database; verify provider Auth/edge abuse controls. Live work remains blocked.
 - [ ] Confirm backups, restore, rollback compatibility, alert routing, accessibility and performance coverage.
 
 The September tables and receipts below are retained as historical evidence. Their test counts,
@@ -101,7 +104,7 @@ Do not label the portal production-verified until all of the following have exac
 
 1. Protected-main CI succeeds.
 2. Vercel serves the exact merge SHA in `/release-revision.json`.
-3. Production migration ledger equals every migration file at the selected source revision (15 at this review).
+3. Production migration ledger equals every migration file at the selected source revision (17 in this candidate).
 4. Production RLS certification ends in `result=PASS`.
 5. Email, confirmation, onboarding, recovery, Google OAuth, persistence, logout/login, and two-member isolation pass with controlled accounts.
 6. Landing CTA completes the same member journey without a VertexED origin.
