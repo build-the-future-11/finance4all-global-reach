@@ -24,7 +24,7 @@ export function useActivityFeed(limit = 8) {
       const [newsRes, appsRes, connRes, eventsRes, savedRes] = await Promise.all([
         supabase
           .from("news_articles")
-          .select("id, title, published_at")
+          .select("id, title, published_at, publication_state")
           .order("published_at", { ascending: false })
           .limit(3),
         supabase
@@ -41,13 +41,13 @@ export function useActivityFeed(limit = 8) {
           .limit(3),
         supabase
           .from("events")
-          .select("id, title, starts_at")
+          .select("id, title, starts_at, publication_state")
           .eq("status", "upcoming")
           .order("starts_at", { ascending: true })
           .limit(3),
         supabase
           .from("news_bookmarks")
-          .select("created_at, news_articles(id, title)")
+          .select("created_at, news_articles(id, title, publication_state)")
           .eq("user_id", user!.id)
           .order("created_at", { ascending: false })
           .limit(2),
@@ -104,7 +104,7 @@ export function useActivityFeed(limit = 8) {
       });
 
       savedRes.data?.forEach((s) => {
-        const article = s.news_articles as { id: string; title: string } | null;
+        const article = s.news_articles as { id: string; title: string; publication_state: string } | null;
         if (article && isVisibleContent("news", article)) {
           items.push({
             id: `saved-${article.id}`,

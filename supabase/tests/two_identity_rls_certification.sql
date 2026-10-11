@@ -265,6 +265,17 @@ BEGIN
 END;
 $fixtures$;
 
+-- Explicitly reviewed disposable fixtures; all writes roll back.
+UPDATE public.chapters SET publication_state='published' WHERE id IN (SELECT id FROM portal_certification_fixtures);
+UPDATE public.news_articles SET publication_state='published' WHERE id IN (SELECT id FROM portal_certification_fixtures);
+UPDATE public.explainer_cards SET publication_state='published' WHERE id IN (SELECT id FROM portal_certification_fixtures);
+UPDATE public.events SET publication_state='published' WHERE id IN (SELECT id FROM portal_certification_fixtures);
+UPDATE public.opportunities SET publication_state='published' WHERE id IN (SELECT id FROM portal_certification_fixtures);
+UPDATE public.research_projects SET publication_state='published' WHERE id IN (SELECT id FROM portal_certification_fixtures);
+UPDATE public.studio_submissions SET publication_state='published' WHERE id IN (SELECT id FROM portal_certification_fixtures);
+UPDATE public.essay_submissions SET publication_state='published' WHERE id IN (SELECT id FROM portal_certification_fixtures);
+UPDATE public.introduction_posts SET publication_state='published' WHERE id IN (SELECT id FROM portal_certification_fixtures);
+
 SET LOCAL ROLE authenticated;
 DO $claims$
 BEGIN

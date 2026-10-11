@@ -71,7 +71,7 @@ export default function Networking() {
         lookingFor: lookingFor.trim(),
         interests: profile?.interests ?? [],
       });
-      toast.success("Introduction posted");
+      toast.success("Introduction saved for review");
       setIntroOpen(false);
       setHeadline("");
       setLookingFor("");
@@ -214,6 +214,7 @@ export default function Networking() {
           {introductions?.map((post) => (
             <PortalCard key={post.id} className="p-4">
               <p className="font-medium text-white">{post.headline}</p>
+              {(post.publicationState ?? "draft") !== "published" && <p className="text-sm">{post.publicationState === "archived" ? "Archived" : "Awaiting publication review"} · Visible to you and administrators.</p>}
               <p className="mt-1 text-sm text-white/50">
                 by {memberNameMap[post.authorId] ?? "Member"}
               </p>

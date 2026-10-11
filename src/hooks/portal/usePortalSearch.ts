@@ -35,12 +35,12 @@ export function usePortalSearch(query: string) {
       const results: SearchResult[] = [];
       for (const tier of ["exact", "prefix", "remaining"] as const) {
       const [news, labs, opps, events, members, explainers] = await Promise.all([
-        supabase.from("news_articles").select("id, title, summary").or(searchFilter(["title","summary"], q, tier)).order("id").limit(12).abortSignal(signal),
+        supabase.from("news_articles").select("id, title, summary, publication_state").or(searchFilter(["title","summary"], q, tier)).order("id").limit(12).abortSignal(signal),
         supabase.from("research_projects").select("id, title, description").neq("status", "draft").or(searchFilter(["title","description"], q, tier)).order("id").limit(12).abortSignal(signal),
-        supabase.from("opportunities").select("id, title, organization").eq("is_active", true).or(searchFilter(["title","organization"], q, tier)).order("id").limit(12).abortSignal(signal),
-        supabase.from("events").select("id, title, description").or(searchFilter(["title","description"], q, tier)).order("id").limit(12).abortSignal(signal),
+        supabase.from("opportunities").select("id, title, organization, publication_state").eq("is_active", true).or(searchFilter(["title","organization"], q, tier)).order("id").limit(12).abortSignal(signal),
+        supabase.from("events").select("id, title, description, publication_state").or(searchFilter(["title","description"], q, tier)).order("id").limit(12).abortSignal(signal),
         supabase.from("profiles").select("id, display_name, bio").neq("display_name", "").or(searchFilter(["display_name","bio"], q, tier)).order("id").limit(12).abortSignal(signal),
-        supabase.from("explainer_cards").select("id, slug, title, summary").or(searchFilter(["title","summary"], q, tier)).order("id").limit(12).abortSignal(signal),
+        supabase.from("explainer_cards").select("id, slug, title, summary, publication_state").or(searchFilter(["title","summary"], q, tier)).order("id").limit(12).abortSignal(signal),
       ]);
 
       if ([news, labs, opps, events, members, explainers].some((response) => response.error)) {

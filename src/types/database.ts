@@ -94,7 +94,7 @@ interface DatabaseDefinition {
           member_count: number;
           created_at: string;
         };
-        Insert: Omit<Database["public"]["Tables"]["chapters"]["Row"], "created_at"> & {
+        Insert: Omit<Database["public"]["Tables"]["chapters"]["Row"], keyof PublicationFields | "created_at"> & {
           created_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["chapters"]["Insert"]>;
@@ -110,7 +110,7 @@ interface DatabaseDefinition {
           tags: string[];
           created_at: string;
         };
-        Insert: Omit<Database["public"]["Tables"]["news_articles"]["Row"], "id" | "created_at" | "published_at"> & Partial<Pick<Database["public"]["Tables"]["news_articles"]["Row"], "published_at">> & {
+        Insert: Omit<Database["public"]["Tables"]["news_articles"]["Row"], keyof PublicationFields | "id" | "created_at" | "published_at"> & Partial<Pick<Database["public"]["Tables"]["news_articles"]["Row"], "published_at">> & {
           id?: string;
           created_at?: string;
         };
@@ -127,7 +127,7 @@ interface DatabaseDefinition {
           related_terms: string[];
           created_at: string;
         };
-        Insert: Omit<Database["public"]["Tables"]["explainer_cards"]["Row"], "id" | "created_at" | "related_terms"> & Partial<Pick<Database["public"]["Tables"]["explainer_cards"]["Row"], "related_terms">> & {
+        Insert: Omit<Database["public"]["Tables"]["explainer_cards"]["Row"], keyof PublicationFields | "id" | "created_at" | "related_terms"> & Partial<Pick<Database["public"]["Tables"]["explainer_cards"]["Row"], "related_terms">> & {
           id?: string;
           created_at?: string;
         };
@@ -162,7 +162,7 @@ interface DatabaseDefinition {
           created_at: string;
           updated_at: string;
         };
-        Insert: Omit<Database["public"]["Tables"]["research_projects"]["Row"], "id" | "created_at" | "updated_at"> & {
+        Insert: Omit<Database["public"]["Tables"]["research_projects"]["Row"], keyof PublicationFields | "id" | "created_at" | "updated_at"> & {
           id?: string;
         };
         Update: Partial<Database["public"]["Tables"]["research_projects"]["Insert"]>;
@@ -197,7 +197,7 @@ interface DatabaseDefinition {
           is_active: boolean;
           created_at: string;
         };
-        Insert: Omit<Database["public"]["Tables"]["opportunities"]["Row"], "id" | "created_at" | "deadline" | "is_active"> & Partial<Pick<Database["public"]["Tables"]["opportunities"]["Row"], "deadline" | "is_active">> & {
+        Insert: Omit<Database["public"]["Tables"]["opportunities"]["Row"], keyof PublicationFields | "id" | "created_at" | "deadline" | "is_active"> & Partial<Pick<Database["public"]["Tables"]["opportunities"]["Row"], "deadline" | "is_active">> & {
           id?: string;
         };
         Update: Partial<Database["public"]["Tables"]["opportunities"]["Insert"]>;
@@ -217,7 +217,7 @@ interface DatabaseDefinition {
           writeup: string;
           submitted_at: string;
         };
-        Insert: Omit<Database["public"]["Tables"]["studio_submissions"]["Row"], "id" | "submitted_at"> & {
+        Insert: Omit<Database["public"]["Tables"]["studio_submissions"]["Row"], keyof PublicationFields | "id" | "submitted_at"> & {
           id?: string;
         };
         Update: Partial<Database["public"]["Tables"]["studio_submissions"]["Insert"]>;
@@ -231,7 +231,7 @@ interface DatabaseDefinition {
           is_editorial_pick: boolean;
           submitted_at: string;
         };
-        Insert: Omit<Database["public"]["Tables"]["essay_submissions"]["Row"], "id" | "submitted_at" | "is_editorial_pick"> & Partial<Pick<Database["public"]["Tables"]["essay_submissions"]["Row"], "is_editorial_pick">> & {
+        Insert: Omit<Database["public"]["Tables"]["essay_submissions"]["Row"], keyof PublicationFields | "id" | "submitted_at" | "is_editorial_pick"> & Partial<Pick<Database["public"]["Tables"]["essay_submissions"]["Row"], "is_editorial_pick">> & {
           id?: string;
         };
         Update: Partial<Database["public"]["Tables"]["essay_submissions"]["Insert"]>;
@@ -254,7 +254,7 @@ interface DatabaseDefinition {
           program_links: Json;
           created_at: string;
         };
-        Insert: Omit<Database["public"]["Tables"]["events"]["Row"], "id" | "created_at" | "ends_at" | "program_links"> & Partial<Pick<Database["public"]["Tables"]["events"]["Row"], "ends_at" | "program_links">> & {
+        Insert: Omit<Database["public"]["Tables"]["events"]["Row"], keyof PublicationFields | "id" | "created_at" | "ends_at" | "program_links"> & Partial<Pick<Database["public"]["Tables"]["events"]["Row"], "ends_at" | "program_links">> & {
           id?: string;
         };
         Update: Partial<Database["public"]["Tables"]["events"]["Insert"]>;
@@ -287,7 +287,7 @@ interface DatabaseDefinition {
           interests: string[];
           created_at: string;
         };
-        Insert: Omit<Database["public"]["Tables"]["introduction_posts"]["Row"], "id" | "created_at"> & {
+        Insert: Omit<Database["public"]["Tables"]["introduction_posts"]["Row"], keyof PublicationFields | "id" | "created_at"> & {
           id?: string;
         };
         Update: Partial<Database["public"]["Tables"]["introduction_posts"]["Insert"]>;
@@ -346,6 +346,10 @@ interface DatabaseDefinition {
       };
     };
     Functions: {
+      review_publication: {
+        Args: { content_table: PublicationTable; content_id: string; expected_revision: number; next_state: PublicationState; review_note: string };
+        Returns: Json;
+      };
       request_account_deletion: {
         Args: { request_reason?: string | null };
         Returns: Database["public"]["Tables"]["account_deletion_requests"]["Row"];
@@ -371,7 +375,10 @@ type Relations = {
  news_bookmarks: [{ foreignKeyName: 'news_bookmarks_article_id_fkey'; columns: ['article_id']; isOneToOne: false; referencedRelation: 'news_articles'; referencedColumns: ['id'] }];
  project_bookmarks: [{ foreignKeyName: 'project_bookmarks_project_id_fkey'; columns: ['project_id']; isOneToOne: false; referencedRelation: 'research_projects'; referencedColumns: ['id'] }];
 };
+export type PublicationState = 'draft' | 'published' | 'archived';
+export type PublicationTable = 'chapters' | 'news_articles' | 'explainer_cards' | 'events' | 'opportunities' | 'research_projects' | 'intake_calls' | 'studio_submissions' | 'essay_submissions' | 'introduction_posts';
+export type PublicationFields = { publication_state: PublicationState; publication_revision: number };
 export type Database = { public: Omit<DatabaseDefinition['public'], 'Tables' | 'Views'> & {
- Tables: { [K in keyof DatabaseDefinition['public']['Tables']]: DatabaseDefinition['public']['Tables'][K] & { Relationships: K extends keyof Relations ? Relations[K] : [] } };
+ Tables: { [K in keyof DatabaseDefinition['public']['Tables']]: Omit<DatabaseDefinition['public']['Tables'][K], 'Row'> & { Row: DatabaseDefinition['public']['Tables'][K]['Row'] & (K extends PublicationTable ? PublicationFields : object); Relationships: K extends keyof Relations ? Relations[K] : [] } };
  Views: { [K in keyof DatabaseDefinition['public']['Views']]: DatabaseDefinition['public']['Views'][K] & { Relationships: [] } };
 } };

@@ -93,6 +93,8 @@ jobs:
             sha256sum supabase/tests/account_lifecycle_rls_certification.sql
             sha256sum supabase/tests/intake_rls_certification.sql
             sha256sum supabase/tests/collaboration_rls_certification.sql
+            sha256sum supabase/tests/publication_and_abuse_certification.sql
+            sha256sum supabase/tests/concurrent_abuse_budget.py
           } > "$evidence_dir/input-sha256.txt"
       - name: Replay migrations and certify account lifecycle RLS
         shell: bash
@@ -116,6 +118,9 @@ jobs:
             docker exec "$POSTGRES_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/intake_rls_certification.sql
             docker cp supabase/tests/collaboration_rls_certification.sql "$POSTGRES_CONTAINER:/tmp/collaboration_rls_certification.sql"
             docker exec "$POSTGRES_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/collaboration_rls_certification.sql
+            docker cp supabase/tests/publication_and_abuse_certification.sql "$POSTGRES_CONTAINER:/tmp/publication_and_abuse_certification.sql"
+            docker exec "$POSTGRES_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/publication_and_abuse_certification.sql
+            python3 supabase/tests/concurrent_abuse_budget.py
           } 2>&1 | tee "$evidence_dir/certification.log"
       - name: Upload database authorization evidence
         if: always()

@@ -7,6 +7,8 @@ UPDATE public.profiles SET role='admin' WHERE id='20000000-0000-4000-8000-000000
 INSERT INTO public.intake_calls(id,title,kind,description,status,closes_at) VALUES
  ('test-closed','Closed intake','cohort','An intentionally closed test call.','closed',NULL),
  ('test-expired','Expired intake','cohort','An intentionally expired test call.','open',now()-interval '1 hour');
+-- Publication is explicit even for rollback-only intake fixtures.
+UPDATE public.intake_calls SET publication_state='published';
 SET LOCAL ROLE authenticated;
 SELECT set_config('request.jwt.claim.role','authenticated',true);
 SELECT set_config('request.jwt.claim.sub','20000000-0000-4000-8000-000000000001',true);
