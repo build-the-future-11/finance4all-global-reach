@@ -19,7 +19,7 @@ constitute policy approval or evidence of support delivery.
 The connected Supabase account still does not expose FinanceMeta project `pnemeegkwyaicsbnbnmg`.
 On 11 October the owner explicitly requested keeping the live database and controlled-account
 checks blocked. No live migrations, authorization tests or account mutations were attempted.
-There are **15 current migration files**; the historical ten-migration references below describe
+There are **17 current migration files**; the historical ten-migration references below describe
 the September baseline only. Certification must compare the complete current file set.
 
 Remaining release gates:

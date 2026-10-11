@@ -38,3 +38,7 @@ storybook-static
 .env*
 !.env.example
 .vercel
+
+# Hosted mobile lab artifacts
+performance-results/
+public-qa-results/

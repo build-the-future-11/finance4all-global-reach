@@ -25,7 +25,9 @@
     "production:verify": "node scripts/verify-production.mjs",
     "test:watch": "vitest",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "test:performance": "node scripts/check-performance-budget.mjs && playwright test --config=playwright.performance.config.ts",
+    "test:public-qa": "playwright test --config=playwright.public.config.ts"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.2.6",

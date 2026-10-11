@@ -10,7 +10,7 @@ export default defineConfig({
   workers: 2,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
-  reporter: "list",
+  reporter: [["list"], ["json", { outputFile: "test-results/browser-results.json" }]],
   use: {
     baseURL: e2eOrigin,
     trace: "retain-on-failure",
@@ -18,8 +18,10 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"], channel: "chrome" },
+      use: { ...devices["Desktop Chrome"] },
     },
+    { name: "firefox", use: { ...devices["Desktop Firefox"] } },
+    { name: "webkit", use: { ...devices["Desktop Safari"] } },
   ],
   webServer: {
     command: `npm run dev -- --host 127.0.0.1 --port ${e2ePort}`,
