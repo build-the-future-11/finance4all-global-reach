@@ -141,13 +141,13 @@ export default function Signup() {
         <>
           {settingsLoading && <p role="status" className="mb-4 text-sm text-white/70">Checking available signup methods…</p>}
           {!settingsLoading && !authSettings && isSupabaseConfigured && (
-            <div className="mb-4 rounded-lg border border-amber-400/25 bg-amber-400/10 px-3 py-3 text-sm text-amber-100">
+            <div className="auth-availability-notice mb-4 rounded-lg px-3 py-3 text-sm">
               <p role="alert">We couldn't check signup availability. Try again before creating an account.</p>
               <Button type="button" variant="outline" className="mt-3" onClick={() => setSettingsAttempt(attempt => attempt + 1)}>Retry availability check</Button>
             </div>
           )}
           {authSettings && !authSettings.signupsEnabled && (
-            <div role="alert" className="mb-4 flex gap-3 rounded-lg border border-amber-400/25 bg-amber-400/10 px-3 py-3 text-sm text-amber-100">
+            <div role="alert" className="auth-availability-notice mb-4 flex gap-3 rounded-lg px-3 py-3 text-sm">
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
               <p>New member signup is currently closed at the authentication provider. Existing members can still sign in.</p>
             </div>
