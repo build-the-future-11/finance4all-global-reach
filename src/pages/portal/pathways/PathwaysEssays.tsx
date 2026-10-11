@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Plus, ThumbsUp } from "lucide-react";
 import {
   useEssays,
@@ -24,8 +24,17 @@ import { toast } from "sonner";
 
 export default function PathwaysEssays() {
   const { data: essays, isLoading, error } = useEssays();
-  const { data: upvotes } = useMyEssayUpvotes();
+  const {
+    data: upvotes,
+    isSuccess: upvotesReady,
+    isFetching: upvotesFetching,
+    error: upvotesError,
+    refetch: refetchUpvotes,
+  } = useMyEssayUpvotes();
   const toggleUpvote = useToggleEssayUpvote();
+  const upvoteLock = useRef(false);
+  const [upvotePending, setUpvotePending] = useState(false);
+  const canChangeUpvote = upvotesReady && !upvotesFetching && !upvotesError && upvotes !== undefined;
   const submitEssay = useSubmitEssay();
   const authorIds = essays?.map((e) => e.authorId) ?? [];
   const { data: authors } = useProfilesByIds(authorIds);
@@ -48,11 +57,19 @@ export default function PathwaysEssays() {
     }
   };
 
-  const handleUpvote = async (essayId: string, upvoted: boolean) => {
+  const handleUpvote = async (essayId: string, upvoted: boolean, published: boolean) => {
+    if (!canChangeUpvote || upvoteLock.current || toggleUpvote.isPending || (!upvoted && !published)) return;
+    upvoteLock.current = true;
+    setUpvotePending(true);
     try {
       await toggleUpvote.mutateAsync({ essayId, upvoted: !upvoted });
+      // Wait for the confirmed state before another toggle can choose its action.
+      await refetchUpvotes({ cancelRefetch: false });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to upvote");
+    } finally {
+      upvoteLock.current = false;
+      setUpvotePending(false);
     }
   };
 
@@ -86,6 +103,14 @@ export default function PathwaysEssays() {
 
       {isLoading && <LoadingState />}
       {error && <EmptyState message="Could not load essays." />}
+      {upvotesError && (
+        <div role="alert" className="mb-4 space-y-2">
+          <p>Your upvote status is unavailable. Retry before changing an upvote.</p>
+          <Button variant="outline" disabled={upvotesFetching} onClick={() => void refetchUpvotes()}>
+            Retry upvote status
+          </Button>
+        </div>
+      )}
 
       <div className="space-y-4">
         {essays?.map((essay) => {
@@ -109,9 +134,10 @@ export default function PathwaysEssays() {
                   size="sm"
                   variant={upvoted ? "default" : "outline"}
                   className={upvoted ? "" : "shrink-0 border-white/20 text-white"}
-                  disabled={toggleUpvote.isPending || (!upvoted && essay.publicationState !== "published")}
-                  aria-label={upvoted ? `Remove your upvote for ${essay.title}` : `Upvote ${essay.title}`}
-                  onClick={() => handleUpvote(essay.id, upvoted)}
+                  disabled={!canChangeUpvote || upvotePending || toggleUpvote.isPending || (!upvoted && essay.publicationState !== "published")}
+                  aria-label={upvotesError ? `Vote unavailable for ${essay.title}` : !canChangeUpvote ? `Checking your vote for ${essay.title}` : upvotePending || toggleUpvote.isPending ? `Updating your vote for ${essay.title}` : upvoted ? `Remove your upvote for ${essay.title}` : `Upvote ${essay.title}`}
+                  aria-pressed={canChangeUpvote ? upvoted : undefined}
+                  onClick={() => handleUpvote(essay.id, upvoted, essay.publicationState === "published")}
                 >
                   <ThumbsUp className={`h-3.5 w-3.5 ${upvoted ? "fill-current" : ""}`} />
                   {essay.upvoteCount}

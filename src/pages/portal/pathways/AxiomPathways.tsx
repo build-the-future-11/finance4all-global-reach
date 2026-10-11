@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { ArrowUpRight, CheckCircle2, ExternalLink, ShieldCheck, Star } from "lucide-react";
 import {
   useOpportunities,
@@ -36,8 +36,17 @@ export default function AxiomPathways() {
   const [typeFilter, setTypeFilter] = useState<OpportunityType | "all">("all");
   const [search, setSearch] = useState("");
   const { data: opportunities, isLoading, error, refetch } = useOpportunities(selectedId);
-  const { data: interests } = useOpportunityInterests();
+  const {
+    data: interests,
+    isSuccess: interestsReady,
+    isFetching: interestsFetching,
+    error: interestsError,
+    refetch: refetchInterests,
+  } = useOpportunityInterests();
   const toggle = useToggleOpportunityInterest();
+  const interestLock = useRef(false);
+  const [interestPending, setInterestPending] = useState(false);
+  const canChangeInterest = interestsReady && !interestsFetching && !interestsError && interests !== undefined;
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -54,11 +63,20 @@ export default function AxiomPathways() {
   }, [opportunities, typeFilter, search, selectedId]);
 
   const handleToggle = async (id: string, currentlyInterested: boolean) => {
+    // An unavailable read is not evidence that an opportunity is unsaved.
+    // Keep the ref lock through refresh, including the same-render click window.
+    if (!canChangeInterest || interestLock.current || toggle.isPending) return;
+    interestLock.current = true;
+    setInterestPending(true);
     try {
       await toggle.mutateAsync({ opportunityId: id, interested: !currentlyInterested });
+      await refetchInterests({ cancelRefetch: false });
       toast.success(currentlyInterested ? "Removed from saved" : "Saved opportunity");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to update");
+    } finally {
+      interestLock.current = false;
+      setInterestPending(false);
     }
   };
 
@@ -125,6 +143,15 @@ export default function AxiomPathways() {
         />
       </div>
 
+      {interestsError && (
+        <div role="alert" className="mb-4 space-y-2">
+          <p>Saved opportunity status is unavailable. Retry before changing your saved opportunities.</p>
+          <Button variant="outline" disabled={interestsFetching} onClick={() => void refetchInterests()}>
+            Retry saved status
+          </Button>
+        </div>
+      )}
+
       <QueryStatus
         isLoading={isLoading}
         error={error}
@@ -163,10 +190,12 @@ export default function AxiomPathways() {
                       size="sm"
                       variant={saved ? "default" : "outline"}
                       className={saved ? "bg-emerald-500 text-slate-950 hover:bg-emerald-400" : "border-white/20 text-white"}
+                      disabled={!canChangeInterest || interestPending || toggle.isPending}
+                      aria-pressed={canChangeInterest ? saved : undefined}
                       onClick={() => handleToggle(opp.id, saved)}
                     >
                       <Star className={`h-3.5 w-3.5 ${saved ? "fill-current" : ""}`} />
-                      {saved ? "Saved" : "Save"}
+                      {interestsError ? "Saved status unavailable" : !canChangeInterest ? "Checking saved status…" : interestPending || toggle.isPending ? "Updating saved status…" : saved ? "Saved" : "Save"}
                     </Button>
                     {opp.applicationUrl && (
                       <a href={opp.applicationUrl} target="_blank" rel="noopener noreferrer">
