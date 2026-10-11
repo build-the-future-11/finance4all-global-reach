@@ -133,7 +133,7 @@ jobs:
 
   verify:
     needs: database-authorization
-    if: always()
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     env:
