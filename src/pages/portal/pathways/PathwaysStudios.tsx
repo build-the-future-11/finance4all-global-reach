@@ -56,7 +56,7 @@ export default function PathwaysStudios() {
         setDemoUrl("");
       } else {
         setSavedEarlierVersion(true);
-        toast.success("Earlier submission saved for review. Newer edits kept.");
+        toast.success("Submission saved for review. Your form is still open.");
       }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to submit");
@@ -95,7 +95,7 @@ export default function PathwaysStudios() {
                   <Label htmlFor="studio-demo-url">Demo URL (optional)</Label>
                   <Input id="studio-demo-url" name="demoUrl" type="url" value={demoUrl} onChange={(e) => { draftRevision.current += 1; setDemoUrl(e.target.value); }} className="mt-1 border-white/20 bg-white/5" />
                 </div>
-                {savedEarlierVersion && <p role="status" className="text-sm">The earlier version was saved for review. Your newer edits are still here and have not been submitted.</p>}
+                {savedEarlierVersion && <p role="status" className="text-sm">The version you submitted was saved for review. Your form is still open. Review the fields before submitting again.</p>}
                 <Button type="submit" disabled={submissionPending || submit.isPending}>{submissionPending || submit.isPending ? "Saving for review…" : "Submit for review"}</Button>
               </form>
             </DialogContent>

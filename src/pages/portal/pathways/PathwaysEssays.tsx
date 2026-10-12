@@ -64,7 +64,7 @@ export default function PathwaysEssays() {
         setBody("");
       } else {
         setSavedEarlierVersion(true);
-        toast.success("Earlier essay saved for review. Newer edits kept.");
+        toast.success("Essay saved for review. Your form is still open.");
       }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to submit");
@@ -111,7 +111,7 @@ export default function PathwaysEssays() {
                   <Label htmlFor="essay-body">Essay</Label>
                   <Textarea id="essay-body" name="body" required value={body} onChange={(e) => { draftRevision.current += 1; setBody(e.target.value); }} rows={8} className="mt-1 border-white/20 bg-white/5" />
                 </div>
-                {savedEarlierVersion && <p role="status" className="text-sm">The earlier version was saved for review. Your newer edits are still here and have not been submitted.</p>}
+                {savedEarlierVersion && <p role="status" className="text-sm">The version you submitted was saved for review. Your form is still open. Review the fields before submitting again.</p>}
                 <Button type="submit" disabled={submissionPending || submitEssay.isPending}>{submissionPending || submitEssay.isPending ? "Saving for review…" : "Submit for review"}</Button>
               </form>
             </DialogContent>

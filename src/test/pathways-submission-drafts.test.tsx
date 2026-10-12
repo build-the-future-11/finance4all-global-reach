@@ -82,8 +82,43 @@ describe.each(cases)("$kind submission draft", form => {
     await act(async () => saved.resolve());
     expect(screen.getByRole("dialog", { name: form.dialog })).toBeVisible();
     expect(screen.getByLabelText(label, { exact: true })).toHaveValue(value);
-    expect(screen.getByRole("status")).toHaveTextContent(/earlier version.*saved.*newer edits.*not been submitted/i);
+    expect(screen.getByRole("status")).toHaveTextContent(/version you submitted.*saved.*form is still open.*review the fields/i);
     expect(screen.getByRole("button", { name: "Submit for review" })).toBeEnabled();
+  });
+
+  it.each(Object.entries(form.fields))("reports a confirmed save truthfully after %s is edited and restored", async (label, originalValue) => {
+    const saved = deferred();
+    state.mutate.mockReturnValue(saved.promise);
+    const element = openForm(form);
+    fireEvent.submit(element);
+    const field = screen.getByLabelText(label, { exact: true });
+    fireEvent.change(field, { target: { value: label.includes("URL") ? "https://example.test/temporary" : "Temporary edit" } });
+    fireEvent.change(field, { target: { value: originalValue } });
+    await act(async () => saved.resolve());
+    expect(screen.getByRole("dialog", { name: form.dialog })).toBeVisible();
+    for (const [fieldLabel, value] of Object.entries(form.fields)) {
+      expect(screen.getByLabelText(fieldLabel, { exact: true })).toHaveValue(value);
+    }
+    expect(screen.getByRole("status")).not.toHaveTextContent(/newer edits|not been submitted/i);
+    expect(screen.getByRole("status")).toHaveTextContent(/saved for review/i);
+    expect(state.success).toHaveBeenCalledTimes(1);
+    expect(state.success.mock.calls[0][0]).not.toMatch(/earlier|newer/i);
+    expect(state.mutate).toHaveBeenCalledExactlyOnceWith(form.payload);
+    expect(screen.getByRole("button", { name: "Submit for review" })).toBeEnabled();
+  });
+
+  it("retains an exact whitespace edit without dispatching another submission", async () => {
+    const saved = deferred();
+    state.mutate.mockReturnValue(saved.promise);
+    const element = openForm(form);
+    fireEvent.submit(element);
+    const title = ` ${form.fields.Title} `;
+    fireEvent.change(screen.getByLabelText("Title", { exact: true }), { target: { value: title } });
+    await act(async () => saved.resolve());
+    expect(screen.getByRole("dialog", { name: form.dialog })).toBeVisible();
+    expect(screen.getByLabelText("Title", { exact: true })).toHaveValue(title);
+    expect(screen.getByRole("status")).toHaveTextContent(/saved for review/i);
+    expect(state.mutate).toHaveBeenCalledExactlyOnceWith(form.payload);
   });
 
   it("preserves newer edits through closing and reopening while the original save is pending", async () => {

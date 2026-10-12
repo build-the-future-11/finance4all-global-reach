@@ -39,7 +39,7 @@ for (const form of forms) {
       await dialog.getByLabel(form.bodyLabel, { exact: true }).fill("Newer evidence that has not yet been submitted.");
       expect(submitted[0]).toMatchObject({ title: "Original submitted title", [form.bodyField]: "Original submitted evidence." });
       acknowledge();
-      await expect(dialog.getByRole("status")).toContainText("have not been submitted");
+      await expect(dialog.getByRole("status")).toContainText("The version you submitted was saved for review. Your form is still open.");
       await expect(dialog.getByLabel("Title", { exact: true })).toHaveValue("Newer title still being edited");
       await expect(dialog.getByLabel(form.bodyLabel, { exact: true })).toHaveValue("Newer evidence that has not yet been submitted.");
       expect(submitted).toHaveLength(1);
