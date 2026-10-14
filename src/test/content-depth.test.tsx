@@ -35,12 +35,15 @@ describe("content depth and claim boundaries", () => {
     expect(programFamilies.some((program) => program.state === "Proposed")).toBe(true);
   });
 
-  it("links every portfolio record to its canonical public project page", () => {
+  it("links IYERN to its integrated portal and other records to their public project pages", () => {
     expect(portfolioProjects).toHaveLength(12);
-    for (const project of portfolioProjects) {
+    for (const project of portfolioProjects.filter(project => project.id !== "iy-ern")) {
       expect(project.page).toBe(`https://finance-meta-landing.vercel.app/research/projects/${project.id}`);
     }
-    expect(portfolioProjects.find((project) => project.id === "iy-ern")?.website).toBe("https://iy-ern.vercel.app/");
+    const iyern = portfolioProjects.find(project => project.id === "iy-ern");
+    expect(iyern?.page).toBe("/iyern");
+    expect(iyern?.website).toBe("/iyern");
+    expect(iyern?.href).toBeUndefined();
     expect(portfolioProjects.find((project) => project.id === "portal")?.website).toBe("https://finance4all-global-reach.vercel.app/");
   });
 
