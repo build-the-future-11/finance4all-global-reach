@@ -29,11 +29,24 @@ describe("content depth and claim boundaries", () => {
     expect(JSON.stringify(applicationPaths)).not.toMatch(/Global Asset Partners|Summer Markets Analyst/);
   });
 
-  it("separates verified repositories, proposals, and coming-soon programs", () => {
+  it("separates verified repositories, proposals, and proposed programs", () => {
     expect(portfolioProjects.some((project) => project.status === "Verified repository" && project.href?.includes("github.com/build-the-future-11"))).toBe(true);
     expect(portfolioProjects.some((project) => project.status === "Proposed" && !project.href)).toBe(true);
-    expect(programFamilies.some((program) => program.state === "Coming soon")).toBe(true);
+    expect(programFamilies.some((program) => program.state === "Proposed")).toBe(true);
   });
+
+  it("links IYERN to its integrated portal and other records to their public project pages", () => {
+    expect(portfolioProjects).toHaveLength(12);
+    for (const project of portfolioProjects.filter(project => project.id !== "iy-ern")) {
+      expect(project.page).toBe(`https://finance-meta-landing.vercel.app/research/projects/${project.id}`);
+    }
+    const iyern = portfolioProjects.find(project => project.id === "iy-ern");
+    expect(iyern?.page).toBe("/iyern");
+    expect(iyern?.website).toBe("/iyern");
+    expect(iyern?.href).toBeUndefined();
+    expect(portfolioProjects.find((project) => project.id === "portal")?.website).toBe("https://finance4all-global-reach.vercel.app/");
+  });
+
 });
 
 describe("chapter map interaction", () => {

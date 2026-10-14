@@ -4,9 +4,10 @@ import { useAuth } from "@/contexts/useAuth";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, Loader2 } from "lucide-react";
 import { readAuthCallbackError, takePostAuthPath } from "@/lib/auth-navigation";
+import AccountRecovery from "@/components/portal/AccountRecovery";
 
 export default function AuthCallback() {
-  const { user, loading, needsOnboarding } = useAuth();
+  const { user, loading, needsOnboarding, initializationError } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const authError = useMemo(
@@ -15,14 +16,14 @@ export default function AuthCallback() {
   );
 
   useEffect(() => {
-    if (loading || authError) return;
+    if (loading || authError || initializationError) return;
     if (user) {
       navigate(needsOnboarding ? "/onboarding" : takePostAuthPath(), { replace: true });
     } else {
       const timer = setTimeout(() => navigate("/login", { replace: true }), 2500);
       return () => clearTimeout(timer);
     }
-  }, [authError, user, loading, needsOnboarding, navigate]);
+  }, [authError, initializationError, user, loading, needsOnboarding, navigate]);
 
   if (authError) {
     return (
@@ -41,6 +42,8 @@ export default function AuthCallback() {
       </main>
     );
   }
+
+  if (!loading && initializationError) return <AccountRecovery />;
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#060a12] text-white">

@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
+import { withDeadline } from "@/lib/asyncDeadline";
 import {
   assertFinanceMetaAuthRedirectOrigin,
   assertFinanceMetaSupabaseProject,
@@ -52,21 +53,34 @@ export function getAuthRedirectUrl(path = "/auth/callback") {
 
 export async function getPublicAuthSettings(): Promise<PublicAuthSettings | null> {
   if (!isSupabaseConfigured) return null;
+  const controller = new AbortController();
   try {
-    const response = await fetch(`${supabaseUrl}/auth/v1/settings`, {
-      headers: { apikey: supabaseKey },
-    });
-    if (!response.ok) return null;
-    const settings = (await response.json()) as {
-      disable_signup?: boolean;
-      external?: { email?: boolean; google?: boolean };
-    };
-    return {
-      signupsEnabled: settings.disable_signup !== true,
-      emailEnabled: settings.external?.email === true,
-      googleEnabled: settings.external?.google === true,
-    };
+    return await withDeadline(async () => {
+      const response = await fetch(`${supabaseUrl}/auth/v1/settings`, {
+        headers: { apikey: supabaseKey },
+        signal: controller.signal,
+      });
+      if (!response.ok) {
+        void response.body?.cancel().catch(() => undefined);
+        return null;
+      }
+      const value: unknown = await response.json();
+      if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+      const settings = value as Record<string, unknown>;
+      if (typeof settings.disable_signup !== "boolean") return null;
+      if (!settings.external || typeof settings.external !== "object" || Array.isArray(settings.external)) return null;
+      const external = settings.external as Record<string, unknown>;
+      if (typeof external.email !== "boolean" || typeof external.google !== "boolean") return null;
+      return {
+        signupsEnabled: !settings.disable_signup,
+        emailEnabled: external.email,
+        googleEnabled: external.google,
+      };
+    }, 15_000, "Public auth settings");
   } catch {
+    // The optional settings lookup must not hold a stalled connection open or
+    // reinterpret an unavailable/malformed response as disabled signup methods.
+    controller.abort();
     return null;
   }
 }

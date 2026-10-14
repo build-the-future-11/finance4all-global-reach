@@ -1,3 +1,4 @@
+import { PublicationQueue } from "@/components/portal/PublicationQueue";
 import { useState } from "react";
 import { useNewsArticles } from "@/hooks/portal/useDebriefed";
 import { useOpportunities } from "@/hooks/portal/usePathways";
@@ -18,7 +19,6 @@ import {
   PortalCard,
   PortalPageHeader,
   portalInputClass,
-  portalButtonOutline,
   CategoryBadge,
 } from "@/components/portal/PortalUI";
 import { Button } from "@/components/ui/button";
@@ -95,11 +95,12 @@ export default function Admin() {
       <PortalPageHeader
         eyebrow="Admin"
         title="Content management"
-        description="Publish portal content and review member account-deletion requests."
+        description="Prepare drafts, review publication and handle member account-deletion requests."
       />
 
-      <Tabs defaultValue="news" className="space-y-6">
+      <Tabs defaultValue="publication" className="space-y-6">
         <TabsList className="flex h-auto flex-wrap gap-1 bg-white/4 p-1">
+          <TabsTrigger value="publication">Publication review</TabsTrigger>
           <TabsTrigger value="news" className="data-[state=active]:bg-emerald-500/20 data-[state=active]:text-emerald-300">
             News ({news?.length ?? 0})
           </TabsTrigger>
@@ -117,9 +118,11 @@ export default function Admin() {
           </TabsTrigger>
         </TabsList>
 
+        <TabsContent value="publication"><PublicationQueue /></TabsContent>
+
         <TabsContent value="news" className="space-y-6">
           <PortalCard className="p-6">
-            <h3 className="font-semibold text-white">Publish article</h3>
+            <h3 className="font-semibold text-white">Create article draft</h3>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
                 <Label htmlFor="admin-news-title" className="text-white/70">Title</Label>
@@ -150,7 +153,7 @@ export default function Admin() {
               </div>
             </div>
             <Button
-              className="mt-4 bg-emerald-500 hover:bg-emerald-400"
+              className="mt-4 bg-emerald-500 text-slate-950 hover:bg-emerald-400"
               disabled={createNews.isPending}
               onClick={async () => {
                 try {
@@ -159,14 +162,14 @@ export default function Admin() {
                     tags: parseTags(newsForm.tags),
                     sourceUrl: newsForm.sourceUrl || undefined,
                   });
-                  toast.success("Article published");
+                  toast.success("Article draft saved for review");
                   setNewsForm({ title: "", summary: "", category: "macro", tags: "", sourceUrl: "" });
                 } catch (e) {
                   toast.error(e instanceof Error ? e.message : "Failed");
                 }
               }}
             >
-              Publish
+              Save draft
             </Button>
           </PortalCard>
           <div className="space-y-2">
@@ -227,10 +230,10 @@ export default function Admin() {
                 <Input id="admin-opportunity-tags" name="tags" value={oppForm.tags} onChange={(e) => setOppForm({ ...oppForm, tags: e.target.value })} className={portalInputClass} />
               </div>
             </div>
-            <Button disabled={createOpp.isPending} className="mt-4 bg-emerald-500 hover:bg-emerald-400" onClick={async () => {
+            <Button disabled={createOpp.isPending} className="mt-4 bg-emerald-500 text-slate-950 hover:bg-emerald-400" onClick={async () => {
               try {
                 await createOpp.mutateAsync({ ...oppForm, tags: parseTags(oppForm.tags), applicationUrl: oppForm.applicationUrl || undefined });
-                toast.success("Opportunity added");
+                toast.success("Opportunity draft saved for review");
                 setOppForm({ title: "", organization: "", type: "internship", description: "", applicationUrl: "", tags: "" });
               } catch (e) {
                 toast.error(e instanceof Error ? e.message : "Failed");
@@ -273,7 +276,7 @@ export default function Admin() {
                 <Input id="admin-event-registration-url" name="registrationUrl" type="url" value={eventForm.registrationUrl} onChange={(e) => setEventForm({ ...eventForm, registrationUrl: e.target.value })} className={portalInputClass} />
               </div>
             </div>
-            <Button disabled={createEvent.isPending} className="mt-4 bg-emerald-500 hover:bg-emerald-400" onClick={async () => {
+            <Button disabled={createEvent.isPending} className="mt-4 bg-emerald-500 text-slate-950 hover:bg-emerald-400" onClick={async () => {
               try {
                 await createEvent.mutateAsync({
                   ...eventForm,
@@ -281,7 +284,7 @@ export default function Admin() {
                   startsAt: new Date(eventForm.startsAt).toISOString(),
                   registrationUrl: eventForm.registrationUrl || undefined,
                 });
-                toast.success("Event created");
+                toast.success("Event draft saved for review");
                 setEventForm({ chapterId: "", title: "", description: "", startsAt: "", registrationUrl: "" });
               } catch (e) {
                 toast.error(e instanceof Error ? e.message : "Failed");
@@ -315,16 +318,16 @@ export default function Admin() {
                 <Textarea id="admin-explainer-body" name="body" value={explainerForm.body} onChange={(e) => setExplainerForm({ ...explainerForm, body: e.target.value })} rows={8} className={portalInputClass} />
               </div>
             </div>
-            <Button disabled={createExplainer.isPending} className="mt-4 bg-emerald-500 hover:bg-emerald-400" onClick={async () => {
+            <Button disabled={createExplainer.isPending} className="mt-4 bg-emerald-500 text-slate-950 hover:bg-emerald-400" onClick={async () => {
               try {
                 await createExplainer.mutateAsync(explainerForm);
-                toast.success("Explainer published");
+                toast.success("Explainer draft saved for review");
                 setExplainerForm({ slug: "", title: "", summary: "", body: "", difficulty: "beginner" });
               } catch (e) {
                 toast.error(e instanceof Error ? e.message : "Failed");
               }
             }}>
-              Publish explainer
+              Save explainer draft
             </Button>
           </PortalCard>
         </TabsContent>
@@ -398,7 +401,7 @@ export default function Admin() {
                     }))}
                   />
                   <Button
-                    className="bg-emerald-500 hover:bg-emerald-400"
+                    className="bg-emerald-500 text-slate-950 hover:bg-emerald-400"
                     disabled={reviewDeletion.isPending}
                     onClick={async () => {
                       try {

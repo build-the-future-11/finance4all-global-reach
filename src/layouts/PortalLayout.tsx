@@ -1,6 +1,7 @@
-import { Link, NavLink, Outlet } from "react-router-dom";
+import "@/styles/workspace.css";
+import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { ChevronRight, LogOut, Menu, PanelLeftClose, PanelLeftOpen, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@/contexts/useAuth";
 import { portalNav, portalRoutes } from "@/routes/portal";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -20,13 +21,15 @@ function PortalBrand({ compact = false }: { compact?: boolean }) {
   return (
     <span className="portal-brand">
       <BrandMark className="h-10 w-10 text-[#153d30] dark:text-[#d9ff8a] dark:[--brand-ink:#153d30]" />
-      {!compact && <span><strong>Finance for All</strong><small>Member space</small></span>}
+      {!compact && <span><strong>Finance for All</strong><small>Research workspace</small></span>}
     </span>
   );
 }
 
 export default function PortalLayout() {
   const { profile, signOut } = useAuth();
+  const location = useLocation();
+  const mobileTrigger = useRef<HTMLButtonElement>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(() => {
     try { return window.localStorage.getItem("finance-portal-sidebar") === "collapsed"; } catch { return false; }
@@ -40,11 +43,14 @@ export default function PortalLayout() {
   const canReview = profile?.role === "lead_researcher" || profile?.role === "admin";
   const isAdmin = profile?.role === "admin";
   const navItems = portalNav.filter((item) => !item.adminOnly || isAdmin);
+  const currentItem = [...navItems]
+    .sort((a, b) => b.path.length - a.path.length)
+    .find((item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`));
 
   return (
-    <div className={`portal-shell ${collapsed ? "portal-sidebar-collapsed" : ""}`}>
+    <div onKeyDown={e => { if(e.key === "Escape" && mobileOpen) { setMobileOpen(false); mobileTrigger.current?.focus(); } }} className={`portal-shell ${collapsed ? "portal-sidebar-collapsed" : ""}`}>
       <header className="portal-mobile-header">
-        <button type="button" className="portal-icon-button lg:hidden" onClick={() => setMobileOpen((value) => !value)} aria-label="Toggle menu">
+        <button ref={mobileTrigger} aria-expanded={mobileOpen} aria-controls="workspace-sidebar" type="button" className="portal-icon-button lg:hidden" onClick={() => setMobileOpen((value) => !value)} aria-label="Toggle menu">
           {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
         <Link to={portalRoutes.dashboard}><PortalBrand /></Link>
@@ -63,7 +69,7 @@ export default function PortalLayout() {
         </div>
       </header>
 
-      <aside className={`portal-sidebar ${mobileOpen ? "is-open" : ""}`}>
+      <aside id="workspace-sidebar" className={`portal-sidebar ${mobileOpen ? "is-open" : ""}`}>
         <div className="portal-sidebar-head">
           <Link to={portalRoutes.dashboard} onClick={() => setMobileOpen(false)}><PortalBrand compact={collapsed} /></Link>
           <button type="button" className="portal-collapse-button hidden lg:grid" onClick={() => setCollapsed((value) => !value)} aria-label={collapsed ? "Expand navigation" : "Collapse navigation"}>
@@ -74,17 +80,20 @@ export default function PortalLayout() {
         {!collapsed && (
           <div className="portal-context-card">
             <span>Your member space</span>
-            <strong>Learn. Build. Contribute.</strong>
+            <strong>Questions. Methods. Evidence.</strong>
             <p>Everything you are part of, in one place.</p>
           </div>
         )}
 
         <nav className="portal-navigation" aria-label="Member portal">
-          {navItems.map((item) => {
+          {navItems.map((item, index) => {
             const Icon = item.icon;
             const children = item.children?.filter((child) => child.path !== portalRoutes.labsReview || canReview);
             return (
               <div className="portal-nav-group" key={item.path}>
+                {!collapsed && (index === 0 || navItems[index - 1]?.group !== item.group) && (
+                  <p className="portal-nav-section-label">{item.group}</p>
+                )}
                 <NavLink
                   to={item.path}
                   end={item.path === portalRoutes.dashboard}
@@ -124,7 +133,7 @@ export default function PortalLayout() {
 
       <main className="portal-main">
         <div className="portal-desktop-bar">
-          <div><span>Member portal</span><strong>Finance for All</strong></div>
+          <div><span>Member portal / {currentItem?.group ?? "Workspace"}</span><strong>{currentItem?.label ?? "Finance for All"}</strong></div>
           <div className="portal-header-actions"><PortalSearch /><NotificationsCenter /><ThemeToggle /></div>
         </div>
         <div className="portal-content"><Outlet /></div>

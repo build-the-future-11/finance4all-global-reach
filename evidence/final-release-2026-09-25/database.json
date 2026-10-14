@@ -1,0 +1,41 @@
+{
+  "engine": "PGlite 0.5.8 / PostgreSQL",
+  "productionCertified": false,
+  "migrations": [
+    "20260709090402_initial_schema.sql",
+    "20260709104954_google_oauth.sql",
+    "20260710031219_bookmarks_notifications.sql",
+    "20260711032432_security_hardening.sql",
+    "20260711032433_education_progress.sql",
+    "20260830141730_authorization_hardening.sql",
+    "20260906121145_portal_security_and_privacy.sql",
+    "20260906150000_retire_unused_hosted_extensions.sql",
+    "20260906150632_member_account_lifecycle.sql",
+    "20260906171941_archive_abandoned_public_tables.sql",
+    "20260906172830_harden_recovered_profile_functions.sql",
+    "20260907110357_trusted_profile_role_administration.sql",
+    "20260921141333_platform_intake.sql",
+    "20260924155017_member_learning_and_application_drafts.sql",
+    "20260924160333_project_collaboration.sql"
+  ],
+  "checks": [
+    "owner creates learning and draft records",
+    "concurrent stale learning update does not overwrite",
+    "client cannot forge learning owner or revision",
+    "stale draft writes and deletes are rejected by revision matching",
+    "another member sees no private learning or drafts",
+    "anonymous access is denied",
+    "submission and withdrawal create immutable real history",
+    "history is private to applicant and authorized reviewer",
+    "account export includes private learning, drafts and history",
+    "account deletion cascades private records and history",
+    "two_identity_rls_certification.sql",
+    "intake_rls_certification.sql",
+    "collaboration_rls_certification.sql"
+  ],
+  "status": "PASS",
+  "notRun": [
+    "account_lifecycle_rls_certification.sql: pgTAP extension unavailable in this local engine; required on standard PostgreSQL before deployment"
+  ],
+  "passed": 13
+}

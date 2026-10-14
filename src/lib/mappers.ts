@@ -126,6 +126,7 @@ export function mapOpportunity(row: Tables<"opportunities">): Opportunity {
 
 export function mapStudioSubmission(row: Tables<"studio_submissions">): StudioSubmission {
   return {
+    publicationState: row.publication_state,
     id: row.id,
     authorId: row.author_id,
     title: row.title,
@@ -140,6 +141,7 @@ export function mapEssaySubmission(
   row: Tables<"essay_submissions"> & { upvote_count?: number },
 ): EssaySubmission {
   return {
+    publicationState: row.publication_state,
     id: row.id,
     authorId: row.author_id,
     title: row.title,
@@ -197,6 +199,7 @@ export function mapConnectionRequest(row: Tables<"connection_requests">): Connec
 
 export function mapIntroductionPost(row: Tables<"introduction_posts">): IntroductionPost {
   return {
+    publicationState: row.publication_state,
     id: row.id,
     authorId: row.author_id,
     headline: row.headline,

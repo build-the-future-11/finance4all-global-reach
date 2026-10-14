@@ -1,6 +1,6 @@
 import { act, render, screen, waitFor } from "@testing-library/react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { expect, it, vi } from "vitest";
+import { onlineManager, QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { afterEach, expect, it, vi } from "vitest";
 import type { Session } from "@supabase/supabase-js";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { useAuth } from "@/contexts/useAuth";
@@ -33,6 +33,35 @@ function Probe() {
   return <div>{user?.id ?? "signed-out"}:{profile?.displayName ?? "no-profile"}</div>;
 }
 function session(id: string) { return { user: { id, user_metadata: {} } } as Session; }
+
+afterEach(() => onlineManager.setOnline(true));
+
+it("does not resume a previous account's paused write after the session changes", async () => {
+  const client = new QueryClient();
+  const write = vi.fn(async (notes: string) => notes);
+  render(<QueryClientProvider client={client}><AuthProvider><Probe /></AuthProvider></QueryClientProvider>);
+  await waitFor(() => expect(screen.getByText("signed-out:no-profile")).toBeInTheDocument());
+  act(() => mock.listener("SIGNED_IN", session("A")));
+  onlineManager.setOnline(false);
+  const queued = client.getMutationCache().build(client, { mutationFn: write });
+  void queued.execute("A-private notes").catch(() => {});
+  await waitFor(() => expect(queued.state.isPaused).toBe(true));
+  expect(write).not.toHaveBeenCalled();
+
+  await act(async () => mock.listener("SIGNED_IN", session("B")));
+  await waitFor(() => expect(screen.getByText("B:B")).toBeInTheDocument());
+  await act(async () => { onlineManager.setOnline(true); await client.resumePausedMutations(); });
+  expect(write).not.toHaveBeenCalled();
+  expect(client.getMutationCache().getAll()).toHaveLength(0);
+
+  const current = client.getMutationCache().build(client, { mutationFn: write });
+  await act(async () => { await current.execute("B-current notes"); });
+  expect(write).toHaveBeenCalledOnce();
+  expect(write.mock.calls[0][0]).toBe("B-current notes");
+  await act(async () => mock.resolveA({ data: { id: "A", display_name: "A", role: "member", interests: [] }, error: null }));
+  expect(screen.getByText("B:B")).toBeInTheDocument();
+  client.clear();
+});
 
 it("clears private query data and ignores a previous member's late profile response", async () => {
   const client = new QueryClient();

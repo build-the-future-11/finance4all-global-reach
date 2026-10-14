@@ -1,6 +1,42 @@
 # Production Readiness
 
-Last reviewed: 2026-09-07
+Last reviewed: 2026-10-11
+
+## Current release decision — 11 October 2026
+
+**Unrestricted member onboarding remains NO-GO.** The current public deployment responds as
+`financemeta-member-portal` at revision `44dca095573d520d7ab1bc39242c0bb623c43dae`.
+An exact-revision read-only health check passed on 11 October, including the four configured
+public/auth route shells and security headers. This does not establish authenticated operation.
+
+The current candidate integrates the newer event registration account safeguards from
+`2182f79e1fbf9b902b6fe80ab433e50993c56ec7` with the local dashboard and complete project links.
+Signup now waits for confirmed provider settings, exposes an explicit retry when settings are
+unavailable, and prevents duplicate/competing submissions. All account screens link the existing
+public privacy information, participation expectations and support contact. These links do not
+constitute policy approval or evidence of support delivery.
+
+The connected Supabase account still does not expose FinanceMeta project `pnemeegkwyaicsbnbnmg`.
+On 11 October the owner explicitly requested keeping the live database and controlled-account
+checks blocked. No live migrations, authorization tests or account mutations were attempted.
+There are **17 current migration files**; the historical ten-migration references below describe
+the September baseline only. Certification must compare the complete current file set.
+
+The publication migration defaults all ten content categories to draft; publication requires an audited administrator review of the observed revision. Editing content invalidates its approval. Member activity is metered atomically in the database, with cancellation/withdrawal preserved. See [controls and rollout](PUBLICATION_AND_ABUSE_CONTROLS.md). The exact final source and expanded browser/performance results are recorded in Draft PR #162 and its current checks; earlier passing runs do not certify later changes.
+
+Remaining release gates:
+
+- [ ] Pass hosted CI on the final integrated candidate and retain its exact source identity.
+- [ ] Review and promote the complete member candidate through the existing protected release process.
+- [ ] Reconcile the canonical live schema and migration ledger, then run rollback-only RLS certification.
+- [ ] Verify controlled email, OAuth, recovery, onboarding, persistence and cross-member journeys.
+- [ ] Resolve the age/consent, retention and support ownership decisions before broad enrollment.
+- [x] Implement server-side member activity budgets and explicit publication state. The first candidate passed all disposable database checks, concurrency certification, 400 source tests and 29 Chromium scenarios in [CI 38142140589](https://github.com/build-the-future-11/finance4all-global-reach/actions/runs/38142140589).
+- [ ] Apply and certify those controls on the canonical database; verify provider Auth/edge abuse controls. Live work remains blocked.
+- [ ] Confirm backups, restore, rollback compatibility, alert routing, accessibility and performance coverage.
+
+The September tables and receipts below are retained as historical evidence. Their test counts,
+deployment identities and resolved statuses must not be represented as fresh certification.
 
 This is the active evidence ledger for the canonical member portal. A repository check proves only
 the layer it exercises. Source tests, deployment health, authenticated behavior, database policy,
@@ -68,7 +104,7 @@ Do not label the portal production-verified until all of the following have exac
 
 1. Protected-main CI succeeds.
 2. Vercel serves the exact merge SHA in `/release-revision.json`.
-3. Production migration ledger equals the ten canonical migration files.
+3. Production migration ledger equals every migration file at the selected source revision (17 in this candidate).
 4. Production RLS certification ends in `result=PASS`.
 5. Email, confirmation, onboarding, recovery, Google OAuth, persistence, logout/login, and two-member isolation pass with controlled accounts.
 6. Landing CTA completes the same member journey without a VertexED origin.

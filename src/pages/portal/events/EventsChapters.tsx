@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Calendar, ExternalLink, LayoutGrid, List, MapPin, Users } from "lucide-react";
 import {
   useChapters,
@@ -50,17 +50,34 @@ export default function EventsChapters() {
     error: eventsError,
     refetch: refetchEvents,
   } = useEvents(selectedChapter === "all" ? undefined : selectedChapter, selectedId);
-  const { data: registrations } = useEventRegistrations();
+  const {
+    data: registrations,
+    isSuccess: registrationsReady,
+    isFetching: registrationsFetching,
+    error: registrationsError,
+    refetch: refetchRegistrations,
+  } = useEventRegistrations();
+  const registrationLock = useRef(false);
+  const [registrationPending, setRegistrationPending] = useState(false);
+  const canChangeRegistration = registrationsReady && !registrationsFetching && !registrationsError && registrations !== undefined;
   const toggleReg = useToggleEventRegistration();
 
   const chapterMap = Object.fromEntries(chapters?.map((c) => [c.id, c]) ?? []);
 
   const handleRegister = async (eventId: string, registered: boolean) => {
+    // A failed or in-flight read is not evidence of an absent registration.
+    // The ref also closes the same-render double-click window.
+    if (!canChangeRegistration || registrationLock.current) return;
+    registrationLock.current = true;
+    setRegistrationPending(true);
     try {
       await toggleReg.mutateAsync({ eventId, registered: !registered });
       toast.success(registered ? "Registration cancelled" : "You're registered!");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to update registration");
+    } finally {
+      registrationLock.current = false;
+      setRegistrationPending(false);
     }
   };
 
@@ -186,6 +203,15 @@ export default function EventsChapters() {
           </Tabs>
         )}
 
+        {registrationsError && (
+          <div role="alert" className="mb-4 space-y-2">
+            <p>Registration status is unavailable. Retry before changing your registration.</p>
+            <Button variant="outline" disabled={registrationsFetching} onClick={() => void refetchRegistrations()}>
+              Retry registration status
+            </Button>
+          </div>
+        )}
+
         <QueryStatus
           isLoading={eventsLoading}
           error={eventsError}
@@ -259,11 +285,12 @@ export default function EventsChapters() {
                     <div className="flex flex-col gap-2">
                       <Button
                         size="sm"
-                        variant={registered ? "default" : "outline-solid"}
-                        className={registered ? "bg-emerald-500 hover:bg-emerald-400" : "border-white/20 text-white"}
+                        variant={registered ? "default" : "outline"}
+                        className={registered ? "bg-emerald-500 text-slate-950 hover:bg-emerald-400" : "border-white/20 text-white"}
+                        disabled={!canChangeRegistration || registrationPending || toggleReg.isPending}
                         onClick={() => handleRegister(event.id, registered)}
                       >
-                        {registered ? "Registered" : "Register interest"}
+                        {registrationsError ? "Registration unavailable" : !canChangeRegistration ? "Checking registration…" : registrationPending ? "Updating registration…" : registered ? "Registered" : "Register interest"}
                       </Button>
                       {event.registrationUrl && (
                         <a href={event.registrationUrl} target="_blank" rel="noopener noreferrer">

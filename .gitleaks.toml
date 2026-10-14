@@ -1,0 +1,9 @@
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Literal example token in historical deployment instructions"
+condition = "AND"
+paths = ['DEPLOYMENT.md']
+regexes = ['Bearer YOUR_ANON_JWT']
+regexTarget = "line"

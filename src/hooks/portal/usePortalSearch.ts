@@ -1,3 +1,4 @@
+import { isVisibleContent } from "@/lib/content-visibility";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { portalRoutes } from "@/routes/portal";
@@ -34,12 +35,12 @@ export function usePortalSearch(query: string) {
       const results: SearchResult[] = [];
       for (const tier of ["exact", "prefix", "remaining"] as const) {
       const [news, labs, opps, events, members, explainers] = await Promise.all([
-        supabase.from("news_articles").select("id, title, summary").or(searchFilter(["title","summary"], q, tier)).order("id").limit(12).abortSignal(signal),
+        supabase.from("news_articles").select("id, title, summary, publication_state").or(searchFilter(["title","summary"], q, tier)).order("id").limit(12).abortSignal(signal),
         supabase.from("research_projects").select("id, title, description").neq("status", "draft").or(searchFilter(["title","description"], q, tier)).order("id").limit(12).abortSignal(signal),
-        supabase.from("opportunities").select("id, title, organization").eq("is_active", true).or(searchFilter(["title","organization"], q, tier)).order("id").limit(12).abortSignal(signal),
-        supabase.from("events").select("id, title, description").or(searchFilter(["title","description"], q, tier)).order("id").limit(12).abortSignal(signal),
+        supabase.from("opportunities").select("id, title, organization, publication_state").eq("is_active", true).or(searchFilter(["title","organization"], q, tier)).order("id").limit(12).abortSignal(signal),
+        supabase.from("events").select("id, title, description, publication_state").or(searchFilter(["title","description"], q, tier)).order("id").limit(12).abortSignal(signal),
         supabase.from("profiles").select("id, display_name, bio").neq("display_name", "").or(searchFilter(["display_name","bio"], q, tier)).order("id").limit(12).abortSignal(signal),
-        supabase.from("explainer_cards").select("id, slug, title, summary").or(searchFilter(["title","summary"], q, tier)).order("id").limit(12).abortSignal(signal),
+        supabase.from("explainer_cards").select("id, slug, title, summary, publication_state").or(searchFilter(["title","summary"], q, tier)).order("id").limit(12).abortSignal(signal),
       ]);
 
       if ([news, labs, opps, events, members, explainers].some((response) => response.error)) {
@@ -47,7 +48,8 @@ export function usePortalSearch(query: string) {
       }
 
       news.data
-        ?.filter((r) => r.title.toLowerCase().includes(q) || r.summary.toLowerCase().includes(q))
+        ?.filter((row) => isVisibleContent("news", row))
+        .filter((r) => r.title.toLowerCase().includes(q) || r.summary.toLowerCase().includes(q))
         .forEach((r) =>
           results.push({
             id: r.id,
@@ -71,7 +73,8 @@ export function usePortalSearch(query: string) {
         );
 
       opps.data
-        ?.filter((r) => r.title.toLowerCase().includes(q) || r.organization.toLowerCase().includes(q))
+        ?.filter((row) => isVisibleContent("opportunity", row))
+        .filter((r) => r.title.toLowerCase().includes(q) || r.organization.toLowerCase().includes(q))
         .forEach((r) =>
           results.push({
             id: r.id,
@@ -83,7 +86,8 @@ export function usePortalSearch(query: string) {
         );
 
       events.data
-        ?.filter((r) => r.title.toLowerCase().includes(q) || r.description.toLowerCase().includes(q))
+        ?.filter((row) => isVisibleContent("event", row))
+        .filter((r) => r.title.toLowerCase().includes(q) || r.description.toLowerCase().includes(q))
         .forEach((r) =>
           results.push({
             id: r.id,
@@ -111,7 +115,8 @@ export function usePortalSearch(query: string) {
         );
 
       explainers.data
-        ?.filter((r) => r.title.toLowerCase().includes(q) || r.summary.toLowerCase().includes(q))
+        ?.filter((row) => isVisibleContent("explainer", row))
+        .filter((r) => r.title.toLowerCase().includes(q) || r.summary.toLowerCase().includes(q))
         .forEach((r) =>
           results.push({
             id: r.id,

@@ -29,4 +29,15 @@ describe("Tailwind v4 compatibility", () => {
     expect(result.css).toContain(".animate-in");
     expect(result.css).toContain("animation-name: enter");
   });
+
+  it("keeps interactive tab-panel text fully opaque during entry motion", () => {
+    const interactions = readFileSync(
+      path.resolve("src/components/experience/interactions.css"),
+      "utf8",
+    );
+    const panelAnimation = interactions.match(/@keyframes panel-enter\s*\{([^}]|}(?!\s*\.))*}/s)?.[0];
+
+    expect(panelAnimation).toBeDefined();
+    expect(panelAnimation).not.toMatch(/opacity\s*:/);
+  });
 });

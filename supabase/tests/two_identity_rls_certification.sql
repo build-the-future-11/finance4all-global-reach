@@ -55,6 +55,7 @@ BEGIN
   INTO missing_tables
   FROM (
     VALUES
+      ('project_memberships'), ('project_tasks'), ('intake_calls'), ('intake_submissions'), ('member_learning'), ('application_drafts'), ('intake_history'),
       ('account_deletion_requests'),
       ('chapters'),
       ('connection_requests'),
@@ -90,7 +91,7 @@ BEGIN
   WHERE n.nspname = 'public'
     AND c.relkind IN ('r', 'p')
     AND c.relname <> ALL (ARRAY[
-      'account_deletion_requests',
+      'project_memberships', 'project_tasks', 'intake_calls', 'intake_submissions', 'member_learning', 'application_drafts', 'intake_history', 'account_deletion_requests',
       'chapters', 'connection_requests', 'digest_preferences',
       'education_lesson_progress', 'essay_submissions', 'essay_upvotes',
       'event_registrations', 'events', 'explainer_cards',
@@ -263,6 +264,17 @@ BEGIN
     ('notification', notification_id);
 END;
 $fixtures$;
+
+-- Explicitly reviewed disposable fixtures; all writes roll back.
+UPDATE public.chapters SET publication_state='published' WHERE id IN (SELECT id FROM portal_certification_fixtures);
+UPDATE public.news_articles SET publication_state='published' WHERE id IN (SELECT id FROM portal_certification_fixtures);
+UPDATE public.explainer_cards SET publication_state='published' WHERE id IN (SELECT id FROM portal_certification_fixtures);
+UPDATE public.events SET publication_state='published' WHERE id IN (SELECT id FROM portal_certification_fixtures);
+UPDATE public.opportunities SET publication_state='published' WHERE id IN (SELECT id FROM portal_certification_fixtures);
+UPDATE public.research_projects SET publication_state='published' WHERE id IN (SELECT id FROM portal_certification_fixtures);
+UPDATE public.studio_submissions SET publication_state='published' WHERE id IN (SELECT id FROM portal_certification_fixtures);
+UPDATE public.essay_submissions SET publication_state='published' WHERE id IN (SELECT id FROM portal_certification_fixtures);
+UPDATE public.introduction_posts SET publication_state='published' WHERE id IN (SELECT id FROM portal_certification_fixtures);
 
 SET LOCAL ROLE authenticated;
 DO $claims$

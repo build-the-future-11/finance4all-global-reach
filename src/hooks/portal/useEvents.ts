@@ -1,3 +1,4 @@
+import { isVisibleContent } from "@/lib/content-visibility";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { mapChapter, mapEvent } from "@/lib/mappers";
@@ -10,7 +11,7 @@ export function useChapters() {
     queryFn: async () => {
       const { data, error } = await supabase.from("chapters").select("*").order("name");
       if (error) throw error;
-      return data.map(mapChapter).filter((chapter) => !chapter.id.startsWith("70000000-0000-4000-8000-00000000000"));
+      return data.filter((row) => isVisibleContent("chapter", row)).map(mapChapter);
     },
   });
 }
@@ -24,8 +25,7 @@ export function useEvents(chapterId?: string, selectedId?: string) {
       else if (chapterId) q = q.eq("chapter_id", chapterId);
       const { data, error } = await q;
       if (error) throw error;
-      const retiredDemoTitles = new Set(["IIT Finance Case Night", "London Markets 101 Workshop"]);
-      return data.map(mapEvent).filter((event) => !retiredDemoTitles.has(event.title));
+      return data.filter((row) => isVisibleContent("event", row)).map(mapEvent);
     },
   });
 }
@@ -49,25 +49,42 @@ export function useEventRegistrations() {
 export function useToggleEventRegistration() {
   const { user } = useAuth();
   const qc = useQueryClient();
-  return useMutation({
-    mutationFn: async ({ eventId, registered }: { eventId: string; registered: boolean }) => {
-      if (registered) {
-        const { error } = await supabase.from("event_registrations").insert({
+  const mutation = useMutation({
+    mutationFn: async ({ userId, eventId, registered }: { userId: string; eventId: string; registered: boolean }) => {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) throw error;
+      const session = data.session;
+      if (!session?.access_token || session.user.id !== userId) {
+        throw new Error("Your account changed before this registration could be updated. Sign in to the original account and try again.");
+      }
+      const query = registered
+        ? supabase.from("event_registrations").insert({
           event_id: eventId,
-          user_id: user!.id,
-        });
-        if (error) throw error;
-      } else {
-        const result = await supabase
+          user_id: userId,
+        }).select("user_id,event_id").single()
+        : supabase
           .from("event_registrations")
           .delete()
           .eq("event_id", eventId)
-          .eq("user_id", user!.id)
-          .select("event_id")
+          .eq("user_id", userId)
+          .select("user_id,event_id")
           .maybeSingle();
-        requireConfirmedRow(result, "Cancelling the event registration");
+      // Preserve the checked credentials even if the shared session changes
+      // before transport dispatch. Database ownership rules remain authoritative.
+      const result = await query.setHeader("Authorization", `Bearer ${session.access_token}`);
+      const row = requireConfirmedRow(result, registered ? "Registering for the event" : "Cancelling the event registration");
+      if (row.user_id !== userId || row.event_id !== eventId) {
+        throw new Error("The registration change for the original account could not be confirmed. Refresh and try again.");
       }
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["event-registrations"] }),
+    onSuccess: (_result, { userId }) => qc.invalidateQueries({ queryKey: ["event-registrations", userId] }),
   });
+  return {
+    isPending: mutation.isPending,
+    mutateAsync: async ({ eventId, registered }: { eventId: string; registered: boolean }) => {
+      if (!user) throw new Error("Sign in to update an event registration.");
+      // Snapshot the owner, event and desired state before offline queuing.
+      return mutation.mutateAsync({ userId: user.id, eventId, registered });
+    },
+  };
 }

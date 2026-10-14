@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, "release/**"]
   pull_request:
 
 permissions:
@@ -91,6 +91,10 @@ jobs:
             sha256sum supabase/tests/bare_postgres_bootstrap.sql
             sha256sum supabase/tests/two_identity_rls_certification.sql
             sha256sum supabase/tests/account_lifecycle_rls_certification.sql
+            sha256sum supabase/tests/intake_rls_certification.sql
+            sha256sum supabase/tests/collaboration_rls_certification.sql
+            sha256sum supabase/tests/publication_and_abuse_certification.sql
+            sha256sum supabase/tests/concurrent_abuse_budget.py
           } > "$evidence_dir/input-sha256.txt"
       - name: Replay migrations and certify account lifecycle RLS
         shell: bash
@@ -110,6 +114,13 @@ jobs:
             docker exec "$POSTGRES_CONTAINER" sh -lc 'set -eu; for migration in /tmp/portal-migrations/*.sql; do psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f "$migration"; done'
             docker exec "$POSTGRES_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/two_identity_rls_certification.sql
             docker exec "$POSTGRES_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/account_lifecycle_rls_certification.sql
+            docker cp supabase/tests/intake_rls_certification.sql "$POSTGRES_CONTAINER:/tmp/intake_rls_certification.sql"
+            docker exec "$POSTGRES_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/intake_rls_certification.sql
+            docker cp supabase/tests/collaboration_rls_certification.sql "$POSTGRES_CONTAINER:/tmp/collaboration_rls_certification.sql"
+            docker exec "$POSTGRES_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/collaboration_rls_certification.sql
+            docker cp supabase/tests/publication_and_abuse_certification.sql "$POSTGRES_CONTAINER:/tmp/publication_and_abuse_certification.sql"
+            docker exec "$POSTGRES_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/publication_and_abuse_certification.sql
+            python3 supabase/tests/concurrent_abuse_budget.py
           } 2>&1 | tee "$evidence_dir/certification.log"
       - name: Upload database authorization evidence
         if: always()
@@ -122,9 +133,9 @@ jobs:
 
   verify:
     needs: database-authorization
-    if: always()
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 30
     env:
       EXPECTED_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
       VITE_SUPABASE_URL: https://pnemeegkwyaicsbnbnmg.supabase.co
@@ -319,10 +330,53 @@ jobs:
       - name: Full test suite
         run: npm test
       - name: Production build
+        id: production_build
         run: npm run build
       - name: Component catalog build
         run: npm run build-storybook
+      - name: Install pinned browser engines
+        run: npx playwright install --with-deps chromium firefox webkit
       - name: Browser journey smoke tests
         run: npm run test:e2e
+      - name: Constrained mobile production performance
+        if: ${{ !cancelled() && steps.production_build.outcome == 'success' }}
+        run: npm run test:performance
       - name: Repository lint gate
         run: npm run lint
+      - name: Upload browser evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: browser-evidence-${{ env.EXPECTED_SOURCE_SHA }}
+          path: |
+            test-results
+            performance-results
+          if-no-files-found: error
+          retention-days: 14
+
+  public-read-only-qa:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      EXPECTED_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ env.EXPECTED_SOURCE_SHA }}
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 22.23.2
+          cache: npm
+      - run: npm ci --no-audit --fund=false
+      - run: npx playwright install --with-deps chromium firefox webkit
+      - name: Read-only exact-revision public route audit
+        run: npm run test:public-qa
+      - name: Upload public browser evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: public-browser-evidence-${{ env.EXPECTED_SOURCE_SHA }}
+          path: public-qa-results
+          if-no-files-found: error
+          retention-days: 14

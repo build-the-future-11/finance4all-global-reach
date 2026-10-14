@@ -12,7 +12,10 @@
 .morphing-tab-list button { position: relative; z-index: 1; padding: 13px 14px; border-radius: 999px; font-size: 14px; font-weight: 600; color: hsl(var(--muted-foreground)); transition: color .2s; }
 .morphing-tab-list button[aria-selected="true"] { color: hsl(var(--background)); }
 .morphing-panel { margin-top: 28px; outline-offset: 6px; animation: panel-enter .4s ease both; }
-@keyframes panel-enter { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+/* Keep text fully opaque throughout the transition. Fading the entire panel
+   temporarily blends its text into the card background and violates WCAG
+   contrast while the interface is still interactive. */
+@keyframes panel-enter { from { transform: translateY(7px); } to { transform: translateY(0); } }
 .lens-area { position: relative; overflow: hidden; --lens-x: 50%; --lens-y: 50%; }
 .lens-glass { position: absolute; inset: 0; clip-path: circle(80px at var(--lens-x) var(--lens-y)); pointer-events: none; opacity: 0; background: #eff1df; color: #193529; }
 .lens-glass > div { transform: scale(1.65); transform-origin: var(--lens-x) var(--lens-y); }

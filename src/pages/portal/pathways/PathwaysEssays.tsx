@@ -39,7 +39,7 @@ export default function PathwaysEssays() {
     if (!title.trim() || !body.trim()) return;
     try {
       await submitEssay.mutateAsync({ title: title.trim(), body: body.trim() });
-      toast.success("Essay published");
+      toast.success("Essay saved for review");
       setOpen(false);
       setTitle("");
       setBody("");
@@ -77,7 +77,7 @@ export default function PathwaysEssays() {
                   <Label htmlFor="essay-body">Essay</Label>
                   <Textarea id="essay-body" name="body" required value={body} onChange={(e) => setBody(e.target.value)} rows={8} className="mt-1 border-white/20 bg-white/5" />
                 </div>
-                <Button type="submit" disabled={submitEssay.isPending}>Publish</Button>
+                <Button type="submit" disabled={submitEssay.isPending}>Submit for review</Button>
               </form>
             </DialogContent>
           </Dialog>
@@ -101,13 +101,16 @@ export default function PathwaysEssays() {
                     )}
                   </div>
                   <h3 className="mt-2 text-lg font-semibold text-white">{essay.title}</h3>
+              {(essay.publicationState ?? "draft") !== "published" && <p className="text-sm">{essay.publicationState === "archived" ? "Archived" : "Awaiting publication review"} · Visible to you and administrators.</p>}
                   <p className="mt-1 text-sm text-white/50">by {author?.displayName ?? "Member"}</p>
                   <p className="mt-3 whitespace-pre-wrap text-sm text-white/70">{essay.body}</p>
                 </div>
                 <Button
                   size="sm"
-                  variant={upvoted ? "default" : "outline-solid"}
+                  variant={upvoted ? "default" : "outline"}
                   className={upvoted ? "" : "shrink-0 border-white/20 text-white"}
+                  disabled={toggleUpvote.isPending || (!upvoted && essay.publicationState !== "published")}
+                  aria-label={upvoted ? `Remove your upvote for ${essay.title}` : `Upvote ${essay.title}`}
                   onClick={() => handleUpvote(essay.id, upvoted)}
                 >
                   <ThumbsUp className={`h-3.5 w-3.5 ${upvoted ? "fill-current" : ""}`} />

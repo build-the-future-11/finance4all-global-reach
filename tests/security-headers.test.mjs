@@ -56,3 +56,19 @@ test("production styling does not depend on third-party font infrastructure", ()
   assert.doesNotMatch(csp, /fonts\.(?:googleapis|gstatic)\.com/i);
   assert.match(csp, /font-src 'self' data:/);
 });
+
+test("account and recovery routes prevent indexing and shared caching", () => {
+  const privateRule = vercelConfig.headers.find(rule => rule.headers.some(header => header.key === "X-Robots-Tag"));
+  assert.ok(privateRule);
+  const pattern = new RegExp(`^${privateRule.source}$`);
+  for (const path of ["/portal", "/portal/settings", "/onboarding", "/login", "/signup", "/auth/callback", "/forgot-password", "/reset-password"]) {
+    assert.ok(pattern.test(path), `${path} requires account-route headers`);
+  }
+  for (const path of ["/", "/learn", "/learn/debriefs", "/evidence", "/assets/index.js"]) assert.equal(pattern.test(path), false);
+  assert.equal(privateRule.headers.find(header => header.key === "Cache-Control")?.value, "private, no-store");
+  assert.match(privateRule.headers.find(header => header.key === "X-Robots-Tag")?.value ?? "", /noindex/);
+  const robots = readFileSync(new URL("../public/robots.txt", import.meta.url), "utf8");
+  assert.equal((robots.match(/^User-agent:/gm) ?? []).length, 1, "specific crawler groups must not override private-route exclusions");
+  assert.match(robots, /^Disallow: \/portal$/m);
+  assert.match(robots, /^Disallow: \/auth\/$/m);
+});

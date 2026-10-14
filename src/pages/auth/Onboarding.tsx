@@ -209,7 +209,7 @@ export default function Onboarding() {
           </p>
         )}
         {submitting && <MultiStepLoader steps={["Saving your public profile", "Saving your private member details", "Opening your member space"]} current={saveStep} />}
-        <div className="auth-step-actions">{step === 1 && <Button type="button" variant="outline" onClick={() => { setStep(0); setError(""); }} disabled={submitting}>Back</Button>}<Button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-400" disabled={submitting}>{submitting ? "Saving…" : step === 0 ? "Continue" : "Enter portal"}</Button></div>
+        <div className="auth-step-actions">{step === 1 && <Button type="button" variant="outline" onClick={() => { setStep(0); setError(""); }} disabled={submitting}>Back</Button>}<Button type="submit" className="w-full bg-emerald-500 text-slate-950 hover:bg-emerald-400" disabled={submitting}>{submitting ? "Saving…" : step === 0 ? "Continue" : "Enter portal"}</Button></div>
       </form>
     </AuthLayout>
   );

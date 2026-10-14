@@ -24,7 +24,7 @@ export function useCreateNewsArticle() {
       });
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["news"] }),
+    onSuccess: () => qc.invalidateQueries(),
   });
 }
 
@@ -50,7 +50,7 @@ export function useCreateOpportunity() {
       });
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["opportunities"] }),
+    onSuccess: () => qc.invalidateQueries(),
   });
 }
 
@@ -76,7 +76,7 @@ export function useCreateEvent() {
       });
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["events"] }),
+    onSuccess: () => qc.invalidateQueries(),
   });
 }
 
@@ -99,7 +99,7 @@ export function useCreateExplainer() {
       });
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["explainers"] }),
+    onSuccess: () => qc.invalidateQueries(),
   });
 }
 
@@ -115,6 +115,6 @@ export function useDeleteNewsArticle() {
         .maybeSingle();
       requireConfirmedRow(result, "Deleting the news article");
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["news"] }),
+    onSuccess: () => qc.invalidateQueries(),
   });
 }

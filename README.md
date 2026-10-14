@@ -5,7 +5,7 @@
 
 Student finance learning site and **Supabase-powered member portal**.
 
-**Live on Vercel:** set env vars (see [DEPLOYMENT.md](DEPLOYMENT.md)) then deploy.
+**Deployment target:** Vercel. Current production certification remains pending; see [FINAL_RELEASE_REPORT.md](FINAL_RELEASE_REPORT.md).
 
 **Runtime:** Node.js 22.12 or newer and npm 10.9.8. The release contract rejects older Node
 versions, alternate package managers, and conflicting lockfiles.
@@ -100,3 +100,19 @@ reports backend failures explicitly. Inputs are limited to 128 characters;
 asterisk wildcard searches and control characters are rejected. Results remain
 bounded to 20 matching candidates per category and 12 displayed matches.
 The account-review queue supports status filtering and incremental loading.
+
+## Workspace additions
+
+`/portal/learn`, `/portal/research`, `/portal/apply`, `/portal/collaboration` and `/portal/intake-review` provide private learning state, application drafts/history, research participation and invitation-based project tasks. Source is under `src/pages/portal`, shared hooks under `src/hooks/portal`, and database migrations/tests under `supabase/`. Server-side grants, policies and triggers enforce ownership, revision checks and reviewer/manager authority.
+
+Run `npm test`, `npm run typecheck` and `npm run lint` before committing; run `npm run build` from the clean commit. The build requires the documented public environment values. CI fixtures are not production credentials. All migrations through `20260924160333_project_collaboration.sql` need deployment review and live certification before these features can be enabled in production.
+
+## License
+
+No standalone portal license is present. The rights holder must select reuse terms before an openly licensed distribution. Public GitHub visibility does not itself grant those rights.
+
+## Candidate publication and abuse controls
+
+The October candidate defaults database content to draft, adds an audited administrator review queue and enforces atomic per-account activity budgets. See [control limits, scope and rollout](docs/PUBLICATION_AND_ABUSE_CONTROLS.md). The canonical live database and controlled-account checks remain blocked; Draft PR #162 is not a production release.
+
+Hosted QA includes three browser engines, responsive publication review, read-only public route checks and constrained production-build mobile measurements. Fixtures certify UI behavior only. Use `npm run test:e2e`, `npm run test:performance` after a clean build, and `npm run test:public-qa` for the explicitly pinned public-site revision. Results and traces are retained as workflow artifacts.
