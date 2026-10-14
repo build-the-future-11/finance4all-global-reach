@@ -29,6 +29,7 @@ const Admin = lazy(() => import("@/pages/portal/Admin"));
 const Saved = lazy(() => import("@/pages/portal/Saved"));
 const Settings = lazy(() => import("@/pages/portal/Settings"));
 const Evidence = lazy(() => import("@/pages/Evidence"));
+const Iyerj = lazy(() => import("@/pages/Iyerj"));
 const Learn = lazy(() => import("@/pages/learn/Learn"));
 const FiveFoundations = lazy(() => import("@/pages/learn/FiveFoundations"));
 const Debriefs = lazy(() => import("@/pages/learn/Debriefs"));
@@ -47,6 +48,7 @@ function AppRoutes() {
     <Suspense fallback={<PortalFallback />}>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/iyerj" element={<Iyerj />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
