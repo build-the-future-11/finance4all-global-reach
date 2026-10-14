@@ -63,8 +63,16 @@ export function resolveReleaseRevision({ env = process.env, gitHead = readGitHea
   if (sourceSha) return sourceSha;
   if (vercelSha) return vercelSha;
 
-  if (String(env.GITHUB_SHA ?? "").trim()) {
-    return validateReleaseRevision(env.GITHUB_SHA, "GITHUB_SHA");
+  let head;
+  try {
+    // Pull request events can name a merge commit while CI checks out the PR head.
+    head = gitHead();
+  } catch (error) {
+    // Source archives may omit Git metadata; preserve the validated CI fallback.
+    if (String(env.GITHUB_SHA ?? "").trim()) {
+      return validateReleaseRevision(env.GITHUB_SHA, "GITHUB_SHA");
+    }
+    throw error;
   }
-  return validateReleaseRevision(gitHead(), "git HEAD");
+  return validateReleaseRevision(head, "git HEAD");
 }
