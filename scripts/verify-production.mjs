@@ -3,6 +3,7 @@
 import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { verifyContentSecurityPolicy } from "./production-csp.mjs";
 
 const DEFAULT_PORTAL_URL = "https://finance4all-global-reach.vercel.app";
 const SERVICE = "financemeta-member-portal";
@@ -167,18 +168,7 @@ export async function verifyProduction({
     "login headers",
     requestTimeoutMs,
   );
-  const csp = requireHeader(headResponse.headers, "content-security-policy", /default-src 'self'/);
-  for (const directive of [
-    "frame-ancestors 'none'",
-    "object-src 'none'",
-    "https://pnemeegkwyaicsbnbnmg.supabase.co",
-    "wss://pnemeegkwyaicsbnbnmg.supabase.co",
-  ]) {
-    if (!csp.includes(directive)) fail(`content-security-policy is missing ${directive}`);
-  }
-  if (/fonts\.googleapis\.com|fonts\.gstatic\.com/.test(csp)) {
-    fail("content-security-policy still permits third-party font infrastructure");
-  }
+  const csp = verifyContentSecurityPolicy(headResponse.headers.get("content-security-policy"));
   requireHeader(headResponse.headers, "strict-transport-security", /max-age=63072000/);
   requireHeader(headResponse.headers, "x-content-type-options", /^nosniff$/i);
   requireHeader(headResponse.headers, "x-frame-options", /^DENY$/i);
