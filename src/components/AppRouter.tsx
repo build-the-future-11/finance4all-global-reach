@@ -33,6 +33,7 @@ const Saved = lazy(() => import("@/pages/portal/Saved"));
 const Settings = lazy(() => import("@/pages/portal/Settings"));
 const Intake = lazy(() => import("@/pages/portal/Intake"));
 const IntakeReview = lazy(() => import("@/pages/portal/IntakeReview"));
+const IYERN = lazy(() => import("@/pages/IYERN"));
 const Evidence = lazy(() => import("@/pages/Evidence"));
 const Learn = lazy(() => import("@/pages/learn/Learn"));
 const FiveFoundations = lazy(() => import("@/pages/learn/FiveFoundations"));
@@ -57,6 +58,12 @@ function AppRoutes() {
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/iyern" element={<IYERN />} />
+          <Route path="/iyern/journal" element={<IYERN />} />
+          <Route path="/iyern/forum" element={<IYERN />} />
+          <Route path="/iyern/fellowship" element={<IYERN />} />
+          <Route path="/iyern/challenge" element={<IYERN />} />
+          <Route path="/iyern/articles/:slug" element={<IYERN />} />
           <Route path="/evidence" element={<Evidence />} />
           <Route path="/learn" element={<Learn />} />
           <Route path="/learn/five-foundations" element={<FiveFoundations />} />

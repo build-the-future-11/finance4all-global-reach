@@ -8,7 +8,7 @@ describe("portfolio link", () => {
 
     expect(landing).toContain('href="https://thebu1ld.com/network"');
     expect(landing).toContain('href="https://finance-meta-landing.vercel.app/"');
-    expect(landing).toContain('href="https://iy-ern.vercel.app/"');
+    expect(landing).toContain('to="/iyern"');
     expect(landing).toContain('"https://finance-meta-landing.vercel.app/projects"');
     expect(landing).toContain("Browse all 48 project records");
     expect(landing).toContain("All project pages");

@@ -79,12 +79,11 @@ const portfolioProjectRecords: Omit<PortfolioProject, "page">[] = [
   {
     id: "iy-ern",
     title: "Iy-ERN economics research network",
-    description: "A public codebase for an economics research and preprint network. Product claims and peer-review status remain bounded by the evidence published in the repository.",
+    description: "The International Youth Economics Research Network connects FinanceMeta Labs, research cohorts, a selective peer-reviewed journal with mentorship, and a moderated preprint forum.",
     status: "Verified repository",
     domain: "Research publishing",
     tags: ["economics", "preprints", "publishing"],
-    website: "https://iy-ern.vercel.app/",
-    href: "https://github.com/build-the-future-11/Iy-ERN",
+    website: "/iyern",
     evidence: "Public repository verified 19 Sep 2026",
   },
   {
@@ -140,7 +139,7 @@ const PROJECT_PAGE_ORIGIN = "https://finance-meta-landing.vercel.app";
 
 export const portfolioProjects: PortfolioProject[] = portfolioProjectRecords.map((project) => ({
   ...project,
-  page: `${PROJECT_PAGE_ORIGIN}/research/projects/${project.id}`,
+  page: project.id === "iy-ern" ? "/iyern" : `${PROJECT_PAGE_ORIGIN}/research/projects/${project.id}`,
 }));
 
 export type ApplicationPath = {

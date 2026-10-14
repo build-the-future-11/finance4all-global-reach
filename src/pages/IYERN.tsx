@@ -1,0 +1,73 @@
+import { useEffect } from "react";
+import { Link, useLocation, useParams, useSearchParams } from "react-router-dom";
+import { ArrowUpRight, BarChart3, Globe2, HeartHandshake, Brain, BookOpenText } from "lucide-react";
+import Brand from "@/components/Brand";
+import ThemeToggle from "@/components/ThemeToggle";
+import NetworkStory from "@/components/iyern/NetworkStory";
+import "@/styles/iyern-network.css";
+import ApplicationCTA from "@/components/iyern/ApplicationCTA";
+import PublicationPreview, { PublicationResources } from "@/components/iyern/PublicationPreview";
+import { publications, researchCategories, filterPublications, isPublicPublication } from "@/content/iyern";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import "@/styles/landing.css";
+import "@/styles/iyern.css";
+
+const icons = [BarChart3, Globe2, HeartHandshake, Brain];
+const initiatives = [["journal", "01", "IYERJ", "The flagship journal"], ["forum", "02", "Preprint Forum", "Ideas open to discussion"], ["fellowship", "03", "Research Fellowship", "A new cohort of inquiry"], ["challenge", "04", "Global Research Challenge", "Questions across borders"]];
+const description = "An international platform for emerging researchers to share economic research, contribute to scholarly publications, collaborate across disciplines, and investigate the forces shaping global economies.";
+
+export default function IYERN() {
+  const { slug } = useParams();
+  const location = useLocation();
+  const [params, setParams] = useSearchParams();
+  const articleRoute = location.pathname.startsWith("/iyern/articles/");
+  const paper = publications.find(p => p.slug === slug && isPublicPublication(p));
+  useDocumentTitle(articleRoute ? paper?.title ?? "Article unavailable | IYERN" : "IYERN — Researching the Economy of Tomorrow");
+  useEffect(() => {
+    const title = paper?.title ?? "IYERN — Researching the Economy of Tomorrow";
+    const summary = paper?.abstract ?? description;
+    const canonical = `https://finance4all-global-reach.vercel.app${location.pathname}`;
+    const restore = [
+      ["meta[name=\"description\"]", "content", summary],
+      ["meta[property=\"og:title\"]", "content", title],
+      ["meta[property=\"og:description\"]", "content", summary],
+      ["meta[property=\"og:url\"]", "content", canonical],
+      ["meta[name=\"twitter:title\"]", "content", title],
+      ["meta[name=\"twitter:description\"]", "content", summary],
+      ["link[rel=\"canonical\"]", "href", canonical],
+    ].map(([selector, attr, value]) => {
+      const element = document.querySelector(selector);
+      const old = element?.getAttribute(attr);
+      element?.setAttribute(attr, value);
+      return () => { if (old !== null && old !== undefined) element?.setAttribute(attr, old); else element?.removeAttribute(attr); };
+    });
+    return () => restore.forEach(reset => reset());
+  }, [location.pathname, paper]);
+  useEffect(() => {
+    const section = location.hash.slice(1) || location.pathname.split("/")[2];
+    if (section && !articleRoute) document.getElementById(section)?.scrollIntoView();
+  }, [location.pathname, location.hash, articleRoute]);
+  const rawCategory = params.get("category") ?? "all";
+  const category = researchCategories.some(c => c.id === rawCategory) ? rawCategory : "all";
+  const query = params.get("q") ?? "";
+  const journalArticles = publications.filter(p => p.kind === "journal" && isPublicPublication(p));
+  const results = filterPublications(publications.filter(p => p.kind === "preprint"), category, query);
+  function updateFilter(key: string, value: string) { const next = new URLSearchParams(params); if (value && value !== "all") next.set(key, value); else next.delete(key); setParams(next, { replace: true, preventScrollReset: true }); }
+
+  return <div className="ffa-home iy-portal">
+    <a className="ffa-skip" href="#iy-main">Skip to content</a>
+    <header className="iy-header"><Link to="/" aria-label="Finance for All home"><Brand /></Link><div><Link to="/learn">Open learning</Link><Link to="/login">Member sign in</Link><ThemeToggle /></div></header>
+    <nav className="iy-nav" aria-label="IYERN initiatives"><Link to="/iyern">IYERN / Overview</Link>{initiatives.map(([id,,name]) => <Link key={id} to={`/iyern/${id}`} aria-current={location.pathname === `/iyern/${id}` ? "page" : undefined}>{name}</Link>)}</nav>
+    <main id="iy-main">
+    {articleRoute ? <section className="iy-section"><Link to="/iyern/forum">← Back to research</Link>{paper ? <article><span className="iy-status">{paper.status}</span><h1>{paper.title}</h1><p>{paper.authors.join(", ")}</p><p><time dateTime={paper.publishedAt}>{paper.publishedAt}</time> · Version {paper.version}</p><h2>Abstract</h2><p>{paper.abstract}</p><p>Keywords: {paper.keywords.join(", ")}</p><PublicationResources paper={paper} /></article> : <><h1>Article unavailable</h1><p>This article has not been published here. The archive will contain only authorized public research.</p></>}</section> : <>
+      <section className="iy-hero"><div><p className="ffa-eyebrow">FinanceMeta / International Youth Economics Research Network</p><h1><span>IYERN —</span> Researching the Economy of <em>Tomorrow</em></h1><p>{description}</p><a href="#journal" className="ffa-button">Explore the journal <ArrowUpRight size={18} /></a></div><div className="iy-art" aria-hidden="true"><span>INQUIRY / EVIDENCE / EXCHANGE</span><div className="iy-orbits"><i /><i /><i /><b>iyern.</b></div><p>New perspectives.<br />Shared economic futures.</p></div></section>
+      <div className="iy-initiative-grid">{initiatives.map(([id,num,name,subtitle]) => <a href={`#${id}`} key={id}><span>{num} <ArrowUpRight size={18} /></span><strong>{name}</strong><small>{subtitle}</small></a>)}</div>
+      <NetworkStory />
+      <section className="iy-section" id="journal"><div className="iy-heading"><div><p className="ffa-eyebrow">01 / The flagship journal</p><h2>IYERJ</h2></div><p>A global, highly selective, peer-reviewed journal for economics, finance, computational economics, public policy, and related fields. Mentorship is offered for every submitted paper.</p></div><div className="iy-journal-grid"><div className="iy-cover"><BookOpenText size={32} /><p>International Youth Economics Research Journal</p><strong>IYERJ</strong><span>Volume 1 / Issue 1</span><hr /><p>Economics. Finance.<br />Policy. Possibility.</p><small>Upcoming · December 2026</small></div><div><span className="iy-status">Upcoming first issue</span><h3>IYERJ — Volume 1, Issue 1</h3><p>Planned publication: <time dateTime="2026-12-01">December 1, 2026</time></p><p>IYERJ brings emerging researchers into an international scholarly conversation. Selection focuses on the quality of the question, methods, evidence and contribution. Mentorship is offered for every submitted paper, including guidance on research design, analysis, writing and revision. Mentorship and editorial acceptance are separate decisions. The first issue remains upcoming until accepted papers complete review and receive publication authorization.</p><div className="iy-details"><details><summary>Author guidelines & submission information</summary><p>Prepare a title, author details and affiliations, abstract, keywords, research question, methods, results, limitations, and references. Describe data provenance, code availability, funding, conflicts of interest, and permission to share all materials. Identify the manuscript version and any prior dissemination.</p><p>Apply through the journal Tally form with a readable manuscript link, abstract, authorship and contribution details, disclosures, and mentorship priorities. Submission does not guarantee acceptance or a response deadline.</p></details><details><summary>Peer-review process, mentorship & publication ethics</summary><p>The journal process comprises editorial scope and ethics screening, independent review, author revision, an editorial decision, and final publication authorization. No paper is represented as reviewed before those steps are recorded.</p><p>Authors must credit sources and contributors, disclose conflicts, and protect confidential or personal information. Reviewers should disclose conflicts and assess the question, methods, evidence and limitations. Contact the editorial team for an appeal, correction or withdrawal request.</p></details><details><summary>DOIs & the publication record</summary><p>The journal aims to give accepted work a durable, globally citable record. DOI registration is being set up; assignment will be confirmed for individual published articles when the service is operational. A submission or preprint listing does not itself confer a DOI.</p></details><details><summary>Editorial board</summary><p>Editorial appointments and confirmed member biographies will be published after authorization. No editorial board members have been announced here.</p></details></div><ApplicationCTA approvedUrl="https://tally.so/r/b5BBko" label="Submit to IYERJ" pending="Journal submission intake is pending verification and approval." /></div></div><div className="iy-empty"><h3>Journal archive / Volume 1, Issue 1</h3>{journalArticles.length === 0 && <p>No articles are published here yet. Authorized articles will appear with their authors, abstract, version, publication date, and manuscript links.</p>}{journalArticles.map(p => <PublicationPreview key={p.slug} paper={p} />)}</div></section>
+      <section className="iy-section iy-forum" id="forum"><div className="iy-heading"><div><p className="ffa-eyebrow">02 / Research in conversation</p><h2>IYERN Preprint Forum</h2></div><p>Share questions, methods, and working research across four connected fields.</p></div><aside className="iy-notice"><strong>Preprints are not peer-reviewed journal publications.</strong><p>They are working manuscripts. Their findings may change and should be read with their stated limitations.</p></aside><div className="iy-category-grid">{researchCategories.map((c,i) => { const Icon = icons[i]; return <button type="button" key={c.id} aria-pressed={category === c.id} onClick={() => updateFilter("category", category === c.id ? "all" : c.id)}><Icon aria-hidden="true" size={25} /><span>0{i+1}</span><h3>{c.title}</h3><p>{c.description}</p><small>{category === c.id ? "Selected · click to show all" : "Browse this field →"}</small></button>; })}</div><div className="iy-search"><div><label htmlFor="iy-search">Search by title, author, or keyword</label><input id="iy-search" type="search" value={query} onChange={e => updateFilter("q", e.target.value)} placeholder="Explore a research question…" /></div><div><label htmlFor="iy-category">Research category</label><select id="iy-category" value={category} onChange={e => updateFilter("category", e.target.value)}><option value="all">All research categories</option>{researchCategories.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}</select></div></div><p className="iy-result-count" role="status">{results.length} public preprints{category !== "all" ? ` · ${researchCategories.find(c => c.id === category)?.title}` : ""}</p>{results.length ? results.map(p => <PublicationPreview key={p.slug} paper={p} />) : <div className="iy-empty"><BookOpenText aria-hidden="true" /><h3>{query || category !== "all" ? "No preprints match these filters" : "The next question starts here"}</h3><p>No authorized public preprints are listed yet. Research will appear after permissions and moderation checks.</p>{(query || category !== "all") && <button onClick={() => setParams({}, { replace: true })}>Clear filters</button>}</div>}<div className="iy-intake"><div><h3>Prepare your preprint</h3><p>Select one of the four research categories and prepare your abstract, author details, keywords, version, and code or data links. All authors must approve public release and have permission to share the manuscript.</p><p>Use the separate preprint Tally form to share your manuscript link, version, disclosures and the feedback you would find useful. Working papers, replication studies and research notes are welcome for moderation. Submissions will never be published automatically.</p></div><ApplicationCTA approvedUrl="https://tally.so/r/RGXXLJ" label="Submit a preprint" pending="Public manuscript submissions are not open yet." /></div></section>
+      <section className="iy-section" id="fellowship"><div className="iy-heading"><div><p className="ffa-eyebrow">03 / Develop your inquiry</p><h2>IYER Research Fellowship — Cohort 1</h2></div><div><span className="iy-status">Applications Opening Soon</span><p>An upcoming research fellowship connecting emerging scholars with collaborative projects in economics, finance, and quantitative research.</p></div></div><div className="iy-tracks">{["Quantitative research", "Applied economics and policy", "Computational finance", "Independent research and academic writing"].map((t,i) => <div key={t}><span>0{i+1}</span><h3>{t}</h3></div>)}</div><ApplicationCTA label="Apply for the fellowship" pending="The approved application form, eligibility, and program details will be shared when ready." /></section>
+      <section className="iy-section iy-challenge" id="challenge"><p className="ffa-eyebrow">04 / Questions across borders</p><div className="iy-heading"><h2>FinanceMeta Global Research Challenge</h2><p>An upcoming international research competition focused on economics, quantitative finance, economic modeling, and applied research.</p></div><div className="iy-challenge-grid"><div><h3>Potential research tracks</h3><ul><li>Economics and public policy</li><li>Quantitative finance and risk</li><li>Economic modeling and computation</li><li>Applied research and financial inclusion</li></ul><p>Researchers interested in participating can revisit this page for the approved registration route. Eligibility, team arrangements, and submission requirements are forthcoming.</p><p>Our summer 2026 programs with Synthica and YEL are described above. Partners and arrangements for this separate upcoming challenge will be announced with its rules.</p></div><div className="iy-timeline">{["Registration & eligibility", "Submission timeline", "Rules & judging"].map(t => <div key={t}><h3>{t}</h3><span>Forthcoming</span></div>)}<ApplicationCTA label="Register interest" pending="Interest registration will open once an approved form is available." /></div></div></section>
+    </>}
+    </main><footer className="iy-footer"><Brand /><p>IYERN · Part of the FinanceMeta / Finance4All ecosystem</p><Link to="/evidence">Research standards</Link><Link to="/">Return to Finance for All</Link></footer>
+  </div>;
+}
