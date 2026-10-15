@@ -101,7 +101,7 @@ export default function EventsChapters() {
 
       <section className="mb-8 space-y-4">
         <WorldMap locations={communityLocations} />
-        <a href="https://tally.so/r/obWxvN" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-sm text-primary">Start a school club or chapter <ExternalLink size={15} /></a>
+        <a href="https://tally.so/r/XxaB1j?utm_source=member_portal&fm_surface=member_portal&fm_route=chapter&fm_version=conversion-v1&utm_medium=website" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-sm text-primary">Start a school club or chapter <ExternalLink size={15} /></a>
       </section>
 
       <QueryStatus
