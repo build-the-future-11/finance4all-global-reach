@@ -59,7 +59,7 @@ const directApplications = [
     label: "Chapters & leadership",
     description:
       "Found or lead a school chapter, regional network, research program, fellowship, competition, Union node, Women in Finance program, operations function, or community.",
-    url: "https://tally.so/r/5B7blP?utm_source=member_portal&utm_medium=opportunity_card&utm_campaign=chapters_leadership&fm_surface=member_portal&fm_route=join&fm_version=conversion-v1",
+    url: "https://tally.so/r/XxaB1j?utm_source=member_portal&utm_medium=opportunity_card&utm_campaign=chapters_leadership&fm_surface=member_portal&fm_route=chapter&fm_version=conversion-v1",
   },
   {
     label: "FinanceDebriefed & media",
@@ -71,13 +71,13 @@ const directApplications = [
     label: "Mentors, professors, speakers & reviewers",
     description:
       "Mentor research, review methodology and papers, speak at workshops, judge competitions, advise teams, or collaborate with student and professional researchers.",
-    url: "https://tally.so/r/5B7blP?utm_source=member_portal&utm_medium=opportunity_card&utm_campaign=mentors_faculty&fm_surface=member_portal&fm_route=join&fm_version=conversion-v1",
+    url: "https://tally.so/r/2EWxzb?utm_source=member_portal&utm_medium=opportunity_card&utm_campaign=mentors_faculty&fm_surface=member_portal&fm_route=partnership&fm_version=conversion-v1",
   },
   {
     label: "Partners, data providers & sponsors",
     description:
       "University, school, nonprofit, financial-institution, data, API, recruiting, sponsorship, prize, research, and distribution partnerships.",
-    url: "https://tally.so/r/5B7blP?utm_source=member_portal&utm_medium=opportunity_card&utm_campaign=partnerships&fm_surface=member_portal&fm_route=join&fm_version=conversion-v1",
+    url: "https://tally.so/r/2EWxzb?utm_source=member_portal&utm_medium=opportunity_card&utm_campaign=partnerships&fm_surface=member_portal&fm_route=partnership&fm_version=conversion-v1",
   },
 ] as const;
 
