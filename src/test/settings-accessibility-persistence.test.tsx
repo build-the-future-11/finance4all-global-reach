@@ -87,7 +87,7 @@ describe("member settings", () => {
 
     expect(displayName).toHaveValue("Ada Member");
     expect(bio).toHaveValue("Original bio");
-    expect(collaboration).toHaveAccessibleDescription("Shown on your public profile");
+    expect(collaboration).toHaveAccessibleDescription("Shown to signed-in members when you opt into the directory");
     expect(macro).toHaveAttribute("aria-pressed", "true");
     expect(research).toHaveAttribute("aria-pressed", "false");
 
@@ -95,6 +95,9 @@ describe("member settings", () => {
     fireEvent.change(bio, { target: { value: "  Durable profile  " } });
     fireEvent.click(research);
     fireEvent.click(collaboration);
+    const directory = screen.getByRole("switch", { name: "Share my profile in the member directory" });
+    expect(directory).not.toBeChecked();
+    fireEvent.click(directory);
     fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
 
     await waitFor(() => {
@@ -103,6 +106,7 @@ describe("member settings", () => {
         bio: "Durable profile",
         interests: ["macro", "research"],
         openToCollaborate: true,
+        directoryVisible: true,
         chapterId: undefined,
       });
     });

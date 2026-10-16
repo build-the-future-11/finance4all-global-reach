@@ -309,11 +309,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const updateProfile = useCallback(
     async (
-      updates: Partial<Pick<UserProfile, "displayName" | "bio" | "interests" | "openToCollaborate" | "chapterId">>,
+      updates: Partial<Pick<UserProfile, "displayName" | "bio" | "interests" | "openToCollaborate" | "directoryVisible" | "chapterId">>,
     ) => {
       if (!session?.user) return { error: "Not authenticated" };
 
       const payload: Database["public"]["Tables"]["profiles"]["Update"] = {};
+      if (updates.directoryVisible !== undefined) payload.directory_visible = updates.directoryVisible;
       if (updates.displayName !== undefined) payload.display_name = updates.displayName;
       if (updates.bio !== undefined) payload.bio = updates.bio;
       if (updates.interests !== undefined) payload.interests = updates.interests;

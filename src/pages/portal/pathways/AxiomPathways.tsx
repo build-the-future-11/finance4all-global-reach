@@ -75,9 +75,9 @@ export default function AxiomPathways() {
         <div className="mb-5 flex items-end justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-500">Verified organization routes</p>
-            <h2 className="mt-1 font-serif text-2xl font-semibold text-foreground">Applications and collaboration</h2>
+            <h2 className="mt-1 font-serif text-2xl font-semibold text-foreground">Interest and collaboration</h2>
           </div>
-          <span className="portal-muted hidden items-center gap-1.5 text-xs sm:flex"><ShieldCheck className="h-3.5 w-3.5" /> Reviewed 19 Sep 2026</span>
+          <span className="portal-muted hidden items-center gap-1.5 text-xs sm:flex"><ShieldCheck className="h-3.5 w-3.5" /> Reviewed 16 Oct 2026</span>
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {applicationPaths.map((path) => (

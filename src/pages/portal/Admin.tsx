@@ -1,13 +1,14 @@
+import ChapterEditor from "@/components/portal/ChapterEditor";
+import EventEditor from "@/components/portal/EventEditor";
 import { PublicationQueue } from "@/components/portal/PublicationQueue";
 import { useState } from "react";
 import { useNewsArticles } from "@/hooks/portal/useDebriefed";
 import { useOpportunities } from "@/hooks/portal/usePathways";
-import { useChapters, useEvents } from "@/hooks/portal/useEvents";
+import { useEvents } from "@/hooks/portal/useEvents";
 import { useExplainers } from "@/hooks/portal/useDebriefed";
 import {
   useCreateNewsArticle,
   useCreateOpportunity,
-  useCreateEvent,
   useCreateExplainer,
   useDeleteNewsArticle,
 } from "@/hooks/portal/useAdmin";
@@ -44,12 +45,10 @@ export default function Admin() {
   const { data: opportunities } = useOpportunities();
   const { data: events } = useEvents();
   const { data: explainers } = useExplainers();
-  const { data: chapters } = useChapters();
   const { data: deletionRequests, isLoading: deletionLoading, isError: deletionError, refetch: retryDeletions, hasNextPage, fetchNextPage, isFetchingNextPage } = useAccountDeletionRequests(deletionStatus);
 
   const createNews = useCreateNewsArticle();
   const createOpp = useCreateOpportunity();
-  const createEvent = useCreateEvent();
   const createExplainer = useCreateExplainer();
   const deleteNews = useDeleteNewsArticle();
   const reviewDeletion = useReviewAccountDeletionRequest();
@@ -68,13 +67,6 @@ export default function Admin() {
     description: "",
     applicationUrl: "",
     tags: "",
-  });
-  const [eventForm, setEventForm] = useState({
-    chapterId: "",
-    title: "",
-    description: "",
-    startsAt: "",
-    registrationUrl: "",
   });
   const [explainerForm, setExplainerForm] = useState({
     slug: "",
@@ -244,56 +236,7 @@ export default function Admin() {
           </PortalCard>
         </TabsContent>
 
-        <TabsContent value="events">
-          <PortalCard className="p-6">
-            <h3 className="font-semibold text-white">Create event</h3>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
-              <div>
-                <Label htmlFor="admin-event-chapter" className="text-white/70">Chapter</Label>
-                <Select value={eventForm.chapterId} onValueChange={(v) => setEventForm({ ...eventForm, chapterId: v })}>
-                  <SelectTrigger id="admin-event-chapter" className={portalInputClass}><SelectValue placeholder="Select chapter" /></SelectTrigger>
-                  <SelectContent>
-                    {chapters?.map((c) => (
-                      <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="admin-event-start" className="text-white/70">Starts at</Label>
-                <Input id="admin-event-start" name="startsAt" type="datetime-local" value={eventForm.startsAt} onChange={(e) => setEventForm({ ...eventForm, startsAt: e.target.value })} className={portalInputClass} />
-              </div>
-              <div className="sm:col-span-2">
-                <Label htmlFor="admin-event-title" className="text-white/70">Title</Label>
-                <Input id="admin-event-title" name="title" value={eventForm.title} onChange={(e) => setEventForm({ ...eventForm, title: e.target.value })} className={portalInputClass} />
-              </div>
-              <div className="sm:col-span-2">
-                <Label htmlFor="admin-event-description" className="text-white/70">Description</Label>
-                <Textarea id="admin-event-description" name="description" value={eventForm.description} onChange={(e) => setEventForm({ ...eventForm, description: e.target.value })} rows={3} className={portalInputClass} />
-              </div>
-              <div className="sm:col-span-2">
-                <Label htmlFor="admin-event-registration-url" className="text-white/70">Registration URL (optional)</Label>
-                <Input id="admin-event-registration-url" name="registrationUrl" type="url" value={eventForm.registrationUrl} onChange={(e) => setEventForm({ ...eventForm, registrationUrl: e.target.value })} className={portalInputClass} />
-              </div>
-            </div>
-            <Button disabled={createEvent.isPending} className="mt-4 bg-emerald-500 text-slate-950 hover:bg-emerald-400" onClick={async () => {
-              try {
-                await createEvent.mutateAsync({
-                  ...eventForm,
-                  status: "upcoming",
-                  startsAt: new Date(eventForm.startsAt).toISOString(),
-                  registrationUrl: eventForm.registrationUrl || undefined,
-                });
-                toast.success("Event draft saved for review");
-                setEventForm({ chapterId: "", title: "", description: "", startsAt: "", registrationUrl: "" });
-              } catch (e) {
-                toast.error(e instanceof Error ? e.message : "Failed");
-              }
-            }}>
-              Create event
-            </Button>
-          </PortalCard>
-        </TabsContent>
+        <TabsContent value="events"><EventEditor /><ChapterEditor /></TabsContent>
 
         <TabsContent value="explainers">
           <PortalCard className="p-6">

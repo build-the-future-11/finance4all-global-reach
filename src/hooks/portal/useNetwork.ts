@@ -10,15 +10,18 @@ import type { ConnectionStatus } from "@/types/domain";
 import { useAuth } from "@/contexts/useAuth";
 import { requireConfirmedRow } from "@/lib/confirmed-mutation";
 
-export function useMemberProfiles() {
+export function useMemberProfiles(search = "", collaboratorsOnly = false) {
+  const { user } = useAuth();
+  const normalized = search.trim().toLowerCase().slice(0, 128);
   return useQuery({
-    queryKey: ["member-profiles"],
+    queryKey: ["member-profiles", user?.id, normalized, collaboratorsOnly],
+    enabled: Boolean(user),
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select(PUBLIC_PROFILE_COLUMNS)
-        .neq("display_name", "")
-        .order("display_name");
+      // Literal search, visibility and collaboration filters run before LIMIT.
+      // The invoker RPC returns only safe columns and remains subject to RLS.
+      const { data, error } = await supabase.rpc("member_directory", {
+        search_text: normalized, collaborators_only: collaboratorsOnly,
+      });
       if (error) throw error;
       return data.map(mapProfile);
     },
@@ -133,6 +136,7 @@ export function useUpdateMyProfile() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["member-profiles"] });
       qc.invalidateQueries({ queryKey: ["profile"] });
+      qc.invalidateQueries({ queryKey: ["portal-search"] });
     },
   });
 }

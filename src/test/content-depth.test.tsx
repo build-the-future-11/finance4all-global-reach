@@ -38,7 +38,7 @@ describe("content depth and claim boundaries", () => {
   it("links IYERN to its integrated portal and other records to their public project pages", () => {
     expect(portfolioProjects).toHaveLength(12);
     for (const project of portfolioProjects.filter(project => project.id !== "iy-ern")) {
-      expect(project.page).toBe(`https://finance-meta-landing.vercel.app/research/projects/${project.id}`);
+      expect(project.page).toBe(`/research/projects/${project.id}`);
     }
     const iyern = portfolioProjects.find(project => project.id === "iy-ern");
     expect(iyern?.page).toBe("/iyern");
@@ -53,7 +53,7 @@ describe("chapter map interaction", () => {
   it("selects a real record and exposes synchronized chapter details", () => {
     const onSelect = vi.fn();
     render(<ChapterMap chapters={[{ id: "70000000-0000-4000-8000-000000000099", name: "Test Chapter", city: "Pune", country: "India", latitude: 18.52, longitude: 73.85, memberCount: 3 }]} onSelect={onSelect} />);
-    fireEvent.click(screen.getByRole("button", { name: "Test Chapter, Pune, India" }));
+    fireEvent.click(screen.getByRole("button", { name: "Test Chapter, Pune, India: Operating status not verified" }));
     expect(onSelect).toHaveBeenCalledWith("70000000-0000-4000-8000-000000000099");
   });
 });

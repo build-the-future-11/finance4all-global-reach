@@ -94,20 +94,27 @@ export function useUpdateDigestPreferences() {
       substackSubscribed?: boolean;
       preferredCategories?: NewsCategory[];
     }) => {
-      const { data: existing } = await supabase
+      if (!user) throw new Error("Sign in to change digest preferences.");
+      const { data: session, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) throw sessionError;
+      if (!session.session?.access_token || session.session.user.id !== user.id) throw new Error("Your account changed. Sign in again.");
+      const { data: existing, error: readError } = await supabase
         .from("digest_preferences")
         .select("*")
-        .eq("user_id", user!.id)
-        .maybeSingle();
+        .eq("user_id", user.id)
+        .maybeSingle().setHeader("Authorization", `Bearer ${session.session.access_token}`);
+      if (readError) throw readError;
 
-      const { error } = await supabase.from("digest_preferences").upsert({
-        user_id: user!.id,
+      const next = {
+        user_id: user.id,
         weekly_digest_enabled: prefs.weeklyDigestEnabled ?? existing?.weekly_digest_enabled ?? false,
         substack_subscribed: prefs.substackSubscribed ?? existing?.substack_subscribed ?? false,
         preferred_categories: prefs.preferredCategories ?? existing?.preferred_categories ?? [],
         updated_at: new Date().toISOString(),
-      });
+      };
+      const { data: receipt, error } = await supabase.from("digest_preferences").upsert(next).select("*").single().setHeader("Authorization", `Bearer ${session.session.access_token}`);
       if (error) throw error;
+      if (receipt?.user_id !== user.id || receipt.weekly_digest_enabled !== next.weekly_digest_enabled || receipt.substack_subscribed !== next.substack_subscribed || JSON.stringify(receipt.preferred_categories) !== JSON.stringify(next.preferred_categories)) throw new Error("The preference update could not be confirmed.");
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["digest-preferences"] }),
   });
