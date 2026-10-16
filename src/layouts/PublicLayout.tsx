@@ -1,4 +1,4 @@
-import { useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import Brand from "@/components/Brand";
@@ -15,9 +15,16 @@ const publicNavigation = [
 export function PublicHeader() {
   const [open, setOpen] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null);
-  return <header className="public-header" onKeyDown={event => {
-    if (event.key === "Escape" && open) { setOpen(false); trigger.current?.focus(); }
-  }}>
+  useEffect(() => {
+    if (!open) return;
+    document.getElementById("public-navigation")?.querySelector<HTMLAnchorElement>("a")?.focus();
+    const dismiss = (event: KeyboardEvent) => {
+      if (event.key === "Escape") { setOpen(false); trigger.current?.focus(); }
+    };
+    document.addEventListener("keydown", dismiss);
+    return () => document.removeEventListener("keydown", dismiss);
+  }, [open]);
+  return <header className="public-header">
     <Link to="/" aria-label="Finance for All home" className="public-identity"><Brand /></Link>
     <nav id="public-navigation" aria-label="Main navigation" className={open ? "is-open" : ""}>
       {publicNavigation.map(([label, path]) => <NavLink key={path} to={path} end={path === "/"} onClick={() => setOpen(false)}>{label}</NavLink>)}

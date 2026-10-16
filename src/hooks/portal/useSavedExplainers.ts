@@ -15,6 +15,7 @@ export function useSavedExplainers() {
     queryKey: ["saved-explainers", user?.id],
     enabled: Boolean(user),
     initialData: savedSlugs(user?.user_metadata?.saved_explainer_slugs),
+    initialDataUpdatedAt: 0,
     queryFn: async () => {
       const { data, error } = await withDeadline(() => supabase.auth.getUser(), 15000, "Reading saved guides");
       if (error) throw error;
@@ -27,6 +28,7 @@ export function useSavedExplainers() {
     mutationFn: async ({ slug, userId }: { slug: string; userId: string }) => {
       if (!userId) throw new Error("Sign in to save this guide.");
       if (!editorialExplainers.some(article => article.slug === slug)) throw new Error("This guide is not available to save.");
+      await client.cancelQueries({ queryKey: ["saved-explainers", userId], exact: true });
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       if (sessionError) throw sessionError;
       const session = sessionData.session;

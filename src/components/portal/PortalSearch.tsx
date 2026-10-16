@@ -118,7 +118,7 @@ export default function PortalSearch() {
         <Search className="h-4 w-4" />
       </button>
 
-      <CommandDialog open={open} onOpenChange={setOpen} shouldFilter={false}>
+      <CommandDialog open={open} onOpenChange={setOpen} shouldFilter={false} label="Search portal">
         <CommandInput
           placeholder="Search research, programs, articles, events, cities, members…"
           value={query}

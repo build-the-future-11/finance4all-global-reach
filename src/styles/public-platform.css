@@ -35,3 +35,5 @@
 @media(max-width:767px) { .public-footer { grid-template-columns: 1fr 1fr; } .public-footer>div { grid-column: 1/-1; } .public-editorial-grid { grid-template-columns: 1fr; } }
 @media(max-width:479px) { .public-header { padding: 12px; gap: 4px; } .public-header .ffa-brand { font-size: 13px; gap: 6px; } .public-header .ffa-brand small { display: none; } .public-header .ffa-brand svg { width: 28px; height: 28px; } .public-header-actions { gap: 2px; } .public-join { padding: 8px; font-size: 11px; } .public-join svg { display: none; } .public-footer { padding: 36px 22px; gap: 24px; } }
 @media(prefers-reduced-motion:reduce) { .public-platform *, .public-header *, .public-footer * { animation: none !important; transition: none !important; } }
+
+@media(max-width:359px) { .public-header { padding-inline: 8px; } }

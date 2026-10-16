@@ -5,12 +5,12 @@ test("research filters persist and lead to a substantive evidence record", async
   await page.goto("/research");
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Ask a sharper question");
   await page.getByLabel("Search research", { exact: true }).fill("covariance");
-  await page.getByLabel("Research topic", { exact: true }).selectOption("financial-ml");
-  await page.getByLabel("Evidence status", { exact: true }).selectOption("Repository available");
+  await page.getByRole("combobox", { name: "Research topic", exact: true }).selectOption("financial-ml");
+  await page.getByRole("combobox", { name: "Evidence status", exact: true }).selectOption("Repository available");
   await expect(page.locator("#directory").getByRole("status")).toHaveText("1 record found");
   await page.reload();
   await expect(page.getByLabel("Search research", { exact: true })).toHaveValue("covariance");
-  await expect(page.getByLabel("Research topic", { exact: true })).toHaveValue("financial-ml");
+  await expect(page.getByRole("combobox", { name: "Research topic", exact: true })).toHaveValue("financial-ml");
   await page.locator("#directory").getByRole("link", { name: "Eigen-JEPA: market geometry and regimes", exact: true }).click();
   await expect(page).toHaveURL(/\/research\/projects\/eigen-jepa$/);
   for (const name of ["What the evidence establishes", "Data & provenance", "Baselines & evaluation", "Leakage & falsification controls", "Publication status"]) await expect(page.getByRole("heading", { name, exact: true })).toBeVisible();
@@ -27,7 +27,7 @@ test("research filters persist and lead to a substantive evidence record", async
 
 test("programs preserve held status and distinguish launch interest from registration", async ({ page }, info) => {
   await page.goto("/programs?status=On%20hold&q=investment");
-  await expect(page.getByLabel("Program status", { exact: true })).toHaveValue("On hold");
+  await expect(page.getByRole("combobox", { name: "Program status", exact: true })).toHaveValue("On hold");
   await expect(page.getByRole("status")).toHaveText("1 program found");
   await page.getByRole("link", { name: "Global Investment Model Challenge 2026", exact: true }).click();
   await expect(page).toHaveURL(/\/programs\/investment-model-challenge$/);
@@ -58,10 +58,10 @@ test("public catalogs remain accessible at phone, tablet and desktop widths", as
   const audit = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
   expect(audit.violations.map(item => ({ id: item.id, nodes: item.nodes.map(node => node.target) }))).toEqual([]);
   await page.goto("/programs?status=On%20hold");
-  const status = page.getByLabel("Program status", { exact: true });
+  const status = page.getByRole("combobox", { name: "Program status", exact: true });
   await status.focus();
   await expect(status).toBeFocused();
   await page.keyboard.press("Tab");
-  await expect(page.getByLabel("Sort programs", { exact: true })).toBeFocused();
+  await expect(page.getByRole("combobox", { name: "Sort programs", exact: true })).toBeFocused();
   expect(errors).toEqual([]);
 });

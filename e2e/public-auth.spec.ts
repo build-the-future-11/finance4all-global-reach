@@ -16,9 +16,9 @@ test("public claims stay inside the evidence boundary", async ({ page }) => {
 test("public learning hub and Five Foundations lesson are reachable without authentication", async ({ page }) => {
   await page.goto("/learn");
 
-  await expect(page.getByRole("heading", { name: "Learn the mechanics, not the hype." })).toBeVisible();
-  await expect(page.getByText("No account", { exact: true })).toBeVisible();
-  await page.getByRole("link", { name: "Open lesson" }).click();
+  await expect(page.getByRole("heading", { name: /Build understanding.\s*One question at a time./ })).toBeVisible();
+  await expect(page.getByText(/No account required/)).toBeVisible();
+  await page.getByRole("link", { name: /Open Five Foundations/ }).click();
 
   await expect(page).toHaveURL(/\/learn\/five-foundations$/);
   await expect(page.getByRole("heading", { level: 1, name: "Five Foundations" })).toBeVisible();

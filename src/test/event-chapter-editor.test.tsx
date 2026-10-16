@@ -29,7 +29,7 @@ vi.mock("@/lib/supabase", () => ({ supabase: {
 } }));
 
 const chapter = { id: "84000000-0000-4000-8000-000000000010", name: "Reviewed Rome chapter", city: "Rome", country: "Italy", latitude: 41.9, longitude: 12.5, publication_state: "published", publication_revision: 3, chapter_status: "unverified", accepted_owner: false, permissions_confirmed: false, operating_evidence_url: null, last_activity_at: null };
-const event = { id: "84000000-0000-4000-8000-000000000020", chapter_id: chapter.id, title: "Completed workshop", description: "An existing reviewed workshop.", status: "completed", starts_at: "2026-10-01T12:00:00Z", ends_at: "2026-10-01T13:00:00Z", registration_url: null, program_links: [], event_details: { timezone: "UTC", scheduleState: "confirmed" }, public_listing: false, publication_state: "published", publication_revision: 7 };
+const event: Tables<"events"> = { id: "84000000-0000-4000-8000-000000000020", chapter_id: chapter.id, title: "Completed workshop", description: "An existing reviewed workshop.", status: "completed", starts_at: "2026-10-01T12:00:00Z", ends_at: "2026-10-01T13:00:00Z", created_at: "2026-10-01T00:00:00Z", registration_url: null, program_links: [], event_details: { timezone: "UTC", scheduleState: "confirmed" }, public_listing: false, publication_state: "published", publication_revision: 7 };
 const clients: QueryClient[] = [];
 function mount(content: React.ReactNode) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false, staleTime: Infinity }, mutations: { retry: false } } });
