@@ -48,7 +48,7 @@ const Debriefs = lazy(() => import("@/pages/learn/Debriefs"));
 
 function PortalFallback() {
   return (
-    <main className="min-h-screen bg-[#060a12] text-white" aria-label="Loading page">
+    <main className="min-h-screen bg-background text-foreground" aria-label="Loading page">
       <h1 className="sr-only">Loading page</h1>
       <LoadingState />
     </main>
