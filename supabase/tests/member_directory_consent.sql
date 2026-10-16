@@ -5,16 +5,20 @@ VALUES
  ('b4160000-0000-4000-8000-000000000001', 'directory-a@example.invalid', '{"display_name":"Directory A"}', '{"provider":"email","providers":["email"]}'),
  ('b4160000-0000-4000-8000-000000000002', 'directory-b@example.invalid', '{"display_name":"Directory B"}', '{"provider":"email","providers":["email"]}');
 SET LOCAL ROLE authenticated;
-SELECT set_config('request.jwt.claims', '{"sub":"b4160000-0000-4000-8000-000000000001","role":"authenticated"}', true);
+-- The pinned bare Supabase image reads individual JWT claim settings, as do
+-- the other rollback-only certification suites. Bind the actual RLS identity.
+SELECT set_config('request.jwt.claim.role', 'authenticated', true);
+SELECT set_config('request.jwt.claim.sub', 'b4160000-0000-4000-8000-000000000001', true);
 DO $$ BEGIN
+  IF auth.uid() IS DISTINCT FROM 'b4160000-0000-4000-8000-000000000001'::uuid THEN RAISE EXCEPTION 'Directory certification identity was not bound'; END IF;
   IF NOT EXISTS (SELECT id FROM public.profiles WHERE id = 'b4160000-0000-4000-8000-000000000001') THEN RAISE EXCEPTION 'Owner cannot read own hidden profile'; END IF;
   IF EXISTS (SELECT id FROM public.profiles WHERE id = 'b4160000-0000-4000-8000-000000000002') THEN RAISE EXCEPTION 'Unconsented profile is visible'; END IF;
   UPDATE public.profiles SET directory_visible = true, interests = ARRAY['Economics','Financial Machine Learning'] WHERE id = 'b4160000-0000-4000-8000-000000000002';
   IF FOUND THEN RAISE EXCEPTION 'Cross-member consent update succeeded'; END IF;
 END $$;
-SELECT set_config('request.jwt.claims', '{"sub":"b4160000-0000-4000-8000-000000000002","role":"authenticated"}', true);
+SELECT set_config('request.jwt.claim.sub', 'b4160000-0000-4000-8000-000000000002', true);
 UPDATE public.profiles SET directory_visible = true, interests = ARRAY['Economics','Financial Machine Learning'] WHERE id = 'b4160000-0000-4000-8000-000000000002';
-SELECT set_config('request.jwt.claims', '{"sub":"b4160000-0000-4000-8000-000000000001","role":"authenticated"}', true);
+SELECT set_config('request.jwt.claim.sub', 'b4160000-0000-4000-8000-000000000001', true);
 DO $$ BEGIN
   IF NOT EXISTS (SELECT id FROM public.profiles WHERE id = 'b4160000-0000-4000-8000-000000000002') THEN RAISE EXCEPTION 'Opted-in member missing'; END IF;
   IF NOT EXISTS (SELECT id FROM public.member_directory('eCoNoMiCs') WHERE id = 'b4160000-0000-4000-8000-000000000002') THEN RAISE EXCEPTION 'Case-insensitive interest match missing'; END IF;
@@ -26,9 +30,9 @@ DO $$ BEGIN
     RAISE EXCEPTION 'Directory exposes email';
   EXCEPTION WHEN insufficient_privilege THEN NULL; END;
 END $$;
-SELECT set_config('request.jwt.claims', '{"sub":"b4160000-0000-4000-8000-000000000002","role":"authenticated"}', true);
+SELECT set_config('request.jwt.claim.sub', 'b4160000-0000-4000-8000-000000000002', true);
 UPDATE public.profiles SET directory_visible = false WHERE id = 'b4160000-0000-4000-8000-000000000002';
-SELECT set_config('request.jwt.claims', '{"sub":"b4160000-0000-4000-8000-000000000001","role":"authenticated"}', true);
+SELECT set_config('request.jwt.claim.sub', 'b4160000-0000-4000-8000-000000000001', true);
 DO $$ BEGIN
   IF EXISTS (SELECT id FROM public.profiles WHERE id = 'b4160000-0000-4000-8000-000000000002') OR EXISTS (SELECT id FROM public.member_directory('machine')) THEN RAISE EXCEPTION 'Revoked profile remains visible'; END IF;
 END $$;

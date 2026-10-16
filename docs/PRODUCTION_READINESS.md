@@ -1,6 +1,12 @@
 # Production Readiness
 
-Last reviewed: 2026-10-11
+Last reviewed: 2026-10-16
+
+## Platform expansion candidate — 16 October 2026
+
+Unrestricted member onboarding remains **NO-GO**. [PR 171](https://github.com/build-the-future-11/finance4all-global-reach/pull/171) adds public catalogs, private reading state, event publication controls and opt-in member discovery. Its repository ledger contains **19 migrations**, including `20261016093000_public_event_catalog.sql` and `20261016094000_member_directory_consent.sql`. The frontend requires that reviewed schema before promotion. No production migrations or controlled-account certification were performed in this wave.
+
+See [the current release evidence](RELEASE_EVIDENCE.md) for exact candidate checks, preview status, retained failures and rollout order. Counts, revisions and deployment claims in the 11 October and September sections below remain historical; their 17- and ten-migration references do not describe this candidate.
 
 ## Current release decision — 11 October 2026
 
