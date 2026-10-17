@@ -1,0 +1,288 @@
+{
+  "schema": "finance4all.ci-registry-mirror-verification.v1",
+  "checked_utc": "2026-10-17T15:25:25.084801+00:00",
+  "reviewed_head": "3521d08f391a79a0ea6f2d40d455771f2aa2bdaf",
+  "reason": "The pinned ECR image failed before checkout with toomanyrequests: Data limit exceeded, including one targeted infrastructure retry. Switch only the registry hostname to the official GHCR mirror; retain the exact OCI index digest and every database authorization check.",
+  "failed_run": "https://github.com/build-the-future-11/finance4all-global-reach/actions/runs/39043771115",
+  "failed_retry_job": "https://github.com/build-the-future-11/finance4all-global-reach/actions/runs/39043771115/job/117430068056",
+  "original_image": "public.ecr.aws/supabase/postgres@sha256:28f0e16a019e648089fc1a6d333549a55548f6019c15ae4bd7cd58b989027518",
+  "new_image": "ghcr.io/supabase/postgres@sha256:28f0e16a019e648089fc1a6d333549a55548f6019c15ae4bd7cd58b989027518",
+  "official_mirror_provenance": {
+    "repository": "supabase/postgres",
+    "source_commit": "4f3798200476a30ce833310b5ed175064d6a605a",
+    "path": ".github/workflows/mirror.yml",
+    "git_blob_sha": "e7ca8b2371dc6ce17aed0ce755a122eb372c95a3",
+    "url": "https://github.com/supabase/postgres/blob/4f3798200476a30ce833310b5ed175064d6a605a/.github/workflows/mirror.yml",
+    "behavior": "Official release workflow copies docker.io/supabase/postgres to public.ecr.aws/supabase/postgres and ghcr.io/supabase/postgres."
+  },
+  "verification_method": "Anonymous public OCI Distribution GET requests. Independently SHA-256 hashed response bytes for the pinned index, selected linux/amd64 image manifest and config blob on each official registry. No user account credentials were accessed.",
+  "identity": {
+    "index_digest": "sha256:28f0e16a019e648089fc1a6d333549a55548f6019c15ae4bd7cd58b989027518",
+    "linux_amd64_manifest_digest": "sha256:fc542c31f334749adbbd3c9e16b6be90f17d0fe6460d5196066d73f2723c9ecf",
+    "linux_amd64_config_digest": "sha256:81c6dd7dfc77117c0932097c0c1aef887991035c963ee9b5cb4d08a51caf566a",
+    "identical_layer_count": 29,
+    "content_identity": "All three OCI index responses, linux/amd64 manifest responses and config responses hash to their exact pinned digests. Every layer digest and size is identical and transitively bound by the selected image manifest; bulk layer payloads were not downloaded locally."
+  },
+  "observations": {
+    "results": [
+      {
+        "registry": "ecr",
+        "url": "https://public.ecr.aws/v2/supabase/postgres/manifests/sha256:28f0e16a019e648089fc1a6d333549a55548f6019c15ae4bd7cd58b989027518",
+        "status": 200,
+        "content_type": "application/vnd.oci.image.index.v1+json",
+        "reported_digest": null,
+        "actual_digest": "sha256:28f0e16a019e648089fc1a6d333549a55548f6019c15ae4bd7cd58b989027518",
+        "exact_digest_match": true,
+        "architecture": null,
+        "os": null
+      },
+      {
+        "registry": "dockerhub",
+        "url": "https://registry-1.docker.io/v2/supabase/postgres/manifests/sha256:28f0e16a019e648089fc1a6d333549a55548f6019c15ae4bd7cd58b989027518",
+        "status": 200,
+        "content_type": "application/vnd.oci.image.index.v1+json",
+        "reported_digest": "sha256:28f0e16a019e648089fc1a6d333549a55548f6019c15ae4bd7cd58b989027518",
+        "actual_digest": "sha256:28f0e16a019e648089fc1a6d333549a55548f6019c15ae4bd7cd58b989027518",
+        "exact_digest_match": true,
+        "architecture": null,
+        "os": null
+      },
+      {
+        "registry": "ghcr",
+        "url": "https://ghcr.io/v2/supabase/postgres/manifests/sha256:28f0e16a019e648089fc1a6d333549a55548f6019c15ae4bd7cd58b989027518",
+        "status": 200,
+        "content_type": "application/vnd.oci.image.index.v1+json",
+        "reported_digest": "sha256:28f0e16a019e648089fc1a6d333549a55548f6019c15ae4bd7cd58b989027518",
+        "actual_digest": "sha256:28f0e16a019e648089fc1a6d333549a55548f6019c15ae4bd7cd58b989027518",
+        "exact_digest_match": true,
+        "architecture": null,
+        "os": null
+      }
+    ],
+    "linux_amd64_manifest": [
+      {
+        "registry": "ecr",
+        "url": "https://public.ecr.aws/v2/supabase/postgres/manifests/sha256:fc542c31f334749adbbd3c9e16b6be90f17d0fe6460d5196066d73f2723c9ecf",
+        "status": 200,
+        "content_type": "application/vnd.oci.image.manifest.v1+json",
+        "reported_digest": null,
+        "actual_digest": "sha256:fc542c31f334749adbbd3c9e16b6be90f17d0fe6460d5196066d73f2723c9ecf",
+        "exact_digest_match": true,
+        "architecture": null,
+        "os": null
+      },
+      {
+        "registry": "dockerhub",
+        "url": "https://registry-1.docker.io/v2/supabase/postgres/manifests/sha256:fc542c31f334749adbbd3c9e16b6be90f17d0fe6460d5196066d73f2723c9ecf",
+        "status": 200,
+        "content_type": "application/vnd.oci.image.manifest.v1+json",
+        "reported_digest": "sha256:fc542c31f334749adbbd3c9e16b6be90f17d0fe6460d5196066d73f2723c9ecf",
+        "actual_digest": "sha256:fc542c31f334749adbbd3c9e16b6be90f17d0fe6460d5196066d73f2723c9ecf",
+        "exact_digest_match": true,
+        "architecture": null,
+        "os": null
+      },
+      {
+        "registry": "ghcr",
+        "url": "https://ghcr.io/v2/supabase/postgres/manifests/sha256:fc542c31f334749adbbd3c9e16b6be90f17d0fe6460d5196066d73f2723c9ecf",
+        "status": 200,
+        "content_type": "application/vnd.oci.image.manifest.v1+json",
+        "reported_digest": "sha256:fc542c31f334749adbbd3c9e16b6be90f17d0fe6460d5196066d73f2723c9ecf",
+        "actual_digest": "sha256:fc542c31f334749adbbd3c9e16b6be90f17d0fe6460d5196066d73f2723c9ecf",
+        "exact_digest_match": true,
+        "architecture": null,
+        "os": null
+      }
+    ],
+    "linux_amd64_config": [
+      {
+        "registry": "ecr",
+        "url": "https://public.ecr.aws/v2/supabase/postgres/blobs/sha256:81c6dd7dfc77117c0932097c0c1aef887991035c963ee9b5cb4d08a51caf566a",
+        "status": 200,
+        "content_type": "application/octet-stream",
+        "reported_digest": null,
+        "actual_digest": "sha256:81c6dd7dfc77117c0932097c0c1aef887991035c963ee9b5cb4d08a51caf566a",
+        "exact_digest_match": true,
+        "architecture": "amd64",
+        "os": "linux"
+      },
+      {
+        "registry": "dockerhub",
+        "url": "https://registry-1.docker.io/v2/supabase/postgres/blobs/sha256:81c6dd7dfc77117c0932097c0c1aef887991035c963ee9b5cb4d08a51caf566a",
+        "status": 200,
+        "content_type": "application/octet-stream",
+        "reported_digest": null,
+        "actual_digest": "sha256:81c6dd7dfc77117c0932097c0c1aef887991035c963ee9b5cb4d08a51caf566a",
+        "exact_digest_match": true,
+        "architecture": "amd64",
+        "os": "linux"
+      },
+      {
+        "registry": "ghcr",
+        "url": "https://ghcr.io/v2/supabase/postgres/blobs/sha256:81c6dd7dfc77117c0932097c0c1aef887991035c963ee9b5cb4d08a51caf566a",
+        "status": 200,
+        "content_type": "application/octet-stream",
+        "reported_digest": null,
+        "actual_digest": "sha256:81c6dd7dfc77117c0932097c0c1aef887991035c963ee9b5cb4d08a51caf566a",
+        "exact_digest_match": true,
+        "architecture": "amd64",
+        "os": "linux"
+      }
+    ]
+  },
+  "selected_layer_descriptors": [
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:e6f31ffc071e5560b82a8685fba8214954e5721e3e49269d00958316edbe89fe",
+      "size": 3844421
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:4816f2085dc3b1b673ee4ab0d890f591429f69291cb1a52ef5b5d89ea9630635",
+      "size": 4385091
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:5dc68b1acf514c34c08bca3404cc43a77f5d80f0f61754912011f50e075aacda",
+      "size": 1022
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:622a75c3aad4c82dae072bab6cdf251c6a76a4527f2b71da0c6233dc40177343",
+      "size": 360595065
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:e733eb89dc5d760e105bdb462f85657c4e5735cbde7a6f5e3f7edbcc950991ff",
+      "size": 77890
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:b5c055a53a29ba2834983d6de8f099baaa75651b7f03103bf07deee237a32f18",
+      "size": 814068
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:de155361b3399e8b2a8ddd80f0babf579673421817c7ef962c8edb9a33057aab",
+      "size": 296
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:ba6e4ed5f64fb7b99c9749722d7496177e6069d1e36db5a686d51fcf77312439",
+      "size": 3212
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:753ec53a43d528bc9a4233ee1b590c23d25998d4da99ee393f4b2bfd243a3690",
+      "size": 1031
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:23f574a925bf4945e208bafd91f08543b7eae572ad0a2d51efe456c876e6fb37",
+      "size": 2370
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:782b84fd67dfe2318bac29ff0efb5a0c8dd7ace484860c2b9d2e86ee22dbaa64",
+      "size": 8537
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:d59fb9edf862b99a54de2a2322818a3117a2eb74139ac0331b3dca41d5281aba",
+      "size": 1994
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:6aa1b655ba9fd5cacc490f511430a1be958c335e220c8e14820a8614fcacbaf7",
+      "size": 1017
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:a20c7d9fd3963a7a9ef86b49fce5bb852308673c3bc0099040c44cd0254669f7",
+      "size": 352
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:5b1cd4d117f863dcd03831e7f7858568d8367f7fe0ec980da46be6b010bf0de1",
+      "size": 277
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:33a6ab621c2165c78f8aec326759d9ba65147771976ef8ed917b2782e6ebd6b9",
+      "size": 1609
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:cb9ce6281bc11db1edf51ba7cd1ed965eab9bb3056cdbdc102eb473da4744e92",
+      "size": 3878
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:d055522c59783e7e6d534527bded805e752a74a0206f2bd7862077425f9c9f80",
+      "size": 361
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:c6616e1dace05a84decfc8b60f871e041ae541d2672c27d5edacd2d6b3063b1d",
+      "size": 390
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:2897e8a71341cc5c8838a1bad579d59d27fb28b8fd9a255b1ac4f8cc23bf83a4",
+      "size": 335
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:34eb06d3d2a826f174e6e123af488bc6a220a53640b591047baab528589dd777",
+      "size": 398
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:6a1e93e646cbccae363417cb965c546d658c6baa53c662f5e71012c919de477e",
+      "size": 635
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:2257e3a0ac1dd08531b3afb919a60e189e75e7b6a54f695a0a34f7a18217ba66",
+      "size": 8631
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:8a1eeea57502a6605594c630bcea7a5c9dabb4d02245becc5f3e6a320ff38a0d",
+      "size": 9870
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:942b358a87cca698fdadb4267a6cb4687686008b60e736bb8c099f45964baf38",
+      "size": 13916
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:c441bf744145fcd91c3feef95a6ff47133cb35d3517e676cf137dae2b211f379",
+      "size": 524
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:cd4fb4ecd8d50f583645a0793167d45ecefbd8a490f9ee5c78de6667b58c29cd",
+      "size": 274
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:358c1e4decdab8b09d74a07920a508d9c8076b5464fee9fc0d534359d84dfd7e",
+      "size": 5283
+    },
+    {
+      "mediaType": "application/vnd.oci.image.layer.v1.tar+gzip",
+      "digest": "sha256:a014880b262f5e38ecd0519af1f6118ee2112975efb8e16fd8d035bcfa21d419",
+      "size": 314
+    }
+  ],
+  "local_scope": "Registry identity and two-line workflow diff only. Bulk image layers and a database container were not executed locally.",
+  "remaining_validation": "A fresh exact-head hosted CI run must pull the same pinned image through GHCR, verify its resolved digest, replay migrations and pass every existing account lifecycle/RLS/intake/collaboration/publication/abuse certification. Full verify, public QA and audit remain required.",
+  "changelog_review": "Supabase changelog scanned on the recorded date. This change upgrades no Postgres, extension, client or schema version; reported database-version and API breaking changes are outside this hostname-only repair.",
+  "production_database_modified": false,
+  "live_account_actions": false,
+  "authorization_gates_changed": false,
+  "workflow_before_sha256": "e0c30ca320e507a6b3857e8e633a3d22702accda05b8fdb4374d81366faaabc7",
+  "workflow_after_sha256": "210a4c39c1f9343316490af367197a4a549f45f09b3aacadac16e5e88c23b519"
+}
