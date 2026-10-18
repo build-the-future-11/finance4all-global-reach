@@ -36,7 +36,7 @@ describe("content depth and claim boundaries", () => {
   });
 
   it("links IYERN to its integrated portal and other records to their public project pages", () => {
-    expect(portfolioProjects).toHaveLength(12);
+    expect(portfolioProjects).toHaveLength(14);
     for (const project of portfolioProjects.filter(project => project.id !== "iy-ern")) {
       expect(project.page).toBe(`/research/projects/${project.id}`);
     }

@@ -84,9 +84,9 @@ describe("program lifecycle and verified actions", () => {
     expect(screen.getByText(/does not accept an entry/)).toBeVisible();
     expect(screen.getByText("Not announced")).toBeVisible();
   });
-  it("does not claim journal publication or a confirmed December deadline", () => {
+  it("labels the December target without claiming publication is complete", () => {
     show("/programs/iyer-journal");
-    expect(screen.getByText(/December 1, 2026 is an unresolved planning milestone/)).toBeVisible();
+    expect(screen.getByText(/Inaugural edition target: December 1, 2026/)).toBeVisible();
     expect(screen.getByText(/Submission is not publication or acceptance/)).toBeVisible();
   });
   it("renders an embedded member directory without a duplicate public navigation", () => {

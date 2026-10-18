@@ -133,6 +133,24 @@ const portfolioProjectRecords: Omit<PortfolioProject, "page">[] = [
     tags: ["filings", "valuation", "scenario analysis"],
     evidence: "Needs common rubric, conflict policy, reviewers, and publication standard",
   },
+  {
+    id: "causal-financial-modeling",
+    title: "Causal financial modeling",
+    description: "A developing research lane for questions about causes, interventions, and financial or economic outcomes, with explicit identification assumptions and sensitivity checks.",
+    status: "Proposed",
+    domain: "Causal inference",
+    tags: ["causal inference", "econometrics", "policy evaluation"],
+    evidence: "Needs a frozen question, defensible identification strategy, negative controls, data provenance, and independent review",
+  },
+  {
+    id: "priormoves",
+    title: "PriorMoves independent evaluation",
+    description: "An independent evaluation project designed to test submitted claims against a frozen protocol, preserved outputs, comparator checks, and a clear external-evidence boundary.",
+    status: "Proposed",
+    domain: "Independent evaluation",
+    tags: ["evaluation", "reproducibility", "research integrity"],
+    evidence: "Project scope is reported; no completed evaluation receipt or independent result is published here",
+  },
 ];
 
 export const portfolioProjects: PortfolioProject[] = portfolioProjectRecords.map((project) => ({

@@ -2,7 +2,7 @@
 
 ## Implementation and source boundary
 
-The canonical portal now owns `/research` and `/research/projects/:slug`. `src/content/research.ts` extends the 12 records in `catalog.ts` with four operating research lanes. The legacy portfolio now links to local detail pages; IYERN retains its integrated `/iyern` destination. No private member project or manuscript is copied into this public catalog.
+The canonical portal now owns `/research` and `/research/projects/:slug`. `src/content/research.ts` extends the 14 records in `catalog.ts` with four operating research lanes. The legacy portfolio now links to local detail pages; IYERN retains its integrated `/iyern` destination. No private member project or manuscript is copied into this public catalog.
 
 The directory supports URL-preserved search, ten topic filters, evidence-status filters, title/evidence-date sorting, topic tags, featured records and empty-state recovery. Every detail has a question/objective, method, design, data provenance, baseline, measures, controls, findings/limitations, publication boundary, source date and participation route. Proposed methods and measures are explicitly prospective. The catalog review date does not replace the date of underlying evidence.
 
@@ -12,7 +12,7 @@ The directory supports URL-preserved search, ten topic filters, evidence-status 
 | Repository available | 1 | Eigen-JEPA |
 | Repository record; current remote read unavailable | 1 | EigenFinance |
 | Research infrastructure | 3 | FinanceMeta Global, IYERN, member platform |
-| Proposed study | 6 | LGWM, market memory/Finimmunity, student cost of living, digital payments, youth expectations, company/sector research |
+| Proposed study | 8 | LGWM, market memory/Finimmunity, student cost of living, digital payments, youth expectations, company/sector research, causal financial modeling, PriorMoves independent evaluation |
 | On hold | 4 | Backtest falsification, Open Markets, quantitative markets/forecasting, financial systems/access/policy |
 | Authorized journal articles / preprints | 0 / 0 | Existing authorization filter and empty archive retained |
 
@@ -30,8 +30,8 @@ The ten discovery topics map to the existing four IDs in `src/content/iyern.ts`.
 ## Discrepancies preserved
 
 1. FI-JEPA's local registry records a bounded NumPy synthetic baseline; the separate public repository describes a broader PyTorch package. The project page names both scopes and does not merge their receipts or infer real-market evidence.
-2. Existing IYERN copy advertised universal mentorship, DOI setup and December 1 as an issue date. The newer consolidated intake promises neither mentorship nor DOI; the launch kit explicitly flags December 1 as an unresolved issue-date/submission-cutoff conflict. Copy now presents both dates as unconfirmed. The old journal form still contains stronger claims, so the journal CTA uses the newer consolidated screening intake.
-3. The prior NetworkStory described 500+ researchers, 30 countries, 250+ summer participants, named chapter partnerships, member affiliations and Synthica/YEL summer activity. No supporting membership/permission/delivery receipt was available in this reconciliation. The launch kit describes YEL discussions as exploratory for the upcoming challenge. These claims were removed from the public narrative without declaring that the historical activities did not occur. They require separate evidence before reintroduction.
+2. The inaugural IYERJ edition now carries an organizer-provided target of December 1, 2026. The manuscript cutoff, reviewer capacity, accepted-paper completion and final publication authorization remain open, and the site does not promise mentorship, DOI or acceptance.
+3. The organizer reports a 500+ researcher ecosystem. The site labels that figure as organizer-reported because no permission-cleared public roster is attached. YEFA, FFI, YIS, YEL and NSRI are described only as a collaboration pipeline or discussions until written scope and delivered or accepted work support formal partnership language.
 4. The launch-kit preprint labels differ from the portal's established four category labels. Existing canonical IDs and authorization rules are retained; discovery mapping is separate from an editorial migration.
 
 ## Publication and participation controls
@@ -44,4 +44,4 @@ General interest links do not create project membership. Private applications, i
 
 Regression coverage is in `src/test/research-programs.test.tsx`, with existing IYERN and content-depth tests updated for conservative timeline/intake language and local detail routes. It checks taxonomy mapping, combined filters, unavailable routes, project-to-program references, detail evidence sections, draft-form exclusion and lifecycle-safe CTAs. Integrated command results and browser evidence belong in `RELEASE_EVIDENCE.md`.
 
-Open gates: current EigenFinance source verification; exact result receipts and independent reproduction for scientific claims; author/publication permissions; editorial/reviewer capacity; December 1 clarification; authenticated production journey and hosted RLS certification. A website build closes none of these research or production gates.
+Open gates: current EigenFinance source verification; exact result receipts and independent reproduction for scientific claims, including PriorMoves; author/publication permissions; editorial/reviewer capacity and final journal publication readiness; authenticated production journey and hosted RLS certification. A website build closes none of these research or production gates.

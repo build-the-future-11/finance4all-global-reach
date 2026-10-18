@@ -43,7 +43,7 @@ Before frontend promotion, verify the canonical live database target and ledger,
 
 Unrestricted onboarding remains **NO-GO** until the existing production readiness controls are satisfied: canonical target/ledger, live controlled-account and admin/RLS certification, email/OAuth/session paths, consent/safeguarding review, publication approval, verified environment, exact-SHA hosted evidence, accessibility/performance and backup/rollback. Public health and fixture browser tests do not satisfy those controls. No production database migration or promotion is authorized by this receipt.
 
-Content gates remain independent: authentic official logo source; Substack archive access and editorial approval for held manuscripts; EigenFinance current source availability; research reproduction and author permissions; confirmed event dates/owners; operating evidence for chapters; program staffing/rules and the conflicting December 1 milestone. Their absence does not prevent reviewing this implementation.
+Content gates remain independent: authentic official logo source; Substack archive access and editorial approval for held manuscripts; EigenFinance current source availability; research reproduction and author permissions; confirmed event dates/owners; operating evidence for chapters and regional networks; competition staffing/rules; journal editorial readiness for the December 1 target; and formal confirmation of named partnership discussions. Their absence does not prevent reviewing this implementation.
 
 
 ## Exact-digest Supabase registry mirror — 16 October 2026

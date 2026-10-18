@@ -4,7 +4,7 @@
 
 The public registry is `src/content/programs.ts`, rendered at `/programs` and `/programs/:slug`. It also supports an embedded member directory through `<Programs embedded />`. Public content is shared; account applications, accepted participation and saved records are not inferred from it. Query parameters preserve search, family, lifecycle and sort selections.
 
-There are **22 consolidated program records**: 2 Active, 9 Interest open, 3 Applications open, 6 On hold, 2 Planned; none are claimed Completed or Archived. “Applications open” is qualified as initial manuscript/editorial screening for these three records, not an operational cohort. Active means open learning resources or the bounded Labs division; neither means unrestricted onboarding is certified.
+There are **23 consolidated program records**: 2 Active, 10 Interest open, 3 Applications open, 6 On hold, 2 Planned; none are claimed Completed or Archived. “Applications open” is qualified as initial manuscript/editorial screening for these three records, not an operational cohort. Active means open learning resources or the bounded Labs division; neither means unrestricted onboarding is certified.
 
 | Slug | Program | Lifecycle | Public action |
 | --- | --- | --- | --- |
@@ -27,6 +27,7 @@ There are **22 consolidated program records**: 2 Active, 9 Interest open, 3 Appl
 | fintech-studio | FinTech Studio / Point-in-Time Market Data Integrity Toolkit | On hold | Contributor interest |
 | axiom-pathways | Axiom Pathways | Planned | Member opportunity board |
 | debriefed-contributors | Finance Debriefed contributors | Applications open | Editorial proposal screening |
+| regional-research-networks | European & Gulf Finance Research Networks | Interest open | Contributor and project matching interest |
 | union-collaborations | The Union / scoped industry collaborations | Interest open | Collaboration proposal |
 | mentors-and-leadership | Mentors / speakers / program contributors | Interest open | Bounded contribution interest |
 | queued-directions | SISTER, Zenipath, podcast, additional competitions, venture directions | Planned | No advertised intake |
@@ -56,7 +57,7 @@ Connected Tally `list_forms` on 2026-10-16 returned metadata for the available w
 
 Sources: existing portal catalog, sibling FinanceMeta-Global program registry, sibling FinanceMeta-Landing program architecture, [canonical operating plan](https://docs.google.com/document/d/1BTYxWzEp-hwP4Gtlqi7sCi5fFx4hV2VK-cV6w_0hiJc/edit), [October launch kit](https://docs.google.com/document/d/1K1q9R0KbJL2vXAtpRIUbTzD_zpxGvF0scoTBVGJsz6E/edit), and the live Tally metadata/ledgers above. Later current form state supersedes draft-list assumptions only for availability, never for staffing or operating readiness.
 
-The December 1 journal conflict, author permissions, reviewer capacity, protected publication state, exact program dates and production member certification remain explicit gates. This registry makes no prize, DOI, ISSN, acceptance, faculty placement, partner or return guarantee.
+The inaugural journal edition targets December 1, 2026. Author permissions, reviewer capacity, editorial readiness, the final publication date, exact competition dates and production member certification remain explicit gates. This registry makes no prize, DOI, ISSN, acceptance, faculty placement, partner or return guarantee.
 
 ## Events
 

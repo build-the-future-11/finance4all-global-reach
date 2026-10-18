@@ -23,7 +23,7 @@ describe("IYERN public portal", () => {
     expect(screen.getByRole("link", { name: /Submit for journal screening/ })).toHaveAttribute("href", "https://tally.so/r/kbayyj");
     expect(screen.getByRole("link", { name: /Submit a preprint/ })).toHaveAttribute("href", "https://tally.so/r/RGXXLJ?utm_source=member_portal&utm_medium=website&fm_route=forum&fm_version=conversion-v1");
     expect(screen.getByRole("heading", { name: /FinanceMeta Labs/ })).toBeVisible();
-    expect(screen.getByText("First-issue date and manuscript cutoff: not confirmed.")).toBeVisible();
+    expect(screen.getByText(/Inaugural edition target: 1 December 2026/)).toBeVisible();
     expect(screen.queryByText(/Mentorship is offered for every submitted paper/)).not.toBeInTheDocument();
   });
   it("restores URL filters, updates them and clears the empty result", () => {

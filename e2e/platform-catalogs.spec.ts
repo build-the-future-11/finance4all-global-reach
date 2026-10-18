@@ -40,7 +40,7 @@ test("programs preserve held status and distinguish launch interest from registr
   await expect(page.getByText(/Acceptance, project assignment, chapter approval and publication decisions are separate/)).toBeVisible();
   await page.screenshot({ path: info.outputPath("held-program-detail.png"), fullPage: true });
   await page.goto("/programs/iyer-journal");
-  await expect(page.getByText(/December 1, 2026 is an unresolved planning milestone/)).toBeVisible();
+  await expect(page.getByText(/Inaugural edition target: December 1, 2026/)).toBeVisible();
   await expect(page.getByText(/Submission is not publication or acceptance/)).toBeVisible();
 });
 

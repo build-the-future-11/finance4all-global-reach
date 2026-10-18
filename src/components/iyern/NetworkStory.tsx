@@ -5,7 +5,7 @@ export default function NetworkStory() {
   return <div className="iy-story">
     <section className="story-section" id="network" aria-labelledby="network-heading">
       <div className="story-heading"><p className="story-kicker">01 / A network built around inquiry</p><h2 id="network-heading">Good questions travel.<br /><em>Research grows together.</em></h2></div>
-      <div className="story-prose"><p>The International Youth Economics Research Network connects emerging researchers with working papers, methods and careful discussion. A useful research community makes questions easier to examine and gives authors room to revise their work.</p><p>Within FinanceMeta, Labs organizes research, Finance4All supports financial education, and IYERN provides a publication pathway. A member account, research application and published manuscript are distinct records.</p></div>
+      <div className="story-prose"><p>The International Youth Economics Research Network connects emerging researchers with working papers, methods and careful discussion. FinanceMeta reports an ecosystem of 500+ researchers across quantitative finance, economics, investment modeling and financial education; that organizer-reported figure is shown without an attached public roster.</p><p>Within FinanceMeta, Labs organizes research, Finance4All supports financial education, and IYERN provides a publication pathway. A member account, research application and published manuscript are distinct records.</p></div>
     </section>
     <section className="story-section" id="cohort" aria-labelledby="cohort-heading">
       <div className="story-heading"><p className="story-kicker">02 / Develop the researcher</p><h2 id="cohort-heading">From interest<br /><em>to a scoped question.</em></h2></div>
@@ -18,7 +18,7 @@ export default function NetworkStory() {
     </section>
     <section className="story-section story-connections" id="community" aria-labelledby="community-heading">
       <div className="story-heading"><p className="story-kicker">04 / Participation with purpose</p><h2 id="community-heading">A contribution,<br /><em>with clear expectations.</em></h2></div>
-      <div className="story-prose"><p>Researchers, editors, reviewers, educators and local organizers contribute in different ways. Every activated role needs a scope, accountable owner and useful artifact.</p><p>Chapter activation requires local permission and verified activity. Institutional relationships are described only when their scope is documented; a contact, individual affiliation or interest form is not an endorsement.</p><Link className="story-link" to="/programs">Explore programs and participation <span aria-hidden="true">→</span></Link></div>
+      <div className="story-prose"><p>Researchers, editors, reviewers, educators and local organizers contribute in different ways. European and Gulf Finance Research Networks are being developed to turn regional interest into scoped projects and accountable working teams.</p><p>Chapter or network activation requires local permission, named owners and verified activity. Institutional relationships are described only when their scope is documented; a contact, individual affiliation or interest form is not an endorsement.</p><Link className="story-link" to="/programs/regional-research-networks">Explore regional network development <span aria-hidden="true">→</span></Link></div>
     </section>
   </div>;
 }
