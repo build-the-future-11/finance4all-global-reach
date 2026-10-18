@@ -63,6 +63,21 @@
 .ffa-timeline h3 { font-size: 16px; font-weight: 600; margin-top: 22px; }
 .ffa-timeline p { font-size: 14px; line-height: 1.8; color: hsl(var(--muted-foreground)); margin-top: 12px; }
 .ffa-history-note { color: hsl(var(--muted-foreground)); margin-top: 32px !important; font-size: 14px; line-height: 1.8; }
+.ffa-ecosystem { background:#153d30; color:#f4f8ed; max-width:none; }
+.ffa-ecosystem .ffa-section-heading p { color:#c0d1c3; }
+.ffa-ecosystem .ffa-text-link { color:#d9ff8a; }
+.ffa-ecosystem-scale { display:grid; grid-template-columns:1fr 1fr; border:1px solid #d9e8d52e; border-radius:14px; overflow:hidden; }
+.ffa-ecosystem-scale>div { padding:clamp(28px,4vw,52px); }
+.ffa-ecosystem-scale>div+div { border-left:1px solid #d9e8d52e; }
+.ffa-ecosystem-scale span { display:block; font-size:10px; color:#aebfaf; letter-spacing:.13em; text-transform:uppercase; }
+.ffa-ecosystem-scale strong { display:block; margin-top:18px; font:400 clamp(2.7rem,5vw,5.3rem)/1 Georgia,serif; letter-spacing:-.05em; color:#d9ff8a; }
+.ffa-ecosystem-scale p { max-width:48ch; margin-top:13px; color:#c5d5c7; font-size:13px; line-height:1.75; }
+.ffa-ecosystem-summary { display:grid; grid-template-columns:repeat(3,1fr); margin-top:26px; border-top:1px solid #d9e8d52e; border-left:1px solid #d9e8d52e; }
+.ffa-ecosystem-summary article { padding:28px; border-right:1px solid #d9e8d52e; border-bottom:1px solid #d9e8d52e; }
+.ffa-ecosystem-summary article>span { font:400 2.8rem/1 Georgia,serif; color:#d9ff8a; }
+.ffa-ecosystem-summary h3 { margin-top:14px; font-size:17px; }
+.ffa-ecosystem-summary p { margin-top:10px; color:#b9cbbd; font-size:12px; line-height:1.7; }
+.ffa-ecosystem-boundary { max-width:760px; margin-top:22px!important; color:#aec1b2; font-size:11px; line-height:1.7; }
 .ffa-programs { padding-top: 80px; }
 .ffa-flagship { display: grid; grid-template-columns: 1.1fr 1fr; gap: 70px; padding: 50px; border-radius: 16px; align-items: center; }
 .ffa-flagship h3 { font-family: var(--ffa-serif); font-size: clamp(34px,3.7vw,51px); font-weight: 400; letter-spacing: -1.8px; line-height: 1.14; margin-top: 20px; }
@@ -214,3 +229,4 @@
   .ffa-community-bottom { flex-direction: column; gap: 14px; } .membership-preview { grid-template-columns: 1fr; } .preview-sidebar { display: none; } .preview-main { padding: 27px; } .preview-main h3 { font-size: 36px; } .preview-feature { padding: 18px; gap: 14px; } .preview-feature span { font-size: 23px; } .preview-row { font-size: 12px; } .ffa-member-benefits { gap: 12px 20px; font-size: 11px; } .ffa-reading-grid { grid-template-columns: 1fr; gap: 35px; } .ffa-reading-art { height: 230px; } .ffa-reading-grid h3 { font-size: 29px; } .ffa-contact { margin: 12px; padding: 60px 22px; } .ffa-contact h2 { font-size: 10vw; } .ffa-contact .ffa-button { padding: 14px 18px; font-size: 13px; gap: 13px; } .ffa-contact-addresses { flex-direction: column; } .ffa-footer { padding: 45px 24px 105px; gap: 35px 24px; } .ffa-footer > div:first-child { grid-column: 1/-1; } .ffa-dock { bottom: 12px; }
 }
 @media(prefers-reduced-motion:reduce) { html { scroll-behavior: auto; } .ffa-marquee > div { animation: none; flex-wrap: wrap; width: auto; } .ffa-marquee-copy { flex-wrap: wrap; justify-content: center; padding: 0 24px; gap: 22px; } .ffa-marquee-copy[aria-hidden="true"] { display: none; } .ffa-dock a, .ffa-button, .ffa-reading-art > span { transition: none; } }
+@media(max-width:650px) { .ffa-ecosystem-scale,.ffa-ecosystem-summary { grid-template-columns:1fr; } .ffa-ecosystem-scale>div+div { border-left:0; border-top:1px solid #d9e8d52e; } }

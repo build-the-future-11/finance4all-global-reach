@@ -10,7 +10,7 @@ for (const width of [390, 768, 1440]) {
       await page.route("**/rest/v1/rpc/public_event_catalog", route => route.fulfill({ status: 200, contentType: "application/json", body: "[]" }));
       const errors: string[] = [];
       page.on("pageerror", error => errors.push(error.message));
-      for (const path of ["/research", "/programs", "/debriefed", "/chapters", "/events", "/learn", "/about"]) {
+      for (const path of ["/ecosystem", "/research", "/programs", "/debriefed", "/chapters", "/events", "/learn", "/about"]) {
         await page.goto(path);
         await expect(page.getByRole("main", { name: "Loading page" })).toBeHidden();
         await expect(page.locator("#public-content").getByRole("heading", { level: 1 })).toBeVisible();

@@ -16,6 +16,7 @@ describe("public platform discovery", () => {
     }
     expect(sitemap).not.toContain("vercel.app/portal");
     expect(sitemap).not.toContain("before-the-backtest");
+    expect(sitemap).toContain("/ecosystem</loc>");
   });
   it("finds research, programs, source text and city destinations without exposing drafts", () => {
     expect(publicSearch("Eigen-JEPA").some(result => result.href === "/research/projects/eigen-jepa")).toBe(true);
@@ -23,6 +24,7 @@ describe("public platform discovery", () => {
     expect(publicSearch("Milan").some(result => result.href === "/chapters?city=milan")).toBe(true);
     expect(publicSearch("APR").some(result => result.type === "resource")).toBe(true);
     expect(publicSearch("Before the Backtest")).toEqual([]);
+    expect(publicSearch("YEFA").some(result => result.href === "/ecosystem")).toBe(true);
     expect(publicSearch("Why bond prices fall").some(result => result.title === "Why bond prices fall when yields rise")).toBe(false);
     expect(publicSearch("*")).toEqual([]);
   });
@@ -35,6 +37,7 @@ describe("public platform discovery", () => {
     expect(trigger).toHaveAttribute("aria-expanded", "false");
     expect(trigger).toHaveFocus();
     expect(screen.getByRole("navigation", { name: "Main navigation" })).toHaveTextContent("Finance Debriefed");
+    expect(screen.getByRole("navigation", { name: "Main navigation" })).toHaveTextContent("Ecosystem");
     expect(document.title).toBe("Programs · Finance for All");
     expect(document.querySelector('meta[name="description"]')).toHaveAttribute("content", "Find a useful next step.");
   });

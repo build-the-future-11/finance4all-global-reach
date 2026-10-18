@@ -47,7 +47,7 @@ test("programs preserve held status and distinguish launch interest from registr
 test("public catalogs remain accessible at phone, tablet and desktop widths", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", error => errors.push(error.message));
-  for (const route of ["/research", "/research/projects/fi-jepa", "/programs", "/programs/fintech-studio"]) {
+  for (const route of ["/ecosystem", "/research", "/research/projects/fi-jepa", "/programs", "/programs/fintech-studio"]) {
     await page.goto(route);
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     for (const width of [320, 768, 1440]) {

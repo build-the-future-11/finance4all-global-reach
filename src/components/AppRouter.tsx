@@ -36,6 +36,7 @@ const IntakeReview = lazy(() => import("@/pages/portal/IntakeReview"));
 const Research = lazy(() => import("@/pages/Research"));
 const Programs = lazy(() => import("@/pages/Programs"));
 const About = lazy(() => import("@/pages/About"));
+const Ecosystem = lazy(() => import("@/pages/Ecosystem"));
 const Chapters = lazy(() => import("@/pages/Chapters"));
 const Events = lazy(() => import("@/pages/Events"));
 const MemberEventDetail = lazy(() => import("@/pages/EventDetail").then(module => ({ default: module.MemberEventDetail })));
@@ -76,6 +77,7 @@ function AppRoutes() {
           <Route path="/programs" element={<Programs />} />
           <Route path="/programs/:slug" element={<Programs />} />
           <Route path="/about" element={<About />} />
+          <Route path="/ecosystem" element={<Ecosystem />} />
           <Route path="/chapters" element={<Chapters />} />
           <Route path="/events" element={<Events />} />
           <Route path="/events/:slug" element={<EventDetail />} />

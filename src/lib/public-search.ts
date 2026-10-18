@@ -13,6 +13,7 @@ export function publicSearch(query: string): SearchResult[] {
     ...publishedDebriefedArticles.map(article => ({ id: `guide-${article.slug}`, type: "explainer" as const, title: article.title, subtitle: `${article.readMinutes} min · Finance Debriefed`, href: `/debriefed/${article.slug}`, text: `${article.summary} ${article.topics.join(" ")} ${article.body}` })),
     ...communityLocations.map(city => ({ id: `city-${city.id}`, type: "chapter" as const, title: `${city.city}, ${city.country}`, subtitle: chapterStatuses[city.status ?? "unverified"], href: `/chapters?city=${encodeURIComponent(city.id)}`, text: city.continent })),
     { id: "five-foundations", type: "resource", title: "Five Foundations", subtitle: "Free financial literacy lesson", href: "/learn/five-foundations", text: "compound interest inflation diversification borrowing APR risk return" },
+    { id: "ecosystem", type: "resource", title: "Finance4All & FinanceMeta ecosystem", subtitle: "Programs, research, networks and current status", href: "/ecosystem", text: "Finance4All FinanceMeta IYER journal fellowship research challenge investment model Finance4 Impact Europe Gulf YEFA FFI YIS YEL NSRI PriorMoves FI-JEPA Eigen-JEPA causal modeling" },
   ];
   const terms = q.split(/\s+/);
   return records.filter(record => terms.every(term => `${record.title} ${record.text}`.toLocaleLowerCase().includes(term)))
