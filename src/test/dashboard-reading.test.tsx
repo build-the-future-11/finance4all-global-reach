@@ -51,3 +51,14 @@ it("resumes at the saved section from the primary dashboard action", () => {
   const next = screen.getByRole("region", { name: "Your next move" });
   expect(within(next).getByText(article.title).closest("a")).toHaveAttribute("href", `/portal/debriefed/explainers/${article.slug}#${entry.section}`);
 });
+
+it("gives a new member three truthful next steps without inventing progress", () => {
+  renderDashboard();
+  const startingPoints = screen.getByRole("region", { name: "A clear place to begin" });
+  expect(within(startingPoints).getByText("0/3")).toBeVisible();
+  expect(within(startingPoints).getAllByRole("link", { name: "Start" }).map(link => link.getAttribute("href"))).toEqual([
+    "/portal/settings",
+    `/portal/debriefed/explainers/${article.slug}`,
+    "/portal/labs",
+  ]);
+});

@@ -1,0 +1,46 @@
+{
+  "status": "local_content_ready",
+  "content": {
+    "newArticles": 6,
+    "newWords": 6639,
+    "totalArticles": 10,
+    "originalArticlesPreserved": 4,
+    "identicalSeriesInPublicAndMemberRepositories": true
+  },
+  "public": {
+    "releaseCheck": "passed",
+    "testsPassed": 63,
+    "prerenderedRoutes": 172,
+    "browserViewports": [
+      1440,
+      1024,
+      390
+    ],
+    "browserChecks": 21,
+    "arithmeticChecks": 24,
+    "deploymentPerformed": false,
+    "newGuidesSaveAndPersistAfterReload": 6,
+    "visualInspection": "Inspected desktop, tablet and mobile article headers, mobile article body, and new-story cards; no content overflow observed."
+  },
+  "member": {
+    "typecheck": "passed",
+    "lint": "passed",
+    "targetedTestsPassed": 25,
+    "testFiles": [
+      "content-depth.test.tsx",
+      "saved-guides.test.tsx",
+      "learning-notes-persistence.test.tsx"
+    ],
+    "productionBuildRun": false,
+    "liveAuthenticatedAccountWritesTested": false,
+    "deploymentPerformed": false
+  },
+  "notes": [
+    "Primary-source links and hypothetical examples are included in each article. Source references are listed in content-manifest.json.",
+    "Public release emits dependency MODULE_LEVEL_DIRECTIVE warnings for Framer Motion use-client directives during SSR bundling; the release checks pass.",
+    "The first public lint attempt preceded regeneration of editorial-index.json and failed on the new metadata fields; after generation the complete release check passed.",
+    "Browser verification used installed Google Chrome because the Playwright-pinned Chromium binary was unavailable.",
+    "The member source checkout received unrelated changes during this task; those were preserved."
+  ],
+  "preview": "http://127.0.0.1:4186/publications/financedebriefed"
+}

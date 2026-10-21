@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-14",
+  "focused_tests": {
+    "files": 4,
+    "passed": 14,
+    "command": "npm exec -- vitest run src/test/iyern.test.tsx src/test/portfolio-link.test.ts src/test/public-claims.test.tsx src/test/content-depth.test.tsx"
+  },
+  "targeted_typecheck": "PASS: temporary config extending tsconfig.app.json, including IYERN page, its test and dependencies; 256 MiB heap",
+  "full_typecheck": "FAILED: 256 MiB heap exhausted; no full typecheck result",
+  "full_test": "INCOMPLETE: pretest 12/12 passed; full Vitest run interrupted after no results under persistent memory pressure",
+  "production_build": "NOT RUN: memory admission blocked",
+  "browser_validation": "NOT RUN: memory admission blocked",
+  "memory_free_plus_speculative_mib": 111.0,
+  "memory_floor_mib": 512,
+  "deployment": "NOT PERFORMED",
+  "lint": "PASS: npm run lint",
+  "diff_check": "PASS: git diff --check"
+}

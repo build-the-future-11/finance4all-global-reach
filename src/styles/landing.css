@@ -64,6 +64,7 @@
 .ffa-timeline p { font-size: 14px; line-height: 1.8; color: hsl(var(--muted-foreground)); margin-top: 12px; }
 .ffa-history-note { color: hsl(var(--muted-foreground)); margin-top: 32px !important; font-size: 14px; line-height: 1.8; }
 .ffa-ecosystem { background:#153d30; color:#f4f8ed; max-width:none; }
+.ffa-ecosystem .ffa-section-heading h2 em { color:#d9ff8a; }
 .ffa-ecosystem .ffa-section-heading p { color:#c0d1c3; }
 .ffa-ecosystem .ffa-text-link { color:#d9ff8a; }
 .ffa-ecosystem-scale { display:grid; grid-template-columns:1fr 1fr; border:1px solid #d9e8d52e; border-radius:14px; overflow:hidden; }

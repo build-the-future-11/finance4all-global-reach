@@ -76,6 +76,35 @@ export default function Dashboard() {
     !completedLessonIds.has(lesson.slug),
   );
   const firstName = profile?.displayName?.trim().split(/\s+/)[0] || "Member";
+  const starterSteps = [
+    {
+      title: "Make your profile useful",
+      detail: profile?.bio?.trim() || (profile?.interests?.length ?? 0)
+        ? "Your interests help other members understand what you want to explore."
+        : "Add a short bio or interests so future collaborators have context.",
+      to: portalRoutes.settings,
+      status: profile?.bio?.trim() || (profile?.interests?.length ?? 0) ? "done" : "ready",
+    },
+    {
+      title: "Read one evidence-led explainer",
+      detail: completedLessonIds.size
+        ? `${completedLessonIds.size} ${completedLessonIds.size === 1 ? "explainer is" : "explainers are"} marked read. Keep your notes close.`
+        : "Start with a short explainer and save an idea worth returning to.",
+      to: nextLesson ? `${portalRoutes.debriefedExplainers}/${nextLesson.slug}` : portalRoutes.learning,
+      status: learning.data === undefined || readingHistory.error ? "loading" : completedLessonIds.size ? "done" : "ready",
+    },
+    {
+      title: "Choose a research direction",
+      detail: projects.data === undefined || applications.data === undefined
+        ? "Checking your research workspace."
+        : mine.length
+          ? `You already have ${mine.length} ${mine.length === 1 ? "project" : "projects"} in your workspace.`
+          : "Browse questions, methods and participation requirements before you apply.",
+      to: mine.length ? portalRoutes.myResearch : portalRoutes.labs,
+      status: projects.data === undefined || applications.data === undefined ? "loading" : mine.length ? "done" : "ready",
+    },
+  ] as const;
+  const completedStarterSteps = starterSteps.filter((step) => step.status === "done").length;
 
   const quickActions = [
     {
@@ -133,6 +162,22 @@ export default function Dashboard() {
         <div><span>Current work</span><strong>{projects.data === undefined || applications.data === undefined ? "—" : mine.length}</strong><small>{mine.length === 1 ? "active project" : "active projects"}</small></div>
         <div><span>Awaiting response</span><strong>{connections.data === undefined ? "—" : incomingConnections.length}</strong><small>{incomingConnections.length === 1 ? "connection request" : "connection requests"}</small></div>
         <div><span>Next deadline</span><strong>{projects.data === undefined ? "—" : nextDeadline ? new Date(nextDeadline.applicationDeadline!).toLocaleDateString(undefined, { month: "short", day: "numeric" }) : "None"}</strong><small>{nextDeadline?.title ?? "No confirmed deadline"}</small></div>
+      </section>
+
+      <section className="portal-starting-points" aria-labelledby="starting-points-heading">
+        <div className="portal-section-title">
+          <div><span>Make this space yours</span><h2 id="starting-points-heading">A clear place to begin</h2></div>
+          <p><strong>{completedStarterSteps}/3</strong> foundation steps complete</p>
+        </div>
+        <ol>
+          {starterSteps.map((step, index) => (
+            <li key={step.title} data-status={step.status}>
+              <span className="portal-starting-step-number" aria-hidden="true">{step.status === "done" ? <CheckCircle2 className="h-4 w-4" /> : `0${index + 1}`}</span>
+              <div><h3>{step.title}</h3><p>{step.detail}</p></div>
+              <Link to={step.to}>{step.status === "done" ? "Review" : step.status === "loading" ? "View" : "Start"}<ArrowRight className="h-4 w-4" /></Link>
+            </li>
+          ))}
+        </ol>
       </section>
 
       <section aria-labelledby="next-heading">
