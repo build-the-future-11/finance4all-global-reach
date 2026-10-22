@@ -7,10 +7,14 @@ test("research filters persist and lead to a substantive evidence record", async
   await page.getByLabel("Search research", { exact: true }).fill("covariance");
   await page.getByRole("combobox", { name: "Research topic", exact: true }).selectOption("financial-ml");
   await page.getByRole("combobox", { name: "Evidence status", exact: true }).selectOption("Repository available");
+  await expect(page).toHaveURL(url => url.searchParams.get("q") === "covariance"
+    && url.searchParams.get("topic") === "financial-ml"
+    && url.searchParams.get("status") === "Repository available");
   await expect(page.locator("#directory").getByRole("status")).toHaveText("1 record found");
   await page.reload();
   await expect(page.getByLabel("Search research", { exact: true })).toHaveValue("covariance");
   await expect(page.getByRole("combobox", { name: "Research topic", exact: true })).toHaveValue("financial-ml");
+  await expect(page.getByRole("combobox", { name: "Evidence status", exact: true })).toHaveValue("Repository available");
   await page.locator("#directory").getByRole("link", { name: "Eigen-JEPA: market geometry and regimes", exact: true }).click();
   await expect(page).toHaveURL(/\/research\/projects\/eigen-jepa$/);
   for (const name of ["What the evidence establishes", "Data & provenance", "Baselines & evaluation", "Leakage & falsification controls", "Publication status"]) await expect(page.getByRole("heading", { name, exact: true })).toBeVisible();

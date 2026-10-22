@@ -1,4 +1,5 @@
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import { useQueuedSearchParams } from "@/hooks/useQueuedSearchParams";
 import { ArrowRight, BookOpenText, FlaskConical, ShieldCheck } from "lucide-react";
 import PublicLayout from "@/layouts/PublicLayout";
 import CatalogLink from "@/components/research/CatalogLink";
@@ -38,14 +39,14 @@ function ResearchDetail({ slug }: { slug: string }) {
 }
 
 function ResearchHome() {
-  const [params, setParams] = useSearchParams();
+  const [params, setParams] = useQueuedSearchParams();
   const query = params.get("q") ?? "";
   const topic = researchTopics.some(t => t.id === params.get("topic")) ? params.get("topic")! : "all";
   const status = researchStatuses.some(s => s === params.get("status")) ? params.get("status")! : "all";
   const sort = ["title", "verified"].includes(params.get("sort") ?? "") ? params.get("sort")! : "featured";
   const filtered = filterResearch(researchProjects, query, topic, status, sort);
   const authorized = publications.filter(isPublicPublication);
-  function update(key: string, value: string) { const next = new URLSearchParams(params); if (value && value !== "all" && value !== "featured") next.set(key, value); else next.delete(key); setParams(next, { replace: true, preventScrollReset: true }); }
+  function update(key: string, value: string) { setParams(previous => { const next = new URLSearchParams(previous); if (value && value !== "all" && value !== "featured") next.set(key, value); else next.delete(key); return next; }, { replace: true, preventScrollReset: true }); }
   return <PublicLayout title="Research" description="Explore FinanceMeta research questions, reproducible methods, evidence boundaries and authorized publications."><div className="catalog-page">
     <header className="catalog-hero"><div><p className="catalog-eyebrow">FinanceMeta / Research & inquiry</p><h1>Ask a sharper question.<br /><em>Make the evidence visible.</em></h1><p className="catalog-deck">Explore the questions behind markets, financial systems and economic decisions. Every record separates the research ambition, the evaluation method and what the evidence can actually support.</p><div className="catalog-actions"><a className="catalog-button" href="#directory">Explore research <ArrowRight size={17} aria-hidden="true" /></a><Link className="catalog-text-link" to="/programs?family=Research">Research opportunities</Link></div></div><aside className="catalog-hero-note"><FlaskConical size={28} aria-hidden="true" /><h2>Question → method → evidence</h2><p>Repositories make work inspectable. Experiments test a claim. Independent review and publication permission are separate steps.</p><dl><dt>Research records</dt><dd>{researchProjects.length}</dd><dt>Authorized publications here</dt><dd>{authorized.length}</dd></dl></aside></header>
     <section className="catalog-section" aria-labelledby="featured-research"><div className="catalog-heading"><div><p className="catalog-eyebrow">Open to inspection</p><h2 id="featured-research">Featured research</h2></div><p>Read the methods and limitations before interpreting a result.</p></div><div className="catalog-feature-grid">{researchProjects.filter(p => p.featured).map(project => <ProjectCard key={project.slug} project={project} featured />)}</div></section>

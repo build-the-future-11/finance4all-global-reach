@@ -1,11 +1,12 @@
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useQueuedSearchParams } from "@/hooks/useQueuedSearchParams";
 import { ArrowRight, BookOpenText, Clock3, Search } from "lucide-react";
 import { debriefedTopics, publishedDebriefedArticles, searchDebriefed, type DebriefedTopic } from "@/content/debriefed";
 import { useReadingHistory } from "@/hooks/portal/useReadingHistory";
 import { useSavedExplainers } from "@/hooks/portal/useSavedExplainers";
 
 export default function DebriefedLibrary({ basePath = "/debriefed", showHero = true }: { basePath?: string; showHero?: boolean }) {
-  const [params, setParams] = useSearchParams();
+  const [params, setParams] = useQueuedSearchParams();
   const query = params.get("q") ?? "";
   const requestedTopic = params.get("topic");
   const topic: DebriefedTopic | "all" = debriefedTopics.includes(requestedTopic as DebriefedTopic) ? requestedTopic as DebriefedTopic : "all";
