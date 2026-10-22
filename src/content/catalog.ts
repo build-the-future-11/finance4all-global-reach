@@ -12,7 +12,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
-export type CatalogStatus = "Verified repository" | "Active intake" | "Proposed" | "Proposed";
+export type CatalogStatus = "Verified repository" | "Active intake" | "Proposed";
 
 export type PortfolioProject = {
   id: string;
@@ -79,7 +79,7 @@ const portfolioProjectRecords: Omit<PortfolioProject, "page">[] = [
   {
     id: "iy-ern",
     title: "Iy-ERN economics research network",
-    description: "The International Youth Economics Research Network connects FinanceMeta Labs, research cohorts, a selective peer-reviewed journal with mentorship, and a moderated preprint forum.",
+    description: "The International Youth Economics Research Network connects FinanceMeta Labs, research cohorts, a planned journal with independent review, and a moderated preprint forum.",
     status: "Verified repository",
     domain: "Research publishing",
     tags: ["economics", "preprints", "publishing"],
@@ -133,19 +133,35 @@ const portfolioProjectRecords: Omit<PortfolioProject, "page">[] = [
     tags: ["filings", "valuation", "scenario analysis"],
     evidence: "Needs common rubric, conflict policy, reviewers, and publication standard",
   },
+  {
+    id: "causal-financial-modeling",
+    title: "Causal financial modeling",
+    description: "A developing research lane for questions about causes, interventions, and financial or economic outcomes, with explicit identification assumptions and sensitivity checks.",
+    status: "Proposed",
+    domain: "Causal inference",
+    tags: ["causal inference", "econometrics", "policy evaluation"],
+    evidence: "Needs a frozen question, defensible identification strategy, negative controls, data provenance, and independent review",
+  },
+  {
+    id: "priormoves",
+    title: "PriorMoves independent evaluation",
+    description: "An independent evaluation project designed to test submitted claims against a frozen protocol, preserved outputs, comparator checks, and a clear external-evidence boundary.",
+    status: "Proposed",
+    domain: "Independent evaluation",
+    tags: ["evaluation", "reproducibility", "research integrity"],
+    evidence: "Project scope is reported; no completed evaluation receipt or independent result is published here",
+  },
 ];
-
-const PROJECT_PAGE_ORIGIN = "https://finance-meta-landing.vercel.app";
 
 export const portfolioProjects: PortfolioProject[] = portfolioProjectRecords.map((project) => ({
   ...project,
-  page: project.id === "iy-ern" ? "/iyern" : `${PROJECT_PAGE_ORIGIN}/research/projects/${project.id}`,
+  page: project.id === "iy-ern" ? "/iyern" : `/research/projects/${project.id}`,
 }));
 
 export type ApplicationPath = {
   title: string;
   description: string;
-  kind: "Application" | "Pilot interest" | "Collaboration";
+  kind: "Interest" | "Pilot interest" | "Collaboration";
   status: "Active intake" | "Interest route";
   href: string;
   verifiedAt: string;
@@ -154,51 +170,51 @@ export type ApplicationPath = {
 export const applicationPaths: ApplicationPath[] = [
   {
     title: "Quantitative Markets & Microstructure Lab",
-    description: "Apply for the evidence-led research cohort covering market structure, volatility, forecasting, execution, risk, and robust backtesting.",
-    kind: "Application",
-    status: "Active intake",
-    href: "https://tally.so/r/5B7blP?utm_source=member_portal&utm_medium=opportunity&fm_call=quant-research&fm_surface=opportunities&fm_route=join&fm_version=conversion-v1",
-    verifiedAt: "19 Sep 2026",
+    description: "Express research interest in market structure, forecasting and robust backtesting. Cohort activation remains on hold pending protocol controls and review capacity.",
+    kind: "Interest",
+    status: "Interest route",
+    href: "https://tally.so/r/kbayyj",
+    verifiedAt: "16 Oct 2026",
   },
   {
     title: "Financial Systems, Access & Policy Lab",
-    description: "Apply to research credit, digital payments, inclusion, consumer protection, policy evaluation, fairness, and infrastructure.",
-    kind: "Application",
-    status: "Active intake",
-    href: "https://tally.so/r/5B7blP?utm_source=member_portal&utm_medium=opportunity&fm_call=economic-research&fm_surface=opportunities&fm_route=join&fm_version=conversion-v1",
-    verifiedAt: "19 Sep 2026",
+    description: "Express interest in credit, payments, inclusion and policy research. Staffing and approved artifact gates remain in force.",
+    kind: "Interest",
+    status: "Interest route",
+    href: "https://tally.so/r/kbayyj",
+    verifiedAt: "16 Oct 2026",
   },
   {
     title: "Finance4All India school & community pilots",
     description: "For schools, educators, student leaders, and community organizations exploring a scoped practical financial-education pilot.",
     kind: "Pilot interest",
-    status: "Active intake",
-    href: "https://tally.so/r/5B7blP?utm_source=member_portal&utm_medium=opportunity&fm_call=school-pilot&fm_surface=opportunities&fm_route=join&fm_version=conversion-v1",
-    verifiedAt: "19 Sep 2026",
+    status: "Interest route",
+    href: "https://tally.so/r/kbayyj",
+    verifiedAt: "16 Oct 2026",
   },
   {
     title: "Financial Foundations cohort",
-    description: "Apply to build finance, economics, markets, systems, and evidence foundations around a concrete final output.",
-    kind: "Application",
-    status: "Active intake",
-    href: "https://tally.so/r/5B7blP?utm_source=member_portal&utm_medium=opportunity&fm_call=foundations&fm_surface=opportunities&fm_route=join&fm_version=conversion-v1",
-    verifiedAt: "19 Sep 2026",
+    description: "Explore open financial foundations and express interest in a future guided cohort. Dates and delivery capacity are not confirmed.",
+    kind: "Interest",
+    status: "Interest route",
+    href: "https://tally.so/r/kbayyj",
+    verifiedAt: "16 Oct 2026",
   },
   {
-    title: "Start a local chapter",
+    title: "Propose a local chapter",
     description: "Propose a school, university, or city chapter. Public active status follows approval, an operating cadence, and a qualifying output.",
-    kind: "Application",
-    status: "Active intake",
-    href: "https://tally.so/r/XxaB1j?utm_source=member_portal&utm_medium=opportunity&fm_call=chapter-proposal&fm_surface=opportunities&fm_route=chapter&fm_version=conversion-v1",
-    verifiedAt: "19 Sep 2026",
+    kind: "Interest",
+    status: "Interest route",
+    href: "https://tally.so/r/kbayyj",
+    verifiedAt: "16 Oct 2026",
   },
   {
     title: "Partners, speakers, and research collaborators",
     description: "For institutions, educators, researchers, speakers, data providers, and bounded program or research collaborations.",
     kind: "Collaboration",
     status: "Interest route",
-    href: "https://tally.so/r/2EWxzb?utm_source=member_portal&utm_medium=opportunity&fm_call=partnership-proposal&fm_surface=opportunities&fm_route=partnership&fm_version=conversion-v1",
-    verifiedAt: "19 Sep 2026",
+    href: "https://tally.so/r/obWxvN",
+    verifiedAt: "16 Oct 2026",
   },
 ];
 

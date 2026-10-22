@@ -6,6 +6,8 @@ export type EditorialExplainer = ExplainerCard & {
   sourceLabel: string;
   reviewedAt: string;
   featured?: boolean;
+  lab?: string;
+  tags?: string[];
 };
 
 const editorialDrafts: EditorialExplainer[] = [
@@ -84,9 +86,9 @@ An IPO does not prove that a company is profitable, fairly valued, low risk, or 
 
 ## Primary sources and next reading
 
-- [SEC: What is a registration statement?](https://www.sec.gov/education/capitalraising/building-blocks/registration-statement)
-- [SEC EDGAR company filings](https://www.sec.gov/edgar/search-and-access)
-- [Investor.gov: Initial public offerings](https://www.investor.gov/introduction-investing/investing-basics/investment-products/stocks/initial-public-offerings)
+- [SEC: What is a registration statement?](https://www.sec.gov/resources-small-businesses/going-public/what-registration-statement)
+- [SEC EDGAR company filings](https://www.sec.gov/search-filings)
+- [Investor.gov: Initial public offerings](https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-bulletins-17)
 
 This explainer is educational and is not a recommendation to buy or sell any security.`,
   },
@@ -164,8 +166,8 @@ Finally, distinguish a slower rise in prices from a fall in the price level. Inf
 
 ## Primary sources and next reading
 
-- [Bank for International Settlements: monetary policy](https://www.bis.org/topic/monetary_policy.htm)
-- [IMF: Monetary policy and central banking](https://www.imf.org/en/Topics/monetary-policy-and-central-banking)
+- [Bank for International Settlements: monetary policy](https://www.bis.org/committees/mc/compendium/overview)
+- [IMF: Monetary policy and central banking](https://www.imf.org/en/about/factsheets/sheets/2023/monetary-policy-and-central-banking)
 - [Reserve Bank of India: monetary policy](https://www.rbi.org.in/Scripts/MonetaryPolicy.aspx)
 - [Bank of England: monetary policy transmission](https://www.bankofengland.co.uk/quarterly-bulletin/2024/2024/about-a-rate-of-general-interest-how-monetary-policy-transmits)
 
@@ -329,6 +331,9 @@ This guide is a starting checklist, not a substitute for reviewing the underlyin
   },
 ];
 
+// Repository-reviewed public assets only. The six complete editorial-series
+// manuscripts remain preserved in their source file, awaiting approval. Never
+// import unpublished bodies into this public module (or the browser bundle).
 export const editorialExplainers = editorialDrafts.map(article => ({ ...article, readMinutes: Math.max(1, Math.ceil(article.body.split(/\s+/).length / 220)) }));
 export const featuredExplainers = editorialExplainers.filter((article) => article.featured);
 

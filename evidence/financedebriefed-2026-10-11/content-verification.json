@@ -1,0 +1,127 @@
+{
+  "originalFourBodiesUnchanged": true,
+  "publicAndMemberSeriesIdentical": true,
+  "seriesSha256": "a52ec73cf5a8e2c3dc6443871aed47fb589557901778291c0b84c75ce78f4aae",
+  "arithmeticChecks": [
+    {
+      "name": "inflation compounded basket",
+      "result": 1112.4,
+      "pass": true
+    },
+    {
+      "name": "basket reversal percent",
+      "result": 10.104279036317877,
+      "pass": true
+    },
+    {
+      "name": "inflation weighted basket",
+      "result": 5.0,
+      "pass": true
+    },
+    {
+      "name": "personal weighted basket",
+      "result": 6.2,
+      "pass": true
+    },
+    {
+      "name": "purchasing power fall",
+      "result": -0.952380952380949,
+      "pass": true
+    },
+    {
+      "name": "purchasing power rise",
+      "result": 1.904761904761898,
+      "pass": true
+    },
+    {
+      "name": "inflation exercise",
+      "result": 539.784,
+      "pass": true
+    },
+    {
+      "name": "one year bond at 7 percent",
+      "result": 981.3084112149533,
+      "pass": true
+    },
+    {
+      "name": "one year bond at 3 percent",
+      "result": 1019.4174757281553,
+      "pass": true
+    },
+    {
+      "name": "two year bond at 7 percent",
+      "result": 963.839636649489,
+      "pass": true
+    },
+    {
+      "name": "two year bond at 3 percent",
+      "result": 1038.2693939108303,
+      "pass": true
+    },
+    {
+      "name": "bond exercise 4 percent",
+      "result": 1038.4615384615383,
+      "pass": true
+    },
+    {
+      "name": "cash gap",
+      "result": 5000,
+      "pass": true
+    },
+    {
+      "name": "cash exercise",
+      "result": 17000,
+      "pass": true
+    },
+    {
+      "name": "currency inverse change",
+      "result": -9.090909090909093,
+      "pass": true
+    },
+    {
+      "name": "exporter first surplus",
+      "result": 70000,
+      "pass": true
+    },
+    {
+      "name": "exporter second surplus",
+      "result": 102000,
+      "pass": true
+    },
+    {
+      "name": "currency tuition change",
+      "result": 12000,
+      "pass": true
+    },
+    {
+      "name": "split ownership percent",
+      "result": 0.003,
+      "pass": true
+    },
+    {
+      "name": "split market move",
+      "result": 3720,
+      "pass": true
+    },
+    {
+      "name": "weighted index return",
+      "result": 4.0,
+      "pass": true
+    },
+    {
+      "name": "equal weighted index return",
+      "result": -3.3333333333333335,
+      "pass": true
+    },
+    {
+      "name": "index exercise weighted",
+      "result": -1.0,
+      "pass": true
+    },
+    {
+      "name": "index exercise equal",
+      "result": 5.0,
+      "pass": true
+    }
+  ]
+}

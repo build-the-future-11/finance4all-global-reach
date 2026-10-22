@@ -12,14 +12,12 @@ describe("public FinanceMeta learning resources", () => {
   it("publishes a discoverable free-resource hub without implying external endorsement", () => {
     renderWithRouter(<Learn />);
 
-    expect(screen.getByRole("heading", { level: 1, name: /learn the mechanics, not the hype/i })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { level: 3, name: "Five Foundations" })).toBeInTheDocument();
-    expect(screen.getByText("35 minutes")).toBeInTheDocument();
-    expect(screen.getByText("Grades 9–12")).toBeInTheDocument();
-    expect(screen.getByText("Free")).toBeInTheDocument();
-    expect(screen.getByText("No account")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /open lesson/i })).toHaveAttribute("href", "/learn/five-foundations");
-    expect(screen.getByText(/does not imply endorsement by a regulator/i)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1, name: /Build understanding.\s*One question at a time./i })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Open Five Foundations/ })).toBeInTheDocument();
+    expect(screen.getByText(/35 minutes · Self-directed/)).toBeInTheDocument();
+    expect(screen.getByText(/Every resource here is free to read/)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Open Five Foundations/ })).toHaveAttribute("href", "/learn/five-foundations");
+    expect(screen.getByText(/No security, lender, broker or individualized financial action is recommended/)).toBeInTheDocument();
   });
 
   it("renders the complete Five Foundations lesson and keeps the advice boundary explicit", () => {

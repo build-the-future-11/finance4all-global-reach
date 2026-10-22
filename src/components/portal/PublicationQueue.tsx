@@ -3,6 +3,7 @@ import { publicationTypes, usePublicationQueue, useReviewPublication, type Publi
 import type { PublicationState, PublicationTable } from "@/types/database";
 import { Button } from "@/components/ui/button";
 import { PortalCard, portalInputClass } from "@/components/portal/PortalUI";
+import EditorialDraftImport from "@/components/portal/EditorialDraftImport";
 
 function ReviewCard({ table, row }: { table: PublicationTable; row: PublicationRecord }) {
   const fieldId = useId();
@@ -40,7 +41,7 @@ function ReviewCard({ table, row }: { table: PublicationTable; row: PublicationR
         <label htmlFor={`${fieldId}-state`} className="block">Publication state</label>
         <select id={`${fieldId}-state`} value={state} onChange={event => setState(event.target.value as PublicationState)} disabled={mutation.isPending} className={`${portalInputClass} mt-1 w-full rounded-md p-2`}>
           <option value="draft">Draft — awaiting review</option>
-          <option value="published">Published — visible to members</option>
+          <option value="published">Published — visible to the permitted audience</option>
           <option value="archived">Archived — removed from member listings</option>
         </select>
       </div>
@@ -61,7 +62,8 @@ export function PublicationQueue() {
   const queue = usePublicationQueue(table);
   return <section aria-label="Publication review" className="space-y-4">
     <h2 className="text-xl font-semibold">Publication review</h2>
-    <p>New and historical records remain drafts until an administrator records a review. Published content is available to signed-in members.</p>
+    <p>New and historical records remain drafts until an administrator records a review. Published database articles remain available to signed-in members. Events explicitly enabled for public listing may also appear anonymously; publication does not expose registrations or member data.</p>
+    <EditorialDraftImport />
     <div>
       <label htmlFor="publication-content-type" className="block">Content type</label>
       <select id="publication-content-type" className={`${portalInputClass} mt-1 max-w-full rounded-md p-2`} value={table} onChange={event => setTable(event.target.value as PublicationTable)}>

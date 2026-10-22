@@ -9,24 +9,26 @@ describe("community map", () => {
   it("keeps geographic points, search results, selection, and reset synchronized", () => {
     const { container } = render(<WorldMap locations={communityLocations} />);
     const map = screen.getByRole("group", { name: /interactive world map/i });
-    expect(within(map).getAllByRole("button")).toHaveLength(communityLocations.length);
+    expect(within(map).getAllByRole("button").length).toBeLessThan(communityLocations.length);
+    expect(screen.getAllByRole("button", { name: /^Explore / })).toHaveLength(communityLocations.length);
     fireEvent.change(screen.getByRole("textbox", { name: "Find a city or country" }), { target: { value: "Tokyo" } });
     expect(within(map).getAllByRole("button")).toHaveLength(1);
     fireEvent.click(screen.getByRole("button", { name: "Explore Tokyo, Japan" }));
-    expect(screen.getByRole("button", { name: "Tokyo, Japan" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "Tokyo, Japan: Expansion interest" })).toHaveAttribute("aria-pressed", "true");
     expect(map).toHaveAttribute("viewBox", "600 51.01111111111112 400 172");
     expect(container.querySelector(".world-map-selection")).toHaveTextContent("TokyoJapan");
     fireEvent.click(screen.getByRole("button", { name: "Reset view" }));
     expect(map).toHaveAttribute("viewBox", "0 0 1000 430");
     expect(screen.getByRole("textbox")).toHaveValue("");
-    expect(within(map).getAllByRole("button")).toHaveLength(communityLocations.length);
+    expect(within(map).getAllByRole("button").length).toBeLessThan(communityLocations.length);
+    expect(screen.getAllByRole("button", { name: /^Explore / })).toHaveLength(communityLocations.length);
   });
   it("filters regions and supports keyboard pin selection", () => {
     const onSelect = vi.fn();
     render(<WorldMap locations={communityLocations} onSelect={onSelect} />);
-    fireEvent.change(screen.getByRole("combobox"), { target: { value: "Africa" } });
-    expect(screen.queryByRole("button", { name: "Tokyo, Japan" })).not.toBeInTheDocument();
-    fireEvent.keyDown(screen.getByRole("button", { name: "Nairobi, Kenya" }), { key: "Enter" });
+    fireEvent.change(screen.getByLabelText("Filter by region"), { target: { value: "Africa" } });
+    expect(screen.queryByRole("button", { name: "Tokyo, Japan: Expansion interest" })).not.toBeInTheDocument();
+    fireEvent.keyDown(screen.getByRole("button", { name: "Nairobi, Kenya: Expansion interest" }), { key: "Enter" });
     expect(onSelect).toHaveBeenCalledWith("nairobi");
   });
 });
