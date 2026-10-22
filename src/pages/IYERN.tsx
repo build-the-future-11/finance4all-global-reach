@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-import { Link, useLocation, useParams, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
+import { useQueuedSearchParams } from "@/hooks/useQueuedSearchParams";
 import { ArrowUpRight, BarChart3, Globe2, HeartHandshake, Brain, BookOpenText } from "lucide-react";
 import Brand from "@/components/Brand";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -19,7 +20,7 @@ const description = "An international platform for emerging researchers to share
 export default function IYERN() {
   const { slug } = useParams();
   const location = useLocation();
-  const [params, setParams] = useSearchParams();
+  const [params, setParams] = useQueuedSearchParams();
   const articleRoute = location.pathname.startsWith("/iyern/articles/");
   const paper = publications.find(p => p.slug === slug && isPublicPublication(p));
   useDocumentTitle(articleRoute ? paper?.title ?? "Article unavailable | IYERN" : "IYERN — Researching the Economy of Tomorrow");
@@ -52,7 +53,7 @@ export default function IYERN() {
   const query = params.get("q") ?? "";
   const journalArticles = publications.filter(p => p.kind === "journal" && isPublicPublication(p));
   const results = filterPublications(publications.filter(p => p.kind === "preprint"), category, query);
-  function updateFilter(key: string, value: string) { const next = new URLSearchParams(params); if (value && value !== "all") next.set(key, value); else next.delete(key); setParams(next, { replace: true, preventScrollReset: true }); }
+  function updateFilter(key: string, value: string) { setParams(previous => { const next = new URLSearchParams(previous); if (value && value !== "all") next.set(key, value); else next.delete(key); return next; }, { replace: true, preventScrollReset: true }); }
 
   return <div className="ffa-home iy-portal">
     <a className="ffa-skip" href="#iy-main">Skip to content</a>
