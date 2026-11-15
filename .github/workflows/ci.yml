@@ -344,11 +344,11 @@ jobs:
         run: npx playwright install --with-deps chromium firefox webkit
       - name: Browser journey smoke tests
         run: npm run test:e2e
+      - name: Repository lint gate
+        run: npm run lint
       - name: Constrained mobile production performance
         if: ${{ !cancelled() && steps.production_build.outcome == 'success' }}
         run: npm run test:performance
-      - name: Repository lint gate
-        run: npm run lint
       - name: Upload browser evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
