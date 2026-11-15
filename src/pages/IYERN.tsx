@@ -57,7 +57,7 @@ export default function IYERN() {
 
   return <div className="ffa-home iy-portal">
     <a className="ffa-skip" href="#iy-main">Skip to content</a>
-    <header className="iy-header"><Link to="/" aria-label="Finance for All home"><Brand /></Link><div><Link to="/learn">Open learning</Link><Link to="/login">Member sign in</Link><ThemeToggle /></div></header>
+    <header className="iy-header"><Link to="/"><Brand /><span className="sr-only"> home</span></Link><div><Link to="/learn">Open learning</Link><Link to="/login">Member sign in</Link><ThemeToggle /></div></header>
     <nav className="iy-nav" aria-label="IYERN initiatives"><Link to="/iyern">IYERN / Overview</Link>{initiatives.map(([id,,name]) => <Link key={id} to={`/iyern/${id}`} aria-current={location.pathname === `/iyern/${id}` ? "page" : undefined}>{name}</Link>)}</nav>
     <main id="iy-main">
     {articleRoute ? <section className="iy-section"><Link to="/iyern/forum">← Back to research</Link>{paper ? <article><span className="iy-status">{paper.status}</span><h1>{paper.title}</h1><p>{paper.authors.join(", ")}</p><p><time dateTime={paper.publishedAt}>{paper.publishedAt}</time> · Version {paper.version}</p><h2>Abstract</h2><p>{paper.abstract}</p><p>Keywords: {paper.keywords.join(", ")}</p><PublicationResources paper={paper} /></article> : <><h1>Article unavailable</h1><p>This article has not been published here. The archive will contain only authorized public research.</p></>}</section> : <>

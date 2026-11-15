@@ -25,7 +25,7 @@ export function PublicHeader() {
     return () => document.removeEventListener("keydown", dismiss);
   }, [open]);
   return <header className="public-header">
-    <Link to="/" aria-label="Finance for All home" className="public-identity"><Brand /></Link>
+    <Link to="/" className="public-identity"><Brand /><span className="sr-only"> home</span></Link>
     <nav id="public-navigation" aria-label="Main navigation" className={open ? "is-open" : ""}>
       {publicNavigation.map(([label, path]) => <NavLink key={path} to={path} end={path === "/"} onClick={() => setOpen(false)}>{label}</NavLink>)}
     </nav>

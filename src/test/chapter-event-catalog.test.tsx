@@ -41,12 +41,12 @@ describe("chapter locations", () => {
     render(<WorldMap locations={communityLocations} />);
     fireEvent.change(screen.getByLabelText("Filter by country"), { target: { value: "Italy" } });
     expect(screen.getByRole("status")).toHaveTextContent("6 locations");
-    expect(screen.getByRole("button", { name: "Explore Milan, Italy" })).toBeVisible();
+    expect(screen.getByRole("button", { name: "Explore Milan, Italy: Expansion interest" })).toBeVisible();
     fireEvent.change(screen.getByLabelText("Filter by chapter status"), { target: { value: "active_verified" } });
     expect(screen.getByRole("status")).toHaveTextContent("0 locations");
     fireEvent.click(screen.getByRole("button", { name: /Reset view/ }));
     fireEvent.change(screen.getByLabelText("Find a city or country"), { target: { value: "sao paulo" } });
-    expect(screen.getByRole("button", { name: "Explore São Paulo, Brazil" })).toBeVisible();
+    expect(screen.getByRole("button", { name: "Explore São Paulo, Brazil: Expansion interest" })).toBeVisible();
   });
 });
 describe("evidence-aware event timing", () => {
