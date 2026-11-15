@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "../playwright-fixture";
 
-test.describe.configure({ mode: "serial" });
+test.describe.configure({ mode: "default" });
 test.setTimeout(90_000);
 
 const PUBLIC_ROUTES = [
