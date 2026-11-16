@@ -108,4 +108,46 @@ describe("member settings", () => {
     });
     expect(mocks.success).toHaveBeenCalledWith("Profile updated");
   });
+
+  it.each(["", "      "])("persists an explicitly cleared bio: %j", async (clearedBio) => {
+    render(<MemoryRouter><Settings /></MemoryRouter>);
+
+    const bio = screen.getByLabelText("Bio");
+    expect(bio).toHaveValue("Original bio");
+    fireEvent.change(bio, { target: { value: clearedBio } });
+    fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+
+    await waitFor(() => {
+      expect(mocks.mutateAsync).toHaveBeenCalledWith(
+        expect.objectContaining({ bio: "" }),
+      );
+    });
+    expect(mocks.success).toHaveBeenCalledWith("Profile updated");
+    expect(mocks.error).not.toHaveBeenCalled();
+  });
+
+  it.each(["", "   "])("rejects a blank display name and allows a corrected save: %j", async (blankName) => {
+    render(<MemoryRouter><Settings /></MemoryRouter>);
+
+    const displayName = screen.getByLabelText("Display name");
+    fireEvent.change(displayName, { target: { value: blankName } });
+    // The submit handler must also reject blanks when native validation is bypassed.
+    fireEvent.submit(screen.getByRole("button", { name: "Save changes" }).closest("form")!);
+
+    await waitFor(() => expect(mocks.error).toHaveBeenCalledWith("Display name is required"));
+    expect(displayName).toBeRequired();
+    expect(mocks.mutateAsync).not.toHaveBeenCalled();
+    expect(mocks.success).not.toHaveBeenCalled();
+
+    fireEvent.change(displayName, { target: { value: "  Ada Restored  " } });
+    fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+
+    await waitFor(() => {
+      expect(mocks.mutateAsync).toHaveBeenCalledOnce();
+      expect(mocks.mutateAsync).toHaveBeenCalledWith(
+        expect.objectContaining({ displayName: "Ada Restored", bio: "Original bio" }),
+      );
+    });
+    expect(mocks.success).toHaveBeenCalledWith("Profile updated");
+  });
 });

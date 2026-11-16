@@ -25,6 +25,8 @@
 .dark .auth-shell .auth-form-heading > p { color: #9be6bc; }
 .auth-shell .auth-form-heading > span { font-size: 14px; line-height: 1.8; margin-top: 15px; }
 .auth-shell .auth-form-body { margin-top: 32px; }
+.auth-shell .auth-availability-notice { color: hsl(var(--foreground)); background: hsl(var(--muted)); border: 1px solid hsl(var(--border)); }
+.auth-shell .auth-availability-notice button { color: hsl(var(--foreground)); background: hsl(var(--background)); }
 .auth-shell .auth-form-body input { height: 48px; border-radius: 9px; font-size: 15px; }
 .auth-shell .auth-form-body label { font-size: 13px; display: inline-block; margin-bottom: 5px; }
 .auth-shell .auth-form-body button[type="submit"] { min-height: 48px; border-radius: 9px; background: #1b503b; color: #f5faef; font-weight: 500; }

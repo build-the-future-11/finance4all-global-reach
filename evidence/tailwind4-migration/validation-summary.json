@@ -1,0 +1,68 @@
+{
+  "schema": "financemeta.tailwind4-validation.v1",
+  "testedCodeCommit": "11d3628f9dbf7cbf67d382f8f0ab2f5aea9a79cf",
+  "node": "22.23.2",
+  "npm": "10.9.8",
+  "results": {
+    "vitest": {
+      "passed": 125,
+      "failed": 0
+    },
+    "releaseToolchainTests": {
+      "passed": 12,
+      "failed": 0
+    },
+    "nodeTests": {
+      "passed": 32,
+      "failed": 0
+    },
+    "publicBrowserTests": {
+      "passed": 12,
+      "failed": 0
+    },
+    "lint": "PASS",
+    "typecheck": "PASS",
+    "productionBuild": "PASS",
+    "storybookBuild": "PASS",
+    "fullDependencyAudit": "PASS_ZERO_FINDINGS",
+    "productionDependencyAudit": "PASS_ZERO_FINDINGS"
+  },
+  "browser": {
+    "version": "153.0.8010.0",
+    "distribution": "@sparticuz/chromium@153.0.0",
+    "repositoryBrowserConfigChanged": false,
+    "reasonForLocalExecutableOverride": "Standard Playwright download returned truncated archives. Browser extracted from the pinned npm distribution; default browser security behavior retained."
+  },
+  "visualComparison": {
+    "baselineBuildCommit": "ad4702af64e20882861bbb078e5636914142e399",
+    "baselineCssSource": "26957bf37df7553db30cefbf0237867df9889cd5",
+    "routes": [
+      "/",
+      "/login"
+    ],
+    "viewports": [
+      {
+        "width": 1365,
+        "height": 900
+      },
+      {
+        "width": 390,
+        "height": 844
+      }
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "cases": 8,
+    "largestMeasuredElementLayoutDeltaPx": 0,
+    "horizontalOverflowAfterPx": 0,
+    "method": "Compare visible headings, buttons and inputs; freeze CSS animation and transitions; inspect screenshots. Pixel/color differences are retained in visual-comparison.json rather than treated as identical renders."
+  },
+  "notCertified": [
+    "Live credentialed production journeys",
+    "Live production RLS",
+    "Deployment approval",
+    "Support for browsers below Tailwind v4 minimum requirements"
+  ]
+}

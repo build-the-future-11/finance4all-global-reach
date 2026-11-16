@@ -58,10 +58,15 @@ export default function Settings() {
 
   const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const normalizedDisplayName = displayName.trim();
+    if (!normalizedDisplayName) {
+      toast.error("Display name is required");
+      return;
+    }
     try {
       const { error } = await updateProfile.mutateAsync({
-        displayName: displayName.trim(),
-        bio: bio.trim() || undefined,
+        displayName: normalizedDisplayName,
+        bio: bio.trim(),
         interests,
         openToCollaborate,
         chapterId: chapterId || undefined,
@@ -135,6 +140,7 @@ export default function Settings() {
               <Input
                 id="settings-display-name"
                 name="displayName"
+                required
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 className={portalInputClass}
@@ -165,7 +171,7 @@ export default function Settings() {
                     className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
                       interests.includes(tag)
                         ? "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-400/30"
-                        : "bg-white/[0.05] text-white/55 ring-1 ring-white/10 hover:bg-white/10"
+                        : "bg-white/5 text-white/55 ring-1 ring-white/10 hover:bg-white/10"
                     }`}
                   >
                     {tag}
@@ -192,7 +198,7 @@ export default function Settings() {
                 </Select>
               </div>
             )}
-            <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.03] p-4">
+            <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/3 p-4">
               <div>
                 <Label htmlFor="settings-open-to-collaborate" className="text-sm font-medium text-white">
                   Open to collaborate
@@ -212,7 +218,7 @@ export default function Settings() {
               <Button
                 type="submit"
                 disabled={updateProfile.isPending}
-                className="bg-emerald-500 hover:bg-emerald-400"
+                className="bg-emerald-500 text-slate-950 hover:bg-emerald-400"
               >
                 {updateProfile.isPending ? "Saving…" : "Save changes"}
               </Button>
@@ -260,7 +266,7 @@ export default function Settings() {
                   <Button variant="outline" className="ml-3" onClick={() => void retryDeletion()}>Retry</Button>
                 </div>
               ) : deletionRequest && deletionRequest.status !== "cancelled" && deletionRequest.status !== "rejected" ? (
-                <div className="mt-4 rounded-lg border border-amber-300/20 bg-amber-300/[0.06] p-3 text-sm text-amber-100/80">
+                <div className="mt-4 rounded-lg border border-amber-300/20 bg-amber-300/6 p-3 text-sm text-amber-100/80">
                   Request status: <span className="font-semibold capitalize">{deletionRequest.status.replace("_", " ")}</span>
                   {deletionRequest.status === "pending" && (
                     <Button

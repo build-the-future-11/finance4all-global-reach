@@ -7,6 +7,8 @@ export interface AuthContextValue {
   user: User | null;
   profile: UserProfile | null;
   loading: boolean;
+  initializationError?: string | null;
+  retryInitialization?: () => void;
   needsOnboarding: boolean;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
   signUp: (email: string, password: string, displayName: string) => Promise<{

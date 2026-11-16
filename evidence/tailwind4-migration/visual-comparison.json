@@ -1,0 +1,179 @@
+{
+  "browser": "153.0.8010.0",
+  "cases": [
+    {
+      "label": "desktop-light-home",
+      "comparedElements": 20,
+      "maxLayoutDelta": 0,
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "differences": [],
+      "pixelComparison": {
+        "changedPixels": 3267,
+        "pixelsDifferentByMoreThan2": 225,
+        "totalPixels": 1228500,
+        "maxChannelDifference": 16
+      }
+    },
+    {
+      "label": "desktop-light-login",
+      "comparedElements": 7,
+      "maxLayoutDelta": 0,
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "differences": [],
+      "pixelComparison": {
+        "changedPixels": 12334,
+        "pixelsDifferentByMoreThan2": 409,
+        "totalPixels": 1228500,
+        "maxChannelDifference": 17
+      }
+    },
+    {
+      "label": "desktop-dark-home",
+      "comparedElements": 20,
+      "maxLayoutDelta": 0,
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "differences": [],
+      "pixelComparison": {
+        "changedPixels": 213,
+        "pixelsDifferentByMoreThan2": 101,
+        "totalPixels": 1228500,
+        "maxChannelDifference": 16
+      }
+    },
+    {
+      "label": "desktop-dark-login",
+      "comparedElements": 7,
+      "maxLayoutDelta": 0,
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "differences": [
+        {
+          "label": "BUTTON:Continue with Google",
+          "layoutDelta": 0,
+          "before": {
+            "label": "BUTTON:Continue with Google",
+            "rect": {
+              "x": 803.75,
+              "y": 327.0625,
+              "width": 440,
+              "height": 40
+            },
+            "color": "rgb(255, 255, 255)",
+            "background": "rgba(255, 255, 255, 0.06)",
+            "fontSize": "14px",
+            "lineHeight": "20px"
+          },
+          "after": {
+            "label": "BUTTON:Continue with Google",
+            "rect": {
+              "x": 803.75,
+              "y": 327.0625,
+              "width": 440,
+              "height": 40
+            },
+            "color": "rgb(255, 255, 255)",
+            "background": "oklab(0.999994 0.0000455678 0.0000200868 / 0.06)",
+            "fontSize": "14px",
+            "lineHeight": "20px"
+          }
+        }
+      ],
+      "pixelComparison": {
+        "changedPixels": 915,
+        "pixelsDifferentByMoreThan2": 100,
+        "totalPixels": 1228500,
+        "maxChannelDifference": 16
+      }
+    },
+    {
+      "label": "mobile-light-home",
+      "comparedElements": 20,
+      "maxLayoutDelta": 0,
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "differences": [],
+      "pixelComparison": {
+        "changedPixels": 12109,
+        "pixelsDifferentByMoreThan2": 530,
+        "totalPixels": 329160,
+        "maxChannelDifference": 17
+      }
+    },
+    {
+      "label": "mobile-light-login",
+      "comparedElements": 6,
+      "maxLayoutDelta": 0,
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "differences": [],
+      "pixelComparison": {
+        "changedPixels": 144,
+        "pixelsDifferentByMoreThan2": 90,
+        "totalPixels": 329160,
+        "maxChannelDifference": 11
+      }
+    },
+    {
+      "label": "mobile-dark-home",
+      "comparedElements": 20,
+      "maxLayoutDelta": 0,
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "differences": [],
+      "pixelComparison": {
+        "changedPixels": 9170,
+        "pixelsDifferentByMoreThan2": 235,
+        "totalPixels": 329160,
+        "maxChannelDifference": 16
+      }
+    },
+    {
+      "label": "mobile-dark-login",
+      "comparedElements": 6,
+      "maxLayoutDelta": 0,
+      "beforeOverflow": 0,
+      "afterOverflow": 0,
+      "differences": [
+        {
+          "label": "BUTTON:Continue with Google",
+          "layoutDelta": 0,
+          "before": {
+            "label": "BUTTON:Continue with Google",
+            "rect": {
+              "x": 25,
+              "y": 376.796875,
+              "width": 340,
+              "height": 40
+            },
+            "color": "rgb(255, 255, 255)",
+            "background": "rgba(255, 255, 255, 0.06)",
+            "fontSize": "14px",
+            "lineHeight": "20px"
+          },
+          "after": {
+            "label": "BUTTON:Continue with Google",
+            "rect": {
+              "x": 25,
+              "y": 376.796875,
+              "width": 340,
+              "height": 40
+            },
+            "color": "rgb(255, 255, 255)",
+            "background": "oklab(0.999994 0.0000455678 0.0000200868 / 0.06)",
+            "fontSize": "14px",
+            "lineHeight": "20px"
+          }
+        }
+      ],
+      "pixelComparison": {
+        "changedPixels": 382,
+        "pixelsDifferentByMoreThan2": 99,
+        "totalPixels": 329160,
+        "maxChannelDifference": 16
+      }
+    }
+  ]
+}

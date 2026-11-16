@@ -1,0 +1,27 @@
+{
+  "schema": "financemeta.dependency-migration.v1",
+  "baselineSource": "26957bf37df7553db30cefbf0237867df9889cd5",
+  "nodeVersion": "22.23.2",
+  "npmVersion": "10.9.8",
+  "auditLevel": "high",
+  "baselineLockSha256": "ebaf2f6f570504ed9599d76f7c04425c855aa7d272aa8621b1bf73e812a9d81e",
+  "candidateFilesSha256": {
+    "package.json": "aeeadccaf0d58fc23554824fac92a7385eb45c125a9736bc0072a4480cdccd46",
+    "package-lock.json": "21ce24bb9d9757190f981d137f46839a04a0fe9a733685483c4f4f24eef3e3d3",
+    "postcss.config.js": "4cae941be9bc3bee9a6905e47ea7a51aee216d587d34a8cc4ae48f78fd6d8159",
+    "components.json": "38d09e0be58f15412e01057114a5d9d4b3582200378441a3c74fd490c37b9a4b",
+    "src/index.css": "b1f094678c1985f6882b76ed0633c662423c6e6cd55e517edd82b4896c703e1e"
+  },
+  "removedDependencyNames": [
+    "braces",
+    "chokidar",
+    "micromatch",
+    "fast-glob"
+  ],
+  "commands": [
+    "npm audit --audit-level=high --json",
+    "npm audit --omit=dev --audit-level=high --json",
+    "npm ls braces chokidar micromatch fast-glob tailwindcss"
+  ],
+  "scope": "Dependency evidence only; not a production or credentialed certification."
+}

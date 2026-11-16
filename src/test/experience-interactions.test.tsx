@@ -12,8 +12,8 @@ describe("community map", () => {
     expect(within(map).getAllByRole("button")).toHaveLength(communityLocations.length);
     fireEvent.change(screen.getByRole("textbox", { name: "Find a city or country" }), { target: { value: "Tokyo" } });
     expect(within(map).getAllByRole("button")).toHaveLength(1);
-    fireEvent.click(screen.getByRole("button", { name: "Explore Tokyo, Japan", exact: true }));
-    expect(screen.getByRole("button", { name: "Tokyo, Japan", exact: true })).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(screen.getByRole("button", { name: "Explore Tokyo, Japan" }));
+    expect(screen.getByRole("button", { name: "Tokyo, Japan" })).toHaveAttribute("aria-pressed", "true");
     expect(map).toHaveAttribute("viewBox", "600 51.01111111111112 400 172");
     expect(container.querySelector(".world-map-selection")).toHaveTextContent("TokyoJapan");
     fireEvent.click(screen.getByRole("button", { name: "Reset view" }));

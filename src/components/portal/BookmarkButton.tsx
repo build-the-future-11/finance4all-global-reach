@@ -36,7 +36,7 @@ export default function BookmarkButton({
       variant={saved ? "default" : "outline"}
       disabled={loading}
       className={cn(
-        saved ? "bg-emerald-500 hover:bg-emerald-400" : "border-white/20 text-white hover:bg-white/10",
+        saved ? "bg-emerald-500 text-slate-950 hover:bg-emerald-400" : "border-white/20 text-white hover:bg-white/10",
         className,
       )}
       onClick={handleClick}

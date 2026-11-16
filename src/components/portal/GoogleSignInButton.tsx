@@ -40,7 +40,7 @@ export default function GoogleSignInButton({
     <Button
       type="button"
       variant="outline"
-      className="w-full border-white/15 bg-white/[0.06] text-white hover:bg-white/10 hover:text-white"
+      className="w-full border-white/15 bg-white/6 text-white hover:bg-white/10 hover:text-white"
       onClick={onClick}
       disabled={loading || disabled}
     >

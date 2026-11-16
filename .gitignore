@@ -34,3 +34,11 @@ storybook-static
 
 # Vercel-generated build output and project metadata, never application source.
 .vercel/
+
+.env*
+!.env.example
+.vercel
+
+# Hosted mobile lab artifacts
+performance-results/
+public-qa-results/

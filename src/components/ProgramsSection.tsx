@@ -106,11 +106,11 @@ function ProgramCard({ program }: { program: typeof programs[0] }) {
         group relative w-full cursor-pointer p-6 rounded-3xl text-left
         border border-white/20
         backdrop-blur-xl
-        bg-white/[0.04]
+        bg-white/4
         transition-all duration-500
         hover:border-white/40
         hover:-translate-y-1
-        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 focus-visible:ring-offset-2 focus-visible:ring-offset-black
+        focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-emerald-300 focus-visible:ring-offset-2 focus-visible:ring-offset-black
         overflow-hidden
       "
     >
@@ -183,8 +183,8 @@ function ImpactNumbers() {
             p-10 text-center rounded-3xl
             border border-white/20
             backdrop-blur-xl
-            bg-white/[0.05]
-            hover:bg-white/[0.08]
+            bg-white/5
+            hover:bg-white/8
             transition
           "
         >
@@ -220,7 +220,7 @@ export default function ProgramsSection() {
 
           <h2 className="text-4xl sm:text-5xl font-bold text-white">
             Programs With Explicit
-            <span className="bg-gradient-to-r from-emerald-300 to-purple-300 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-emerald-300 to-purple-300 bg-clip-text text-transparent">
               {" "}Evidence Gates
             </span>
           </h2>

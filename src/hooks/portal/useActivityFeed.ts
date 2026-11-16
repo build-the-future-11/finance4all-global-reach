@@ -1,3 +1,4 @@
+import { isVisibleContent } from "@/lib/content-visibility";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/useAuth";
@@ -12,10 +13,10 @@ export interface ActivityItem {
 }
 
 export function useActivityFeed(limit = 8) {
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
 
   return useQuery({
-    queryKey: ["activity-feed", user?.id],
+    queryKey: ["activity-feed", user?.id, limit],
     enabled: Boolean(user),
     queryFn: async (): Promise<ActivityItem[]> => {
       const items: ActivityItem[] = [];
@@ -23,7 +24,7 @@ export function useActivityFeed(limit = 8) {
       const [newsRes, appsRes, connRes, eventsRes, savedRes] = await Promise.all([
         supabase
           .from("news_articles")
-          .select("id, title, published_at")
+          .select("id, title, published_at, publication_state")
           .order("published_at", { ascending: false })
           .limit(3),
         supabase
@@ -40,19 +41,23 @@ export function useActivityFeed(limit = 8) {
           .limit(3),
         supabase
           .from("events")
-          .select("id, title, starts_at")
+          .select("id, title, starts_at, publication_state")
           .eq("status", "upcoming")
           .order("starts_at", { ascending: true })
           .limit(3),
         supabase
           .from("news_bookmarks")
-          .select("created_at, news_articles(id, title)")
+          .select("created_at, news_articles(id, title, publication_state)")
           .eq("user_id", user!.id)
           .order("created_at", { ascending: false })
           .limit(2),
       ]);
 
-      newsRes.data?.forEach((a) => {
+      if ([newsRes, appsRes, connRes, eventsRes, savedRes].some((response) => response.error)) {
+        throw new Error("Activity could not be loaded. Please retry.");
+      }
+
+      newsRes.data?.filter((row) => isVisibleContent("news", row)).forEach((a) => {
         items.push({
           id: `news-${a.id}`,
           type: "news",
@@ -87,7 +92,7 @@ export function useActivityFeed(limit = 8) {
         });
       });
 
-      eventsRes.data?.forEach((e) => {
+      eventsRes.data?.filter((row) => isVisibleContent("event", row)).forEach((e) => {
         items.push({
           id: `event-${e.id}`,
           type: "event",
@@ -99,8 +104,8 @@ export function useActivityFeed(limit = 8) {
       });
 
       savedRes.data?.forEach((s) => {
-        const article = s.news_articles as { id: string; title: string } | null;
-        if (article) {
+        const article = s.news_articles as { id: string; title: string; publication_state: string } | null;
+        if (article && isVisibleContent("news", article)) {
           items.push({
             id: `saved-${article.id}`,
             type: "saved_article",

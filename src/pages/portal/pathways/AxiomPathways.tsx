@@ -104,7 +104,7 @@ export default function AxiomPathways() {
 
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <Tabs value={typeFilter} onValueChange={(v) => setTypeFilter(v as OpportunityType | "all")}>
-          <TabsList className="h-auto flex-wrap gap-1 bg-white/[0.04] p-1">
+          <TabsList className="h-auto flex-wrap gap-1 bg-white/4 p-1">
             {TYPES.map((t) => (
               <TabsTrigger
                 key={t.value}
@@ -162,7 +162,7 @@ export default function AxiomPathways() {
                     <Button
                       size="sm"
                       variant={saved ? "default" : "outline"}
-                      className={saved ? "bg-emerald-500 hover:bg-emerald-400" : "border-white/20 text-white"}
+                      className={saved ? "bg-emerald-500 text-slate-950 hover:bg-emerald-400" : "border-white/20 text-white"}
                       onClick={() => handleToggle(opp.id, saved)}
                     >
                       <Star className={`h-3.5 w-3.5 ${saved ? "fill-current" : ""}`} />

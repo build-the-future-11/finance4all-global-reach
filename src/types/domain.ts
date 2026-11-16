@@ -127,6 +127,7 @@ export const OpportunitySchema = z.object({
 export type Opportunity = z.infer<typeof OpportunitySchema>;
 
 export const StudioSubmissionSchema = z.object({
+  publicationState: z.enum(["draft", "published", "archived"]).optional(),
   id: z.string().uuid(),
   authorId: z.string().uuid(),
   title: z.string(),
@@ -138,6 +139,7 @@ export const StudioSubmissionSchema = z.object({
 export type StudioSubmission = z.infer<typeof StudioSubmissionSchema>;
 
 export const EssaySubmissionSchema = z.object({
+  publicationState: z.enum(["draft", "published", "archived"]).optional(),
   id: z.string().uuid(),
   authorId: z.string().uuid(),
   title: z.string(),
@@ -195,6 +197,7 @@ export const ConnectionRequestSchema = z.object({
 export type ConnectionRequest = z.infer<typeof ConnectionRequestSchema>;
 
 export const IntroductionPostSchema = z.object({
+  publicationState: z.enum(["draft", "published", "archived"]).optional(),
   id: z.string().uuid(),
   authorId: z.string().uuid(),
   headline: z.string(),
@@ -207,6 +210,7 @@ export type IntroductionPost = z.infer<typeof IntroductionPostSchema>;
 // ─── Bookmarks & Notifications ──────────────────────────────────────────────
 
 export const NotificationTypeSchema = z.enum([
+  "project_task", "intake_status",
   "connection_request",
   "connection_accepted",
   "lab_application_status",

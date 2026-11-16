@@ -40,7 +40,7 @@ export default function ForgotPassword() {
         </div>
         {error && <p role="alert" className="rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</p>}
         {message && <p role="status" className="rounded-lg border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">{message}</p>}
-        <Button type="submit" disabled={submitting} className="w-full bg-emerald-500 hover:bg-emerald-400">
+        <Button type="submit" disabled={submitting} className="w-full bg-emerald-500 text-slate-950 hover:bg-emerald-400">
           {submitting ? "Sending..." : "Send recovery link"}
         </Button>
       </form>

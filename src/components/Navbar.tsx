@@ -71,7 +71,7 @@ export default function Navbar() {
           <div
             ref={navRef}
             onMouseMove={handleMove}
-            className="group relative overflow-hidden rounded-full border border-white/20 px-6 py-3 backdrop-blur-xl bg-white/[0.05] shadow-[0_20px_60px_rgba(0,0,0,0.35)]"
+            className="group relative overflow-hidden rounded-full border border-white/20 px-6 py-3 backdrop-blur-xl bg-white/5 shadow-[0_20px_60px_rgba(0,0,0,0.35)]"
           >
             <div
               className="absolute inset-0 rounded-full opacity-70"
@@ -89,11 +89,11 @@ export default function Navbar() {
               }}
             />
 
-            <div className="pointer-events-none absolute inset-0 rounded-full bg-gradient-to-br from-white/40 via-white/10 to-transparent opacity-30" />
+            <div className="pointer-events-none absolute inset-0 rounded-full bg-linear-to-br from-white/40 via-white/10 to-transparent opacity-30" />
             <div className="pointer-events-none absolute inset-0 rounded-full ring-1 ring-inset ring-white/25" />
 
             <div className="relative z-10 flex items-center justify-between">
-              <a href="#" className="flex items-center gap-2 text-lg tracking-tight">
+              <a href="/" className="flex items-center gap-2 text-lg tracking-tight">
                 <span className="font-semibold text-white">Finance4All</span>
                 <span className="text-white/50">Meta</span>
               </a>

@@ -8,7 +8,7 @@ import { searchFilter, usePortalSearch } from "@/hooks/portal/usePortalSearch";
 const state = vi.hoisted(() => ({ failed: false, filteredBeforeLimit: true, crowded: false }));
 vi.mock("@/lib/supabase", () => ({ supabase: { from: (table: string) => {
   let filtered = false;
-  const rows = Array.from({ length: 50 }, (_, i) => ({ id: String(i), title: i === 40 ? "Needle" : state.crowded ? "Needle extended" : "Other", summary: "summary" }));
+  const rows = Array.from({ length: 50 }, (_, i) => ({ id: String(i), title: i === 40 ? "Needle" : state.crowded ? "Needle extended" : "Other", summary: "summary", publication_state: "published" }));
   let data = table === "news_articles" ? rows : [];
   const chain = {
     select: () => chain, neq: () => chain, eq: () => chain, order: () => chain,

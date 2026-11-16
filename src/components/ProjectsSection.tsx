@@ -4,80 +4,80 @@ import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { portalRoutes } from "@/routes/portal";
 
 const FINANCEMETA_APPLICATION_URL =
-  "https://tally.so/r/obWxvN?utm_source=website&utm_medium=cta&utm_campaign=general_application";
+  "https://tally.so/r/5B7blP?utm_source=member_portal&utm_medium=cta&utm_campaign=general_application&fm_surface=member_portal&fm_route=join&fm_version=conversion-v1";
 
 const directApplications = [
   {
     label: "Research & FinanceMeta Labs",
     description:
       "Quantitative finance, financial ML, econometrics, macro, market microstructure, alternative data, financial systems, AI × finance, replications, benchmarks, papers, and faculty collaboration.",
-    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=research_labs",
+    url: "https://tally.so/r/5B7blP?utm_source=member_portal&utm_medium=opportunity_card&utm_campaign=research_labs&fm_surface=member_portal&fm_route=join&fm_version=conversion-v1",
   },
   {
     label: "International Youth Research Initiative",
     description:
       "Join the journal, preprint and working-paper forum, youth research cohorts, reviewer network, editorial board, research showcases, and faculty mentorship pathways.",
-    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=youth_research_initiative",
+    url: "https://tally.so/r/5B7blP?utm_source=member_portal&utm_medium=opportunity_card&utm_campaign=youth_research_initiative&fm_surface=member_portal&fm_route=join&fm_version=conversion-v1",
   },
   {
     label: "The Union",
     description:
       "For finance, economics, investing, research, and financial-literacy organizations that want shared programs, speakers, competitions, research, chapters, and cross-network distribution.",
-    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=the_union",
+    url: "https://tally.so/r/5B7blP?utm_source=member_portal&utm_medium=opportunity_card&utm_campaign=the_union&fm_surface=member_portal&fm_route=join&fm_version=conversion-v1",
   },
   {
     label: "Women in Finance",
     description:
       "Mentorship, research, speaker programming, education, chapters, career access, partnerships, and leadership for women interested in finance and economics.",
-    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=women_in_finance",
+    url: "https://tally.so/r/5B7blP?utm_source=member_portal&utm_medium=opportunity_card&utm_campaign=women_in_finance&fm_surface=member_portal&fm_route=join&fm_version=conversion-v1",
   },
   {
     label: "Fellowships, analyst programs & cohorts",
     description:
       "FinanceMeta Research Fellowship, Global Fellowship, Analyst Program, Financial Foundations, Axiom Pathways, Youth Economy Lab, and structured research or learning cohorts.",
-    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=fellowships_cohorts",
+    url: "https://tally.so/r/5B7blP?utm_source=member_portal&utm_medium=opportunity_card&utm_campaign=fellowships_cohorts&fm_surface=member_portal&fm_route=join&fm_version=conversion-v1",
   },
   {
     label: "FinTech Studio & builders",
     description:
       "Build financial applications, data products, research tools, experiments, and scoped prototypes with technical, product, design, and finance contributors.",
-    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=fintech_builders",
+    url: "https://tally.so/r/5B7blP?utm_source=member_portal&utm_medium=opportunity_card&utm_campaign=fintech_builders&fm_surface=member_portal&fm_route=join&fm_version=conversion-v1",
   },
   {
     label: "Finance4All education & school pilots",
     description:
       "Financial-literacy programs, school visits, workshops, Take Charge Today facilitation, Catalyst, curriculum collaborations, student pilots, and educator partnerships.",
-    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=education_pilots",
+    url: "https://tally.so/r/5B7blP?utm_source=member_portal&utm_medium=opportunity_card&utm_campaign=education_pilots&fm_surface=member_portal&fm_route=join&fm_version=conversion-v1",
   },
   {
     label: "Competitions & challenges",
     description:
       "Investment and economics competitions, monthly research challenges, quantitative research challenges, global research challenges, and reproducibility projects.",
-    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=competitions_challenges",
+    url: "https://tally.so/r/5B7blP?utm_source=member_portal&utm_medium=opportunity_card&utm_campaign=competitions_challenges&fm_surface=member_portal&fm_route=join&fm_version=conversion-v1",
   },
   {
     label: "Chapters & leadership",
     description:
       "Found or lead a school chapter, regional network, research program, fellowship, competition, Union node, Women in Finance program, operations function, or community.",
-    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=chapters_leadership",
+    url: "https://tally.so/r/XxaB1j?utm_source=member_portal&utm_medium=opportunity_card&utm_campaign=chapters_leadership&fm_surface=member_portal&fm_route=chapter&fm_version=conversion-v1",
   },
   {
     label: "FinanceDebriefed & media",
     description:
       "Write, research, edit, explain markets and economics, build financial-news formats, work on podcasts, or help grow distribution.",
-    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=media_editorial",
+    url: "https://tally.so/r/5B7blP?utm_source=member_portal&utm_medium=opportunity_card&utm_campaign=media_editorial&fm_surface=member_portal&fm_route=join&fm_version=conversion-v1",
   },
   {
     label: "Mentors, professors, speakers & reviewers",
     description:
       "Mentor research, review methodology and papers, speak at workshops, judge competitions, advise teams, or collaborate with student and professional researchers.",
-    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=mentors_faculty",
+    url: "https://tally.so/r/2EWxzb?utm_source=member_portal&utm_medium=opportunity_card&utm_campaign=mentors_faculty&fm_surface=member_portal&fm_route=partnership&fm_version=conversion-v1",
   },
   {
     label: "Partners, data providers & sponsors",
     description:
       "University, school, nonprofit, financial-institution, data, API, recruiting, sponsorship, prize, research, and distribution partnerships.",
-    url: "https://tally.so/r/obWxvN?utm_source=website&utm_medium=opportunity_card&utm_campaign=partnerships",
+    url: "https://tally.so/r/2EWxzb?utm_source=member_portal&utm_medium=opportunity_card&utm_campaign=partnerships&fm_surface=member_portal&fm_route=partnership&fm_version=conversion-v1",
   },
 ] as const;
 
@@ -141,7 +141,7 @@ export default function ProjectsSection() {
               <Link
                 key={module.title}
                 to={module.href}
-                className="block rounded-3xl border border-white/20 bg-white/[0.05] p-6 backdrop-blur-xl transition hover:-translate-y-1 hover:border-white/35"
+                className="block rounded-3xl border border-white/20 bg-white/5 p-6 backdrop-blur-xl transition hover:-translate-y-1 hover:border-white/35"
               >
                 <div className="mb-5 flex items-center gap-3">
                   <div className="rounded-xl border border-white/20 bg-white/10 p-3 text-emerald-300">
@@ -167,7 +167,7 @@ export default function ProjectsSection() {
 
         <div
           id="join"
-          className="mt-10 flex flex-col items-start justify-between gap-4 rounded-3xl border border-white/20 bg-gradient-to-r from-white/10 to-white/[0.04] p-6 sm:flex-row sm:items-center"
+          className="mt-10 flex flex-col items-start justify-between gap-4 rounded-3xl border border-white/20 bg-linear-to-r from-white/10 to-white/4 p-6 sm:flex-row sm:items-center"
         >
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-emerald-200/90">
@@ -222,7 +222,7 @@ export default function ProjectsSection() {
                 href={application.url}
                 target="_blank"
                 rel="noreferrer"
-                className="group rounded-2xl border border-white/15 bg-white/[0.035] p-5 transition hover:-translate-y-0.5 hover:border-emerald-300/50 hover:bg-white/[0.06]"
+                className="group rounded-2xl border border-white/15 bg-white/[0.035] p-5 transition hover:-translate-y-0.5 hover:border-emerald-300/50 hover:bg-white/6"
               >
                 <div className="flex items-start justify-between gap-3">
                   <h4 className="font-semibold text-white">{application.label}</h4>

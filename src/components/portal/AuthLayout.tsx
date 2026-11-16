@@ -25,9 +25,9 @@ export default function AuthLayout({ title, subtitle, children, footer }: AuthLa
           <h2><BoxReveal>Your curiosity.</BoxReveal><br /><em><BoxReveal delay={150}>A world of<br />possibility.</BoxReveal></em></h2>
           <span>Finance is for everyone. Find clear explanations, meaningful research, and people who share your questions.</span>
           <div className="auth-reach">
-            <strong>100,000+</strong>
-            <span>students reached · six continents</span>
-            <small>Organisation-reported as of September 2026; not independently audited.</small>
+            <strong>Open paths</strong>
+            <span>lessons · research · contribution</span>
+            <small>Availability and evidence boundaries are shown before you begin.</small>
           </div>
         </div>
         <div className="auth-story-grid">
@@ -52,6 +52,13 @@ export default function AuthLayout({ title, subtitle, children, footer }: AuthLa
 
           <div className="auth-form-body">{children}</div>
           <div className="auth-form-footer">{footer}</div>
+          <nav aria-label="Member information" className="auth-form-footer">
+            <a href="https://finance-meta-landing.vercel.app/privacy">Privacy information</a>
+            {" · "}
+            <a href="https://finance-meta-landing.vercel.app/participation">Participation expectations</a>
+            {" · "}
+            <a href="mailto:financeforalledu@gmail.com">Contact support</a>
+          </nav>
         </div>
       </main>
     </div>

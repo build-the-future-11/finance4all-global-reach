@@ -38,7 +38,7 @@ export default function PathwaysStudios() {
         repoUrl: repoUrl.trim() || undefined,
         demoUrl: demoUrl.trim() || undefined,
       });
-      toast.success("Submission published");
+      toast.success("Submission saved for review");
       setOpen(false);
       setTitle("");
       setWriteup("");
@@ -78,7 +78,7 @@ export default function PathwaysStudios() {
                   <Label htmlFor="studio-demo-url">Demo URL (optional)</Label>
                   <Input id="studio-demo-url" name="demoUrl" type="url" value={demoUrl} onChange={(e) => setDemoUrl(e.target.value)} className="mt-1 border-white/20 bg-white/5" />
                 </div>
-                <Button type="submit" disabled={submit.isPending}>Publish</Button>
+                <Button type="submit" disabled={submit.isPending}>Submit for review</Button>
               </form>
             </DialogContent>
           </Dialog>
@@ -94,6 +94,7 @@ export default function PathwaysStudios() {
           return (
             <PortalCard key={sub.id} className="p-5">
               <h3 className="text-lg font-semibold text-white">{sub.title}</h3>
+              {(sub.publicationState ?? "draft") !== "published" && <p className="text-sm">{sub.publicationState === "archived" ? "Archived" : "Awaiting publication review"} · Visible to you and administrators.</p>}
               <p className="mt-1 text-sm text-white/50">by {author?.displayName ?? "Member"}</p>
               <p className="mt-3 text-sm text-white/70">{sub.writeup}</p>
               <div className="mt-4 flex flex-wrap gap-3">

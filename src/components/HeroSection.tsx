@@ -57,12 +57,12 @@ export default function HeroSection() {
       </div>
 
       <div className="absolute inset-0 -z-20 pointer-events-none">
-        <div className="absolute h-2 w-2 bg-white/40 rounded-full blur-sm top-1/3 left-1/4 animate-pulse"></div>
-        <div className="absolute h-2 w-2 bg-white/40 rounded-full blur-sm top-1/2 left-3/4 animate-pulse"></div>
-        <div className="absolute h-2 w-2 bg-white/40 rounded-full blur-sm bottom-1/4 left-1/3 animate-pulse"></div>
+        <div className="absolute h-2 w-2 bg-white/40 rounded-full blur-xs top-1/3 left-1/4 animate-pulse"></div>
+        <div className="absolute h-2 w-2 bg-white/40 rounded-full blur-xs top-1/2 left-3/4 animate-pulse"></div>
+        <div className="absolute h-2 w-2 bg-white/40 rounded-full blur-xs bottom-1/4 left-1/3 animate-pulse"></div>
       </div>
 
-      <div className="absolute inset-0 -z-10 bg-black/50 backdrop-blur-[12px]" />
+      <div className="absolute inset-0 -z-10 bg-black/50 backdrop-blur-md" />
 
       <div
         ref={gridRef}
@@ -79,7 +79,7 @@ export default function HeroSection() {
       />
 
       <div className="relative z-10 max-w-4xl">
-        <div className="relative rounded-[36px] p-12 border border-white/20 backdrop-blur-2xl bg-white/[0.06] shadow-[0_40px_140px_rgba(0,0,0,0.7)] overflow-hidden">
+        <div className="relative rounded-[36px] p-12 border border-white/20 backdrop-blur-2xl bg-white/6 shadow-[0_40px_140px_rgba(0,0,0,0.7)] overflow-hidden">
           <div
             ref={glareRef}
             className="pointer-events-none absolute -top-40 -left-40 w-[600px] h-[600px] opacity-30 bg-[radial-gradient(circle,rgba(255,255,255,0.5),transparent_60%)] transition-transform duration-500"
@@ -91,7 +91,7 @@ export default function HeroSection() {
           </p>
 
           <h1 className="mb-6 text-5xl sm:text-6xl font-bold tracking-tight leading-tight">
-            <span className="bg-gradient-to-r from-emerald-300 via-white to-purple-300 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-emerald-300 via-white to-purple-300 bg-clip-text text-transparent">
               Study financial systems.
             </span>
             <br />

@@ -4,9 +4,10 @@ import { useAuth } from "@/contexts/useAuth";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, Loader2 } from "lucide-react";
 import { readAuthCallbackError, takePostAuthPath } from "@/lib/auth-navigation";
+import AccountRecovery from "@/components/portal/AccountRecovery";
 
 export default function AuthCallback() {
-  const { user, loading, needsOnboarding } = useAuth();
+  const { user, loading, needsOnboarding, initializationError } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const authError = useMemo(
@@ -15,19 +16,19 @@ export default function AuthCallback() {
   );
 
   useEffect(() => {
-    if (loading || authError) return;
+    if (loading || authError || initializationError) return;
     if (user) {
       navigate(needsOnboarding ? "/onboarding" : takePostAuthPath(), { replace: true });
     } else {
       const timer = setTimeout(() => navigate("/login", { replace: true }), 2500);
       return () => clearTimeout(timer);
     }
-  }, [authError, user, loading, needsOnboarding, navigate]);
+  }, [authError, initializationError, user, loading, needsOnboarding, navigate]);
 
   if (authError) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#060a12] px-4 text-white">
-        <section className="w-full max-w-md border border-amber-400/25 bg-white/[0.04] p-6 text-center">
+        <section className="w-full max-w-md border border-amber-400/25 bg-white/4 p-6 text-center">
           <AlertTriangle className="mx-auto h-9 w-9 text-amber-300" />
           <h1 className="mt-4 text-xl font-semibold">Sign in was not completed</h1>
           <p role="alert" className="mt-2 text-sm leading-6 text-white/65">
@@ -41,6 +42,8 @@ export default function AuthCallback() {
       </main>
     );
   }
+
+  if (!loading && initializationError) return <AccountRecovery />;
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#060a12] text-white">

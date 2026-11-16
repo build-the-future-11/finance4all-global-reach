@@ -45,9 +45,6 @@ jobs:
         run: |
           set -euo pipefail
 
-          node -e "const p=require('./package.json');process.stdout.write(JSON.stringify({dependencies:p.dependencies,devDependencies:p.devDependencies}))" \
-            > production-evidence/current-dependencies.json
-
           for attempt in $(seq 1 20); do
             # A push-triggered health run can start before Vercel has promoted the
             # new main revision. Refresh the production receipt and allow a bounded
@@ -58,14 +55,10 @@ jobs:
 
             if git fetch --no-tags --depth=1 origin "$revision" >/dev/null 2>&1 \
               && git cat-file -e "${revision}^{commit}" 2>/dev/null; then
-              git show "${revision}:package.json" \
-                | node -e "let s='';process.stdin.on('data',c=>s+=c).on('end',()=>{const p=JSON.parse(s);process.stdout.write(JSON.stringify({dependencies:p.dependencies,devDependencies:p.devDependencies}))})" \
-                > production-evidence/deployed-dependencies.json
-
-              if git diff --quiet "$revision" "$EXPECTED_SOURCE_SHA" -- \
-                src ':(exclude)src/test/**' public index.html package-lock.json vite.config.ts vercel.json \
-                tailwind.config.ts tsconfig.app.json tsconfig.json \
-                && cmp -s production-evidence/deployed-dependencies.json production-evidence/current-dependencies.json; then
+              if node scripts/verify-runtime-equivalence.mjs \
+                --deployed-revision "$revision" \
+                --source-revision "$EXPECTED_SOURCE_SHA" \
+                --receipt production-evidence/runtime-equivalence.json; then
                 printf 'deployed_revision=%s\ncurrent_main=%s\nruntime_equivalent=true\nattempt=%s\n' \
                   "$revision" "$EXPECTED_SOURCE_SHA" "$attempt" \
                   > production-evidence/runtime-equivalence.txt

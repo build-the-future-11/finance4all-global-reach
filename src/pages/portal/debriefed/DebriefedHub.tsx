@@ -145,7 +145,7 @@ export default function DebriefedHub() {
         onValueChange={(v) => setCategory(v as NewsCategory | "all")}
         className="mb-6"
       >
-        <TabsList className="h-auto flex-wrap gap-1 bg-white/[0.04] p-1">
+        <TabsList className="h-auto flex-wrap gap-1 bg-white/4 p-1">
           {CATEGORIES.map((c) => (
             <TabsTrigger
               key={c.value}

@@ -1,4 +1,4 @@
-import "@testing-library/jest-dom";
+import "@testing-library/jest-dom/vitest";
 
 // jsdom has no canvas renderer. Exercise the component's no-canvas fallback;
 // the animated canvas is checked separately in the real browser.

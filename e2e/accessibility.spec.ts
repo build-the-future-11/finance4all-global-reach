@@ -26,3 +26,21 @@ for (const { route, heading } of PUBLIC_ROUTES) {
     expect(results.violations).toEqual([]);
   });
 }
+
+for (const theme of ["light", "dark"]) {
+  for (const state of ["unavailable", "closed"]) {
+    test(`signup ${state} notice remains accessible in ${theme} theme`, async ({ page }) => {
+      await page.addInitScript(value => localStorage.setItem("theme", value), theme);
+      await page.route("**/auth/v1/settings", route => route.fulfill({
+        status: state === "unavailable" ? 503 : 200,
+        contentType: "application/json",
+        body: JSON.stringify(state === "unavailable" ? {} : { disable_signup: true, external: { email: true, google: true } }),
+      }));
+      await page.goto("/signup");
+      await expect(page.getByRole("alert")).toContainText(state === "unavailable" ? "couldn't check signup availability" : "signup is currently closed");
+      await expect(page.getByRole("button", { name: "Create account with email" })).toBeDisabled();
+      const results = await new AxeBuilder({ page }).analyze();
+      expect(results.violations).toEqual([]);
+    });
+  }
+}
