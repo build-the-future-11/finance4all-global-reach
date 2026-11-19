@@ -22,6 +22,8 @@ for (const path of inventory.paths) {
     const response = await page.goto(inventory.origin + path, { waitUntil: "networkidle" });
     expect(response?.status()).toBe(200);
     await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
+    // The legacy hero is rendered before its entrance animation finishes.
+    if (path === "/finance-for-all") await expect(page.locator(".hero-copy")).toHaveCSS("opacity", "1");
     // A bare HTTPS origin and the same origin ending in / identify the same URL.
     const canonical = await page.locator('link[rel="canonical"]').getAttribute("href");
     expect(new URL(canonical!).href).toBe(new URL(inventory.origin + path).href);
