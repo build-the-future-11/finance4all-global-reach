@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "dataset_id": "REPLACE-WITH-STABLE-DATASET-ID",
+  "source_title": "REPLACE WITH PUBLISHER DATASET TITLE",
+  "source_url": "https://",
+  "source_vintage": "REPLACE WITH RELEASE/VINTAGE IDENTIFIER",
+  "license_note": "REPLACE WITH REVIEWED ACCESS/USE TERMS AND SOURCE",
+  "redistribution_rule": "REPLACE WITH THE ACTUAL REDISTRIBUTION BOUNDARY",
+  "release_time_policy": "Define how publisher release timestamps are interpreted.",
+  "availability_time_policy": "Define when a row/value is considered usable by a historical prediction.",
+  "observation_time_field": "REPLACE_WITH_FIELD",
+  "availability_time_field": "REPLACE_WITH_DISTINCT_FIELD",
+  "retrieved_at": "YYYY-MM-DDTHH:MM:SSZ",
+  "published_at": null,
+  "local_sha256": "REPLACE_WITH_64_LOWERCASE_HEX"
+}
