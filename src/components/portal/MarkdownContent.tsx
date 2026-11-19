@@ -5,6 +5,7 @@ interface MarkdownContentProps {
   content: string;
   className?: string;
   titleAlreadyRendered?: boolean;
+  headingAnchors?: boolean;
 }
 
 function inlineFormat(text: string): React.ReactNode[] {
@@ -52,7 +53,7 @@ function inlineFormat(text: string): React.ReactNode[] {
   return parts;
 }
 
-export default function MarkdownContent({ content, className, titleAlreadyRendered = false }: MarkdownContentProps) {
+export default function MarkdownContent({ content, className, titleAlreadyRendered = false, headingAnchors = false }: MarkdownContentProps) {
   const blocks = content.split(/\n\n+/);
 
   return (
@@ -65,7 +66,7 @@ export default function MarkdownContent({ content, className, titleAlreadyRender
         if (trimmed.startsWith("### ")) {
           const Heading = titleAlreadyRendered ? "h3" : "h4";
           return (
-            <Heading key={i} className="mb-2 mt-6 text-base font-semibold text-foreground">
+            <Heading key={i} id={headingAnchors ? `section-${i}` : undefined} className="mb-2 mt-6 scroll-mt-24 text-base font-semibold text-foreground">
               {inlineFormat(trimmed.slice(4))}
             </Heading>
           );
@@ -73,7 +74,7 @@ export default function MarkdownContent({ content, className, titleAlreadyRender
         if (trimmed.startsWith("## ")) {
           const Heading = titleAlreadyRendered ? "h2" : "h3";
           return (
-            <Heading key={i} className="mb-3 mt-8 font-serif text-2xl font-semibold text-foreground">
+            <Heading key={i} id={headingAnchors ? `section-${i}` : undefined} className="mb-3 mt-8 scroll-mt-24 font-serif text-2xl font-semibold text-foreground">
               {inlineFormat(trimmed.slice(3))}
             </Heading>
           );

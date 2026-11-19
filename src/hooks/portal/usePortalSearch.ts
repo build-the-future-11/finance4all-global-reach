@@ -5,7 +5,7 @@ import { portalRoutes } from "@/routes/portal";
 
 export interface SearchResult {
   id: string;
-  type: "news" | "lab" | "opportunity" | "event" | "member" | "explainer";
+  type: "news" | "lab" | "opportunity" | "event" | "member" | "explainer" | "program" | "chapter" | "resource";
   title: string;
   subtitle?: string;
   href: string;
@@ -25,22 +25,22 @@ export function searchFilter(columns: string[], query: string, tier: "all" | "ex
   return matches;
 }
 
-export function usePortalSearch(query: string) {
+export function usePortalSearch(query: string, userId?: string) {
   const q = query.trim().toLowerCase();
 
   return useQuery({
-    queryKey: ["portal-search", q],
+    queryKey: ["portal-search", userId, q],
     enabled: q.length >= 2,
     queryFn: async ({ signal }): Promise<SearchResult[]> => {
       const results: SearchResult[] = [];
       for (const tier of ["exact", "prefix", "remaining"] as const) {
       const [news, labs, opps, events, members, explainers] = await Promise.all([
-        supabase.from("news_articles").select("id, title, summary, publication_state").or(searchFilter(["title","summary"], q, tier)).order("id").limit(12).abortSignal(signal),
-        supabase.from("research_projects").select("id, title, description").neq("status", "draft").or(searchFilter(["title","description"], q, tier)).order("id").limit(12).abortSignal(signal),
-        supabase.from("opportunities").select("id, title, organization, publication_state").eq("is_active", true).or(searchFilter(["title","organization"], q, tier)).order("id").limit(12).abortSignal(signal),
-        supabase.from("events").select("id, title, description, publication_state").or(searchFilter(["title","description"], q, tier)).order("id").limit(12).abortSignal(signal),
-        supabase.from("profiles").select("id, display_name, bio").neq("display_name", "").or(searchFilter(["display_name","bio"], q, tier)).order("id").limit(12).abortSignal(signal),
-        supabase.from("explainer_cards").select("id, slug, title, summary, publication_state").or(searchFilter(["title","summary"], q, tier)).order("id").limit(12).abortSignal(signal),
+        supabase.from("news_articles").select("id, title, summary, publication_state").eq("publication_state", "published").or(searchFilter(["title","summary"], q, tier)).order("id").limit(12).abortSignal(signal),
+        supabase.from("research_projects").select("id, title, description, publication_state").eq("publication_state", "published").neq("status", "draft").or(searchFilter(["title","description"], q, tier)).order("id").limit(12).abortSignal(signal),
+        supabase.from("opportunities").select("id, title, organization, publication_state").eq("is_active", true).eq("publication_state", "published").or(searchFilter(["title","organization"], q, tier)).order("id").limit(12).abortSignal(signal),
+        supabase.from("events").select("id, title, description, publication_state").eq("publication_state", "published").or(searchFilter(["title","description"], q, tier)).order("id").limit(12).abortSignal(signal),
+        supabase.from("profiles").select("id, display_name, bio").eq("directory_visible", true).neq("display_name", "").or(searchFilter(["display_name","bio"], q, tier)).order("id").limit(12).abortSignal(signal),
+        supabase.from("explainer_cards").select("id, slug, title, summary, publication_state").eq("publication_state", "published").or(searchFilter(["title","summary"], q, tier)).order("id").limit(12).abortSignal(signal),
       ]);
 
       if ([news, labs, opps, events, members, explainers].some((response) => response.error)) {
@@ -61,7 +61,8 @@ export function usePortalSearch(query: string) {
         );
 
       labs.data
-        ?.filter((r) => r.title.toLowerCase().includes(q) || r.description.toLowerCase().includes(q))
+        ?.filter(row => isVisibleContent("lab", row))
+        .filter((r) => r.title.toLowerCase().includes(q) || r.description.toLowerCase().includes(q))
         .forEach((r) =>
           results.push({
             id: r.id,

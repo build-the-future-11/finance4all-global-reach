@@ -1,0 +1,79 @@
+{
+  "reviewedAt": "2026-10-11",
+  "scope": "Six original educational explainers; local source integration only. No current market data or return forecasts. No attributed individual author or external editorial certification.",
+  "sourceReview": "Primary-source pages opened during authoring on 2026-10-11; links support adjacent factual explanations. Worked examples and exercises are original hypothetical scenarios.",
+  "originalCatalogSha256": "bc2958c5af56dcad9d27dd01a119b71a761d5c6c4aab007cd3a2357cfdb8a945",
+  "seriesSha256": "a52ec73cf5a8e2c3dc6443871aed47fb589557901778291c0b84c75ce78f4aae",
+  "articles": [
+    {
+      "slug": "lower-inflation-does-not-mean-lower-prices",
+      "title": "Why lower inflation does not mean lower prices",
+      "words": 1151,
+      "readMinutes": 6,
+      "bodySha256": "308ba646aa82086389cc4234624c4a2b4368ce389efafd8172b943d4c54e580d",
+      "sources": [
+        "https://www.bankofengland.co.uk/explainers/what-is-inflation",
+        "https://www.bls.gov/cpi/questions-and-answers.htm"
+      ]
+    },
+    {
+      "slug": "why-bond-prices-fall-when-yields-rise",
+      "title": "Why bond prices fall when yields rise",
+      "words": 1089,
+      "readMinutes": 5,
+      "bodySha256": "51b6b4e219f6601236c2729417f07f6df779f6ddfe3fecaae5d5293020f692f8",
+      "sources": [
+        "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-bulletins-86",
+        "https://www.finra.org/investors/insights/bond-yield-return",
+        "https://www.investor.gov/introduction-investing/investing-basics/glossary/bond-funds-and-income-funds"
+      ]
+    },
+    {
+      "slug": "how-a-profitable-company-runs-short-of-cash",
+      "title": "How a profitable company can run short of cash",
+      "words": 1106,
+      "readMinutes": 6,
+      "bodySha256": "f1b11818011968c231068d6344885c2fe05df78cc0ad43f43ae2c9d8661d8542",
+      "sources": [
+        "https://www.sec.gov/about/reports-publications/investorpubsbegfinstmtguide",
+        "https://www.ifrs.org/issued-standards/list-of-standards/ias-7-statement-of-cash-flows/"
+      ]
+    },
+    {
+      "slug": "what-a-weaker-currency-changes",
+      "title": "What a weaker currency changes",
+      "words": 1085,
+      "readMinutes": 5,
+      "bodySha256": "74958c20f2a5178a701a2853c63c1502088a87a4cddef8aa838f49e845d02352",
+      "sources": [
+        "https://www.rba.gov.au/education/resources/explainers/exchange-rates-and-the-australian-economy.html",
+        "https://www.imf.org/en/publications/fandd/issues/series/back-to-basics/real-exchange-rates"
+      ]
+    },
+    {
+      "slug": "a-stock-split-does-not-make-a-company-cheaper",
+      "title": "A stock split does not make a company cheaper",
+      "words": 1102,
+      "readMinutes": 6,
+      "bodySha256": "2584258c14a6d869a0bf2dfda725b64f737455c11ae6823abbdfa5c715200b89",
+      "sources": [
+        "https://www.investor.gov/introduction-investing/investing-basics/glossary/stock-split",
+        "https://www.sec.gov/about/reports-publications/investorpubsbegfinstmtguide",
+        "https://syndication.finra.org/content/corporate-actions-public-companies-what-you-should-know"
+      ]
+    },
+    {
+      "slug": "a-rising-stock-index-is-not-the-whole-economy",
+      "title": "Why a rising stock index is not the whole economy",
+      "words": 1106,
+      "readMinutes": 6,
+      "bodySha256": "7ba9656b3cafef27dc5198e8cbfdb04e8de1f8973b75ce18edc544422dd48668",
+      "sources": [
+        "https://www.investor.gov/introduction-investing/investing-basics/glossary/market-indices",
+        "https://www.spglobal.com/spdji/en/research-insights/index-literacy/methodology-matters/",
+        "https://www.bea.gov/data/gdp/gross-domestic-product",
+        "https://www.investor.gov/introduction-investing/investing-basics/investment-products/mutual-funds-and-exchange-traded-4"
+      ]
+    }
+  ]
+}

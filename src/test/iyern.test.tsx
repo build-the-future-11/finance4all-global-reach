@@ -17,13 +17,14 @@ describe("IYERN public portal", () => {
   it("keeps the archive empty while routing journal and preprint applications separately", () => {
     expect(publications).toEqual([]); portal();
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Researching the Economy of Tomorrow");
-    expect(screen.getByRole("link", { name: /Explore roles & express interest/ })).toHaveAttribute("href", "https://finance-meta-landing.vercel.app/join?role=Research%20Fellow&utm_source=member_portal&utm_medium=website");
+    expect(screen.getByRole("link", { name: /Explore roles & express interest/ })).toHaveAttribute("href", "https://tally.so/r/kbayyj");
     expect(screen.getByText(/Challenge registration is not open/)).toBeVisible();
     expect(screen.getByText("Preprints are not peer-reviewed journal publications.")).toBeVisible();
-    expect(screen.getByRole("link", { name: /Submit to IYERJ/ })).toHaveAttribute("href", "https://tally.so/r/b5BBko?utm_source=member_portal&utm_medium=website&fm_route=journal&fm_version=conversion-v1");
+    expect(screen.getByRole("link", { name: /Submit for journal screening/ })).toHaveAttribute("href", "https://tally.so/r/kbayyj");
     expect(screen.getByRole("link", { name: /Submit a preprint/ })).toHaveAttribute("href", "https://tally.so/r/RGXXLJ?utm_source=member_portal&utm_medium=website&fm_route=forum&fm_version=conversion-v1");
     expect(screen.getByRole("heading", { name: /FinanceMeta Labs/ })).toBeVisible();
-    expect(screen.getByText("December 1, 2026")).toHaveAttribute("dateTime", "2026-12-01");
+    expect(screen.getByText(/Inaugural edition target: 1 December 2026/)).toBeVisible();
+    expect(screen.queryByText(/Mentorship is offered for every submitted paper/)).not.toBeInTheDocument();
   });
   it("restores URL filters, updates them and clears the empty result", () => {
     portal("/iyern/forum?category=policy&q=inflation");

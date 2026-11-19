@@ -4,6 +4,7 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import EventsChapters from '@/pages/portal/events/EventsChapters';
 
 const state = vi.hoisted(() => ({
+  eventStartsAt: "2099-10-01T10:00:00Z",
   registrations: undefined as Set<string> | undefined,
   isSuccess: false,
   isFetching: false,
@@ -18,13 +19,14 @@ vi.mock('@/components/experience/WorldMap', () => ({ default: () => null }));
 vi.mock('@/components/portal/ChapterMap', () => ({ default: () => null }));
 vi.mock('@/hooks/portal/useEvents', () => ({
   useChapters: () => ({ data: [], isLoading: false, error: null }),
-  useEvents: () => ({ data: [{ id: 'event-1', title: 'Local workshop', startsAt: '2026-10-01T10:00:00Z', chapterId: 'chapter-1', status: 'upcoming', description: 'Test event', programLinks: [] }], isLoading: false, error: null }),
+  useEvents: () => ({ data: [{ id: 'event-1', title: 'Local workshop', startsAt: state.eventStartsAt, chapterId: 'chapter-1', status: 'upcoming', description: 'Test event', programLinks: [] }], isLoading: false, error: null }),
   useEventRegistrations: () => ({ data: state.registrations, isSuccess: state.isSuccess, isFetching: state.isFetching, error: state.error, refetch: state.refetch }),
   useToggleEventRegistration: () => ({ mutateAsync: state.mutate, isPending: false }),
 }));
 const page = () => <MemoryRouter><EventsChapters /></MemoryRouter>;
 beforeEach(() => {
   vi.clearAllMocks();
+  state.eventStartsAt = "2099-10-01T10:00:00Z";
   state.registrations = undefined;
   state.isSuccess = false;
   state.isFetching = false;
@@ -106,4 +108,23 @@ it('uses the refreshed state after successful persistence, including cancellatio
   fireEvent.click(screen.getByRole('button', { name: 'Registered' }));
   await waitFor(() => expect(state.mutate).toHaveBeenCalledTimes(2));
   expect(state.mutate.mock.calls.map(([input]) => input.registered)).toEqual([true, false]);
+});
+
+it('does not allow new interest after the verified start timestamp', () => {
+  state.eventStartsAt = '2020-10-01T10:00:00Z';
+  state.registrations = new Set();
+  state.isSuccess = true;
+  render(page());
+  const button = screen.getByRole('button', { name: 'Registration closed' });
+  expect(button).toBeDisabled();
+  fireEvent.click(button);
+  expect(state.mutate).not.toHaveBeenCalled();
+});
+it('allows withdrawal of existing interest even after the event closes', async () => {
+  state.eventStartsAt = '2020-10-01T10:00:00Z';
+  state.registrations = new Set(['event-1']);
+  state.isSuccess = true;
+  render(page());
+  fireEvent.click(screen.getByRole('button', { name: 'Registered' }));
+  await waitFor(() => expect(state.mutate).toHaveBeenCalledWith({ eventId: 'event-1', registered: false }));
 });

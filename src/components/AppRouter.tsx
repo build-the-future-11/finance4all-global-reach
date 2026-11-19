@@ -33,6 +33,14 @@ const Saved = lazy(() => import("@/pages/portal/Saved"));
 const Settings = lazy(() => import("@/pages/portal/Settings"));
 const Intake = lazy(() => import("@/pages/portal/Intake"));
 const IntakeReview = lazy(() => import("@/pages/portal/IntakeReview"));
+const Research = lazy(() => import("@/pages/Research"));
+const Programs = lazy(() => import("@/pages/Programs"));
+const About = lazy(() => import("@/pages/About"));
+const Ecosystem = lazy(() => import("@/pages/Ecosystem"));
+const Chapters = lazy(() => import("@/pages/Chapters"));
+const Events = lazy(() => import("@/pages/Events"));
+const MemberEventDetail = lazy(() => import("@/pages/EventDetail").then(module => ({ default: module.MemberEventDetail })));
+const EventDetail = lazy(() => import("@/pages/EventDetail"));
 const IYERN = lazy(() => import("@/pages/IYERN"));
 const Evidence = lazy(() => import("@/pages/Evidence"));
 const Learn = lazy(() => import("@/pages/learn/Learn"));
@@ -41,7 +49,7 @@ const Debriefs = lazy(() => import("@/pages/learn/Debriefs"));
 
 function PortalFallback() {
   return (
-    <main className="min-h-screen bg-[#060a12] text-white" aria-label="Loading page">
+    <main className="min-h-screen bg-background text-foreground" aria-label="Loading page">
       <h1 className="sr-only">Loading page</h1>
       <LoadingState />
     </main>
@@ -64,6 +72,17 @@ function AppRoutes() {
           <Route path="/iyern/fellowship" element={<IYERN />} />
           <Route path="/iyern/challenge" element={<IYERN />} />
           <Route path="/iyern/articles/:slug" element={<IYERN />} />
+          <Route path="/research" element={<Research />} />
+          <Route path="/research/projects/:slug" element={<Research />} />
+          <Route path="/programs" element={<Programs />} />
+          <Route path="/programs/:slug" element={<Programs />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/ecosystem" element={<Ecosystem />} />
+          <Route path="/chapters" element={<Chapters />} />
+          <Route path="/events" element={<Events />} />
+          <Route path="/events/:slug" element={<EventDetail />} />
+          <Route path="/debriefed" element={<Debriefs />} />
+          <Route path="/debriefed/:slug" element={<Debriefs />} />
           <Route path="/evidence" element={<Evidence />} />
           <Route path="/learn" element={<Learn />} />
           <Route path="/learn/five-foundations" element={<FiveFoundations />} />
@@ -104,10 +123,14 @@ function AppRoutes() {
               }
             />
             <Route path="labs/:id" element={<MetaLabs />} />
+            <Route path="programs" element={<Programs embedded />} />
+            <Route path="programs/:slug" element={<Programs embedded />} />
             <Route path="pathways" element={<AxiomPathways />} />
             <Route path="pathways/studios" element={<PathwaysStudios />} />
             <Route path="pathways/essays" element={<PathwaysEssays />} />
             <Route path="events" element={<EventsChapters />} />
+            <Route path="events/:slug" element={<MemberEventDetail />} />
+            <Route path="chapters" element={<Chapters portal />} />
             <Route path="network" element={<Networking />} />
             <Route path="network/profile/:id" element={<MemberProfile />} />
             <Route

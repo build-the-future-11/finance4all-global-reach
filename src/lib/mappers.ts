@@ -1,3 +1,5 @@
+import { verifiedChapterStatus } from "@/lib/chapter-status";
+import { EventDetailsSchema } from "@/types/domain";
 import type { Tables } from "@/types/database";
 import type {
   Chapter,
@@ -19,7 +21,7 @@ import { normalizeExternalHttpUrl } from "@/lib/external-url";
 import { sanitizePostAuthPath } from "@/lib/auth-navigation";
 
 export const PUBLIC_PROFILE_COLUMNS =
-  "id, display_name, role, bio, avatar_url, interests, open_to_collaborate, chapter_id, created_at, updated_at" as const;
+  "id, display_name, role, bio, avatar_url, interests, open_to_collaborate, directory_visible, chapter_id, created_at, updated_at" as const;
 
 type PublicProfileRow = Pick<
   Tables<"profiles">,
@@ -30,6 +32,7 @@ type PublicProfileRow = Pick<
   | "avatar_url"
   | "interests"
   | "open_to_collaborate"
+  | "directory_visible"
   | "chapter_id"
   | "created_at"
   | "updated_at"
@@ -44,6 +47,7 @@ export function mapProfile(row: PublicProfileRow): UserProfile {
     avatarUrl: normalizeExternalHttpUrl(row.avatar_url),
     interests: row.interests,
     openToCollaborate: row.open_to_collaborate,
+    directoryVisible: row.directory_visible ?? false,
     chapterId: row.chapter_id ?? undefined,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -161,10 +165,12 @@ export function mapChapter(row: Tables<"chapters">): Chapter {
     latitude: row.latitude,
     longitude: row.longitude,
     memberCount: row.member_count,
+    status: verifiedChapterStatus(row),
   };
 }
 
-export function mapEvent(row: Tables<"events">): Event {
+export function mapEvent(row: Pick<Tables<"events">, "id" | "chapter_id" | "title" | "description" | "status" | "starts_at" | "ends_at" | "registration_url" | "program_links" | "event_details">): Event {
+  const details = EventDetailsSchema.safeParse(row.event_details ?? {});
   const links = Array.isArray(row.program_links)
     ? row.program_links.flatMap((value) => {
         if (!value || typeof value !== "object" || Array.isArray(value)) return [];
@@ -180,6 +186,7 @@ export function mapEvent(row: Tables<"events">): Event {
     description: row.description,
     status: row.status,
     startsAt: row.starts_at,
+    details: details.success ? details.data : { scheduleState: "on_hold" },
     endsAt: row.ends_at ?? undefined,
     registrationUrl: normalizeExternalHttpUrl(row.registration_url),
     programLinks: links,

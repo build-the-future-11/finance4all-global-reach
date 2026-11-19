@@ -19,6 +19,7 @@ export const UserProfileSchema = z.object({
   avatarUrl: ExternalHttpUrlSchema.optional(),
   interests: z.array(z.string()).default([]),
   openToCollaborate: z.boolean().default(false),
+  directoryVisible: z.boolean().optional(),
   chapterId: z.string().uuid().optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
@@ -162,9 +163,30 @@ export const ChapterSchema = z.object({
   country: z.string(),
   latitude: z.number(),
   longitude: z.number(),
+  status: z.enum(["unverified", "expansion_interest", "application_received", "lead_screening", "pre_launch", "approved", "active_verified", "inactive"]).optional(),
   memberCount: z.number().int().nonnegative().default(0),
 });
 export type Chapter = z.infer<typeof ChapterSchema>;
+
+export const EventDetailsSchema = z.object({
+  host: z.string().optional(),
+  type: z.enum(["workshop", "webinar", "seminar", "competition", "conference", "chapter", "editorial", "other"]).optional(),
+  modality: z.enum(["online", "in_person", "hybrid", "unconfirmed"]).optional(),
+  timezone: z.string().optional(),
+  location: z.string().optional(),
+  city: z.string().optional(),
+  country: z.string().optional(),
+  audience: z.string().optional(),
+  capacity: z.number().int().positive().optional(),
+  registrationOpensAt: z.string().datetime().optional(),
+  registrationClosesAt: z.string().datetime().optional(),
+  sourceUrl: ExternalHttpUrlSchema.optional(),
+  recordingUrl: ExternalHttpUrlSchema.optional(),
+  verifiedAt: z.string().optional(),
+  relatedProgram: z.string().optional(),
+  scheduleState: z.enum(["confirmed", "on_hold", "cancelled", "awaiting_schedule"]).optional(),
+});
+export type EventDetails = z.infer<typeof EventDetailsSchema>;
 
 export const EventSchema = z.object({
   id: z.string().uuid(),
@@ -174,6 +196,7 @@ export const EventSchema = z.object({
   status: EventStatusSchema,
   startsAt: z.string().datetime(),
   endsAt: z.string().datetime().optional(),
+  details: EventDetailsSchema.optional(),
   registrationUrl: ExternalHttpUrlSchema.optional(),
   programLinks: z
     .array(z.object({ label: z.string(), url: ExternalHttpUrlSchema }))

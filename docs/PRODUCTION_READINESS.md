@@ -1,6 +1,26 @@
 # Production Readiness
 
-Last reviewed: 2026-10-11
+Last reviewed: 2026-11-19
+
+## Current release decision — 19 November 2026
+
+Unrestricted member onboarding remains **NO-GO**. The integrated member candidate is [draft PR #183](https://github.com/build-the-future-11/finance4all-global-reach/pull/183), with **19 migration files**. The current operative migration checklist is in [DEPLOYMENT.md](../DEPLOYMENT.md); all 19 files must be reconciled against the canonical database before promotion.
+
+Candidate code revision `dfd7dcb20875b027cf74bb000f20c89a97a0bcf5` passed [CI 44518179250](https://github.com/build-the-future-11/finance4all-global-reach/actions/runs/44518179250) and [Full Dependency Audit 44518179253](https://github.com/build-the-future-11/finance4all-global-reach/actions/runs/44518179253). These source checks supersede the older live Landing identity failures; FinanceMeta Landing now serves the verified `409215132495499dfb3383b3caf6b3bc1e2c915a` release. Later candidate revisions still require their own checks.
+
+The existing public portal deployment passed [Production Health 44519464226](https://github.com/build-the-future-11/finance4all-global-reach/actions/runs/44519464226), observing exact protected-main revision `9fc595b6932e3563497735bb739bce73e6fc088a` at 11:58:30 UTC on 19 November. This verifies public/auth route shells, release identity and headers; it does not certify authenticated member operation or promote the draft candidate.
+
+Canonical Supabase project `pnemeegkwyaicsbnbnmg` remains inaccessible through the connected account: the project lookup returned permission denied on 19 November. The accessible VertexED project is outside the FinanceMeta boundary. No live database mutation or controlled-account certification was performed during this review.
+
+Remaining release work is concrete: obtain authorized canonical-project access; compare the complete schema and migration ledger with the selected candidate; repair or apply migrations only through the reviewed operator process; run rollback-only Production RLS Certification; run Production Auth Certification with the two controlled ordinary-member accounts; complete the existing policy and operational acceptance gates. Keep this candidate draft until that evidence is retained.
+
+The October and September sections below are historical records. Their candidate references, migration counts, deployment identities and resolved statuses are not current certification.
+
+## Platform expansion candidate — 16 October 2026
+
+Unrestricted member onboarding remains **NO-GO**. [PR 171](https://github.com/build-the-future-11/finance4all-global-reach/pull/171) adds public catalogs, private reading state, event publication controls and opt-in member discovery. Its repository ledger contains **19 migrations**, including `20261016093000_public_event_catalog.sql` and `20261016094000_member_directory_consent.sql`. The frontend requires that reviewed schema before promotion. No production migrations or controlled-account certification were performed in this wave.
+
+See [the current release evidence](RELEASE_EVIDENCE.md) for exact candidate checks, preview status, retained failures and rollout order. Counts, revisions and deployment claims in the 11 October and September sections below remain historical; their 17- and ten-migration references do not describe this candidate.
 
 ## Current release decision — 11 October 2026
 

@@ -22,7 +22,7 @@ export interface AuthContextValue {
     updates: Partial<
       Pick<
         UserProfile,
-        "displayName" | "bio" | "interests" | "openToCollaborate" | "chapterId"
+        "displayName" | "bio" | "interests" | "openToCollaborate" | "directoryVisible" | "chapterId"
       >
     >,
   ) => Promise<{ error: string | null }>;

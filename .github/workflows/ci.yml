@@ -18,10 +18,10 @@ jobs:
     timeout-minutes: 10
     env:
       EXPECTED_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
-      EXPECTED_POSTGRES_IMAGE_REF: public.ecr.aws/supabase/postgres@sha256:28f0e16a019e648089fc1a6d333549a55548f6019c15ae4bd7cd58b989027518
+      EXPECTED_POSTGRES_IMAGE_REF: ghcr.io/supabase/postgres@sha256:28f0e16a019e648089fc1a6d333549a55548f6019c15ae4bd7cd58b989027518
     services:
       postgres:
-        image: public.ecr.aws/supabase/postgres@sha256:28f0e16a019e648089fc1a6d333549a55548f6019c15ae4bd7cd58b989027518
+        image: ghcr.io/supabase/postgres@sha256:28f0e16a019e648089fc1a6d333549a55548f6019c15ae4bd7cd58b989027518
         env:
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: postgres
@@ -95,6 +95,8 @@ jobs:
             sha256sum supabase/tests/collaboration_rls_certification.sql
             sha256sum supabase/tests/publication_and_abuse_certification.sql
             sha256sum supabase/tests/concurrent_abuse_budget.py
+            sha256sum supabase/tests/public_event_catalog_certification.sql
+            sha256sum supabase/tests/member_directory_consent.sql
           } > "$evidence_dir/input-sha256.txt"
       - name: Replay migrations and certify account lifecycle RLS
         shell: bash
@@ -114,6 +116,10 @@ jobs:
             docker exec "$POSTGRES_CONTAINER" sh -lc 'set -eu; for migration in /tmp/portal-migrations/*.sql; do psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f "$migration"; done'
             docker exec "$POSTGRES_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/two_identity_rls_certification.sql
             docker exec "$POSTGRES_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/account_lifecycle_rls_certification.sql
+            docker cp supabase/tests/public_event_catalog_certification.sql "$POSTGRES_CONTAINER:/tmp/public_event_catalog_certification.sql"
+            docker cp supabase/tests/member_directory_consent.sql "$POSTGRES_CONTAINER:/tmp/member_directory_consent.sql"
+            docker exec "$POSTGRES_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/public_event_catalog_certification.sql
+            docker exec "$POSTGRES_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/member_directory_consent.sql
             docker cp supabase/tests/intake_rls_certification.sql "$POSTGRES_CONTAINER:/tmp/intake_rls_certification.sql"
             docker exec "$POSTGRES_CONTAINER" psql -v ON_ERROR_STOP=1 -U postgres -d postgres -f /tmp/intake_rls_certification.sql
             docker cp supabase/tests/collaboration_rls_certification.sql "$POSTGRES_CONTAINER:/tmp/collaboration_rls_certification.sql"

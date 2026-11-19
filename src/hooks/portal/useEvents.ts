@@ -1,6 +1,6 @@
 import { isVisibleContent } from "@/lib/content-visibility";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/lib/supabase";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import { mapChapter, mapEvent } from "@/lib/mappers";
 import { useAuth } from "@/contexts/useAuth";
 import { requireConfirmedRow } from "@/lib/confirmed-mutation";
@@ -87,4 +87,20 @@ export function useToggleEventRegistration() {
       return mutation.mutateAsync({ userId: user.id, eventId, registered });
     },
   };
+}
+
+// The public and member views share canonical event rows. Anonymous access is
+// a bounded, approved projection, never a broad table query or private fallback.
+export function usePublicEvents(selectedId?: string, enabled = true) {
+  return useInfiniteQuery({
+    queryKey: ["public-events", selectedId],
+    enabled: isSupabaseConfigured && enabled,
+    initialPageParam: 0,
+    queryFn: async ({ pageParam }) => {
+      const { data, error } = await supabase.rpc("public_event_catalog", { target_id: selectedId, page_offset: pageParam });
+      if (error) throw error;
+      return data.map(mapEvent);
+    },
+    getNextPageParam: (page, pages) => page.length === 100 && !selectedId ? pages.length * 100 : undefined,
+  });
 }

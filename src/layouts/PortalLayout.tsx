@@ -5,9 +5,10 @@ import { useEffect, useState, useRef } from "react";
 import { useAuth } from "@/contexts/useAuth";
 import { portalNav, portalRoutes } from "@/routes/portal";
 import ThemeToggle from "@/components/ThemeToggle";
-import { BrandMark } from "@/components/Brand";
+import { BrandIdentity } from "@/components/Brand";
 import MobileBottomNav from "@/components/portal/MobileBottomNav";
 import NotificationsCenter from "@/components/portal/NotificationsCenter";
+import AccountMenu from "@/components/portal/AccountMenu";
 import PortalSearch from "@/components/portal/PortalSearch";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import { Button } from "@/components/ui/button";
@@ -18,23 +19,19 @@ function initials(name: string) {
 }
 
 function PortalBrand({ compact = false }: { compact?: boolean }) {
-  return (
-    <span className="portal-brand">
-      <BrandMark className="h-10 w-10 text-[#153d30] dark:text-[#d9ff8a] dark:[--brand-ink:#153d30]" />
-      {!compact && <span><strong>Finance for All</strong><small>Research workspace</small></span>}
-    </span>
-  );
+  return <BrandIdentity compact={compact} className="portal-brand" subtitle="Your member space" />;
 }
 
 export default function PortalLayout() {
   const { profile, signOut } = useAuth();
   const location = useLocation();
+  const sidebarRef = useRef<HTMLElement>(null);
   const mobileTrigger = useRef<HTMLButtonElement>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(() => {
     try { return window.localStorage.getItem("finance-portal-sidebar") === "collapsed"; } catch { return false; }
   });
-  useDocumentTitle("Portal");
+
 
   useEffect(() => {
     try { window.localStorage.setItem("finance-portal-sidebar", collapsed ? "collapsed" : "open"); } catch { /* noop */ }
@@ -47,8 +44,27 @@ export default function PortalLayout() {
     .sort((a, b) => b.path.length - a.path.length)
     .find((item) => location.pathname === item.path || location.pathname.startsWith(`${item.path}/`));
 
+  useDocumentTitle(currentItem?.label ?? "Member portal");
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const firstLink = sidebarRef.current?.querySelector<HTMLElement>("a, button");
+    firstLink?.focus();
+    const trap = (event: KeyboardEvent) => {
+      if (event.key !== "Tab" || window.matchMedia("(min-width: 1024px)").matches) return;
+      const items = [...(sidebarRef.current?.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), [tabindex="0"]') ?? [])].filter(element => element.getClientRects().length > 0);
+      const first = items[0], last = items.at(-1);
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    };
+    document.addEventListener("keydown", trap);
+    const closeOnDesktop = () => { if (window.matchMedia("(min-width: 1024px)").matches) setMobileOpen(false); };
+    window.addEventListener("resize", closeOnDesktop);
+    return () => { document.removeEventListener("keydown", trap); window.removeEventListener("resize", closeOnDesktop); };
+  }, [mobileOpen]);
+
   return (
     <div onKeyDown={e => { if(e.key === "Escape" && mobileOpen) { setMobileOpen(false); mobileTrigger.current?.focus(); } }} className={`portal-shell ${collapsed ? "portal-sidebar-collapsed" : ""}`}>
+      <a href="#member-content" className="public-skip">Skip to member content</a>
       <header className="portal-mobile-header">
         <button ref={mobileTrigger} aria-expanded={mobileOpen} aria-controls="workspace-sidebar" type="button" className="portal-icon-button lg:hidden" onClick={() => setMobileOpen((value) => !value)} aria-label="Toggle menu">
           {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -58,19 +74,13 @@ export default function PortalLayout() {
           <PortalSearch />
           <NotificationsCenter />
           <ThemeToggle />
-          {profile && (
-            <Link to={portalRoutes.settings} aria-label="Open profile settings">
-              <Avatar className="h-9 w-9 border border-border">
-                <AvatarImage src={profile.avatarUrl} />
-                <AvatarFallback className="bg-primary/10 text-xs text-primary">{initials(profile.displayName)}</AvatarFallback>
-              </Avatar>
-            </Link>
-          )}
+          <AccountMenu />
         </div>
       </header>
 
-      <aside id="workspace-sidebar" className={`portal-sidebar ${mobileOpen ? "is-open" : ""}`}>
+      <aside ref={sidebarRef} id="workspace-sidebar" className={`portal-sidebar ${mobileOpen ? "is-open" : ""}`}>
         <div className="portal-sidebar-head">
+          <button className="portal-icon-button lg:hidden" type="button" aria-label="Close navigation" onClick={() => { setMobileOpen(false); mobileTrigger.current?.focus(); }}><X size={18} /></button>
           <Link to={portalRoutes.dashboard} onClick={() => setMobileOpen(false)}><PortalBrand compact={collapsed} /></Link>
           <button type="button" className="portal-collapse-button hidden lg:grid" onClick={() => setCollapsed((value) => !value)} aria-label={collapsed ? "Expand navigation" : "Collapse navigation"}>
             {collapsed ? <PanelLeftOpen className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
@@ -99,6 +109,7 @@ export default function PortalLayout() {
                   end={item.path === portalRoutes.dashboard}
                   onClick={() => setMobileOpen(false)}
                   title={collapsed ? item.label : undefined}
+                  aria-label={item.label}
                   className={({ isActive }) => `portal-nav-link ${isActive ? "active" : ""}`}
                 >
                   <Icon className="h-[18px] w-[18px] shrink-0" />
@@ -131,10 +142,10 @@ export default function PortalLayout() {
 
       {mobileOpen && <button className="portal-sidebar-scrim" type="button" aria-label="Close navigation" onClick={() => setMobileOpen(false)} />}
 
-      <main className="portal-main">
+      <main id="member-content" tabIndex={-1} className="portal-main">
         <div className="portal-desktop-bar">
           <div><span>Member portal / {currentItem?.group ?? "Workspace"}</span><strong>{currentItem?.label ?? "Finance for All"}</strong></div>
-          <div className="portal-header-actions"><PortalSearch /><NotificationsCenter /><ThemeToggle /></div>
+          <div className="portal-header-actions"><Link to="/" className="text-sm underline underline-offset-4">Explore public site</Link><PortalSearch /><NotificationsCenter /><ThemeToggle /><AccountMenu /></div>
         </div>
         <div className="portal-content"><Outlet /></div>
       </main>

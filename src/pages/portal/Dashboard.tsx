@@ -19,6 +19,9 @@ import { useConnectionRequests } from "@/hooks/portal/useNetwork";
 import { useEvents } from "@/hooks/portal/useEvents";
 import { useMyLabApplications, useResearchProjects } from "@/hooks/portal/useLabs";
 import { useOpportunities } from "@/hooks/portal/usePathways";
+import { useSavedExplainers } from "@/hooks/portal/useSavedExplainers";
+import { useReadingHistory } from "@/hooks/portal/useReadingHistory";
+import { useIntakeSubmissions } from "@/hooks/portal/useIntake";
 import { editorialExplainers } from "@/content/editorial";
 import { portalRoutes } from "@/routes/portal";
 import { PortalCard, QueryStatus } from "@/components/portal/PortalUI";
@@ -38,7 +41,7 @@ function loadedCount(value: unknown[] | undefined) {
 }
 
 export default function Dashboard() {
-  useDocumentTitle("Home");
+  useDocumentTitle("Dashboard");
   const { user, profile } = useAuth();
   const news = useNewsArticles();
   const projects = useResearchProjects();
@@ -48,6 +51,9 @@ export default function Dashboard() {
   const connections = useConnectionRequests();
   const learning = useMemberLearning().records;
   const activity = useActivityFeed(6);
+  const savedReading = useSavedExplainers();
+  const readingHistory = useReadingHistory();
+  const intake = useIntakeSubmissions();
 
   const mine = memberProjects(projects.data ?? [], applications.data ?? [], user?.id);
   const deadlines = projectDeadlines(projects.data ?? []);
@@ -61,20 +67,53 @@ export default function Dashboard() {
   const incomingConnections = connections.data?.filter((connection) =>
     connection.toUserId === user?.id && connection.status === "pending",
   ) ?? [];
-  const completedLessons = learning.data?.filter((record) => record.completed) ?? [];
-  const nextLesson = editorialExplainers.find((lesson) =>
-    !completedLessons.some((record) => record.lesson_id === lesson.slug),
+  const completedLessonIds = new Set([
+    ...(learning.data?.filter((record) => record.completed).map(record => record.lesson_id) ?? []),
+    ...readingHistory.entries.filter(entry => entry.completed).map(entry => entry.slug),
+  ]);
+  const recentReading = readingHistory.continueReading[0];
+  const nextLesson = recentReading?.article ?? editorialExplainers.find((lesson) =>
+    !completedLessonIds.has(lesson.slug),
   );
   const firstName = profile?.displayName?.trim().split(/\s+/)[0] || "Member";
+  const starterSteps = [
+    {
+      title: "Make your profile useful",
+      detail: profile?.bio?.trim() || (profile?.interests?.length ?? 0)
+        ? "Your interests help other members understand what you want to explore."
+        : "Add a short bio or interests so future collaborators have context.",
+      to: portalRoutes.settings,
+      status: profile?.bio?.trim() || (profile?.interests?.length ?? 0) ? "done" : "ready",
+    },
+    {
+      title: "Read one evidence-led explainer",
+      detail: completedLessonIds.size
+        ? `${completedLessonIds.size} ${completedLessonIds.size === 1 ? "explainer is" : "explainers are"} marked read. Keep your notes close.`
+        : "Start with a short explainer and save an idea worth returning to.",
+      to: nextLesson ? `${portalRoutes.debriefedExplainers}/${nextLesson.slug}` : portalRoutes.learning,
+      status: learning.data === undefined || readingHistory.error ? "loading" : completedLessonIds.size ? "done" : "ready",
+    },
+    {
+      title: "Choose a research direction",
+      detail: projects.data === undefined || applications.data === undefined
+        ? "Checking your research workspace."
+        : mine.length
+          ? `You already have ${mine.length} ${mine.length === 1 ? "project" : "projects"} in your workspace.`
+          : "Browse questions, methods and participation requirements before you apply.",
+      to: mine.length ? portalRoutes.myResearch : portalRoutes.labs,
+      status: projects.data === undefined || applications.data === undefined ? "loading" : mine.length ? "done" : "ready",
+    },
+  ] as const;
+  const completedStarterSteps = starterSteps.filter((step) => step.status === "done").length;
 
   const quickActions = [
     {
-      eyebrow: completedLessons.length ? "Continue learning" : "Start learning",
+      eyebrow: completedLessonIds.size ? "Continue learning" : "Start learning",
       title: nextLesson?.title ?? "Review your learning notes",
       copy: nextLesson
         ? `${nextLesson.readMinutes} min · Continue with the next evidence-led explainer.`
         : "You have marked every current explainer read. Revisit your private notes.",
-      to: nextLesson ? `${portalRoutes.debriefedExplainers}/${nextLesson.slug}` : portalRoutes.learning,
+      to: nextLesson ? `${portalRoutes.debriefedExplainers}/${nextLesson.slug}${recentReading ? `#${recentReading.section}` : ""}` : portalRoutes.learning,
       icon: BookOpenText,
       className: "portal-action-primary",
     },
@@ -115,14 +154,30 @@ export default function Dashboard() {
         <div className="portal-member-status" aria-label="Member status">
           <span><i aria-hidden="true" /> Signed in</span>
           <strong>{profile?.role.replaceAll("_", " ") ?? "member"}</strong>
-          <small>Member since {profile?.createdAt ? new Date(profile.createdAt).toLocaleDateString(undefined, { month: "short", year: "numeric" }) : "recently"}</small>
+          <small>{profile?.createdAt ? `Member since ${new Date(profile.createdAt).toLocaleDateString(undefined, { month: "short", year: "numeric" })}` : "Account profile loading"}</small>
         </div>
       </section>
 
       <section className="portal-focus-strip" aria-label="Your current priorities">
-        <div><span>Current work</span><strong>{projects.isLoading || applications.isLoading ? "—" : mine.length}</strong><small>{mine.length === 1 ? "active project" : "active projects"}</small></div>
-        <div><span>Awaiting response</span><strong>{connections.isLoading ? "—" : incomingConnections.length}</strong><small>{incomingConnections.length === 1 ? "connection request" : "connection requests"}</small></div>
-        <div><span>Next deadline</span><strong>{projects.isLoading ? "—" : nextDeadline ? new Date(nextDeadline.applicationDeadline!).toLocaleDateString(undefined, { month: "short", day: "numeric" }) : "None"}</strong><small>{nextDeadline?.title ?? "No confirmed deadline"}</small></div>
+        <div><span>Current work</span><strong>{projects.data === undefined || applications.data === undefined ? "—" : mine.length}</strong><small>{mine.length === 1 ? "active project" : "active projects"}</small></div>
+        <div><span>Awaiting response</span><strong>{connections.data === undefined ? "—" : incomingConnections.length}</strong><small>{incomingConnections.length === 1 ? "connection request" : "connection requests"}</small></div>
+        <div><span>Next deadline</span><strong>{projects.data === undefined ? "—" : nextDeadline ? new Date(nextDeadline.applicationDeadline!).toLocaleDateString(undefined, { month: "short", day: "numeric" }) : "None"}</strong><small>{nextDeadline?.title ?? "No confirmed deadline"}</small></div>
+      </section>
+
+      <section className="portal-starting-points" aria-labelledby="starting-points-heading">
+        <div className="portal-section-title">
+          <div><span>Make this space yours</span><h2 id="starting-points-heading">A clear place to begin</h2></div>
+          <p><strong>{completedStarterSteps}/3</strong> foundation steps complete</p>
+        </div>
+        <ol>
+          {starterSteps.map((step, index) => (
+            <li key={step.title} data-status={step.status}>
+              <span className="portal-starting-step-number" aria-hidden="true">{step.status === "done" ? <CheckCircle2 className="h-4 w-4" /> : `0${index + 1}`}</span>
+              <div><h3>{step.title}</h3><p>{step.detail}</p></div>
+              <Link to={step.to}>{step.status === "done" ? "Review" : step.status === "loading" ? "View" : "Start"}<ArrowRight className="h-4 w-4" /></Link>
+            </li>
+          ))}
+        </ol>
       </section>
 
       <section aria-labelledby="next-heading">
@@ -164,18 +219,26 @@ export default function Dashboard() {
         <aside aria-labelledby="attention-heading">
           <div className="portal-section-title"><div><span>At a glance</span><h2 id="attention-heading">Needs attention</h2></div></div>
           <PortalCard className="portal-attention-card">
-            <Link to={portalRoutes.apply}><span><Clock3 className="h-4 w-4" /><b>Applications in review</b></span><strong>{applications.isLoading ? "—" : pendingApplications.length}</strong></Link>
-            <Link to={portalRoutes.network}><span><UsersRound className="h-4 w-4" /><b>Connection requests</b></span><strong>{connections.isLoading ? "—" : incomingConnections.length}</strong></Link>
-            <Link to={portalRoutes.events}><span><CalendarDays className="h-4 w-4" /><b>Upcoming events</b></span><strong>{events.isLoading ? "—" : upcomingEvents.length}</strong></Link>
-            <Link to={portalRoutes.learning}><span><CheckCircle2 className="h-4 w-4" /><b>Lessons marked read</b></span><strong>{learning.isLoading ? "—" : completedLessons.length}</strong></Link>
+            <Link to={portalRoutes.apply}><span><Clock3 className="h-4 w-4" /><b>Applications in review</b></span><strong>{applications.data === undefined ? "—" : pendingApplications.length}</strong></Link>
+            <Link to={portalRoutes.network}><span><UsersRound className="h-4 w-4" /><b>Connection requests</b></span><strong>{connections.data === undefined ? "—" : incomingConnections.length}</strong></Link>
+            <Link to={portalRoutes.events}><span><CalendarDays className="h-4 w-4" /><b>Upcoming events</b></span><strong>{events.data === undefined ? "—" : upcomingEvents.length}</strong></Link>
+            <Link to={portalRoutes.learning}><span><CheckCircle2 className="h-4 w-4" /><b>Lessons marked read</b></span><strong>{learning.data === undefined || readingHistory.error ? "—" : completedLessonIds.size}</strong></Link>
           </PortalCard>
         </aside>
+      </div>
+
+      <div className="portal-dashboard-columns">
+        <section aria-labelledby="reading-home-heading">
+          <div className="portal-section-title"><div><span>Your reading room</span><h2 id="reading-home-heading">Saved & in progress</h2></div><Link to={portalRoutes.saved}>View saved content <ArrowRight size={16} /></Link></div>
+          {readingHistory.continueReading.length === 0 && savedReading.articles.length === 0 ? <PortalCard className="p-6"><h3 className="font-serif text-xl">Keep a useful idea close.</h3><p className="mt-2 text-sm text-muted-foreground">Save an explainer or remember your place while reading. Your library belongs to your account.</p><Link to={portalRoutes.debriefed} className="mt-4 inline-block underline">Explore Finance Debriefed →</Link></PortalCard> : <div className="portal-work-list">{readingHistory.continueReading.slice(0, 2).map(entry => <Link key={entry.slug} className="portal-work-row" to={`${portalRoutes.debriefedExplainers}/${entry.slug}#${entry.section}`}><span><small>Continue reading · saved position</small><h3>{entry.article.title}</h3><p>{entry.article.readMinutes} min read</p></span><ArrowRight size={16} /></Link>)}{savedReading.articles.filter(article => !readingHistory.continueReading.some(entry => entry.slug === article.slug)).slice(0, 3).map(article => <Link key={article.slug} className="portal-work-row" to={`${portalRoutes.debriefedExplainers}/${article.slug}`}><span><small>Saved for later</small><h3>{article.title}</h3></span><ArrowRight size={16} /></Link>)}</div>}
+        </section>
+        <section aria-labelledby="application-home-heading"><div className="portal-section-title"><div><span>Private receipts</span><h2 id="application-home-heading">Your applications</h2></div><Link to={portalRoutes.apply}>View all <ArrowRight size={16} /></Link></div><QueryStatus isLoading={intake.isLoading} error={intake.error} onRetry={() => void intake.refetch()} isEmpty={!intake.data?.pages.flat().length} emptyMessage="No application receipts are recorded. Explore programs to understand their current availability.">{intake.data?.pages.flat().slice(0, 3).map(submission => <Link className="portal-work-row" to={portalRoutes.apply} key={submission.id}><span><h3>{submission.call_id.replaceAll("-", " ")}</h3><p>{submission.status.replaceAll("_", " ")} · {new Date(submission.created_at).toLocaleDateString()}</p></span><ArrowRight size={16} /></Link>)}</QueryStatus><Link className="mt-4 inline-block text-sm underline" to={portalRoutes.programs}>Explore programs and requirements →</Link></section>
       </div>
 
       <section className="portal-overview" aria-label="Explore the portal">
         {[
           ["Open projects", projects.data?.filter((project) => project.status === "open"), "Questions accepting applications", portalRoutes.labs, BriefcaseBusiness],
-          ["Upcoming events", upcomingEvents, "Confirmed future sessions", portalRoutes.events, CalendarDays],
+          ["Upcoming events", events.data === undefined ? undefined : upcomingEvents, "Confirmed future sessions", portalRoutes.events, CalendarDays],
           ["Debriefs", news.data, "Published evidence-led reading", portalRoutes.debriefed, Newspaper],
           ["Opportunities", opportunities.data, "Currently discoverable", portalRoutes.pathways, BookOpenText],
         ].map(([label, values, detail, to, Icon], index) => {
@@ -200,7 +263,7 @@ export default function Dashboard() {
         <aside>
           <div className="portal-section-title"><div><span>Coming up</span><h2>Next event</h2></div></div>
           <PortalCard className="portal-next-event">
-            {events.isLoading ? <p>Loading confirmed events…</p> : upcomingEvents[0] ? <>
+            {events.isLoading ? <p>Loading confirmed events…</p> : events.error ? <p role="alert">Events could not be loaded. <button className="underline" onClick={() => void events.refetch()}>Retry</button></p> : upcomingEvents[0] ? <>
               <CalendarDays className="h-5 w-5" />
               <time dateTime={upcomingEvents[0].startsAt}>{new Date(upcomingEvents[0].startsAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}</time>
               <h3>{upcomingEvents[0].title}</h3>

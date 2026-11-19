@@ -141,7 +141,7 @@ describe("FinanceMeta authorization boundary", () => {
 
   it("keeps the member profile UI within the safe-column grant", () => {
     expect(authContext).toContain(
-      'Pick<UserProfile, "displayName" | "bio" | "interests" | "openToCollaborate" | "chapterId">',
+      'Pick<UserProfile, "displayName" | "bio" | "interests" | "openToCollaborate" | "directoryVisible" | "chapterId">',
     );
     const updateStart = authContext.indexOf("const updateProfile = useCallback");
     const updateEnd = authContext.indexOf("const needsOnboarding", updateStart);

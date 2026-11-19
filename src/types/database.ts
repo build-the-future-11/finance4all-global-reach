@@ -66,6 +66,7 @@ interface DatabaseDefinition {
           avatar_url: string | null;
           interests: string[];
           open_to_collaborate: boolean;
+          directory_visible?: boolean;
           chapter_id: string | null;
           created_at: string;
           updated_at: string;
@@ -79,6 +80,7 @@ interface DatabaseDefinition {
           avatar_url?: string | null;
           interests?: string[];
           open_to_collaborate?: boolean;
+          directory_visible?: boolean;
           chapter_id?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["profiles"]["Insert"]>;
@@ -93,6 +95,11 @@ interface DatabaseDefinition {
           longitude: number;
           member_count: number;
           created_at: string;
+          chapter_status?: string;
+          accepted_owner?: boolean;
+          permissions_confirmed?: boolean;
+          operating_evidence_url?: string | null;
+          last_activity_at?: string | null;
         };
         Insert: Omit<Database["public"]["Tables"]["chapters"]["Row"], keyof PublicationFields | "created_at"> & {
           created_at?: string;
@@ -253,6 +260,8 @@ interface DatabaseDefinition {
           registration_url: string | null;
           program_links: Json;
           created_at: string;
+          public_listing?: boolean;
+          event_details?: Json;
         };
         Insert: Omit<Database["public"]["Tables"]["events"]["Row"], keyof PublicationFields | "id" | "created_at" | "ends_at" | "program_links"> & Partial<Pick<Database["public"]["Tables"]["events"]["Row"], "ends_at" | "program_links">> & {
           id?: string;
@@ -346,6 +355,14 @@ interface DatabaseDefinition {
       };
     };
     Functions: {
+      member_directory: {
+        Args: { search_text?: string; collaborators_only?: boolean };
+        Returns: Pick<Database["public"]["Tables"]["profiles"]["Row"], "id" | "display_name" | "role" | "bio" | "avatar_url" | "interests" | "open_to_collaborate" | "directory_visible" | "chapter_id" | "created_at" | "updated_at">[];
+      };
+      public_event_catalog: {
+        Args: { target_id?: string; page_offset?: number };
+        Returns: Pick<Tables<"events">, "id" | "chapter_id" | "title" | "description" | "status" | "starts_at" | "ends_at" | "registration_url" | "program_links" | "event_details">[];
+      };
       review_publication: {
         Args: { content_table: PublicationTable; content_id: string; expected_revision: number; next_state: PublicationState; review_note: string };
         Returns: Json;

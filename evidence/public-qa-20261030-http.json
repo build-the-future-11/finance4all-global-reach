@@ -1,0 +1,2257 @@
+{
+  "checked_at_utc": "2026-10-30T14:26:39.582183+00:00",
+  "read_only": true,
+  "methods": [
+    "GET"
+  ],
+  "inventory_sha256": "4fe1bf9e220b1294a04e2afef807808b0909ef8d7a9c2ac88760cc6c033162fb",
+  "expected_revision": "0794d6664942eff02a8d6fc3a048a67c1910e061",
+  "before": {
+    "status": 200,
+    "url": "https://finance-meta-landing.vercel.app/release-revision.json",
+    "payload": {
+      "service": "finance-meta-landing",
+      "revision": "0794d6664942eff02a8d6fc3a048a67c1910e061"
+    },
+    "sha256": "a7188f8847b2da1fe2c5d54f60f04ff4b28aa160ce19c3153b7a84ffea365778"
+  },
+  "after": {
+    "status": 200,
+    "url": "https://finance-meta-landing.vercel.app/release-revision.json",
+    "payload": {
+      "service": "finance-meta-landing",
+      "revision": "0794d6664942eff02a8d6fc3a048a67c1910e061"
+    },
+    "sha256": "a7188f8847b2da1fe2c5d54f60f04ff4b28aa160ce19c3153b7a84ffea365778"
+  },
+  "route_count": 202,
+  "passed": 202,
+  "failed": 0,
+  "browser_qa": false,
+  "limitations": "HTTP status, HTML H1 existence and canonical checks only; no JavaScript execution, accessibility, viewport or performance certification.",
+  "routes": [
+    {
+      "path": "/",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app"
+      ],
+      "sha256": "6dcb16cc30e3112881c57192aa84c73e6de5c9cd4a1b0a372226d0c1dc518bcc",
+      "pass": true
+    },
+    {
+      "path": "/about",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/about",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/about"
+      ],
+      "sha256": "2591c2377cfd7dbc95c767073665a781ce4aaeaf4b02ac2c7510d9822835a577",
+      "pass": true
+    },
+    {
+      "path": "/about/contact",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/about/contact",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/about/contact"
+      ],
+      "sha256": "edf2a493685be6bfc184dcc8c5c391e6412f7eb43ff63cf4772bd0199c3641c1",
+      "pass": true
+    },
+    {
+      "path": "/about/mission",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/about/mission",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/about/mission"
+      ],
+      "sha256": "327ba2ac12f33d0398f6ee8122d7a1c3248f9ce8dc5c22fe56e773c6f3575884",
+      "pass": true
+    },
+    {
+      "path": "/about/partners",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/about/partners",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/about/partners"
+      ],
+      "sha256": "23ea4a807f338724639dd33d81972ceaa61fbf864a11a29a6a7269634e4c287f",
+      "pass": true
+    },
+    {
+      "path": "/about/team",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/about/team",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/about/team"
+      ],
+      "sha256": "574bd181044ab8c1b5924209167bfa680230d998f41f2fc9653a07ee3a300d9d",
+      "pass": true
+    },
+    {
+      "path": "/apply",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/apply",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/apply"
+      ],
+      "sha256": "27cbc1ea416261d40d28fd76b6400cb7e3ed746a5ff5f7885f66e201667614d4",
+      "pass": true
+    },
+    {
+      "path": "/challenges",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/challenges",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/challenges"
+      ],
+      "sha256": "a94f8639682d8279098f6260cc7fc0a39d83aa95f14d08e50925816e61b0a2f2",
+      "pass": true
+    },
+    {
+      "path": "/challenges/economics-olympiad",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/challenges/economics-olympiad",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/challenges/economics-olympiad"
+      ],
+      "sha256": "a2859306b826702f31abf41f1dbd8a17e4fff29bb60db6f2cdbe8ca99a8dd02a",
+      "pass": true
+    },
+    {
+      "path": "/challenges/essay-prize",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/challenges/essay-prize",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/challenges/essay-prize"
+      ],
+      "sha256": "ed801344851f73c4b89f352064e758cbb0798724beb5868da5dc0ef33a37e033",
+      "pass": true
+    },
+    {
+      "path": "/challenges/global-research-challenge",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/challenges/global-research-challenge",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/challenges/global-research-challenge"
+      ],
+      "sha256": "eea7996b78612aab327fb9cb75bd2012ba165c8b37fb62cba765c98f5016af3d",
+      "pass": true
+    },
+    {
+      "path": "/challenges/investment-case",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/challenges/investment-case",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/challenges/investment-case"
+      ],
+      "sha256": "38159820c914f6a9e1d40fb5e7c6b8c73bd7fe99df7ba75d7f5da45a65347347",
+      "pass": true
+    },
+    {
+      "path": "/events",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/events",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/events"
+      ],
+      "sha256": "c51f35274ea922dcf6a0104d2e966bf496471f3287e108e793fe2f502ceb8e63",
+      "pass": true
+    },
+    {
+      "path": "/events/backtest-falsification-challenge",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/events/backtest-falsification-challenge",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/events/backtest-falsification-challenge"
+      ],
+      "sha256": "1e79b794150d30214cedfaba37dac5b7ecc19f67fc79a8fcfaf649727a80be21",
+      "pass": true
+    },
+    {
+      "path": "/events/calendar",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/events/calendar",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/events/calendar"
+      ],
+      "sha256": "64c1945d9c56681b02cc116ccc2aa22eef54be09f68eac570e8c729667bcb667",
+      "pass": true
+    },
+    {
+      "path": "/events/finance4-impact-pilots",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/events/finance4-impact-pilots",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/events/finance4-impact-pilots"
+      ],
+      "sha256": "67751a628bf2adfdfdff56af9f13dd28cdc4bf96a8c8ea8fce545188d6ef27b0",
+      "pass": true
+    },
+    {
+      "path": "/events/fintech-studio-buildathon",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/events/fintech-studio-buildathon",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/events/fintech-studio-buildathon"
+      ],
+      "sha256": "6087185fd90d393e94c601a8c0183c722463ab90fa0203f66a3ab11fa8576c73",
+      "pass": true
+    },
+    {
+      "path": "/events/investment-model-challenge-2026",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/events/investment-model-challenge-2026",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/events/investment-model-challenge-2026"
+      ],
+      "sha256": "b0968744e4cde19faa8547b669f5f94f5b6a595ca85d8daeaee2b031fc26167b",
+      "pass": true
+    },
+    {
+      "path": "/events/iyern-global-research-challenge",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/events/iyern-global-research-challenge",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/events/iyern-global-research-challenge"
+      ],
+      "sha256": "479006145e91b99b0d044aa220f4f40236b57bc13fdd0adcf03f8ac02dc65bf7",
+      "pass": true
+    },
+    {
+      "path": "/events/open-markets-challenge-001",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/events/open-markets-challenge-001",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/events/open-markets-challenge-001"
+      ],
+      "sha256": "9c4e2df98e7394c7537a2bcf199e350e595ab261fbe5d05d39c1adf4dd5490ba",
+      "pass": true
+    },
+    {
+      "path": "/events/quant-arena-2026",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/events/quant-arena-2026",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/events/quant-arena-2026"
+      ],
+      "sha256": "ba518536e45a44737220d257c6c5fc35cc6df3eb3c210634208d1905d7e77c05",
+      "pass": true
+    },
+    {
+      "path": "/finance-for-all",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/finance-for-all",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/finance-for-all"
+      ],
+      "sha256": "7607fc534650e31eb3a4c20ac06f632ada09517a8bfe6894ed30ea44729f84be",
+      "pass": true
+    },
+    {
+      "path": "/join",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/join",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/join"
+      ],
+      "sha256": "775a387c1401704739eeddb09aac9da75b1739bc7b21a7e78d1ff39335770c20",
+      "pass": true
+    },
+    {
+      "path": "/labs",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/labs",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/labs"
+      ],
+      "sha256": "2af86c3bd0f57b3d2819380a388765778d6a3906fba4fa292f1134a525480983",
+      "pass": true
+    },
+    {
+      "path": "/learn",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/learn",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/learn"
+      ],
+      "sha256": "05f7145e7e4a5beebe93275cc2547ece27be90005aa16f8bd7c490426b356c49",
+      "pass": true
+    },
+    {
+      "path": "/learn/economics",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/learn/economics",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/learn/economics"
+      ],
+      "sha256": "5debd6e94d6df0b15d7647f29e628a4557c8ef25f08f61e5559f5c66975a694d",
+      "pass": true
+    },
+    {
+      "path": "/learn/financial-modeling",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/learn/financial-modeling",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/learn/financial-modeling"
+      ],
+      "sha256": "27ddc10cc6c42f8d77a695e06aca7c829a5921cb80c1a085535b850ef5292e26",
+      "pass": true
+    },
+    {
+      "path": "/learn/glossary",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/learn/glossary",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/learn/glossary"
+      ],
+      "sha256": "9f380652ad6674d5bbc037e40ed209097a1384e7e1ac4d1fed05b7f737dfec31",
+      "pass": true
+    },
+    {
+      "path": "/learn/investing",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/learn/investing",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/learn/investing"
+      ],
+      "sha256": "58ed36cecf682d567299b2720ef6c6c298d3acf8b5a9d632a6a76a2b8ea9f8a7",
+      "pass": true
+    },
+    {
+      "path": "/learn/markets",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/learn/markets",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/learn/markets"
+      ],
+      "sha256": "f0fd482662e7ab1cfc21594de7b1fdcfecdf1f454c9cdae6f63996f81352e474",
+      "pass": true
+    },
+    {
+      "path": "/learn/practice",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/learn/practice",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/learn/practice"
+      ],
+      "sha256": "8cb9b8351ea697d27dc345e82a2f107e8463f152136eff80a1a124ee9f67555e",
+      "pass": true
+    },
+    {
+      "path": "/learn/quantitative-finance",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/learn/quantitative-finance",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/learn/quantitative-finance"
+      ],
+      "sha256": "bd0cf9f9d23716c1d03ce07019012bdd5abe561312241cf2c9dcc92a08946f27",
+      "pass": true
+    },
+    {
+      "path": "/markets",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/markets",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/markets"
+      ],
+      "sha256": "7e54c1d1e34ac072b6c2f42ffa3e1cf723268d898b20ce1fb39965a9355fa57a",
+      "pass": true
+    },
+    {
+      "path": "/media",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/media",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/media"
+      ],
+      "sha256": "e99202c3fa245f509b30b4e88d075e66737e26b80678d93854a69fcfbe86e4c0",
+      "pass": true
+    },
+    {
+      "path": "/media/interviews",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/media/interviews",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/media/interviews"
+      ],
+      "sha256": "60582a4881dc72d630baf73c0cf34b521df72ee33a937891b09ff72148ef2c38",
+      "pass": true
+    },
+    {
+      "path": "/media/videos",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/media/videos",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/media/videos"
+      ],
+      "sha256": "f1396f2791568d5b3b966fd8a35cd756f736c634875ac966504995722b3f3f84",
+      "pass": true
+    },
+    {
+      "path": "/network",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/network",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/network"
+      ],
+      "sha256": "a6f9808a8969ba9150253213fcbde99431bf3604fcfb9256a74dab081fe075ba",
+      "pass": true
+    },
+    {
+      "path": "/network/chapters",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/network/chapters",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/network/chapters"
+      ],
+      "sha256": "09f6b6cf9c336841030f4a9c379388246daeb10e42d03f32e7e21405084e1a8d",
+      "pass": true
+    },
+    {
+      "path": "/network/chapters/start",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/network/chapters/start",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/network/chapters/start"
+      ],
+      "sha256": "2d5b3a0f0fe1a8861e41b6f55755ceaef77b073f806f0c6b1d7b27cb43f3727d",
+      "pass": true
+    },
+    {
+      "path": "/network/community",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/network/community",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/network/community"
+      ],
+      "sha256": "67b873a2a015197e4573b0ee19bda5b31454e73a308c2ef6d81e4b2446d6dce1",
+      "pass": true
+    },
+    {
+      "path": "/network/partners",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/network/partners",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/network/partners"
+      ],
+      "sha256": "c9d7b8cfbf92e2115799db86edefeda609bca48c797176f607b661d0e6c53653",
+      "pass": true
+    },
+    {
+      "path": "/open",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/open",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/open"
+      ],
+      "sha256": "a6523496e6a6e63966b427ba03a6bcc12b5b6c2b40b6dcbf4f7d52ef861ca2c3",
+      "pass": true
+    },
+    {
+      "path": "/open/courses",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/open/courses",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/open/courses"
+      ],
+      "sha256": "fd2ca0b2ccb85509cce28967b746ed2f433f174ca71b81343ba309951aceb220",
+      "pass": true
+    },
+    {
+      "path": "/open/courses/financial-systems",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/open/courses/financial-systems",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/open/courses/financial-systems"
+      ],
+      "sha256": "dd2addccf2262ee92dad506a2eeaf1946860cf702c05ef7f2cc86d0755079a69",
+      "pass": true
+    },
+    {
+      "path": "/open/library",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/open/library",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/open/library"
+      ],
+      "sha256": "407432ba8636b7419ec6d66996b9ccb6457dc00f76cc8e9620498e2a10803322",
+      "pass": true
+    },
+    {
+      "path": "/open/resources",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/open/resources",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/open/resources"
+      ],
+      "sha256": "43089422e46a1b7c8a051f16eabdf6e3a61e67136743bd41f54d4c30873f2030",
+      "pass": true
+    },
+    {
+      "path": "/open/tools",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/open/tools",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/open/tools"
+      ],
+      "sha256": "d926e40e3e8f493efa2f1982f5c16b3a50a1cfe449662ddae907de5820d3c1e0",
+      "pass": true
+    },
+    {
+      "path": "/open/workshops",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/open/workshops",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/open/workshops"
+      ],
+      "sha256": "cb6c871fe7bae21c42b029c12780ebe67e7ca6a237c53e42c90d26a8227edebf",
+      "pass": true
+    },
+    {
+      "path": "/participation",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/participation",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/participation"
+      ],
+      "sha256": "d620bf43a86b197343a8c38389fd909f583b53d25efd9c64b2cab4aea1fabe0b",
+      "pass": true
+    },
+    {
+      "path": "/podcast",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/podcast",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/podcast"
+      ],
+      "sha256": "180434ce8782f6413551eaeeed8cd9f4049f99257cd8cbdf7f291bb883ece902",
+      "pass": true
+    },
+    {
+      "path": "/podcast/episodes",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/podcast/episodes",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/podcast/episodes"
+      ],
+      "sha256": "e5a8e604701eae13416b08987e2e408e3a147e09b4d00f7635e57e6d27ebbf32",
+      "pass": true
+    },
+    {
+      "path": "/podcast/guests",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/podcast/guests",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/podcast/guests"
+      ],
+      "sha256": "b8886d63a0eeb06581986017cdc3e05586c6498b83281eb3cd8ba4093da33497",
+      "pass": true
+    },
+    {
+      "path": "/podcast/topics",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/podcast/topics",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/podcast/topics"
+      ],
+      "sha256": "985814a727e1cf55e2c71fe0400244d0eb028013013cf96c1920dee9ffc3dfef",
+      "pass": true
+    },
+    {
+      "path": "/privacy",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/privacy",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/privacy"
+      ],
+      "sha256": "1c70dfbf81eef87a988d24c7cf543f27ff3440d801c890cc3baf42023ed14354",
+      "pass": true
+    },
+    {
+      "path": "/programs",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/programs",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/programs"
+      ],
+      "sha256": "78a79e6f7437a467f874140c06c8e1fbc4380d0861c6af03cef90bf370e79f00",
+      "pass": true
+    },
+    {
+      "path": "/programs/axiom-pathways",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/programs/axiom-pathways",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/programs/axiom-pathways"
+      ],
+      "sha256": "f8d0345674e79866f1e848161e3fc146d65837b5676f9b18edd8e7595cbdf9fb",
+      "pass": true
+    },
+    {
+      "path": "/programs/backtest-falsification",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/programs/backtest-falsification",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/programs/backtest-falsification"
+      ],
+      "sha256": "e56cabde1d09fc7b604dca6e30ad36c33d976e4e86ff53d2736764b850275ca3",
+      "pass": true
+    },
+    {
+      "path": "/programs/chapters",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/programs/chapters",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/programs/chapters"
+      ],
+      "sha256": "e1b9476534cbe4d19c995d071c1488d73f2e1d487e05d3d2e8032a97c67f1578",
+      "pass": true
+    },
+    {
+      "path": "/programs/compare",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/programs/compare",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/programs/compare"
+      ],
+      "sha256": "22fcd5a13da651ba3736810b2a260d7cac2b03a73dad2cbc732d53b153a376a7",
+      "pass": true
+    },
+    {
+      "path": "/programs/debriefed-contributors",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/programs/debriefed-contributors",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/programs/debriefed-contributors"
+      ],
+      "sha256": "b36662b5a5e6c655110c86f75db77aefd4e2de74000150104a8280d0e12659fc",
+      "pass": true
+    },
+    {
+      "path": "/programs/editorial-reviewers",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/programs/editorial-reviewers",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/programs/editorial-reviewers"
+      ],
+      "sha256": "a2ace32e8e4ce596caeb869c970db5d96a3a77c27a41d12c3339f5a93c77dbad",
+      "pass": true
+    },
+    {
+      "path": "/programs/finance-meta-labs",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/programs/finance-meta-labs",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/programs/finance-meta-labs"
+      ],
+      "sha256": "53abdd1b001483f416b876c08715607b60f531265cbfbd36bb99bf559ec10afe",
+      "pass": true
+    },
+    {
+      "path": "/programs/finance4-impact",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/programs/finance4-impact",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/programs/finance4-impact"
+      ],
+      "sha256": "157c92d3af97d073d1ce5a395a72ce6678b1c085dead189bb2fa5eb17bd76963",
+      "pass": true
+    },
+    {
+      "path": "/programs/financial-foundations",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/programs/financial-foundations",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/programs/financial-foundations"
+      ],
+      "sha256": "49afa5c99657fc8d1ee548d2e59071a14bcaeede9485384ff0f209a93327360c",
+      "pass": true
+    },
+    {
+      "path": "/programs/financial-systems-policy",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/programs/financial-systems-policy",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/programs/financial-systems-policy"
+      ],
+      "sha256": "396a980e3fd6dfbe6ea8fc320136e1863e900cc53b8271cf8312f6025996742b",
+      "pass": true
+    },
+    {
+      "path": "/programs/fintech-studio",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/programs/fintech-studio",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/programs/fintech-studio"
+      ],
+      "sha256": "15f960d0644cf9ae7954d4351b6e6386b1d9adc7b583903810bb9c745466fa7d",
+      "pass": true
+    },
+    {
+      "path": "/programs/global-research-challenge",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/programs/global-research-challenge",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/programs/global-research-challenge"
+      ],
+      "sha256": "61ccabb15889196cbde65143d3f7c535af59c51674251570be8bb7ec95c25610",
+      "pass": true
+    },
+    {
+      "path": "/programs/investment-model-challenge",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/programs/investment-model-challenge",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/programs/investment-model-challenge"
+      ],
+      "sha256": "15858ec35c486e5718cda9ff8dc972509a1daeab17aadb5a77b450f10460c0d0",
+      "pass": true
+    },
+    {
+      "path": "/programs/iyer-journal",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/programs/iyer-journal",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/programs/iyer-journal"
+      ],
+      "sha256": "88e3ad7272559d7082be81dc3b54cacccc7b4de128a0cb6de6058fa71c35586b",
+      "pass": true
+    },
+    {
+      "path": "/programs/mentors-and-leadership",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/programs/mentors-and-leadership",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/programs/mentors-and-leadership"
+      ],
+      "sha256": "c9867f8297e8fb3744048fdcd792ea05d56e9accf0023cd0f615e50c1f5df534",
+      "pass": true
+    },
+    {
+      "path": "/programs/methods-reproducibility",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/programs/methods-reproducibility",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/programs/methods-reproducibility"
+      ],
+      "sha256": "614ad62ac7ea37d0cc70256f98ff0171882414c5acca3f55d7b52b1b33d888e7",
+      "pass": true
+    },
+    {
+      "path": "/programs/open-markets",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/programs/open-markets",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/programs/open-markets"
+      ],
+      "sha256": "9046496a18b672d86fba6755868e76dc959c7ea0fe7c7cdf083ee785fa0675e3",
+      "pass": true
+    },
+    {
+      "path": "/programs/preprint-forum",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/programs/preprint-forum",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/programs/preprint-forum"
+      ],
+      "sha256": "8e4d9aa0b57afcfef76b35c12459df8bda7d2244727a2348d2ce47dbf7aecae8",
+      "pass": true
+    },
+    {
+      "path": "/programs/quantitative-markets",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/programs/quantitative-markets",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/programs/quantitative-markets"
+      ],
+      "sha256": "d9a10d4e978eca350d137bda3796957fff557f3d0180671562616fd1c1128763",
+      "pass": true
+    },
+    {
+      "path": "/programs/queued-directions",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/programs/queued-directions",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/programs/queued-directions"
+      ],
+      "sha256": "2c18ef4d0089b4bfa9a39d03808371a583e4808f92e1d038f9dc14646949d1b4",
+      "pass": true
+    },
+    {
+      "path": "/programs/research-fellowship",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/programs/research-fellowship",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/programs/research-fellowship"
+      ],
+      "sha256": "d1cf2a954e715a403feef8e6b212482a11651630a788056de9a7cd2a18234a01",
+      "pass": true
+    },
+    {
+      "path": "/programs/student-research",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/programs/student-research",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/programs/student-research"
+      ],
+      "sha256": "7ebea5a4631587a855230982fcab36300e861f511ff136a377e11f7ad20cbee3",
+      "pass": true
+    },
+    {
+      "path": "/programs/union-collaborations",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/programs/union-collaborations",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/programs/union-collaborations"
+      ],
+      "sha256": "01e32b065bb0dcf5f4895763d0a3a2e022190872991f7921fdfece093caba858",
+      "pass": true
+    },
+    {
+      "path": "/projects",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects"
+      ],
+      "sha256": "6c1ea7aeb48ab0dc32cd0028f41ca92c656668e54ed730c4d97beae29e45de4d",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-01",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-01",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-01"
+      ],
+      "sha256": "578dfce5892d827c3dd02d1da4060cd64eebf5897a7240b3fb88515d7d77920c",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-02",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-02",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-02"
+      ],
+      "sha256": "5d4a2d4d94ae1ac08c3e4e0ab5bab2fc11718742717e1d4ad683ae0d3c0d6592",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-03",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-03",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-03"
+      ],
+      "sha256": "a542aef9f85fa18514ac4f128c5a508e371990ee64fc146b145c3d81dc08a178",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-04",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-04",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-04"
+      ],
+      "sha256": "7508c549edc2e6d4300adf1b0e8607a8b0c502ca0270dad67d6135118d8993e2",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-05",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-05",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-05"
+      ],
+      "sha256": "dd14f100ffd2c95cd34204394620379b3c135b9ac42c3eb03d0131d4987e7c9c",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-06",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-06",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-06"
+      ],
+      "sha256": "d5eb570cac440bd0401ce03e4237c16fa198441ba8465f82d2d91a94ba99e1b9",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-07",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-07",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-07"
+      ],
+      "sha256": "696b64be30f1300db41033c8e9b75050362a67aed56a317c49e16361a31541a8",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-08",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-08",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-08"
+      ],
+      "sha256": "20a96d59bb144728a63fda195f2f3c4842592e035da688d8c8f83c9055cd68fe",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-09",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-09",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-09"
+      ],
+      "sha256": "da91cc078e2ad20d7fc781d821a0b1a58c7b160574fc302028456feb64cce5c1",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-10",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-10",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-10"
+      ],
+      "sha256": "a402a101d188e8655c207cb48bb94c711ec86431801cb0932b61f42b6bbb5d46",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-11",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-11",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-11"
+      ],
+      "sha256": "1837c610bf9360e514667c571a9cf92a84c6a5dfbc063f6585ae08e4e7b86d0b",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-12",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-12",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-12"
+      ],
+      "sha256": "0b8bc61f3b992e203a00c11fdb34c5132d1fdb68af1c10ddeefede13f6fd7ad3",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-13",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-13",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-13"
+      ],
+      "sha256": "c762f5c72902c6a41d4c42031720958c364fc0b164e0301555adfc4b25519e47",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-14",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-14",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-14"
+      ],
+      "sha256": "b5b456411f4d636be61fa36e7211e7a3278e111f6915e96309b65e4947275656",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-15",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-15",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-15"
+      ],
+      "sha256": "bb3cf38bc9d81e21f5ecda43fd7688e50ad8a4745672d57176c47dc2e5cd494f",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-16",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-16",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-16"
+      ],
+      "sha256": "6400fe7e68cb83f9b385d8eb0dede1db147db4eef013831c1bbf4ef93bb26ac0",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-17",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-17",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-17"
+      ],
+      "sha256": "975443e5311c7621e74d075c19fcc2edc97356643b21052398e079c53aa98448",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-18",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-18",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-18"
+      ],
+      "sha256": "9c878fbd24fa9149c7154f637a49fdaaa3566f3cb6b8d4f85c5190dad3c73fa0",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-19",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-19",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-19"
+      ],
+      "sha256": "8c649680ab772df19c73d662280846d607047bb55b36520e5a6bf5187f6c6165",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-20",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-20",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-20"
+      ],
+      "sha256": "fcd4456497a78bc771e629c0e7f93d1e437bed4459e0d1a47c59ee3f477f2c10",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-21",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-21",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-21"
+      ],
+      "sha256": "6883eb2e2d2e95c4613688c7d07ec93722727dc21bfbd66a4900e023a131caf2",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-22",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-22",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-22"
+      ],
+      "sha256": "66f76947d6adcda127afcc8041d87d48dc323348d7f1173bfb4632da2801aada",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-23",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-23",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-23"
+      ],
+      "sha256": "daf0a645e52f455d9fd1ca656bc1aaab4e179f8723fc7faa2f2a08005370d514",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-24",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-24",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-24"
+      ],
+      "sha256": "3d9f5f5c28e47770de0de48af87fd1e6efccb5a97490f7c9256578abee9b2287",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-25",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-25",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-25"
+      ],
+      "sha256": "bfe169c3aed0674054f0a997ad76f1005dab6061e21b468c724f4dea081e6a7a",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-26",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-26",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-26"
+      ],
+      "sha256": "ed49c3f960da45ebe882602bf41cb8ca637d93a4e52fa08edbce5a9d354dc932",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-27",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-27",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-27"
+      ],
+      "sha256": "f29392819bdaebd409041854016e77fd0720d41c990cd5a47552768b964d3cf1",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-28",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-28",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-28"
+      ],
+      "sha256": "2a4fbfc42cf60e7d9a55946b4c9b9762480851775a17351a833059481ae07867",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-29",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-29",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-29"
+      ],
+      "sha256": "0a6ac7b00960055f320359b17b7435da61fc11ff78e089fe4bffa10070dfc4e4",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-30",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-30",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-30"
+      ],
+      "sha256": "4523863313356df59060d411a43a84b4478bd1170ecc9d29d2c5ed4a96a9a5a0",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-31",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-31",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-31"
+      ],
+      "sha256": "a6ef25736520a422ce208d8af0eac31ccf14063963274bda86f8801c4d43799b",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-32",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-32",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-32"
+      ],
+      "sha256": "036e24ecf75e41369cd45f6c05d89fbb0b09f53b009995183042d272523ab9d9",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-33",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-33",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-33"
+      ],
+      "sha256": "20e99f25ce4f1237b6d4f0fb87fc60124e90bdc897d47cbfb1ead59ac6931147",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-34",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-34",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-34"
+      ],
+      "sha256": "511e3de47c6f4fb217f044b057bb0456d2eaaba96942437e512179cc53615f77",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-35",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-35",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-35"
+      ],
+      "sha256": "5a666cb8fa98ab99fe78fc6b737ab83fd37de3fc32d9f58f046bb2178f074f9c",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-36",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-36",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-36"
+      ],
+      "sha256": "25471148ae251d0414475c2a96d4460095b5acb69f046e71e9ee363f68bb0337",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-37",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-37",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-37"
+      ],
+      "sha256": "f9df6ed8470b6fccc5ee0190671cd14cd9971c369d8140b9227e0f3dddb106a8",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-38",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-38",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-38"
+      ],
+      "sha256": "3bff42efbacbc19e9d85178293801f26405eea2a355127e5bf6655ff5aabb813",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-39",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-39",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-39"
+      ],
+      "sha256": "1ee05ea77e80ac062b8f05a1f9b87ba573e64b7ef296c66b480f794cd0883f7c",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-40",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-40",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-40"
+      ],
+      "sha256": "1f56fc5441de9910111fac7c906052a531cf27e0ef8743609b307c5d953955b1",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-41",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-41",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-41"
+      ],
+      "sha256": "4ec506cf65c93d1a209c4b6d743d9e7e1c5b07032d7b663f34e66ba49b3a1756",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-42",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-42",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-42"
+      ],
+      "sha256": "d672a792bf31ba17595b1fa40347b0b2b38b2504012ac16cf8ddc40611943c4b",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-43",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-43",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-43"
+      ],
+      "sha256": "516698c9cb6fae142e5fa88ce7e89b34f2aee3d708e6a9943759e6df7e7e43d8",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-44",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-44",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-44"
+      ],
+      "sha256": "c15032b2651d13aa2d94eeae6891d8da043d5ba9b32f58b5ec0728a1e1ad4669",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-45",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-45",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-45"
+      ],
+      "sha256": "44871af0e7b5982a45051ed0d50a44fe6ab35524fcf533c0a7489f1e97924fc5",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-46",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-46",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-46"
+      ],
+      "sha256": "84703644742b7a78f7e5e273e1774bcc3bd800c45520d0fef4e3ab4c4ca1887c",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-47",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-47",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-47"
+      ],
+      "sha256": "d3e8b3ad8b90aff1f69bf9f69e99b0d65933198c7edc3d1102bad485d9de91be",
+      "pass": true
+    },
+    {
+      "path": "/projects/f4a-48",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/projects/f4a-48",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/projects/f4a-48"
+      ],
+      "sha256": "9259b3dd17aed088ca0651eb4a7627af45eb8606b8e522fca37e6ee61f470616",
+      "pass": true
+    },
+    {
+      "path": "/publications",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/publications",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/publications"
+      ],
+      "sha256": "0db3009e821bcd62cc81c37e9a41b6ae03b100d7ee1480acdfa8c1ef2d5788a5",
+      "pass": true
+    },
+    {
+      "path": "/publications/financedebriefed",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/publications/financedebriefed",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/publications/financedebriefed"
+      ],
+      "sha256": "dd89220d0f03fbed5565abff2a9cea061f1e79aec46b61b440394eecbdb06edd",
+      "pass": true
+    },
+    {
+      "path": "/publications/financedebriefed/a-rising-stock-index-is-not-the-whole-economy",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/publications/financedebriefed/a-rising-stock-index-is-not-the-whole-economy",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/publications/financedebriefed/a-rising-stock-index-is-not-the-whole-economy"
+      ],
+      "sha256": "0dcc38e925b36f71a7d8fde1b37feb7f4bb3c79fbea843af14ef08374d746389",
+      "pass": true
+    },
+    {
+      "path": "/publications/financedebriefed/a-stock-split-does-not-make-a-company-cheaper",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/publications/financedebriefed/a-stock-split-does-not-make-a-company-cheaper",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/publications/financedebriefed/a-stock-split-does-not-make-a-company-cheaper"
+      ],
+      "sha256": "7b43e6c66e819533455e11f6053f8e695b3d5de6fa82a0019792d1369522e359",
+      "pass": true
+    },
+    {
+      "path": "/publications/financedebriefed/how-a-profitable-company-runs-short-of-cash",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/publications/financedebriefed/how-a-profitable-company-runs-short-of-cash",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/publications/financedebriefed/how-a-profitable-company-runs-short-of-cash"
+      ],
+      "sha256": "8d0a1c519b117879b7160780781eb09d8bd9722df1e07a22593c68c7c622e661",
+      "pass": true
+    },
+    {
+      "path": "/publications/financedebriefed/how-interest-rates-move-through-the-economy",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/publications/financedebriefed/how-interest-rates-move-through-the-economy",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/publications/financedebriefed/how-interest-rates-move-through-the-economy"
+      ],
+      "sha256": "67ccc031cea79c2be4c5349019513c3b76cfe953fce218be113edb993d62073d",
+      "pass": true
+    },
+    {
+      "path": "/publications/financedebriefed/ipo-from-private-company-to-public-market",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/publications/financedebriefed/ipo-from-private-company-to-public-market",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/publications/financedebriefed/ipo-from-private-company-to-public-market"
+      ],
+      "sha256": "3ba1d5e07e116bc0778da94ab305665f0b2e0602980f4d439545058e5117d766",
+      "pass": true
+    },
+    {
+      "path": "/publications/financedebriefed/lower-inflation-does-not-mean-lower-prices",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/publications/financedebriefed/lower-inflation-does-not-mean-lower-prices",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/publications/financedebriefed/lower-inflation-does-not-mean-lower-prices"
+      ],
+      "sha256": "607d92cd3b0d8fb47c0c0b60a74ede182e0978b362d67bf19f56782fb03ecb91",
+      "pass": true
+    },
+    {
+      "path": "/publications/financedebriefed/reading-an-economic-claim-without-getting-fooled",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/publications/financedebriefed/reading-an-economic-claim-without-getting-fooled",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/publications/financedebriefed/reading-an-economic-claim-without-getting-fooled"
+      ],
+      "sha256": "ca8307743ff58bc093be1331e4e33b6e175b543863bab09438963e9100772cab",
+      "pass": true
+    },
+    {
+      "path": "/publications/financedebriefed/upi-payments-and-the-economics-of-a-network",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/publications/financedebriefed/upi-payments-and-the-economics-of-a-network",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/publications/financedebriefed/upi-payments-and-the-economics-of-a-network"
+      ],
+      "sha256": "16326313f1109e4ff4d255d58c5298a2a61683cc43c240e2609e6e91fd0b55ed",
+      "pass": true
+    },
+    {
+      "path": "/publications/financedebriefed/what-a-weaker-currency-changes",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/publications/financedebriefed/what-a-weaker-currency-changes",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/publications/financedebriefed/what-a-weaker-currency-changes"
+      ],
+      "sha256": "e3982a62cfb32f87a9898aa2ad0487508866426efd8529ebeb83b421ada75af8",
+      "pass": true
+    },
+    {
+      "path": "/publications/financedebriefed/why-bond-prices-fall-when-yields-rise",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/publications/financedebriefed/why-bond-prices-fall-when-yields-rise",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/publications/financedebriefed/why-bond-prices-fall-when-yields-rise"
+      ],
+      "sha256": "9397d2fa7c8ee34436530b788a25b62b3a66f8286ad77fad958e672453a47e08",
+      "pass": true
+    },
+    {
+      "path": "/publications/iyerj",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/publications/iyerj",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/publications/iyerj"
+      ],
+      "sha256": "9921b386e2c6bb0f9630320435d7be3e04333227a46a71c8465404102e7e43e9",
+      "pass": true
+    },
+    {
+      "path": "/publications/iyerj/submissions",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/publications/iyerj/submissions",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/publications/iyerj/submissions"
+      ],
+      "sha256": "7c3094e9b7d8a79d8a3db39ff9e71944cd9fe81c71a85e8374e8d730ceeb6811",
+      "pass": true
+    },
+    {
+      "path": "/publications/library",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/publications/library",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/publications/library"
+      ],
+      "sha256": "324c55a48c308559dc0f035653cea6a7a1bcb33c0b24d7c2da907f8d42ac9ee2",
+      "pass": true
+    },
+    {
+      "path": "/publications/research-notes",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/publications/research-notes",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/publications/research-notes"
+      ],
+      "sha256": "25bb7e55f3aae29a5567af21d03554e8ae4c7c3947965282bd9d333a29ce2a11",
+      "pass": true
+    },
+    {
+      "path": "/publications/working-papers",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/publications/working-papers",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/publications/working-papers"
+      ],
+      "sha256": "19413c2bf500cfbd1347a91fc01498de74d6719936413f644032c117db9f778c",
+      "pass": true
+    },
+    {
+      "path": "/reading-list",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/reading-list",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/reading-list"
+      ],
+      "sha256": "5cf61f71739d7d1346043dcbc37fc936f6879a6565129049f1c8d3740049fe3e",
+      "pass": true
+    },
+    {
+      "path": "/research",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research"
+      ],
+      "sha256": "982d554ec5d944ae01ee670f0112742d26a22f1c595200c6a3cb932b1b4788db",
+      "pass": true
+    },
+    {
+      "path": "/research/cohorts",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/cohorts",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/cohorts"
+      ],
+      "sha256": "0a4c4e13bcb472648ce4d6b6d6af799e4033678cb1ff87249e95a389eb20fa7b",
+      "pass": true
+    },
+    {
+      "path": "/research/cohorts/capitallab",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/cohorts/capitallab",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/cohorts/capitallab"
+      ],
+      "sha256": "5f4a04f55b5c3d561bb81df2c5f0e4fa7dc3c0845944023f7c683f36d8d77a3d",
+      "pass": true
+    },
+    {
+      "path": "/research/cohorts/causal-finance",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/cohorts/causal-finance",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/cohorts/causal-finance"
+      ],
+      "sha256": "89177d40a3e742d50cb0156888e1ab5b950eb0524f0abdbcff3d1c2c4501bd5e",
+      "pass": true
+    },
+    {
+      "path": "/research/cohorts/finml-benchmark",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/cohorts/finml-benchmark",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/cohorts/finml-benchmark"
+      ],
+      "sha256": "c4a82065fa5bc8ea65d62476cb4f579d0946103f68a13ae736956574e3bf4f7a",
+      "pass": true
+    },
+    {
+      "path": "/research/cohorts/macrocast",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/cohorts/macrocast",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/cohorts/macrocast"
+      ],
+      "sha256": "d1c2bcf4e8d5291fa50651874c88636c8995be31e2f87df27a6821f050016e44",
+      "pass": true
+    },
+    {
+      "path": "/research/cohorts/market-frictions",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/cohorts/market-frictions",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/cohorts/market-frictions"
+      ],
+      "sha256": "e799df1b9698c587fb2a11868f48de29f0e66de6dcbd4a20c6384fc0292b6926",
+      "pass": true
+    },
+    {
+      "path": "/research/cohorts/realitycheck",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/cohorts/realitycheck",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/cohorts/realitycheck"
+      ],
+      "sha256": "8fbf691ab94dd9a085863f6b47edee7246430e61b1521ffe6de550969b7d4dcb",
+      "pass": true
+    },
+    {
+      "path": "/research/fellowship",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/fellowship",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/fellowship"
+      ],
+      "sha256": "b44ee142bd20bdd4691d698283446815eda99cecc96bb9d3c7c265073ed81a2d",
+      "pass": true
+    },
+    {
+      "path": "/research/industry-projects",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/industry-projects",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/industry-projects"
+      ],
+      "sha256": "4d0816310f8324803c292c63ea2abd47768b5d4be9c6f8e31f3733424d8cb7fe",
+      "pass": true
+    },
+    {
+      "path": "/research/labs",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/labs",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/labs"
+      ],
+      "sha256": "4145511876c7ae61dfb501d59bb2e1b1c60759de15d927631d322611fed6bc2b",
+      "pass": true
+    },
+    {
+      "path": "/research/labs/behavioral-household-finance",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/labs/behavioral-household-finance",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/labs/behavioral-household-finance"
+      ],
+      "sha256": "f1b74d9ab51baec28069220766a2df7fa6fc3db8d2fc52776839623edc2f3778",
+      "pass": true
+    },
+    {
+      "path": "/research/labs/corporate-finance-private-markets",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/labs/corporate-finance-private-markets",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/labs/corporate-finance-private-markets"
+      ],
+      "sha256": "6f49d484f498e1fe1437dcb6b4a45abeb381dc34c10270678531f4b49b45b6f8",
+      "pass": true
+    },
+    {
+      "path": "/research/labs/financial-econometrics-causal-inference",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/labs/financial-econometrics-causal-inference",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/labs/financial-econometrics-causal-inference"
+      ],
+      "sha256": "ac98762d49b18dc6acf943cdf450210538180f676be4e4912bab35dd48eaf450",
+      "pass": true
+    },
+    {
+      "path": "/research/labs/machine-learning-for-finance",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/labs/machine-learning-for-finance",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/labs/machine-learning-for-finance"
+      ],
+      "sha256": "a5c963d541828ac02ce7e0bef4c06d13ffc2496b6e550eb5351ea414f126b0a6",
+      "pass": true
+    },
+    {
+      "path": "/research/labs/macro-monetary-financial-economics",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/labs/macro-monetary-financial-economics",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/labs/macro-monetary-financial-economics"
+      ],
+      "sha256": "eec87d9396f0bcf16165d0323542351b1221e9be2dbc59a9f538303fd5a77f05",
+      "pass": true
+    },
+    {
+      "path": "/research/labs/market-microstructure-financial-systems",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/labs/market-microstructure-financial-systems",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/labs/market-microstructure-financial-systems"
+      ],
+      "sha256": "aa514a7e51dc760e3d647b1a291fbb3d05aebefd68a9b59e15184a579ba57122",
+      "pass": true
+    },
+    {
+      "path": "/research/labs/quantitative-finance-asset-pricing",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/labs/quantitative-finance-asset-pricing",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/labs/quantitative-finance-asset-pricing"
+      ],
+      "sha256": "94463d86ade526a70d641368469d110c3a0414acd89eeda6a5891be57d9ba0d5",
+      "pass": true
+    },
+    {
+      "path": "/research/map",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/map",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/map"
+      ],
+      "sha256": "7f8fef503b54472c99098ac5acab76391754baf837c8181cbfb3f2f6fbe6cf34",
+      "pass": true
+    },
+    {
+      "path": "/research/partner-programs",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/partner-programs",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/partner-programs"
+      ],
+      "sha256": "c114a36c48f6aa815e6c2d29aed87e12b9f2675b60a5b632f94cfb2d92207408",
+      "pass": true
+    },
+    {
+      "path": "/research/partner-programs/yel",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/partner-programs/yel",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/partner-programs/yel"
+      ],
+      "sha256": "1aafa2eaa3bd3a97f60a4929feced0f4228aaa516ddd70696dcd8be022cc2bdd",
+      "pass": true
+    },
+    {
+      "path": "/research/projects",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/projects",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/projects"
+      ],
+      "sha256": "ae746565ebed1ca0da33d57ad0c7520c2dff3ad69ce17629576bb6d2511f4692",
+      "pass": true
+    },
+    {
+      "path": "/research/projects/capitallab",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/projects/capitallab",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/projects/capitallab"
+      ],
+      "sha256": "77857ef8790ff6348a39b33ed9ea407af0f9ffaf309b5e1ef25552bb2c1ff227",
+      "pass": true
+    },
+    {
+      "path": "/research/projects/causal-finance",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/projects/causal-finance",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/projects/causal-finance"
+      ],
+      "sha256": "83ecabc0d6faf195bda70fbdd99e1e8291ea8036cc51bbe73d864868328935a8",
+      "pass": true
+    },
+    {
+      "path": "/research/projects/digital-payments-access",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/projects/digital-payments-access",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/projects/digital-payments-access"
+      ],
+      "sha256": "a35af80fab7195bbf62575b511042fa5ee797fd4eb5df331ea565cb9ed009cf4",
+      "pass": true
+    },
+    {
+      "path": "/research/projects/eigen-jepa",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/projects/eigen-jepa",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/projects/eigen-jepa"
+      ],
+      "sha256": "5576523094c5005c2669a7e5e26515c3bf27d23e5100a06015e6211e6554c105",
+      "pass": true
+    },
+    {
+      "path": "/research/projects/eigenfinance",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/projects/eigenfinance",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/projects/eigenfinance"
+      ],
+      "sha256": "e891bc29c6d61b8d9934bf0443a67b9bb920521a3c377d5cfead033d31622e59",
+      "pass": true
+    },
+    {
+      "path": "/research/projects/fi-jepa",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/projects/fi-jepa",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/projects/fi-jepa"
+      ],
+      "sha256": "c244bb3d1403494addcabcf70f1503a84aa327d2071a078f8af0b7845af79362",
+      "pass": true
+    },
+    {
+      "path": "/research/projects/finance-meta-global",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/projects/finance-meta-global",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/projects/finance-meta-global"
+      ],
+      "sha256": "358b24bed333a097d2de3eaa1670dc82ebfd8ff25ec48340b9e3b6fea52b90d5",
+      "pass": true
+    },
+    {
+      "path": "/research/projects/finimmunity",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/projects/finimmunity",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/projects/finimmunity"
+      ],
+      "sha256": "aac1a13176f1df1ae92c3bb9434663b7a6f3f566080e9e6ac308bbdab37525c6",
+      "pass": true
+    },
+    {
+      "path": "/research/projects/finml-benchmark",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/projects/finml-benchmark",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/projects/finml-benchmark"
+      ],
+      "sha256": "eb4c35b3a31c91b209aa19c833e02f28b616a215694607c8afd2e666aae343a3",
+      "pass": true
+    },
+    {
+      "path": "/research/projects/inflation-observatory",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/projects/inflation-observatory",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/projects/inflation-observatory"
+      ],
+      "sha256": "de658bb211e098aa16d5e0e7fc8bc603b6c243106f9a7b2382d0f805ef05b12a",
+      "pass": true
+    },
+    {
+      "path": "/research/projects/iy-ern",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/projects/iy-ern",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/projects/iy-ern"
+      ],
+      "sha256": "8978d11fc5c6bd8514856689940b246d240769b1bfb809a4182cd026ee40ced9",
+      "pass": true
+    },
+    {
+      "path": "/research/projects/lgwm",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/projects/lgwm",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/projects/lgwm"
+      ],
+      "sha256": "5892c59a7a5fa6aa711c7afb6846ffc24581253eb3051e41c6e56daae1d47af3",
+      "pass": true
+    },
+    {
+      "path": "/research/projects/macrocast",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/projects/macrocast",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/projects/macrocast"
+      ],
+      "sha256": "e886e48519a068b357dfe6400b702b45b11f05254f7f72bd4dcd41c5bcf6f51e",
+      "pass": true
+    },
+    {
+      "path": "/research/projects/market-frictions",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/projects/market-frictions",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/projects/market-frictions"
+      ],
+      "sha256": "2d40703efaa9c2b975423b6f1a206488acb486da81d5b80de01970cb5bc804db",
+      "pass": true
+    },
+    {
+      "path": "/research/projects/portal",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/projects/portal",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/projects/portal"
+      ],
+      "sha256": "fe0e513b7349113f9ffb1f06bed42e200b1f496a2933d7f686693220424b6982",
+      "pass": true
+    },
+    {
+      "path": "/research/projects/public-company-lab",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/projects/public-company-lab",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/projects/public-company-lab"
+      ],
+      "sha256": "c14d52727edf20c3f5b72e3fecf2b1767e31e2b848eb5a443f94b9c422f208cc",
+      "pass": true
+    },
+    {
+      "path": "/research/projects/realitycheck",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/projects/realitycheck",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/projects/realitycheck"
+      ],
+      "sha256": "b707d1a5a577b296d9279fb89e89a78976e56e3d7c6f510ba90b97d66470b888",
+      "pass": true
+    },
+    {
+      "path": "/research/projects/youth-expectations-panel",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/projects/youth-expectations-panel",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/projects/youth-expectations-panel"
+      ],
+      "sha256": "0b1507472ac373437d045892fa153261f972314861195be38d5ea39cec116b8c",
+      "pass": true
+    },
+    {
+      "path": "/research/sister",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/sister",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/sister"
+      ],
+      "sha256": "f56fdbf91a6d41a4cf8c78cfa8b93841b097b1b61a30a09473be1148d18255b7",
+      "pass": true
+    },
+    {
+      "path": "/research/special-projects",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/special-projects",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/special-projects"
+      ],
+      "sha256": "8bd3656c7593ad8f620d5709d21fae6c8e47cf48fe1939b2c174570e923e7e74",
+      "pass": true
+    },
+    {
+      "path": "/research/standards",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/research/standards",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/research/standards"
+      ],
+      "sha256": "f02776ca6aa231c2f99a66f2a00331b874da81e94fa8ab37afa94a9e54310c86",
+      "pass": true
+    },
+    {
+      "path": "/search",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/search",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/search"
+      ],
+      "sha256": "11bcbf4675ca02dbfa4371d46682567508e7be0400dd80e1ac2416ff0fd7dccb",
+      "pass": true
+    },
+    {
+      "path": "/signin",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/signin",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/signin"
+      ],
+      "sha256": "9dd52c33baf84d00ff1c5874b44ce309ef30e368f9558a9cfa321540c91ee5d3",
+      "pass": true
+    },
+    {
+      "path": "/studio",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/studio",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/studio"
+      ],
+      "sha256": "238d9089aca0ab29efb7598f3df55dc268b3286ce3c6cd17b4b28ea7925bd745",
+      "pass": true
+    },
+    {
+      "path": "/studio/data",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/studio/data",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/studio/data"
+      ],
+      "sha256": "59fc1797a5b11152ec0df0b1bea277c1b29afd5cef6682015a4e9efb403d8a0b",
+      "pass": true
+    },
+    {
+      "path": "/studio/fintech",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/studio/fintech",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/studio/fintech"
+      ],
+      "sha256": "9a60b975de128d5de10ea41e0e4a8cdbdc6558fd39aeea5d7eb8a6e62a804007",
+      "pass": true
+    },
+    {
+      "path": "/studio/research-engineering",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/studio/research-engineering",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/studio/research-engineering"
+      ],
+      "sha256": "687ee28c96f707e82c1d5b2c6347cf7b50296d3bf6137d32551645cf9eb887fa",
+      "pass": true
+    },
+    {
+      "path": "/studio/visualization",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/studio/visualization",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/studio/visualization"
+      ],
+      "sha256": "8553ea1d284370288a2a46057d0290084d239b11274f2db314de390a27d7021b",
+      "pass": true
+    },
+    {
+      "path": "/studio/zenipath",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/studio/zenipath",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/studio/zenipath"
+      ],
+      "sha256": "93dcefa31f46a10f7fd2a5794ac4b750c6299d50c415e497079add4e31bf6e34",
+      "pass": true
+    },
+    {
+      "path": "/union",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/union",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/union"
+      ],
+      "sha256": "83aa4351a2f739ae9668dd6aead371207c047d6adae3271676572864980cdad2",
+      "pass": true
+    },
+    {
+      "path": "/ventures",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/ventures",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/ventures"
+      ],
+      "sha256": "d7eccf850b031f40ee762c039bdee5382a7040742ef88d6971f4329590b3b48f",
+      "pass": true
+    },
+    {
+      "path": "/ventures/axiom-pathways",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/ventures/axiom-pathways",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/ventures/axiom-pathways"
+      ],
+      "sha256": "4dc473d253dbfc07264d89ac32af57f82c244a8e041bbaccbbbc8763e013c85b",
+      "pass": true
+    },
+    {
+      "path": "/ventures/founder-network",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/ventures/founder-network",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/ventures/founder-network"
+      ],
+      "sha256": "97e95848693f2d4655a9cc10d96a65e329d0c7dc2f5970d53af1219d7df058be",
+      "pass": true
+    },
+    {
+      "path": "/ventures/startup-diligence",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/ventures/startup-diligence",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/ventures/startup-diligence"
+      ],
+      "sha256": "30f1cb5a4d952aad79f4aa8e2abd4858bf59ec1c4dfb44c5bac4c809c35da0cf",
+      "pass": true
+    },
+    {
+      "path": "/ventures/venture-research",
+      "status": 200,
+      "final_url": "https://finance-meta-landing.vercel.app/ventures/venture-research",
+      "h1_count": 1,
+      "canonical": [
+        "https://finance-meta-landing.vercel.app/ventures/venture-research"
+      ],
+      "sha256": "97496429371844d98393fcea07a4ca2004e37e68deb415192b098666c89cc6a3",
+      "pass": true
+    }
+  ],
+  "revision_stable": true
+}

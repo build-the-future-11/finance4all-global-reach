@@ -1,6 +1,6 @@
 # Member portal deployment
 
-Current decision (11 October 2026): **NO-GO for unrestricted onboarding.** Keep Draft PR #162 unpromoted while canonical live database, controlled-account, policy and operating gates are blocked. The candidate includes 17 migrations; passing disposable CI is not permission to apply them to production. See [readiness](docs/PRODUCTION_READINESS.md) and [publication/abuse rollout](docs/PUBLICATION_AND_ABUSE_CONTROLS.md).
+Current decision (19 November 2026): **NO-GO for unrestricted onboarding.** Keep Draft PR #183 unpromoted while canonical live database, controlled-account, policy and operating gates are blocked. The candidate includes 19 migrations; passing disposable CI is not permission to apply them to production. See [readiness](docs/PRODUCTION_READINESS.md) and [publication/abuse rollout](docs/PUBLICATION_AND_ABUSE_CONTROLS.md).
 
 This is a **Vite** app. All client env vars must use the `VITE_` prefix so they are exposed at build time. Do **not** use `NEXT_PUBLIC_`.
 
@@ -17,7 +17,7 @@ Before treating a Vercel deployment as production-ready, verify all of the follo
 - `VITE_SUPABASE_PUBLISHABLE_KEY` is present and uses the browser-safe `sb_publishable_...` format.
 - The variables are enabled for **Production and Preview** (and Development if Vercel development environments are used).
 - The deployment was rebuilt after any environment-variable change.
-- The live ledger and schema match every migration at the exact candidate revision, including the two October publication/abuse migrations. Verify before applying anything.
+- The live ledger and schema match every migration at the exact candidate revision, including publication/abuse controls, the public event catalog, and member-directory consent. Verify before applying anything.
 - Google OAuth redirect URLs match the deployed production and preview domains.
 
 If a Vercel deployment starts failing after the fail-closed configuration gate was introduced, check the build log for `validate-public-env` output first. Do not weaken or bypass the validator to make a deployment green.
@@ -121,6 +121,8 @@ Required migration order:
 15. `supabase/migrations/20260924160333_project_collaboration.sql` (membership, tasks and private evidence workflow)
 16. `supabase/migrations/20261011090000_member_abuse_budgets.sql` (atomic committed-activity budgets and metered export)
 17. `supabase/migrations/20261011091000_reviewed_publication.sql` (draft-by-default publication, review audit and dependent-write gates)
+18. `supabase/migrations/20261016093000_public_event_catalog.sql` (explicit public-event discovery, chapter evidence fields, and fail-closed registration windows)
+19. `supabase/migrations/20261016094000_member_directory_consent.sql` (opt-in member discovery; existing profiles remain hidden by default)
 
 The recovered migrations were traced to commit `9539faadecc5d5c564b33e7610e02cbe1789f97c` and matched against the live schema before being restored. See `docs/PRODUCTION_SCHEMA_RECONCILIATION.md` for the observed production state and the remaining ledger-repair boundary.
 
@@ -206,7 +208,7 @@ For each production release, retain a compact record containing:
 - Git commit SHA;
 - Vercel deployment URL and successful build result;
 - environment-contract validation result (never the secret/public-key value itself);
-- complete migration ledger/schema equality at the candidate revision (17 migration files in this candidate);
+- complete migration ledger/schema equality at the candidate revision (19 migration files in this candidate);
 - auth/onboarding/protected-route smoke-test result;
 - ordinary-member authorization test result;
 - known failures or exceptions and their owner.

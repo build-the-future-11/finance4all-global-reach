@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowUpRight, MapPin, Plus, UserRound } from "lucide-react";
 import { useAuth } from "@/contexts/useAuth";
@@ -39,7 +39,11 @@ import { useChapters } from "@/hooks/portal/useEvents";
 export default function Networking() {
   useDocumentTitle("Network");
   const { profile } = useAuth();
-  const { data: members, isLoading, error, refetch } = useMemberProfiles();
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [collaboratorsOnly, setCollaboratorsOnly] = useState(false);
+  useEffect(() => { const timer = setTimeout(() => setDebouncedSearch(search), 250); return () => clearTimeout(timer); }, [search]);
+  const { data: members, isLoading, error, refetch } = useMemberProfiles(debouncedSearch, collaboratorsOnly);
   const { data: connections } = useConnectionRequests();
   const { data: introductions } = useIntroductionPosts();
   const { data: chapters } = useChapters();
@@ -50,8 +54,7 @@ export default function Networking() {
   const [introOpen, setIntroOpen] = useState(false);
   const [headline, setHeadline] = useState("");
   const [lookingFor, setLookingFor] = useState("");
-  const [search, setSearch] = useState("");
-  const [collaboratorsOnly, setCollaboratorsOnly] = useState(false);
+
 
   const handleRespond = async (connectionId: string, status: "accepted" | "declined") => {
     try {
@@ -105,6 +108,7 @@ export default function Networking() {
         if (!q) return true;
         return (
           m.displayName.toLowerCase().includes(q) ||
+          (m.bio ?? "").toLowerCase().includes(q) ||
           m.interests.some((i) => i.toLowerCase().includes(q))
         );
       }) ?? []
@@ -163,8 +167,8 @@ export default function Networking() {
 
       <PortalCard className="mb-8 flex flex-col justify-between gap-5 p-5 sm:flex-row sm:items-center">
         <div>
-          <Label htmlFor="network-profile-visibility" className="font-medium text-foreground">Make your profile useful</Label>
-          <p id="network-profile-visibility-description" className="portal-muted mt-1 text-sm">Add a bio and interests in Settings, then choose whether you are open to collaboration.</p>
+          <Label htmlFor="network-profile-visibility" className="font-medium text-foreground">Open to collaboration</Label>
+          <p id="network-profile-visibility-description" className="portal-muted mt-1 text-sm">Choose whether to appear in the member directory in Settings. Collaboration availability is a separate preference.</p>
         </div>
         <div className="flex items-center gap-4"><Link to={portalRoutes.settings} className="inline-flex items-center gap-1 text-sm font-semibold text-emerald-500">Edit profile <ArrowUpRight className="h-3.5 w-3.5" /></Link><Switch
           id="network-profile-visibility"
@@ -227,6 +231,7 @@ export default function Networking() {
       <section>
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-lg font-semibold text-white">Members</h2>
+          <p className="text-sm text-muted-foreground">Up to 60 matching profiles shared by their owners. Refine your search to find more.</p>
           <div className="flex flex-wrap items-center gap-3">
             <Input
               aria-label="Search members"

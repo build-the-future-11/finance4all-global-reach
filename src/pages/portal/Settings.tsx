@@ -47,6 +47,7 @@ export default function Settings() {
   const [bio, setBio] = useState(profile?.bio ?? "");
   const [interests, setInterests] = useState<string[]>(profile?.interests ?? []);
   const [openToCollaborate, setOpenToCollaborate] = useState(profile?.openToCollaborate ?? false);
+  const [directoryVisible, setDirectoryVisible] = useState(profile?.directoryVisible ?? false);
   const [chapterId, setChapterId] = useState(profile?.chapterId ?? "");
   const [deletionReason, setDeletionReason] = useState("");
 
@@ -69,6 +70,7 @@ export default function Settings() {
         bio: bio.trim(),
         interests,
         openToCollaborate,
+        directoryVisible,
         chapterId: chapterId || undefined,
       });
       if (error) throw new Error(error);
@@ -198,13 +200,17 @@ export default function Settings() {
                 </Select>
               </div>
             )}
+            <div className="flex items-center justify-between gap-4 rounded-xl border border-border p-4">
+              <div><Label htmlFor="settings-directory-visible">Share my profile in the member directory</Label><p id="directory-consent-description" className="mt-2 text-sm text-muted-foreground">Off by default. When enabled, signed-in members can discover your display name, bio, avatar, interests and chapter. Your email is never included. Turn this off to remove your profile from discovery; previously shared contributions and connection messages remain.</p></div>
+              <Switch id="settings-directory-visible" checked={directoryVisible} onCheckedChange={setDirectoryVisible} aria-describedby="directory-consent-description" />
+            </div>
             <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/3 p-4">
               <div>
                 <Label htmlFor="settings-open-to-collaborate" className="text-sm font-medium text-white">
                   Open to collaborate
                 </Label>
                 <p id="settings-open-to-collaborate-description" className="text-xs text-white/45">
-                  Shown on your public profile
+                  Shown to signed-in members when you opt into the directory
                 </p>
               </div>
               <Switch

@@ -149,11 +149,11 @@ test('database authorization digest-pins and records the resolved Postgres servi
   assert.notEqual(end, -1, 'CI must declare the verify job');
   const databaseAuthorization = source.slice(start, end);
 
-  const digestRef = /public\.ecr\.aws\/supabase\/postgres@sha256:[0-9a-f]{64}/i;
-  assert.match(databaseAuthorization, /EXPECTED_POSTGRES_IMAGE_REF:\s*public\.ecr\.aws\/supabase\/postgres@sha256:[0-9a-f]{64}/i);
-  assert.match(databaseAuthorization, /image:\s*public\.ecr\.aws\/supabase\/postgres@sha256:[0-9a-f]{64}/i);
+  const digestRef = /ghcr\.io\/supabase\/postgres@sha256:[0-9a-f]{64}/i;
+  assert.match(databaseAuthorization, /EXPECTED_POSTGRES_IMAGE_REF:\s*ghcr\.io\/supabase\/postgres@sha256:[0-9a-f]{64}/i);
+  assert.match(databaseAuthorization, /image:\s*ghcr\.io\/supabase\/postgres@sha256:[0-9a-f]{64}/i);
   assert.ok((databaseAuthorization.match(new RegExp(digestRef.source, 'gi')) ?? []).length >= 2);
-  assert.doesNotMatch(databaseAuthorization, /image:\s*public\.ecr\.aws\/supabase\/postgres:[^@\s]+/i);
+  assert.doesNotMatch(databaseAuthorization, /image:\s*ghcr\.io\/supabase\/postgres:[^@\s]+/i);
   assert.match(databaseAuthorization, /name: Record resolved database service image/);
   assert.match(databaseAuthorization, /docker inspect --format '\{\{\.Image\}\}'/);
   assert.match(databaseAuthorization, /docker image inspect "\$image_id" --format '\{\{json \.RepoDigests\}\}'/);
