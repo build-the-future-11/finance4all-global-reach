@@ -1,0 +1,121 @@
+{
+  "schema": "public-qa-landing-source-binding-v1",
+  "recorded_at_utc": "2026-11-19T11:41:45.372598+00:00",
+  "landing_repository": "build-the-future-11/FinanceMeta-Landing",
+  "landing_revision": "409215132495499dfb3383b3caf6b3bc1e2c915a",
+  "source_tree_untruncated": true,
+  "source_files": [
+    {
+      "path": "src/content/editorial-index.json",
+      "git_blob": "0797b50d2925aae7b1e3ac4b7fc9996a7b0ae684",
+      "sha256": "c5d22a5d4202df7c86d6bf72ae81ee4844da1f07eef8374348f7b92f94ee75ce",
+      "utf8_bytes": 4359
+    },
+    {
+      "path": "src/content/learning.ts",
+      "git_blob": "4b72bca3737778d1680a3f3d519799fd1ade7213",
+      "sha256": "78240d9946c0280ef9fa279464121aab1de9a745cf20613478fa0453a7a96973",
+      "utf8_bytes": 2303
+    },
+    {
+      "path": "src/content/legacy-catalog.ts",
+      "git_blob": "bc104bfd2a055a0a5469efe3e26d27701a569847",
+      "sha256": "eeda4589fee89a6f99a957f592df00136e23838c8147ac6e8602754ad92c2374",
+      "utf8_bytes": 8500
+    },
+    {
+      "path": "src/content/models.ts",
+      "git_blob": "5423898236a796052efc77177b750919e6da0936",
+      "sha256": "6cb5ce606c087e72c3b009e7f14d6dee0d0fd0833c7b60d00163d34cb9f9e1ee",
+      "utf8_bytes": 4218
+    },
+    {
+      "path": "src/content/network-routes.ts",
+      "git_blob": "40316f8bd3add7c63f99903928da14332707dcb5",
+      "sha256": "d80769b12df9e58f4ed57e589dd3762b851977ac85df08a1d674994f4ec9e41d",
+      "utf8_bytes": 6239
+    },
+    {
+      "path": "src/content/programs.ts",
+      "git_blob": "5fe37c1e3b55870434f588cf984dcbfef2cfad74",
+      "sha256": "502f1f0abdff7f65fffbcb04f1a91a5c7e5eed64c295da43236e38f3cd142e65",
+      "utf8_bytes": 22279
+    },
+    {
+      "path": "src/content/research.ts",
+      "git_blob": "47d6290787d2940a79924f00f26a2e8ff0097485",
+      "sha256": "feb84fba378edac81912c049355d7ce272ca81a879eae5c7a3221305d2b21345",
+      "utf8_bytes": 16129
+    },
+    {
+      "path": "src/routes.ts",
+      "git_blob": "90e6d43cc5ab0a82b2675e6ee68944dfcfa49872",
+      "sha256": "ac0a4d4bdf00055c1d6bbd1dece6f9be52bca0e253fcf950548a2dc9ad85b462",
+      "utf8_bytes": 9633
+    }
+  ],
+  "derivation": {
+    "node": "24.22.3",
+    "method": "Verify all eight complete Git blob identities against the immutable source tree; use node:module stripTypeScriptTypes on the seven TypeScript modules, resolve their local ESM imports, import the JSON catalog with type json, and read the actual exported routes array; sort path strings and reject duplicates. No route path is inferred from prose.",
+    "route_count": 203,
+    "inventory_sha256": "fa5c2e0c09f9e220b4c1db62d6114aea5693bd6c94f0e79f5452ac66d29d211a",
+    "new_paths_vs_142_175": [
+      "/challenges/prepare",
+      "/events/backtest-falsification-challenge",
+      "/events/calendar",
+      "/events/finance4-impact-pilots",
+      "/events/fintech-studio-buildathon",
+      "/events/investment-model-challenge-2026",
+      "/events/iyern-global-research-challenge",
+      "/events/open-markets-challenge-001",
+      "/events/quant-arena-2026",
+      "/programs/axiom-pathways",
+      "/programs/backtest-falsification",
+      "/programs/chapters",
+      "/programs/debriefed-contributors",
+      "/programs/editorial-reviewers",
+      "/programs/finance-meta-labs",
+      "/programs/finance4-impact",
+      "/programs/financial-foundations",
+      "/programs/financial-systems-policy",
+      "/programs/fintech-studio",
+      "/programs/global-research-challenge",
+      "/programs/investment-model-challenge",
+      "/programs/iyer-journal",
+      "/programs/mentors-and-leadership",
+      "/programs/methods-reproducibility",
+      "/programs/open-markets",
+      "/programs/preprint-forum",
+      "/programs/quantitative-markets",
+      "/programs/queued-directions",
+      "/programs/research-fellowship",
+      "/programs/student-research",
+      "/programs/union-collaborations"
+    ],
+    "removed_paths_vs_142_175": [],
+    "new_paths_vs_183": [
+      "/challenges/prepare"
+    ],
+    "removed_paths_vs_183": []
+  },
+  "live_revision_evidence": {
+    "production_health_run": "https://github.com/build-the-future-11/FinanceMeta-Landing/actions/runs/44512810876",
+    "job": 135521089683,
+    "verified_at_utc": "2026-11-19T11:13:40.1529262Z",
+    "served_revision": "409215132495499dfb3383b3caf6b3bc1e2c915a",
+    "release_check": "https://github.com/build-the-future-11/FinanceMeta-Landing/actions/runs/44512811341",
+    "qualification": "The exact production-health log records old revision on the first probe, then exact current merged revision on the second; all14 deterministic health contracts and public contract pass. This source binding and observed health result do not substitute for fresh portal public browser/performance checks."
+  },
+  "unchanged_gates": [
+    "Before and after public revision assertions",
+    "Canonical URL, HTTP, H1, runtime error, responsive overflow and Axe assertions",
+    "Constrained mobile performance budgets",
+    "Production audit, typecheck, unit, database authorization, browser and build workflows"
+  ],
+  "not_authorized_by_this_record": [
+    "Live database migrations or account writes",
+    "Portal member activation or production acceptance",
+    "EFRA proposal or scientific adoption",
+    "External outreach or form publication"
+  ]
+}

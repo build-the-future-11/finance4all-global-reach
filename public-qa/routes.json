@@ -1,6 +1,6 @@
 {
   "origin": "https://finance-meta-landing.vercel.app",
-  "revision": "0794d6664942eff02a8d6fc3a048a67c1910e061",
+  "revision": "409215132495499dfb3383b3caf6b3bc1e2c915a",
   "paths": [
     "/",
     "/about",
@@ -14,6 +14,7 @@
     "/challenges/essay-prize",
     "/challenges/global-research-challenge",
     "/challenges/investment-case",
+    "/challenges/prepare",
     "/events",
     "/events/backtest-falsification-challenge",
     "/events/calendar",

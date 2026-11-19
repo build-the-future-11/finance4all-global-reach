@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, expect, it, vi } from "vitest";
 import EditorialDraftImport from "@/components/portal/EditorialDraftImport";
@@ -46,5 +46,49 @@ it("stops an account switch before insertion", async () => {
   state.sessionUser = "other-admin";
   mount(); await chooseDraft(); fireEvent.click(screen.getByText("Import as unpublished draft"));
   await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("account changed"));
+  expect(state.insert).not.toHaveBeenCalled();
+});
+
+function deferredText() {
+  let resolve!: (value: string) => void;
+  let reject!: (reason: Error) => void;
+  const promise = new Promise<string>((accept, fail) => { resolve = accept; reject = fail; });
+  return { promise, resolve, reject };
+}
+
+it("keeps the latest selected draft when an older file finishes reading later", async () => {
+  mount();
+  const oldRead = deferredText();
+  const input = screen.getByLabelText(/Draft package/);
+  fireEvent.change(input, { target: { files: [{ size: 2000, text: () => oldRead.promise }] } });
+  const newer = { ...draft, article: { ...draft.article, slug: "newer-draft", title: "Newer selected draft" } };
+  fireEvent.change(input, { target: { files: [{ size: 2000, text: async () => JSON.stringify(newer) }] } });
+  await waitFor(() => expect(screen.getByText("Newer selected draft")).toBeInTheDocument());
+  await act(async () => { oldRead.resolve(JSON.stringify(draft)); await oldRead.promise; });
+  expect(screen.getByText("Newer selected draft")).toBeInTheDocument();
+  expect(screen.queryByText("Example draft")).not.toBeInTheDocument();
+  state.response = { id: "newer-id", slug: "newer-draft", publication_state: "draft", publication_revision: 0 };
+  fireEvent.click(screen.getByText("Import as unpublished draft"));
+  await waitFor(() => expect(state.insert).toHaveBeenCalledWith(newer.article));
+});
+
+it("ignores an old file read failure after a newer valid draft is selected", async () => {
+  mount();
+  const oldRead = deferredText();
+  fireEvent.change(screen.getByLabelText(/Draft package/), { target: { files: [{ size: 2000, text: () => oldRead.promise }] } });
+  await chooseDraft();
+  await act(async () => { oldRead.reject(new Error("Old file read failed")); await oldRead.promise.catch(() => undefined); });
+  expect(screen.getByText("Example draft")).toBeInTheDocument();
+  expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+});
+
+it("does not restore a pending draft after the selection is cleared", async () => {
+  mount();
+  const oldRead = deferredText();
+  const input = screen.getByLabelText(/Draft package/);
+  fireEvent.change(input, { target: { files: [{ size: 2000, text: () => oldRead.promise }] } });
+  fireEvent.change(input, { target: { files: [] } });
+  await act(async () => { oldRead.resolve(JSON.stringify(draft)); await oldRead.promise; });
+  expect(screen.queryByText("Import as unpublished draft")).not.toBeInTheDocument();
   expect(state.insert).not.toHaveBeenCalled();
 });
