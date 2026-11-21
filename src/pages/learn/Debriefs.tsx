@@ -11,8 +11,8 @@ import "@/styles/landing.css";
 function Header() {
   return (
     <header className="public-editorial-header">
-      <Link to="/" className="app-gateway-brand" aria-label="Finance for All home">
-        <Brand />
+      <Link to="/" className="app-gateway-brand">
+        <Brand /><span className="sr-only"> home</span>
       </Link>
       <nav><Link to="/learn">Learning</Link><Link to="/login">Member sign in</Link><ThemeToggle /></nav>
     </header>
