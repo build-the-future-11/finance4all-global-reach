@@ -4,7 +4,9 @@ test("public claims stay inside the evidence boundary", async ({ page }) => {
   await page.goto("/");
 
   await expect(page.getByRole("heading", { name: /Money shapes\s*every life\.\s*Let's open it up\./i })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Finance for All home" })).toBeVisible();
+  const homeLink = page.getByRole("link", { name: "Finance for All Knowledge without barriers. home", exact: true });
+  await expect(homeLink).toBeVisible();
+  await expect(homeLink).toHaveAttribute("href", "/");
   await expect(page.getByRole("link", { name: "Start with a free lesson" })).toBeVisible();
   await expect(page.getByText(/No audience or impact totals are asserted/i)).toBeVisible();
   await expect(page.getByText(/not claims of investment performance/i)).toBeVisible();
